@@ -1,0 +1,48 @@
+version: '2'
+services:
+  mongo:
+    image: mongo
+    volumes:
+      - ./data:/data/db
+    # map port to be accessible from extern (dev-only)
+    ports:
+      - "27017:27017"
+    # Wrong direction of dependency on purpose, due to test the reconnect functionality of the backend
+    links:
+      - backend
+  backend-test:
+    build: ./backend-test
+    depends_on:
+      - backend
+    volumes:
+      - ./backend:/app
+  backend:
+    build: ./backend
+    volumes:
+      - ./backend:/app
+    ports:
+      - "8081:8081"
+  web:
+    build: ./frontend
+    #image: ebiven/vue-cli
+    #command: bash -c "cd /code && npm install && npm run build"
+    # development server (without production server)
+    #command: npm run dev
+    # production version (with production-server)
+    #command: npm run build
+    depends_on:
+      - backend
+    volumes:
+      - ./frontend:/code
+    # development server (without production server)
+    #ports:
+    #   - 9090:9090
+  # Testing dist on a "real" webserver
+  production-server:
+    image: nginx:stable-alpine
+    depends_on:
+      - web
+    volumes:
+      - ./frontend/dist:/usr/share/nginx/html
+    ports:
+      - 8080:80

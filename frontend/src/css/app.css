@@ -1,0 +1,396 @@
+/*
+* Author: is058
+* Editor: sublime text;
+*/
+
+@import url('https://fonts.googleapis.com/css?family=Roboto+Condensed');
+/* imports the font family Roboto Condensed from google fonts which is the main font family of the app */
+
+/*
+* ---------------------------
+* BEGIN EMOTIONS PAGE COLORS
+* ---------------------------
+*/
+
+#emotions #wuetend{
+    background-color: #d40000;
+    color: #000;
+}
+
+#emotions #angewidert{
+    background-color: #de00de;
+    color: #000;
+}
+
+#emotions #betruebt{
+    background-color: #0000c8;
+    color: #fff;
+}
+
+#emotions #erstaunt{
+    background-color: #0089e0;
+    color: #000;
+}
+
+#emotions #erschrocken{
+    background-color: #008000;
+    color: #000;
+}
+
+#emotions #bewundernd{
+    background-color: #00b400;
+    color: #000;
+}
+
+#emotions #begeistert{
+    background-color: #ffe854;
+    color: #000;
+}
+
+#emotions #achtsam{
+    background-color: #ff7d00;
+    color: #000;
+}
+
+#emotions #bereit{
+    background-color: #ffa854;
+    color: #000;
+}
+
+#emotions #neugierig{
+    background-color: #ffc48c;
+    color: #000;
+}
+
+#emotions #froh{
+    background-color: #ffff54;
+    color: #000;
+}
+
+#emotions #gelassen{
+    background-color: #ffffb1;
+    color: #000;
+}
+
+#emotions #vertrauend{
+    background-color: #54ff54;
+    color: #000;
+}
+
+#emotions #akzeptierend{
+    background-color: #8cff8c;
+    color: #000;
+}
+
+#emotions #aengstlich{
+    background-color: #009600;
+    color: #000;
+}
+
+#emotions #besorgt{
+    background-color: #8cc68c;
+    color: #000;
+}
+
+#emotions #ueberrascht{
+    background-color: #59bdff;
+    color: #000;
+}
+
+#emotions #verwirrt{
+    background-color: #a5dbff;
+    color: #000;
+}
+
+#emotions #traurig{
+    background-color: #5151ff;
+    color: #000;
+}
+
+#emotions #nachdenklich{
+    background-color: #8a8afc;
+    color: #000;
+}
+
+#emotions #ablehnend{
+    background-color: #ff54ff;
+    color: #000;
+}
+
+#emotions #gelangweilt{
+    background-color: #ffc6ff;
+    color: #000;
+}
+
+#emotions #veraergert{
+    background-color: #ff0000;
+    color: #000;
+}
+
+#emotions #gereizt{
+    background-color: #ff8c8c;
+    color: #000;
+}
+
+#emotions #gereizt{
+    background-color: #ff8c8c;
+    color: #000;
+}
+
+/*
+*---------------------------
+*END EMOTIONS PAGE COLORS
+*
+*
+*BEGIN EMOTIONS POPUP
+*---------------------------
+*/
+
+.popover {
+    width: 200px;
+}
+
+/*
+*---------------------------
+*END EMOTIONS POPUP
+*---------------------------
+* 
+*---------------------------------------------
+*BEGIN EMOTIONS STATISTIC AND GENEREL STYLES
+*---------------------------------------------
+*/
+
+#bar-chart{
+    margin-top: 0px;
+    max-height: 500px;
+    /* sets a final hight to the bar chart */
+}
+
+.list-block .item-title:hover{
+    cursor: pointer;
+    color: #333333;
+    /* sets the cursor behavior when hovering the item title */
+}
+
+
+.login-screen-title{ text-transform: uppercase; }
+
+body{ font-family: Roboto Condensed; /* sets a default font family for the app */ }
+
+hr{
+    width: 80%;
+    border-bottom: none;
+}
+
+.navbar, .subnavbar, .toolbar{
+    background: #00ad4e;
+    color: #ffffff;
+}
+
+.navbar-inner{
+    border-bottom: 2px solid #000000;
+}
+
+.button{
+    color: #00ad4e;
+    border: 1px solid #00ad4e;
+    /* defines what buttons should look like */
+}
+
+.list-block .list-button{ color: #00ad4e; }
+
+.navbar a, .navbar .icon-back, .navbar .icon-bars{ color: #ffffff; }
+
+.buttons { margin-top: 2rem; }
+
+.list-block {
+    margin-left: 1rem;
+    margin-right: 1rem;
+}
+
+.align-top { height: 100%; }
+
+.item-input textarea {
+    width: 100%;
+    height: 20rem;
+    font-size: 24px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+#launeButton {
+    position: fixed;
+    left: 5%;
+    bottom: 5%;
+    width: 90%;
+    /* defines the behavior of the emotion button */
+}
+
+/*
+*---------------------------
+*BEGIN MOODSLIDER STYLING
+*---------------------------
+*/
+
+.outerMoodslider {
+    /* defines what the outer box of the moodslider should look like */
+    position: absolute;
+    top: 5%;
+    left: 5%;
+    height: 85%;
+    width: 89%;
+    border: 2px solid #ccc;
+    overflow: hidden;
+    position: relative;
+    -moz-border-radius: 4px;
+    -webkit-border-radius: 4px;
+    border-radius: 4px;
+}
+
+.inner, .inner div {
+    width: 100%;
+    overflow: hidden;
+    left: -2px;
+    position: absolute;
+}
+
+.inner {
+    border: 2px solid #999;
+    border-top-width: 0;
+    background-image: linear-gradient(to top, red, orange, green);
+    /* defines the color gradient for the slider inside the moodslider and stretches it when the bar is pulled to the top */
+    -webkit-background-size: cover; /* For WebKit*/
+    -moz-background-size: cover;    /* Mozilla*/
+    -o-background-size: cover;      /* Opera*/
+    background-size: 100% 100%;         /* Generic*/
+    bottom: 0;
+    height: 40%;
+}
+
+.inner div {
+    border: 2px solid lightgray;
+    border-bottom-width: 0;
+    background-color: lightgray;
+    top: 0;
+    width: 100%;
+    height: 5px;
+}
+
+/*
+*---------------------------
+*END MOODSLIDER STYLING
+*---------------------------
+*/
+
+/* Shared */
+
+.loginBtn {
+    /* defines what the login button should look like */
+    box-sizing: border-box;
+    position: relative;
+    /* width: 13em;  - apply for fixed size */
+    margin: 0.2em;
+    padding: 0 15px 0 46px;
+    border: none;
+    text-align: left;
+    line-height: 34px;
+    white-space: nowrap;
+    border-radius: 0.2em;
+    font-size: 16px;
+    color: #FFF;
+}
+
+.loginBtn:before {
+    /* gives the login button a before pseudo element */
+    content: "";
+    box-sizing: border-box;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 34px;
+    height: 100%;
+}
+
+.loginBtn:focus { outline: none; }
+
+.loginBtn:active {
+    box-shadow: inset 0 0 0 32px rgba(0, 0, 0, 0.1);
+}
+
+.center{ text-align: center; }
+
+/*
+*---------------------------
+*BEGIN SPOTIFY STYLING
+*---------------------------
+*/
+
+.btn-primary, .btn-primary {
+    color: #fff;
+    background-color: #2ebd59;
+    border-color: #29a84f;
+}
+
+.btn-primary:active{
+    color: #fff;
+    background-color: #2ebd59;
+    box-shadow: none;
+}
+
+.btn:active{ outline: 0; }
+
+.btn-primary:hover, .btn-primary:focus{
+    color: #fff;
+    background-color: #1ed760;
+}
+
+.btn:hover {
+    text-decoration: none;
+}
+
+.btn:focus{
+    outline-offset: -2px;
+    text-decoration: none;
+}
+
+.btn:focus:focus {
+    outline: 0;
+}
+
+.btn {
+    /* additional definitions for buttons with btn class */
+    font-size: 18px;
+    line-height: 1.5;
+    border-radius: 500px;
+    -webkit-transition: background-color .15s ease,border-color .15s ease,color .15s ease;
+    -o-transition: background-color .15s ease,border-color .15s ease,color .15s ease;
+    transition: background-color .15s ease,border-color .15s ease,color .15s ease;
+    border-width: 0;
+    letter-spacing: 1.2px;
+    min-width: 130px;
+    text-transform: uppercase;
+    white-space: normal;
+    display: inline-block;
+    margin-bottom: 0;
+    font-weight: 600;
+    text-align: center;
+    vertical-align: middle;
+    cursor: pointer;
+    background-image: none;
+    border: 1px solid transparent;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+
+/*
+*---------------------------
+*END SPOTIFY STYLING
+*---------------------------
+*/
+
+.navbar a.icon-only, .subnavbar a.icon-only, .toolbar a.icon-only{
+    background-color: #ffffff !important;
+}

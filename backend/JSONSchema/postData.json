@@ -1,0 +1,37 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "id": "http://launometer.com/postData.json",
+  "type": "object",
+  "properties": {
+    "accessToken": {
+      "type": "string",
+      "minLength": 1
+    },
+    "authType": {
+      "type": "integer",
+    	"minimum": 0,
+      "maximum": 2
+    },
+    "payload":{
+      "type": "object",
+      "properties": {
+        "date":{
+        },
+        "mood":{
+          "type": "number"
+        },
+        "emotion":{
+          "type": "string"
+        },
+        "colour":{
+          "type": "string"
+        },
+        "text":{
+          "type": "string"
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false
+}

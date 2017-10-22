@@ -1,0 +1,10 @@
+/data/
+/frontend/dist/static/*
+
+node_modules/js-cookie/
+
+node_modules/vue-stash/
+
+node_modules/jwt-simple/
+
+frontend/npm-debug\.log

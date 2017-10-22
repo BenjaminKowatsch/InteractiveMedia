@@ -1,0 +1,17 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "id": "http://launometer.com/accessToken.json",
+  "type": "object",
+  "properties": {
+    "accessToken": {
+      "type": "string",
+      "minLength": 1
+    },
+    "authType": {
+      "type": "integer",
+    	"minimum": 0,
+      "maximum": 2
+    }
+  },
+  "additionalProperties": false
+}
