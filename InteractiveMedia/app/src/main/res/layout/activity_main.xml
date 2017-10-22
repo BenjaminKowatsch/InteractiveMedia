@@ -61,4 +61,19 @@
 
     </com.google.android.gms.common.SignInButton>
 
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/fb_status_text"
+        android:layout_marginTop="50dp"
+        android:text="Login Status"
+        android:textStyle="bold"
+        android:layout_gravity="center"
+        />
+    <com.facebook.login.widget.LoginButton
+        android:layout_height="wrap_content"
+        android:layout_width="wrap_content"
+        android:id="@+id/fb_login_bn"
+        android:layout_gravity="center"></com.facebook.login.widget.LoginButton>
+
 </LinearLayout>

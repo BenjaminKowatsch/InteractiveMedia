@@ -13,6 +13,12 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
+import com.facebook.CallbackManager;
+import com.facebook.FacebookCallback;
+import com.facebook.FacebookException;
+import com.facebook.FacebookSdk;
+import com.facebook.login.LoginResult;
+import com.facebook.login.widget.LoginButton;
 import com.google.android.gms.auth.api.Auth;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
@@ -33,10 +39,34 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private GoogleApiClient googleApiClient;
     private static final int REQ_CODE = 9001;
 
+    private LoginButton loginButton;
+    private TextView fbStatusText;
+    private CallbackManager callbackManager;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        loginButton =(LoginButton) findViewById(R.id.fb_login_bn);
+        fbStatusText = (TextView) findViewById(R.id.fb_status_text);
+        callbackManager = CallbackManager.Factory.create();
+        loginButton.registerCallback(callbackManager, new FacebookCallback<LoginResult>() {
+            @Override
+            public void onSuccess(LoginResult loginResult) {
+                fbStatusText.setText("Login Status success\n"+ loginResult.getAccessToken().getUserId()+ "\n UserToken: "+ loginResult.getAccessToken().getToken());
+            }
+
+            @Override
+            public void onCancel() {
+                fbStatusText.setText("Login Status cancelled");
+            }
+
+            @Override
+            public void onError(FacebookException error) {
+                fbStatusText.setText("Login Status error");
+
+            }
+        });
 
         profSection = (LinearLayout) findViewById(R.id.prof_section);
         signOut = (Button) findViewById(R.id.bn_logout);
@@ -123,6 +153,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             Log.i("MainActivity","correct requestCode received");
             GoogleSignInResult googleSignInResult = Auth.GoogleSignInApi.getSignInResultFromIntent(data);
             handleResult(googleSignInResult);
+        } else {
+            callbackManager.onActivityResult(requestCode,resultCode,data);
         }
     }
 }
