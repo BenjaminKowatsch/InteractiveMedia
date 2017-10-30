@@ -1,6 +1,7 @@
 ## Installation
 ### Windows
 * Voraussetzung: Virtualbox (Version >5), Vagrant(Verison >1.9) und SSH-fähiges Terminal (zB git-bash)
+* Terminal als Administrator öffnen
 * in Projektverzeichnis wechseln
 * VM starten: `vagrant up`
 * per SSH in VM einloggen: `vagrant ssh`
