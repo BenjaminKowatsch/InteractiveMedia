@@ -3,7 +3,7 @@ services:
   mongo:
     image: mongo
     volumes:
-      - ./data:/data/db
+      - /data:/data/db
     # map port to be accessible from extern (dev-only)
     ports:
       - "27017:27017"

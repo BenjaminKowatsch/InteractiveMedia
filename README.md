@@ -1,3 +1,15 @@
+## Installation
+### Windows
+* Voraussetzung: Virtualbox (Version >5), Vagrant(Verison >1.9) und SSH-fähiges Terminal (zB git-bash)
+* in Projektverzeichnis wechseln
+* VM starten: `vagrant up`
+* per SSH in VM einloggen: `vagrant ssh`
+* root Passwort zu beliebige, Passwort ändern: `sudo passwd`
+* als root User einloggen: `su - root`
+
+### Linux
+* data Ordner für mongodb erstellen: `mkdir -p /data`
+
 ## Ausführen der Android-Anwendung
 Damit der Google-SignIn funktioniert, muss zunächst für jede Developer-Maschine eine google-services.json erzeugt werden.
 Hierfür diesen Link besuchen https://developers.google.com/mobile/add?platform=android&cntapi=signin&cntapp=Default%20Demo%20App&cntpkg=com.media.interactive.cs3.hdm.interactivemedia&cnturl=https:%2F%2Fdevelopers.google.com%2Fidentity%2Fsign-in%2Fandroid%2Fstart%3Fconfigured%3Dtrue&cntlbl=Continue%20with%20Try%20Sign-In

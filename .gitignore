@@ -8,3 +8,5 @@ node_modules/vue-stash/
 node_modules/jwt-simple/
 
 frontend/npm-debug\.log
+
+.vagrant
