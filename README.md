@@ -6,6 +6,7 @@
 * per SSH in VM einloggen: `vagrant ssh`
 * root Passwort zu beliebige, Passwort ändern: `sudo passwd`
 * als root User einloggen: `su - root`
+* in das Projektverzeichnis wechseln: `cd /vagrant`
 
 ### Linux
 * data Ordner für mongodb erstellen: `mkdir -p /data`
