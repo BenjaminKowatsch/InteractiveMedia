@@ -1,0 +1,53 @@
+apply plugin: 'findbugs'
+apply plugin: 'checkstyle'
+
+// Define gradle task to execute findbugs
+task customFindbugs(type: FindBugs) {
+    ignoreFailures = true
+    group 'verification'
+    effort = "default"
+    reportLevel = "medium"
+    classes = files("$project.buildDir/intermediates/classes")
+    excludeFilter = file("$rootProject.rootDir/app/code_quality_tools/findbugs_exclude_filter.xml")
+
+    source = fileTree('src/main/java/')
+    classpath = files()
+    reports {
+        xml.enabled = false
+        html.enabled = true
+        html.destination "$project.buildDir/outputs/findbugs/findbugs-output.html"
+    }
+}
+
+// Define gradle task to execute checkstyle
+task checkstyle(type: Checkstyle) {
+    showViolations = true
+    group 'verification'
+    configFile file("${project.rootDir}/app/code_quality_tools/google_checks.xml")
+
+    source 'src/main/java'
+    include '**/*.java'
+    exclude '**/gen/**'
+    exclude '**/R.java'
+    exclude '**/BuildConfig.java'
+
+    reports {
+        showViolations = true
+        xml.enabled = false
+        html.enabled = true
+        html.destination "${project.buildDir}/outputs/checkstyle/google_checks-output.html"
+    }
+
+    // empty classpath
+    classpath = files()
+}
+
+checkstyle {
+    toolVersion '8.0'  // Set Checkstyle version here
+}
+
+// UPDATE: renamed the task to customFindbugs and made it automatically be called when build is called
+build.dependsOn customFindbugs
+
+preBuild.dependsOn('checkstyle')
+check.dependsOn('checkstyle')
