@@ -1,4 +1,12 @@
 <resources>
     <string name="app_name">InteractiveMedia</string>
+    <string name="app_tag">com.media.interactive.cs3.hdm.interactivemedia</string>
+    <string name="has_run">appHasRunBefore</string>
     <string name="facebook_app_id">1971379956470536</string>
+    <string name="title_activity_home">HomeActivity</string>
+
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+
+    <string name="action_settings">Settings</string>
 </resources>
