@@ -11,7 +11,7 @@ RUN mkdir -p /tmp/dependencies
 ADD ./package.json /tmp/dependencies
 
 # Enter directory and install node dependencies
-RUN cd /tmp/dependencies && npm install
+RUN cd /tmp/dependencies && npm install --no-bin-links
 
 # Copy the node_modules into the directory /code
 # Build the static frontend files
