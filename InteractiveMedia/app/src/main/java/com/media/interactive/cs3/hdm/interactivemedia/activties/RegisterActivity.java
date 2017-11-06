@@ -1,4 +1,4 @@
-package com.media.interactive.cs3.hdm.interactivemedia;
+package com.media.interactive.cs3.hdm.interactivemedia.activties;
 
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -6,6 +6,8 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
+
+import com.media.interactive.cs3.hdm.interactivemedia.R;
 
 public class RegisterActivity extends AppCompatActivity
         implements View.OnClickListener {

@@ -1,4 +1,4 @@
-package com.media.interactive.cs3.hdm.interactivemedia;
+package com.media.interactive.cs3.hdm.interactivemedia.activties;
 
 import android.content.Intent;
 import android.support.annotation.NonNull;
@@ -28,6 +28,7 @@ import com.google.android.gms.common.SignInButton;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.common.api.Status;
+import com.media.interactive.cs3.hdm.interactivemedia.R;
 import com.media.interactive.cs3.hdm.interactivemedia.data.Hash;
 import com.media.interactive.cs3.hdm.interactivemedia.data.User;
 

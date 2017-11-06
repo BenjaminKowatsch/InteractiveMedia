@@ -1,4 +1,4 @@
-package com.media.interactive.cs3.hdm.interactivemedia;
+package com.media.interactive.cs3.hdm.interactivemedia.activties;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 
+import com.media.interactive.cs3.hdm.interactivemedia.R;
 import com.media.interactive.cs3.hdm.interactivemedia.data.DatabaseHelper;
 import com.media.interactive.cs3.hdm.interactivemedia.data.Hash;
 import com.media.interactive.cs3.hdm.interactivemedia.data.User;
@@ -23,7 +24,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         databaseHelper = new DatabaseHelper(this);
 
-        /*
+
         databaseHelper.deleteAllUsers();
         databaseHelper.resetDatabase();
 
@@ -31,9 +32,8 @@ public class MainActivity extends AppCompatActivity {
         testUser.setUsername("Test User");
         testUser.setEmail("user.test@gmail.com");
         testUser.setHashedPassword(Hash.hashStringSHA256("Passwort1234"));
-        databaseHelper.insertUser(testUser);
         databaseHelper.deleteAllUsers();
-        */
+
 
         User.getInstance().clear();
 
