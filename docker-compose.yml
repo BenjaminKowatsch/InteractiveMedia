@@ -22,27 +22,9 @@ services:
       - ./backend:/app
     ports:
       - "8081:8081"
-  web:
+  production-server:
     build: ./frontend
-    #image: ebiven/vue-cli
-    #command: bash -c "cd /code && npm install && npm run build"
-    # development server (without production server)
-    #command: npm run dev
-    # production version (with production-server)
-    #command: npm run build
     depends_on:
       - backend
-    volumes:
-      - ./frontend:/code
-    # development server (without production server)
-    #ports:
-    #   - 9090:9090
-  # Testing dist on a "real" webserver
-  production-server:
-    image: nginx:stable-alpine
-    depends_on:
-      - web
-    volumes:
-      - ./frontend/dist:/usr/share/nginx/html
     ports:
       - 8088:80
