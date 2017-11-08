@@ -18,8 +18,7 @@ services:
       - ./backend:/app
   backend:
     build: ./backend
-    volumes:
-      - ./backend:/app
+    image: localhost:5000/backend
     ports:
       - "8081:8081"
   production-server:

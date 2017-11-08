@@ -14,5 +14,8 @@ ADD ./package.json /tmp/dependencies
 RUN cd /tmp/dependencies && npm install --no-bin-links
 
 # Copy the node_modules into the directory /app
-# Build the static frontend files
-CMD cp -a /tmp/dependencies/node_modules /app/ && cd /app/ && node index.js
+RUN cp -a /tmp/dependencies/node_modules /app/
+
+ADD . /app
+
+CMD ["node", "index.js"]
