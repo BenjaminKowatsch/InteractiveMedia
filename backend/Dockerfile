@@ -16,6 +16,8 @@ RUN cd /tmp/dependencies && npm install --no-bin-links
 # Copy the node_modules into the directory /app
 RUN cp -a /tmp/dependencies/node_modules /app/
 
+# Copy current directory including source code
 ADD . /app
 
+# Start and initialize backend
 CMD ["node", "index.js"]
