@@ -1,6 +1,5 @@
 FROM ebiven/vue-cli
 
-
 # Install nginx
 RUN apt-get update
 RUN apt-get install -y nginx
@@ -19,14 +18,25 @@ ADD ./package.json /tmp/dependencies
 # Enter directory and install node dependencies
 RUN cd /tmp/dependencies && npm install --no-bin-links
 
+# Copy the node_modules into the directory /code
+RUN cp -a /tmp/dependencies/node_modules /code/
+
 # Add current directory into container
 ADD . /code
 
+# Build the static frontend files
+RUN cd /code/ && npm run build
+
+# Copy the generated static files into nginx document root
+RUN cp -a /code/dist/. /var/www/html/
+
+# Remove the default Nginx configuration file
+RUN rm -v /etc/nginx/nginx.conf
+
+# Copy a configuration file from the current directory
+ADD nginx.conf /etc/nginx/
+
+# Expos port
 EXPOSE 80
 
-# Copy the node_modules into the directory /code
-# Build the static frontend files
-CMD cp -a /tmp/dependencies/node_modules /code/ && \
-    cd /code/ && npm run build && \
-    cp -a /code/dist/. /var/www/html/ &&\
-    nginx -g "daemon off;" \
+CMD  nginx

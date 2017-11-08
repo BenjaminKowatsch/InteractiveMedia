@@ -23,6 +23,7 @@ services:
       - "8081:8081"
   production-server:
     build: ./frontend
+    image: localhost:5000/frontend
     depends_on:
       - backend
     ports:
