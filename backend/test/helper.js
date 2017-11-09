@@ -6,7 +6,7 @@ var user = require('../modules/user')
 var database = require('../modules/database')
 var emotionData = require('../modules/emotionData')
 var test = require('assert');
-var randomMongodbURL = config.mongodbTestURL + generateUUID();
+var randomMongodbURL = config.mongodbURL + generateUUID();
 
 
 
@@ -19,7 +19,7 @@ function up (callback) {
 
   database.tryConnect(randomMongodbURL, function () {
     console.log('Connection to database has been established');
-    
+
     collection = database.db.collection('test');
 
 
@@ -27,7 +27,7 @@ function up (callback) {
   }, function () {
     console.log('Not connected to database after maxRetries reached.');
   });
- 
+
 }
 
 
@@ -45,7 +45,7 @@ function onDatabaseConnected(collection){
   collection.remove({}).then(function () {
     console.log('Removed all documents from test');
   }).then(function(){
-       
+
     database.db.dropDatabase(function (err, result){
 
       test.equal(null, err);
@@ -54,10 +54,10 @@ function onDatabaseConnected(collection){
       setTimeout(function () {
         closeDBAndExit(0);
       }, 2000);
-      
+
     });
 
-   
+
   }).catch(function () {
     console.log('Error during Inserting default data');
     closeDBAndExit(1)
@@ -68,7 +68,7 @@ function onDatabaseConnected(collection){
 
 
 function closeDBAndExit(code){
- 
+
   database.db.close()
   process.exit(code) // End node js with code 0, which indicates a successful end
 }

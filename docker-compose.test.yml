@@ -1,0 +1,12 @@
+version: '2'
+services:
+  mongo-test:
+    image: mongo
+    volumes:
+      - /data:/data/db
+    links:
+      - backend-test
+  backend-test:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile.test

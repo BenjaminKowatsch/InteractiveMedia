@@ -3,6 +3,13 @@ FROM node:6-alpine
 # Set working directory
 WORKDIR /app
 
+ENV PORT 8081
+ENV MONGODB_URL "mongodb://mongo/launometer"
+ENV ORIGIN  "http://localhost:8080"
+ENV GOOGLE_OAUTH_CLIENT_ID "483987638756-eg6ba9fiqro5fne5taq9qciptbl6dlkr.apps.googleusercontent.com"
+ENV FACEBOOK_APP_TOKEN "783033221863758|K0XxUC6Dc7Q-wkoAhFC1681IOzU"
+ENV JWT_SIMPLE_SECRET "A3xFr93Yl2qTn5"
+
 # Create new directory /tmp/dependencies to install node dependencies
 # Will enable Docker to cache the data
 RUN mkdir -p /tmp/dependencies

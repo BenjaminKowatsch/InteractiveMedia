@@ -1,0 +1,19 @@
+FROM localhost:5000/backend
+
+# Set working directory
+WORKDIR /app
+
+ENV MONGODB_URL "mongodb://mongo-test/launometer"
+
+# Copy the test files
+COPY test /app/test
+
+# Override the NODE_ENV environment variable to 'dev', in order to get required test packages
+ENV NODE_ENV dev
+
+ADD ./package.json /app/
+
+# Get dev packages required to conduct tests
+RUN npm install --no-bin-links --only=dev
+
+CMD ["npm", "test"]

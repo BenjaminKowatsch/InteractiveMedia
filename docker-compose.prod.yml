@@ -10,18 +10,16 @@ services:
     # Wrong direction of dependency on purpose, due to test the reconnect functionality of the backend
     links:
       - backend
-  backend-test:
-    build: ./backend-test
-    depends_on:
-      - backend
-    volumes:
-      - ./backend:/app
   backend:
-    build: ./backend
+    build:
+      context: ./backend
+      dockerfile: Dockerfile.production
     image: localhost:5000/backend
+    # environment:
+    #   NODE_ENV: production
     ports:
       - "8081:8081"
-  production-server:
+  web-production:
     build: ./frontend
     image: localhost:5000/frontend
     depends_on:
