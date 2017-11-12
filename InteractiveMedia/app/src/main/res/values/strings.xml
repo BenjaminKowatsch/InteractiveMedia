@@ -3,6 +3,7 @@
     <string name="app_tag">com.media.interactive.cs3.hdm.interactivemedia</string>
     <string name="has_run">appHasRunBefore</string>
     <string name="facebook_app_id">1971379956470536</string>
+    <string name="server_client_id">908170470873-8151s7cvldroebdl7mcpg2houdgljgfg.apps.googleusercontent.com</string>
     <string name="title_activity_home">HomeActivity</string>
 
     <string name="navigation_drawer_open">Open navigation drawer</string>

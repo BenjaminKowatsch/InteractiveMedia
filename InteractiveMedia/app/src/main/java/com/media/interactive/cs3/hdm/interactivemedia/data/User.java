@@ -1,9 +1,22 @@
 package com.media.interactive.cs3.hdm.interactivemedia.data;
 
+import android.content.Context;
 import android.database.Cursor;
 import android.util.Log;
 
+import com.android.volley.Request;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonObjectRequest;
+import com.media.interactive.cs3.hdm.interactivemedia.R;
+import com.media.interactive.cs3.hdm.interactivemedia.RestRequestQueue;
+import com.media.interactive.cs3.hdm.interactivemedia.activties.LoginActivity;
+
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.util.ArrayList;
+
 
 import static com.bumptech.glide.gifdecoder.GifHeaderParser.TAG;
 
@@ -18,6 +31,8 @@ public class User {
     private String hashedPassword = null;
     private UserType userType;
     private DatabaseHelper databaseHelper;
+
+    private String accessToken = null;
 
     private static final User ourInstance = new User();
 
@@ -72,8 +87,52 @@ public class User {
         return userType;
     }
 
-    private void setUserType(UserType userType) {
+    public void setUserType(UserType userType) {
         this.userType = userType;
+    }
+
+
+    public void register(Context context){
+        final String url = context.getResources().getString(R.string.web_service_url).concat("/register");
+        Log.d(TAG,"url: "+ url);
+        final JSONObject data = new JSONObject();
+        try {
+            data.put("username", username);
+            data.put("password", hashedPassword);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        Log.d(TAG,"data: "+ data.toString());
+
+        final JsonObjectRequest jsObjRequest = new JsonObjectRequest
+                (Request.Method.POST, url, data, new Response.Listener<JSONObject>() {
+
+                    @Override
+                    public void onResponse(JSONObject response) {
+                        try {
+                            if(response.getBoolean("success")){
+                                final JSONObject payload = response.getJSONObject("payload");
+                                accessToken = payload.getString("accessToken");
+                                userType = UserType.values()[payload.getInt("authType")];
+                                Log.d(TAG,"Successfully registered and logged in with\naccessToken:"+accessToken+"\nuserType:"+userType+"\n");
+                            }else {
+                                Log.e(TAG,"Received an unsuccessful answer from backend during registration.");
+                            }
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                        Log.d(TAG,"Response: " + response.toString());
+                    }
+                }, new Response.ErrorListener() {
+
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        Log.d(TAG,"Error occurred. "+ error.getMessage());
+
+                    }
+                });
+
+        RestRequestQueue.getInstance(context).addToRequestQueue(jsObjRequest);
     }
 
     public void setDatabaseHelper(DatabaseHelper databaseHelper) {
@@ -97,6 +156,14 @@ public class User {
         }
         Log.d(TAG,"login: "+ result);
         return result;
+    }
+
+    public String getAccessToken() {
+        return accessToken;
+    }
+
+    public void setAccessToken(String accessToken) {
+        this.accessToken = accessToken;
     }
 
     @Override
