@@ -1,7 +1,55 @@
-FROM node:6-alpine
+#
+# ---- Base Node ----
+FROM node:6-alpine AS base
+
+# install tini
+RUN apk add --no-cache tini
 
 # Set working directory
 WORKDIR /app
+
+# Set tini as entrypoint
+ENTRYPOINT ["/sbin/tini", "--"]
+
+# copy project file
+COPY package.json .
+
+
+#
+# ---- Dependencies ----
+FROM base AS dependencies
+
+# disable progress bar to increase speed of npm install
+RUN npm set progress=false
+
+# npm granular control over what you see with recursive commands such as ls
+RUN npm config set depth 0
+
+# install only node packages required for production
+RUN npm install --only=production --no-bin-links
+
+# copy production node_modules aside
+RUN cp -R node_modules prod_node_modules
+
+# install ALL node_modules, including 'devDependencies'
+RUN npm install --no-bin-links
+
+
+#
+# ---- Unit tests and linters ----
+FROM dependencies AS test
+
+# add current folder
+COPY . .
+
+# RUN npm run lint
+# RUN npm run setup
+RUN npm run unit-test
+
+
+#
+# ---- Release ----
+FROM base AS release
 
 # Set environment variables
 ENV PORT 8081
@@ -11,30 +59,14 @@ ENV GOOGLE_OAUTH_CLIENT_ID "908170470873-8151s7cvldroebdl7mcpg2houdgljgfg.apps.g
 ENV FACEBOOK_APP_TOKEN "1971379956470536|hIQ5dRDon3DJq2YzH1NU41byB-w"
 ENV JWT_SIMPLE_SECRET "A3xFr93Yl2qTn5"
 
-# Create new directory /tmp/dependencies to install node dependencies
-# Will enable Docker to cache the data
-RUN mkdir -p /tmp/dependencies
+# copy production node_modules
+COPY --from=dependencies /app/prod_node_modules ./node_modules
 
-# Copy current package.json to /tmp/dependencies
-ADD ./package.json /tmp/dependencies
+# copy app sources
+COPY . .
 
-# Enter directory and install node dependencies
-RUN cd /tmp/dependencies &&\
-    npm install
-    #--no-bin-links &&\
-#    npm install --only=dev
+# expose port
+EXPOSE $PORT
 
-# Copy the node_modules into the directory /app
-RUN cp -a /tmp/dependencies/node_modules /app/
-
-# Copy current directory including source code
-ADD . /app
-
-# Run unit tests
-#RUN npm test
-
-# Delete dev dependencies
-#RUN npm prune --production
-
-# Start and initialize backend
-CMD ["node", "index.js"]
+# set starting point
+CMD npm run start

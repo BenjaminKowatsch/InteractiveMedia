@@ -1,6 +1,0 @@
-version: '2'
-services:
-  build-static-frontend:
-    build: ./frontend
-    volumes:
-      - ./frontend:/code

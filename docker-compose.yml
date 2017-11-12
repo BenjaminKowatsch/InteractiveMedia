@@ -1,0 +1,22 @@
+version: '2'
+services:
+  mongo:
+    image: mongo
+    volumes:
+      - /data:/data/db
+    ports:
+      - "27017:27017"
+  backend:
+    build: ./backend
+    image: localhost:5000/backend
+    ports:
+      - "8081:8081"
+    depends_on:
+      - mongo
+  web:
+    build: ./frontend
+    image: localhost:5000/frontend
+    ports:
+      - 8080:80
+    depends_on:
+      - backend
