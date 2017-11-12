@@ -13,16 +13,17 @@ services:
   backend:
     build:
       context: ./backend
-      dockerfile: Dockerfile.production
+      dockerfile: Dockerfile
     image: localhost:5000/backend
     # environment:
     #   NODE_ENV: production
     ports:
       - "8081:8081"
   web-production:
-    build: ./frontend
-    image: localhost:5000/frontend
+    image: nginx:stable-alpine
+    volumes:
+      - ./frontend/dist:/usr/share/nginx/html
+    ports:
+      - 8080:80
     depends_on:
       - backend
-    ports:
-      - 8088:80

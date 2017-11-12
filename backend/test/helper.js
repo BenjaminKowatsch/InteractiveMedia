@@ -1,10 +1,8 @@
-var helper = module.exports = {}
-
-
-var config = require('../modules/config')
-var user = require('../modules/user')
-var database = require('../modules/database')
-var emotionData = require('../modules/emotionData')
+var helper = module.exports = {};
+var config = require('../modules/config');
+var user = require('../modules/user');
+var database = require('../modules/database');
+var emotionData = require('../modules/emotionData');
 var test = require('assert');
 var randomMongodbURL = config.mongodbURL + generateUUID();
 
@@ -14,19 +12,17 @@ var randomMongodbURL = config.mongodbURL + generateUUID();
  * Build up method before each test
  * Creates database, inserts necessary data, ...
  */
-function up (callback) {
-  console.log("Build up unit tests");
+function up(callback) {
+  console.log('Build up unit tests');
 
   database.tryConnect(randomMongodbURL, function () {
-    console.log('Connection to database has been established');
-
-    collection = database.db.collection('test');
-
-
-     callback(collection);
-  }, function () {
-    console.log('Not connected to database after maxRetries reached.');
-  });
+        console.log('Connection to database has been established');
+        collection = database.db.collection('test');
+        callback(collection);
+      }, function () {
+        
+          console.log('Not connected to database after maxRetries reached.');
+        });
 
 }
 
@@ -35,7 +31,7 @@ function up (callback) {
  * Teardown after each test
  * Essentially deletes the created database
  */
-function down (collection) {
+function down(collection) {
     console.log("Tear down Unit Test");
     onDatabaseConnected(collection);
 }

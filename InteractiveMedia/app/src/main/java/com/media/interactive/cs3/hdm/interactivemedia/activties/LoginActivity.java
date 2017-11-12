@@ -13,6 +13,11 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonObjectRequest;
 import com.bumptech.glide.Glide;
 import com.facebook.CallbackManager;
 import com.facebook.FacebookCallback;
@@ -29,8 +34,12 @@ import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.common.api.Status;
 import com.media.interactive.cs3.hdm.interactivemedia.R;
+import com.media.interactive.cs3.hdm.interactivemedia.RestRequestQueue;
 import com.media.interactive.cs3.hdm.interactivemedia.data.Hash;
 import com.media.interactive.cs3.hdm.interactivemedia.data.User;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 public class LoginActivity extends AppCompatActivity
         implements View.OnClickListener, GoogleApiClient.OnConnectionFailedListener{
@@ -71,6 +80,32 @@ public class LoginActivity extends AppCompatActivity
             @Override
             public void onSuccess(LoginResult loginResult) {
                 navigateToHome();
+                final String url = getResources().getString(R.string.web_service_url).concat("/facebook_login");
+                Log.d(TAG,"url: "+ url);
+                JSONObject data = new JSONObject();
+                String accessToken = null;
+                accessToken = loginResult.getAccessToken().getToken().toString();
+                try {
+                    data.put("accessToken", accessToken);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+                JsonObjectRequest jsObjRequest = new JsonObjectRequest
+                        (Request.Method.POST, url, data, new Response.Listener<JSONObject>() {
+
+                            @Override
+                            public void onResponse(JSONObject response) {
+                                Log.d(TAG,"Response: " + response.toString());
+                            }
+                        }, new Response.ErrorListener() {
+
+                            @Override
+                            public void onErrorResponse(VolleyError error) {
+                                Log.d(TAG,"Error occurred. ");
+                            }
+                        });
+
+                RestRequestQueue.getInstance(LoginActivity.this).addToRequestQueue(jsObjRequest);
                 fbStatusText.setText("Login Status success\n"
                         + loginResult.getAccessToken().getUserId()
                         + "\n UserToken: "
@@ -116,6 +151,9 @@ public class LoginActivity extends AppCompatActivity
                 .enableAutoManage(this, this)
                 .addApi(Auth.GOOGLE_SIGN_IN_API, signInOptions)
                 .build();
+
+        //String url = "http://musicovery.com/api/V4/playlist.php?&fct=getfrommood&popularitymax=100&popularitymin=50&starttrackid=&date10=true&trackvalence=900000&trackarousal=900000&resultsnumber=15&listenercountry=de&format=json";
+
 
     }
 
@@ -189,6 +227,33 @@ public class LoginActivity extends AppCompatActivity
 
             name.setText(googleName);
             email.setText(googleEmail);
+
+            final String url = getResources().getString(R.string.web_service_url).concat("/google_login");
+            Log.d(TAG,"url: "+ url);
+            JSONObject data = new JSONObject();
+            String accessToken = null;
+            accessToken = account.getIdToken();
+            try {
+                data.put("accessToken", accessToken);
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+            JsonObjectRequest jsObjRequest = new JsonObjectRequest
+                    (Request.Method.POST, url, data, new Response.Listener<JSONObject>() {
+
+                        @Override
+                        public void onResponse(JSONObject response) {
+                            Log.d(TAG,"Response: " + response.toString());
+                        }
+                    }, new Response.ErrorListener() {
+
+                        @Override
+                        public void onErrorResponse(VolleyError error) {
+                            Log.d(TAG,"Error occurred. ");
+                        }
+                    });
+
+            RestRequestQueue.getInstance(LoginActivity.this).addToRequestQueue(jsObjRequest);
 
             if (account.getPhotoUrl() != null) {
                 final String googleImgUrl = account.getPhotoUrl().toString();
