@@ -17,6 +17,6 @@ services:
     build: ./frontend
     image: localhost:5000/frontend
     ports:
-      - 8080:80
+      - 8088:80
     depends_on:
       - backend
