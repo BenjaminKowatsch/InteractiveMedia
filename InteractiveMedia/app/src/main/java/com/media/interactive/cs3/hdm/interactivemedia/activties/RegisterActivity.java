@@ -1,6 +1,8 @@
 package com.media.interactive.cs3.hdm.interactivemedia.activties;
 
+import android.os.Build;
 import android.os.Bundle;
+import android.support.annotation.RequiresApi;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
@@ -34,6 +36,7 @@ public class RegisterActivity extends AppCompatActivity
     }
 
 
+    @RequiresApi(api = Build.VERSION_CODES.N)
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
@@ -42,10 +45,16 @@ public class RegisterActivity extends AppCompatActivity
                 user.setUsername(registerUsername.getText().toString());
                 user.setEmail(registerEmail.getText().toString());
                 user.setHashedPassword(Hash.hashStringSHA256(registerPassword.getText().toString()));
-                user.register(RegisterActivity.this);
-                Toast.makeText(getApplicationContext(),
-                        "TODO: create REST request to backend",
-                        Toast.LENGTH_SHORT).show();
+                user.register(RegisterActivity.this)
+                        .thenAccept((Void) -> {
+                            Toast.makeText(getApplicationContext(),
+                                    "Success fully logged in",
+                                    Toast.LENGTH_SHORT).show();
+                        })
+                        .exceptionally((error) -> {
+                            throw new RuntimeException(error.getMessage());
+                        });
+
                 Log.d(TAG, "TODO: create REST request to backend");
                 break;
             default:

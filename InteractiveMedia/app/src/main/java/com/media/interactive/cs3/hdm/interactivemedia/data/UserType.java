@@ -5,7 +5,16 @@ package com.media.interactive.cs3.hdm.interactivemedia.data;
  */
 
 public enum UserType {
-    DEFAULT,
-    GOOGLE,
-    FACEBOOK
+    DEFAULT(0),
+    GOOGLE(1),
+    FACEBOOK(2);
+
+    private final int value;
+    private UserType(int value) {
+        this.value = value;
+    }
+
+    public int getValue() {
+        return value;
+    }
 }

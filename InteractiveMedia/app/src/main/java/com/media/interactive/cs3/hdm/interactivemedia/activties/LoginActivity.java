@@ -1,7 +1,10 @@
 package com.media.interactive.cs3.hdm.interactivemedia.activties;
 
+import android.content.Context;
 import android.content.Intent;
+import android.os.Build;
 import android.support.annotation.NonNull;
+import android.support.annotation.RequiresApi;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -19,6 +22,8 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.bumptech.glide.Glide;
+import com.facebook.AccessToken;
+import com.facebook.AccessTokenTracker;
 import com.facebook.CallbackManager;
 import com.facebook.FacebookCallback;
 import com.facebook.FacebookException;
@@ -26,15 +31,19 @@ import com.facebook.login.LoginResult;
 import com.facebook.login.widget.LoginButton;
 import com.google.android.gms.auth.api.Auth;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
+import com.google.android.gms.auth.api.signin.GoogleSignInApi;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.auth.api.signin.GoogleSignInResult;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.Scopes;
 import com.google.android.gms.common.SignInButton;
 import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.common.api.OptionalPendingResult;
 import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.common.api.Scope;
 import com.google.android.gms.common.api.Status;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.media.interactive.cs3.hdm.interactivemedia.R;
 import com.media.interactive.cs3.hdm.interactivemedia.RestRequestQueue;
 import com.media.interactive.cs3.hdm.interactivemedia.data.Hash;
@@ -45,6 +54,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.security.Key;
+import java.util.concurrent.CompletableFuture;
 
 import static com.bumptech.glide.gifdecoder.GifHeaderParser.TAG;
 
@@ -77,6 +87,7 @@ public class LoginActivity extends AppCompatActivity
     // Register variables
     private Button registerButton;
 
+    @RequiresApi(api = Build.VERSION_CODES.N)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -85,6 +96,7 @@ public class LoginActivity extends AppCompatActivity
         fbStatusText = (TextView) findViewById(R.id.fb_status_text);
         callbackManager = CallbackManager.Factory.create();
         loginButton.registerCallback(callbackManager, new FacebookCallback<LoginResult>() {
+            @RequiresApi(api = Build.VERSION_CODES.N)
             @Override
             public void onSuccess(LoginResult loginResult) {
                 navigateToHome();
@@ -98,35 +110,14 @@ public class LoginActivity extends AppCompatActivity
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
-                JsonObjectRequest jsObjRequest = new JsonObjectRequest
-                        (Request.Method.POST, url, data, new Response.Listener<JSONObject>() {
 
-                            @Override
-                            public void onResponse(JSONObject response) {
-                                try {
-                                    if(response.getBoolean("success")){
-                                        final JSONObject payload = response.getJSONObject("payload");
-                                        final User user = User.getInstance();
-                                        user.setAccessToken(payload.getString("accessToken"));
-                                        user.setUserType(UserType.values()[payload.getInt("authType")]);
-                                        Log.d(TAG,"Successfully registered and logged in with\naccessToken:"+user.getAccessToken()+"\nuserType:"+user.getUserType()+"\n");
-                                    }else {
-                                        Log.e(TAG,"Received an unsuccessful answer from backend during facebook sign in.");
-                                    }
-                                } catch (JSONException e) {
-                                    e.printStackTrace();
-                                }
-                                Log.d(TAG,"Response: " + response.toString());
-                            }
-                        }, new Response.ErrorListener() {
-
-                            @Override
-                            public void onErrorResponse(VolleyError error) {
-                                Log.d(TAG,"Error occurred. ");
-                            }
+                RestRequestQueue.getInstance(LoginActivity.this)
+                        .send(url, Request.Method.POST,data)
+                        .thenAccept(User.getInstance()::loginResponseHandler)
+                        .exceptionally(error -> {
+                            throw new RuntimeException(error.getMessage(),error.getCause());
                         });
 
-                RestRequestQueue.getInstance(LoginActivity.this).addToRequestQueue(jsObjRequest);
                 fbStatusText.setText("Login Status success\n"
                         + loginResult.getAccessToken().getUserId()
                         + "\n UserToken: "
@@ -177,18 +168,23 @@ public class LoginActivity extends AppCompatActivity
                 .build();
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.N)
     private void navigateToHome(){
-        if(User.getInstance().login()) {
-            final Intent toHome = new Intent(LoginActivity.this, HomeActivity.class);
-            toHome.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
-            startActivity(toHome);
-            finish();
-        } else {
-            Log.d(TAG,"Login failed");
-            Toast.makeText(getApplicationContext(),"Login failed",Toast.LENGTH_SHORT).show();
-        }
+        User.getInstance().login(LoginActivity.this)
+                .thenAccept(Void -> {
+                    final Intent toHome = new Intent(LoginActivity.this, HomeActivity.class);
+                    toHome.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+                    startActivity(toHome);
+                    finish();
+                })
+                .exceptionally(error -> {
+                    Log.d(TAG,"Login failed");
+                    Toast.makeText(getApplicationContext(),"Login failed",Toast.LENGTH_SHORT).show();
+                    throw new RuntimeException(error.getMessage());
+                });
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.N)
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
@@ -239,6 +235,7 @@ public class LoginActivity extends AppCompatActivity
                 });
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.N)
     private void handleResult(GoogleSignInResult result) {
         if (result.isSuccess()) {
             final GoogleSignInAccount account = result.getSignInAccount();
@@ -258,35 +255,13 @@ public class LoginActivity extends AppCompatActivity
             } catch (JSONException e) {
                 e.printStackTrace();
             }
-            final JsonObjectRequest jsObjRequest = new JsonObjectRequest
-                    (Request.Method.POST, url, data, new Response.Listener<JSONObject>() {
 
-                        @Override
-                        public void onResponse(JSONObject response) {
-                            try {
-                                if(response.getBoolean("success")){
-                                    final JSONObject payload = response.getJSONObject("payload");
-                                    final User user = User.getInstance();
-                                    user.setAccessToken(payload.getString("accessToken"));
-                                    user.setUserType(UserType.values()[payload.getInt("authType")]);
-                                    Log.d(TAG,"Successfully registered and logged in with\naccessToken:"+user.getAccessToken()+"\nuserType:"+user.getUserType()+"\n");
-                                }else {
-                                    Log.e(TAG,"Received an unsuccessful answer from backend during google sign in.");
-                                }
-                            } catch (JSONException e) {
-                                e.printStackTrace();
-                            }
-                            Log.d(TAG,"Response: " + response.toString());
-                        }
-                    }, new Response.ErrorListener() {
-
-                        @Override
-                        public void onErrorResponse(VolleyError error) {
-                            Log.d(TAG,"Error occurred. ");
-                        }
+            RestRequestQueue.getInstance(LoginActivity.this)
+                    .send(url, Request.Method.POST, data)
+                    .thenAccept(User.getInstance()::loginResponseHandler)
+                    .exceptionally((error) -> {
+                        throw new RuntimeException(error.getMessage(),error.getCause());
                     });
-
-            RestRequestQueue.getInstance(LoginActivity.this).addToRequestQueue(jsObjRequest);
 
             if (account.getPhotoUrl() != null) {
                 final String googleImgUrl = account.getPhotoUrl().toString();
@@ -309,6 +284,7 @@ public class LoginActivity extends AppCompatActivity
         }
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.N)
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);

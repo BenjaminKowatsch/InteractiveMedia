@@ -22,7 +22,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     private static final String COL1 = "username";
     private static final String COL2 = "password";
     private static final String COL3 = "email";
-    private static final String COL4 = "lastLogin";
+    private static final String COL4 = "userType";
+    private static final String COL5 = "lastLogin";
 
     public DatabaseHelper(Context context) {
         super(context, DATABASE_NAME, null, 1);
@@ -42,7 +43,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         Log.d(TAG, "onCreate: Dropping table " + TABLE_NAME);
 
         final String createTable = "CREATE TABLE " + TABLE_NAME + "(ID INTEGER PRIMARY KEY AUTOINCREMENT, " +
-                COL1 + " TEXT," + COL2 + " TEXT," + COL3 + " TEXT, "+ COL4 +" TIMESTAMP DEFAULT CURRENT_TIMESTAMP)";
+                COL1 + " TEXT," + COL2 + " TEXT," + COL3 + " TEXT, "+ COL4 +" INTEGER, "+ COL5 +" TIMESTAMP DEFAULT CURRENT_TIMESTAMP)";
         db.execSQL(createTable);
         Log.d(TAG, "onCreate: Creating table " + TABLE_NAME + " with " + createTable);
     }
@@ -76,6 +77,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 user.setUsername(cursor.getString(1));
                 user.setHashedPassword(cursor.getString(2));
                 user.setEmail(cursor.getString(3));
+                user.setUserType(UserType.values()[cursor.getInt(4)]);
                 Log.d(TAG,"Latest Credentials cache: " + cursor.getString(4)+ " "+ user);
             }
         return result;
@@ -87,6 +89,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         final ContentValues contentValues = new ContentValues();
         contentValues.put(COL1, user.getUsername());
         contentValues.put(COL2, user.getHashedPassword());
+        contentValues.put(COL4, user.getUserType().getValue());
 
         Log.d(TAG, "cacheCredentials: Adding " + user + " to " + TABLE_NAME);
 
@@ -98,4 +101,5 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             return true;
         }
     }
+
 }
