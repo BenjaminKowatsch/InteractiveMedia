@@ -99,6 +99,13 @@ public class LoginActivity extends AppCompatActivity
             @RequiresApi(api = Build.VERSION_CODES.N)
             @Override
             public void onSuccess(LoginResult loginResult) {
+                final User user = User.getInstance();
+                user.setAccessToken(loginResult.getAccessToken().getToken().toString());
+                user.setUserType(UserType.FACEBOOK);
+                user.login(LoginActivity.this)
+                        .thenAccept(LoginActivity.this::navigateToHome)
+                        .exceptionally(LoginActivity.this::loginFailedHandler);
+                /*
                 navigateToHome();
                 final String url = getResources().getString(R.string.web_service_url).concat("/facebook_login");
                 Log.d(TAG,"url: "+ url);
@@ -117,7 +124,7 @@ public class LoginActivity extends AppCompatActivity
                         .exceptionally(error -> {
                             throw new RuntimeException(error.getMessage(),error.getCause());
                         });
-
+                */
                 fbStatusText.setText("Login Status success\n"
                         + loginResult.getAccessToken().getUserId()
                         + "\n UserToken: "
@@ -168,20 +175,16 @@ public class LoginActivity extends AppCompatActivity
                 .build();
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.N)
-    private void navigateToHome(){
-        User.getInstance().login(LoginActivity.this)
-                .thenAccept(Void -> {
-                    final Intent toHome = new Intent(LoginActivity.this, HomeActivity.class);
-                    toHome.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
-                    startActivity(toHome);
-                    finish();
-                })
-                .exceptionally(error -> {
-                    Log.d(TAG,"Login failed");
-                    Toast.makeText(getApplicationContext(),"Login failed",Toast.LENGTH_SHORT).show();
-                    throw new RuntimeException(error.getMessage());
-                });
+    private void navigateToHome(Void aVoid) {
+        final Intent toHome = new Intent(LoginActivity.this, HomeActivity.class);
+        toHome.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+        startActivity(toHome);
+        finish();
+    }
+
+    private Void loginFailedHandler(Throwable error) {
+            Log.d(TAG,"Login failed");
+            throw new RuntimeException(error.getMessage());
     }
 
     @RequiresApi(api = Build.VERSION_CODES.N)
@@ -198,13 +201,13 @@ public class LoginActivity extends AppCompatActivity
                 startActivity(new Intent(LoginActivity.this, RegisterActivity.class));
                 break;
             case R.id.bn_default_login:
-                User.getInstance().setUsername(loginUsername.getText().toString());
-                User.getInstance().setHashedPassword(Hash.hashStringSHA256(loginPassword.getText().toString()));
-                navigateToHome();
-                Toast.makeText(getApplicationContext(),
-                        "TODO: create REST request to backend",
-                        Toast.LENGTH_SHORT).show();
-                Log.d(TAG, "TODO: create REST request to backend");
+                final User user = User.getInstance();
+                user.setUsername(loginUsername.getText().toString());
+                user.setHashedPassword(Hash.hashStringSHA256(loginPassword.getText().toString()));
+                user.setUserType(UserType.DEFAULT);
+                user.login(LoginActivity.this)
+                        .thenAccept(LoginActivity.this::navigateToHome)
+                        .exceptionally(LoginActivity.this::loginFailedHandler);
                 break;
             default:
                 Log.e(TAG, "OnClick error occurred");
@@ -239,34 +242,17 @@ public class LoginActivity extends AppCompatActivity
     private void handleResult(GoogleSignInResult result) {
         if (result.isSuccess()) {
             final GoogleSignInAccount account = result.getSignInAccount();
-            final String googleName = account.getDisplayName();
-            final String googleEmail = account.getEmail();
-
-            name.setText(googleName);
-            email.setText(googleEmail);
-
-            final String url = getResources().getString(R.string.web_service_url).concat("/google_login");
-            Log.d(TAG,"url: "+ url);
-            final JSONObject data = new JSONObject();
-            String accessToken = null;
-            accessToken = account.getIdToken();
-            try {
-                data.put("accessToken", accessToken);
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
-
-            RestRequestQueue.getInstance(LoginActivity.this)
-                    .send(url, Request.Method.POST, data)
-                    .thenAccept(User.getInstance()::loginResponseHandler)
-                    .exceptionally((error) -> {
-                        throw new RuntimeException(error.getMessage(),error.getCause());
-                    });
-
+            final User user = User.getInstance();
+            user.setAccessToken(account.getIdToken());
+            user.setUserType(UserType.GOOGLE);
+            user.login(LoginActivity.this)
+                    .thenAccept(LoginActivity.this::navigateToHome)
+                    .exceptionally(LoginActivity.this::loginFailedHandler);
+            /*
             if (account.getPhotoUrl() != null) {
                 final String googleImgUrl = account.getPhotoUrl().toString();
                 Glide.with(this).load(googleImgUrl).into(profPic);
-            }
+            }*/
 
             updateUi(true);
         } else {

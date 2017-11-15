@@ -1,9 +1,13 @@
 package com.media.interactive.cs3.hdm.interactivemedia.activties;
 
 
+import android.app.Activity;
 import android.app.Fragment;
 import android.app.FragmentTransaction;
+import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
+import android.support.annotation.RequiresApi;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
@@ -22,6 +26,7 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.media.interactive.cs3.hdm.interactivemedia.R;
 import com.media.interactive.cs3.hdm.interactivemedia.RestRequestQueue;
+import com.media.interactive.cs3.hdm.interactivemedia.data.User;
 import com.media.interactive.cs3.hdm.interactivemedia.fragments.GroupFragment;
 import com.media.interactive.cs3.hdm.interactivemedia.fragments.dummy.DummyContent;
 
@@ -34,6 +39,7 @@ public class HomeActivity extends AppCompatActivity
 
 
 
+    @RequiresApi(api = Build.VERSION_CODES.N)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -81,6 +87,7 @@ public class HomeActivity extends AppCompatActivity
         return super.onOptionsItemSelected(item);
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.N)
     private void displayFragment(int id) {
 
         Fragment fragment = null;
@@ -89,6 +96,24 @@ public class HomeActivity extends AppCompatActivity
             case R.id.nav_groups:
                 Log.d(TAG, "item with id nav_groups was selected");
                 fragment = new GroupFragment();
+                break;
+            case R.id.nav_logout:
+                User.getInstance().logout(this)
+                .thenAccept((Void) -> {
+                    Log.d(TAG, "Successfully logged out.");
+                    Toast.makeText(HomeActivity.this,"Sucessfully logged out.",Toast.LENGTH_SHORT).show();
+                    final Intent toLogin = new Intent(HomeActivity.this, LoginActivity.class);
+                    toLogin.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+                    startActivity(toLogin);
+                    finish();
+                })
+                .exceptionally(error -> {
+                    Log.d(TAG, "Failed during logout.");
+                    Toast.makeText(HomeActivity.this,"Logout failed",Toast.LENGTH_SHORT).show();
+                    throw new RuntimeException(error.getMessage());
+                });
+
+
                 break;
             default:
                 Log.e(TAG, "No item id was selected");
@@ -104,6 +129,7 @@ public class HomeActivity extends AppCompatActivity
         drawer.closeDrawer(GravityCompat.START);
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.N)
     @SuppressWarnings("StatementWithEmptyBody")
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {

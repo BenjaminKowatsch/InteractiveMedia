@@ -73,7 +73,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             final Cursor cursor = db.rawQuery(query, null);
             result = cursor.getCount() > 0;
             while(cursor.moveToNext()){
-                user.setId(cursor.getInt(0)+"");
+                user.setId(cursor.getLong(0));
                 user.setUsername(cursor.getString(1));
                 user.setHashedPassword(cursor.getString(2));
                 user.setEmail(cursor.getString(3));
@@ -98,8 +98,18 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         if (result == -1) {
             return false;
         } else {
+            user.setId(result);
             return true;
         }
     }
 
+    public boolean deleteUser(User user) {
+        final SQLiteDatabase db = this.getWritableDatabase();
+        final String sql = "DELETE FROM "+TABLE_NAME +" WHERE "+COL0+"=?";
+        final SQLiteStatement statement = db.compileStatement(sql);
+
+        statement.bindLong(1, user.getId());
+
+        return statement.executeUpdateDelete() > 0;
+    }
 }

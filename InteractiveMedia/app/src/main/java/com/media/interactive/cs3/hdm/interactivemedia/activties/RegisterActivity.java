@@ -1,5 +1,6 @@
 package com.media.interactive.cs3.hdm.interactivemedia.activties;
 
+import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.RequiresApi;
@@ -13,6 +14,7 @@ import android.widget.Toast;
 import com.media.interactive.cs3.hdm.interactivemedia.R;
 import com.media.interactive.cs3.hdm.interactivemedia.data.Hash;
 import com.media.interactive.cs3.hdm.interactivemedia.data.User;
+import com.media.interactive.cs3.hdm.interactivemedia.data.UserType;
 
 public class RegisterActivity extends AppCompatActivity
         implements View.OnClickListener {
@@ -43,6 +45,7 @@ public class RegisterActivity extends AppCompatActivity
             case R.id.bn_register:
                 final User user = User.getInstance();
                 user.setUsername(registerUsername.getText().toString());
+                user.setUserType(UserType.DEFAULT);
                 user.setEmail(registerEmail.getText().toString());
                 user.setHashedPassword(Hash.hashStringSHA256(registerPassword.getText().toString()));
                 user.register(RegisterActivity.this)
@@ -50,12 +53,16 @@ public class RegisterActivity extends AppCompatActivity
                             Toast.makeText(getApplicationContext(),
                                     "Success fully logged in",
                                     Toast.LENGTH_SHORT).show();
+                            final Intent toHome = new Intent(RegisterActivity.this, HomeActivity.class);
+                            toHome.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+                            startActivity(toHome);
+                            finish();
                         })
                         .exceptionally((error) -> {
+                            Log.e(TAG, "error: "+ error.getMessage());
                             throw new RuntimeException(error.getMessage());
                         });
 
-                Log.d(TAG, "TODO: create REST request to backend");
                 break;
             default:
                 Log.e(TAG, "OnClick error occurred");

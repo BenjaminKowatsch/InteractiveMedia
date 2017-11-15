@@ -172,8 +172,8 @@ registerLoggedInPostMethod('/facebook_login', jsonSchema.googleFacebookLogin, ge
 
 registerLoggedInPostMethod('/logout', jsonSchema.accessToken, function (userCollection, expiryDate, userId, req, res, responseData) {
   user.logout(userCollection, responseData, userId)
-  .then(getSendResponseDataCallback(res))
-  .catch(getSendResponseDataCallback(res))
+  .then(html.getSendResponseDataCallback(res))
+  .catch(html.getSendResponseDataCallback(res))
 })
 
 registerLoggedInPostMethod('/get_max_val', jsonSchema.accessToken, function (userCollection, expiryDate, userId, req, res, responseData) {
