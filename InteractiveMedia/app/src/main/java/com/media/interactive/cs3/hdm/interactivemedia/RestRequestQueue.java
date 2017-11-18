@@ -4,6 +4,7 @@ import android.content.Context;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.support.annotation.RequiresApi;
+import android.util.Log;
 
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
@@ -58,6 +59,8 @@ public class RestRequestQueue  {
     @RequiresApi(api = Build.VERSION_CODES.N)
     public CompletableFuture<JSONObject> send(String url, int requestMethod, JSONObject data){
         final CompletableFuture<JSONObject> future = new CompletableFuture<>();
+
+        Log.d("RestQueue: "," Thread Id: "+android.os.Process.getThreadPriority(android.os.Process.myTid()));
 
         final JsonObjectRequest jsonObjectRequest = new JsonObjectRequest
                 (requestMethod, url, data, future::complete, future::completeExceptionally);

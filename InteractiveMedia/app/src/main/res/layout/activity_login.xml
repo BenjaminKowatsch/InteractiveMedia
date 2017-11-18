@@ -11,8 +11,6 @@
         android:orientation="vertical"
         tools:context="com.media.interactive.cs3.hdm.interactivemedia.activties.MainActivity">
 
-        <include layout="@layout/user_info_logout_google" />
-
         <include layout="@layout/user_login" />
 
         <View
@@ -35,15 +33,6 @@
             android:layout_height="wrap_content"
             android:layout_marginLeft="30dp"
             android:layout_marginRight="30dp" />
-
-        <TextView
-            android:id="@+id/fb_status_text"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:layout_marginTop="10dp"
-            android:text="Login Status"
-            android:textStyle="bold" />
 
         <com.facebook.login.widget.LoginButton
             android:id="@+id/fb_login_bn"

@@ -2,17 +2,21 @@ package com.media.interactive.cs3.hdm.interactivemedia.data;
 
 import android.content.Context;
 import android.os.Build;
+import android.support.annotation.NonNull;
 import android.support.annotation.RequiresApi;
 import android.util.Log;
 
 import com.android.volley.Request;
 import com.facebook.AccessToken;
+import com.facebook.login.LoginManager;
 import com.google.android.gms.auth.api.Auth;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.auth.api.signin.GoogleSignInResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.OptionalPendingResult;
+import com.google.android.gms.common.api.ResultCallback;
+import com.google.android.gms.common.api.Status;
 import com.media.interactive.cs3.hdm.interactivemedia.R;
 import com.media.interactive.cs3.hdm.interactivemedia.RestRequestQueue;
 
@@ -94,6 +98,8 @@ public class User {
     }
 
     public boolean loginResponseHandler(JSONObject response) {
+
+        Log.d("User: ","loginResponseHandler: Thread Id: "+android.os.Process.getThreadPriority(android.os.Process.myTid()));
         Log.d(TAG, "Response: " + response.toString());
         try {
             if (response.getBoolean("success")) {
@@ -252,6 +258,7 @@ public class User {
                     }
                 })
                 .exceptionally(error -> {
+                    Log.e("User: ","Exceptionally Thread Id: "+android.os.Process.getThreadPriority(android.os.Process.myTid()));
                     future.completeExceptionally(error);
                     throw new RuntimeException(error.getMessage());
                 });
@@ -292,6 +299,7 @@ public class User {
                     }
                 })
                 .exceptionally(error -> {
+                    Log.e("User: ","Exceptionally Thread Id: "+android.os.Process.getThreadPriority(android.os.Process.myTid()));
                     future.completeExceptionally(error);
                     throw new RuntimeException(error.getMessage());
                 });
@@ -324,6 +332,8 @@ public class User {
                     }
                 })
                 .exceptionally(error -> {
+
+                    Log.e("User: ","Exceptionally Thread Id: "+android.os.Process.getThreadPriority(android.os.Process.myTid()));
                     future.completeExceptionally(error);
                     throw new RuntimeException(error.getMessage());
                 });
@@ -353,6 +363,27 @@ public class User {
     public CompletableFuture<Void> logout(Context context) {
         final CompletableFuture<Void> future = new CompletableFuture<>();
 
+        // Local Facebook logout
+        LoginManager.getInstance().logOut();
+        // Local Google logout
+        final String serverClientId = context.getString(R.string.server_client_id);
+        final GoogleSignInOptions signInOptions = new GoogleSignInOptions
+                .Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                .requestIdToken(serverClientId)
+                .requestEmail()
+                .build();
+        final GoogleApiClient googleApiClient = new GoogleApiClient
+                .Builder(context)
+                .addApi(Auth.GOOGLE_SIGN_IN_API, signInOptions)
+                .build();
+        if( googleApiClient.isConnected()) {
+            Auth.GoogleSignInApi
+                    .signOut(googleApiClient)
+                    .setResultCallback((status) -> {
+                        Log.i(TAG, "Google signed out.");
+                    });
+        }
+        // Logout at backend
         final String url = context.getResources().getString(R.string.web_service_url).concat("/logout");
         Log.d(TAG, "url: " + url);
         final JSONObject data = new JSONObject();

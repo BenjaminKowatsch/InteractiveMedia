@@ -65,18 +65,12 @@ public class LoginActivity extends AppCompatActivity
     private static final String TAG = "LoginActivity";
 
     // Google SignIn variables
-    private LinearLayout profSection;
-    private Button signOut;
     private SignInButton signIn;
-    private TextView name;
-    private TextView email;
-    private ImageView profPic;
     private GoogleApiClient googleApiClient;
     private static final int REQ_CODE = 9001;
 
     // Facebook SignIn variables
     private LoginButton loginButton;
-    private TextView fbStatusText;
     private CallbackManager callbackManager;
 
     // Default Login variables
@@ -93,7 +87,6 @@ public class LoginActivity extends AppCompatActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
         loginButton = (LoginButton) findViewById(R.id.fb_login_bn);
-        fbStatusText = (TextView) findViewById(R.id.fb_status_text);
         callbackManager = CallbackManager.Factory.create();
         loginButton.registerCallback(callbackManager, new FacebookCallback<LoginResult>() {
             @RequiresApi(api = Build.VERSION_CODES.N)
@@ -105,52 +98,21 @@ public class LoginActivity extends AppCompatActivity
                 user.login(LoginActivity.this)
                         .thenAccept(LoginActivity.this::navigateToHome)
                         .exceptionally(LoginActivity.this::loginFailedHandler);
-                /*
-                navigateToHome();
-                final String url = getResources().getString(R.string.web_service_url).concat("/facebook_login");
-                Log.d(TAG,"url: "+ url);
-                JSONObject data = new JSONObject();
-                String accessToken = null;
-                accessToken = loginResult.getAccessToken().getToken().toString();
-                try {
-                    data.put("accessToken", accessToken);
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-
-                RestRequestQueue.getInstance(LoginActivity.this)
-                        .send(url, Request.Method.POST,data)
-                        .thenAccept(User.getInstance()::loginResponseHandler)
-                        .exceptionally(error -> {
-                            throw new RuntimeException(error.getMessage(),error.getCause());
-                        });
-                */
-                fbStatusText.setText("Login Status success\n"
-                        + loginResult.getAccessToken().getUserId()
-                        + "\n UserToken: "
-                        + loginResult.getAccessToken().getToken());
             }
 
             @Override
             public void onCancel() {
-                fbStatusText.setText("Login Status cancelled");
+                Log.d(TAG,"Facebook Login Status cancelled");
             }
 
             @Override
             public void onError(FacebookException error) {
-                fbStatusText.setText("Login Status error");
-
+                Log.e(TAG,"Facebook Login Status error");
             }
         });
 
-        profSection = (LinearLayout) findViewById(R.id.prof_section);
-        signOut = (Button) findViewById(R.id.bn_logout);
         signIn = (SignInButton) findViewById(R.id.bn_login);
-        name = (TextView) findViewById(R.id.name);
-        email = (TextView) findViewById(R.id.email);
-        profPic = (ImageView) findViewById(R.id.prof_pic);
         signIn.setOnClickListener(this);
-        signOut.setOnClickListener(this);
 
         registerButton = (Button) findViewById(R.id.bn_create_account);
         registerButton.setOnClickListener(this);
@@ -160,7 +122,6 @@ public class LoginActivity extends AppCompatActivity
         loginUsername = (EditText) findViewById(R.id.et_login_username);
         loginPassword = (EditText) findViewById(R.id.et_login_password);
 
-        profSection.setVisibility(View.GONE);
 
         final String serverClientId = getString(R.string.server_client_id);
         final GoogleSignInOptions signInOptions = new GoogleSignInOptions
@@ -227,15 +188,6 @@ public class LoginActivity extends AppCompatActivity
     }
 
     private void signOut() {
-        Log.i(TAG, "signOut called");
-        Auth.GoogleSignInApi
-                .signOut(googleApiClient)
-                .setResultCallback(new ResultCallback<Status>() {
-                    @Override
-                    public void onResult(@NonNull Status status) {
-                        updateUi(false);
-                    }
-                });
     }
 
     @RequiresApi(api = Build.VERSION_CODES.N)
@@ -254,21 +206,11 @@ public class LoginActivity extends AppCompatActivity
                 Glide.with(this).load(googleImgUrl).into(profPic);
             }*/
 
-            updateUi(true);
         } else {
-            updateUi(false);
+           Log.e(TAG,"Error during Google login");
         }
     }
 
-    private void updateUi(boolean isLoggedIn) {
-        if (isLoggedIn) {
-            profSection.setVisibility(View.VISIBLE);
-            signIn.setVisibility(View.GONE);
-        } else {
-            profSection.setVisibility(View.GONE);
-            signIn.setVisibility(View.VISIBLE);
-        }
-    }
 
     @RequiresApi(api = Build.VERSION_CODES.N)
     @Override

@@ -46,11 +46,13 @@ public class MainActivity extends AppCompatActivity {
         appTag = getResources().getString(R.string.app_tag);
         hasRun = getResources().getString(R.string.has_run);
         sharedPreferences = getSharedPreferences(appTag, MODE_PRIVATE);
+
+        Log.e(TAG,"Exceptionally Thread Id: "+android.os.Process.getThreadPriority(android.os.Process.myTid()));
     }
 
     @RequiresApi(api = Build.VERSION_CODES.N)
     private void launchNextActivity() {
-        User.getInstance().login(MainActivity.this)
+       User.getInstance().login(MainActivity.this)
                 .thenAccept(Void -> {
                     if (sharedPreferences.getBoolean(hasRun, false)) {
                         // This is not the first run
@@ -65,7 +67,7 @@ public class MainActivity extends AppCompatActivity {
                 .exceptionally(error -> {
                     Log.d(TAG, "Login failed due to " + error.getMessage());
                     Toast.makeText(getApplicationContext(), "Login failed", Toast.LENGTH_SHORT).show();
-                        /* Do first run stuff */
+                        // Do first run stuff
                     Log.d(TAG, "Launching Login Activity");
                     final Intent intent = new Intent(MainActivity.this, LoginActivity.class);
                     intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
@@ -75,7 +77,7 @@ public class MainActivity extends AppCompatActivity {
                             .commit();
                     throw new RuntimeException(error.getMessage());
                 }).thenAccept((result) -> {
-                    finish();
+                   finish();
                 });
     }
 
