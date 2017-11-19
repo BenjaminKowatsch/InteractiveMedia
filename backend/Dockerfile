@@ -42,12 +42,12 @@ FROM dependencies AS test
 # add current folder
 COPY . .
 
+RUN npm run static-code-analysis
 # RUN npm run lint
 # RUN npm run setup
 RUN npm run unit-test
 
 
-#
 # ---- Release ----
 FROM base AS release
 

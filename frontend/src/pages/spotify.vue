@@ -100,7 +100,7 @@ export default {
      */
     getMoodResponseHandler: function(payload){
       this.search = payload.emotion
-      this.currentMood = payload.emotion_de
+      this.currentMood = payload.emotionDe
       this.searchTracks(0,false,10)
     },
     /**

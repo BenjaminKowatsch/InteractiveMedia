@@ -7,5 +7,4 @@ describe('Array', function() {
 
     assert.equal(arr.length, 0);
   });
-
 });

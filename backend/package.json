@@ -5,6 +5,7 @@
   "main": "index.js",
   "scripts": {
     "unit-test": "./node_modules/mocha/bin/mocha --reporter spec ./test/unit",
+    "static-code-analysis": "./node_modules/gulp/bin/gulp.js ",
     "start": "node index.js"
   },
   "author": "",
@@ -19,6 +20,13 @@
   },
   "devDependencies": {
     "mocha": "^3.4.2",
-    "chai": "^4.0.2"
+    "chai": "^4.0.2",
+    "gulp": "^3.9.1",
+    "gulp-jshint": "^2.0.4",
+    "jshint": "^2.9.5",
+    "jshint-stylish": "^2.2.1",
+    "jscs": "^3.0.7",
+    "gulp-jscs": "^4.0.0",
+    "gulp-jscs-stylish": "^1.4.0"
   }
 }

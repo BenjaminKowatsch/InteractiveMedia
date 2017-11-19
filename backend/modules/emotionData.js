@@ -1,179 +1,179 @@
-var emotionData = module.exports = {}
+var emotionData = module.exports = {};
 
 emotionData.data = [
   {
     name: 'Interessiert',
-    name_en:'Interested',
+    nameEn: 'Interested',
     color: 'FDB47A'
   },
   {
     name: 'Erwartungsvoll',
-    name_en:'expectant',
+    nameEn: 'expectant',
     color: 'FD9447'
   },
   {
     name: 'Aufmerksam',
-    name_en:'attentively',
+    nameEn: 'attentively',
     color: 'FC6618'
   },
   {
     name: 'Optmistisch',
-    name_en:'Optimistic',
+    nameEn: 'Optimistic',
     color: 'FCE9AE'
   },
   {
     name: 'Gelassen',
-    name_en:'Calmly',
+    nameEn: 'Calmly',
     color: 'FEFCA7'
   },
   {
     name: 'Freudig',
-    name_en:'Joyful',
+    nameEn: 'Joyful',
     color: 'F6EE4D'
   },
   {
     name: 'Begeistert',
-    name_en:'Excited',
+    nameEn: 'Excited',
     color: 'EBBD10'
   },
   {
     name: 'Verliebt',
-    name_en:'In love',
+    nameEn: 'In love',
     color: 'F2F2B2'
   },
   {
     name: 'Bewundernd',
-    name_en:'admiring',
+    nameEn: 'admiring',
     color: '00b400'
   },
   {
     name: 'Erschrocken',
-    name_en:'Frightened',
+    nameEn: 'Frightened',
     color: '008000'
   },
   {
     name: 'Erstaunt',
-    name_en:'Amazed',
+    nameEn: 'Amazed',
     color: '0089e0'
   },
   {
     name: 'Überrascht',
-    name_en:'Surprised',
+    nameEn: 'Surprised',
     color: '59bdff'
   },
   {
     name: 'Betrübt',
-    name_en:'sad',
+    nameEn: 'sad',
     color: '0000c8'
   },
   {
     name: 'Angewidert',
-    name_en:'Disgusted',
+    nameEn: 'Disgusted',
     color: 'de00de'
   },
   {
     name: 'Wütend',
-    name_en:'Angry',
+    nameEn: 'Angry',
     color: 'd40000'
   },
   {
     name: 'Achtsam',
-    name_en:'mindful',
+    nameEn: 'mindful',
     color: 'ff7d00'
   },
   {
     name: 'Bereit',
-    name_en:'ready',
+    nameEn: 'ready',
     color: 'ffa854'
   },
   {
     name: 'Neugierig',
-    name_en:'Curious',
+    nameEn: 'Curious',
     color: 'ffc48c'
   },
   {
     name: 'Hassend',
-    name_en:'hating',
+    nameEn: 'hating',
     color: 'ffc5c5'
   },
   {
     name: 'Bereuend',
-    name_en:'repenting',
+    nameEn: 'repenting',
     color: 'ffe2ff'
   },
   {
     name: 'Enttäuscht',
-    name_en:'Disappointed',
+    nameEn: 'Disappointed',
     color: 'c5c5ff'
   },
   {
     name: 'Ehrfürchtig',
-    name_en:'reverent',
+    nameEn: 'reverent',
     color: 'd5eeff'
   },
   {
     name: 'Fügsam',
-    name_en:'Docile',
+    nameEn: 'Docile',
     color: 'c5e2c5'
   },
   {
     name: 'Verwirrt',
-    name_en:'Confused',
+    nameEn: 'Confused',
     color: 'a5dbff'
   },
   {
     name: 'Nachdenklich',
-    name_en:'Pensive',
+    nameEn: 'Pensive',
     color: '8c8cff'
   },
   {
     name: 'Gelangweilt',
-    name_en:'bored',
+    nameEn: 'bored',
     color: 'ffc6ff'
   },
   {
     name: 'Gereizt',
-    name_en:'irritated',
+    nameEn: 'irritated',
     color: 'ff8c8c'
   },
   {
     name: 'Verärgert',
-    name_en:'Upset',
+    nameEn: 'Upset',
     color: 'ff0000'
   },
   {
     name: 'Ablehnend',
-    name_en:'unfavorably',
+    nameEn: 'unfavorably',
     color: 'ff54ff'
   },
   {
     name: 'Traurig',
-    name_en:'Sad',
+    nameEn: 'Sad',
     color: '5151ff'
   },
   {
     name: 'Vertrauend',
-    name_en:'trusting',
+    nameEn: 'trusting',
     color: '54ff54'
   },
   {
     name: 'Akzeptierend',
-    name_en:'Accepting',
+    nameEn: 'Accepting',
     color: '8cff8c'
   },
   {
     name: 'Froh',
-    name_en:'Glad',
+    nameEn: 'Glad',
     color: 'ffff54'
   },
   {
     name: 'Ängstlich',
-    name_en:'Scared',
+    nameEn: 'Scared',
     color: '009600'
   },
   {
     name: 'Besorgt',
-    name_en:'Concerned',
+    nameEn: 'Concerned',
     color: '8cc68c'
   }
-]
+];
