@@ -13,7 +13,7 @@ import android.widget.Toast;
 
 import com.media.interactive.cs3.hdm.interactivemedia.R;
 import com.media.interactive.cs3.hdm.interactivemedia.data.Hash;
-import com.media.interactive.cs3.hdm.interactivemedia.data.User;
+import com.media.interactive.cs3.hdm.interactivemedia.data.Login;
 import com.media.interactive.cs3.hdm.interactivemedia.data.UserType;
 
 public class RegisterActivity extends AppCompatActivity
@@ -43,12 +43,12 @@ public class RegisterActivity extends AppCompatActivity
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.bn_register:
-                final User user = User.getInstance();
-                user.setUsername(registerUsername.getText().toString());
-                user.setUserType(UserType.DEFAULT);
-                user.setEmail(registerEmail.getText().toString());
-                user.setHashedPassword(Hash.hashStringSHA256(registerPassword.getText().toString()));
-                user.register(RegisterActivity.this)
+                final Login login = Login.getInstance();
+                login.setUsername(registerUsername.getText().toString());
+                login.setUserType(UserType.DEFAULT);
+                login.setEmail(registerEmail.getText().toString());
+                login.setHashedPassword(Hash.hashStringSHA256(registerPassword.getText().toString()));
+                login.register(RegisterActivity.this)
                         .thenAccept((Void) -> {
                             Toast.makeText(getApplicationContext(),
                                     "Success fully logged in",

@@ -47,7 +47,7 @@ import com.google.android.gms.tasks.Task;
 import com.media.interactive.cs3.hdm.interactivemedia.R;
 import com.media.interactive.cs3.hdm.interactivemedia.RestRequestQueue;
 import com.media.interactive.cs3.hdm.interactivemedia.data.Hash;
-import com.media.interactive.cs3.hdm.interactivemedia.data.User;
+import com.media.interactive.cs3.hdm.interactivemedia.data.Login;
 import com.media.interactive.cs3.hdm.interactivemedia.data.UserType;
 
 import org.json.JSONException;
@@ -92,10 +92,10 @@ public class LoginActivity extends AppCompatActivity
             @RequiresApi(api = Build.VERSION_CODES.N)
             @Override
             public void onSuccess(LoginResult loginResult) {
-                final User user = User.getInstance();
-                user.setAccessToken(loginResult.getAccessToken().getToken().toString());
-                user.setUserType(UserType.FACEBOOK);
-                user.login(LoginActivity.this)
+                final Login login = Login.getInstance();
+                login.setAccessToken(loginResult.getAccessToken().getToken().toString());
+                login.setUserType(UserType.FACEBOOK);
+                login.login(LoginActivity.this)
                         .thenAccept(LoginActivity.this::navigateToHome)
                         .exceptionally(LoginActivity.this::loginFailedHandler);
             }
@@ -162,11 +162,11 @@ public class LoginActivity extends AppCompatActivity
                 startActivity(new Intent(LoginActivity.this, RegisterActivity.class));
                 break;
             case R.id.bn_default_login:
-                final User user = User.getInstance();
-                user.setUsername(loginUsername.getText().toString());
-                user.setHashedPassword(Hash.hashStringSHA256(loginPassword.getText().toString()));
-                user.setUserType(UserType.DEFAULT);
-                user.login(LoginActivity.this)
+                final Login login = Login.getInstance();
+                login.setUsername(loginUsername.getText().toString());
+                login.setHashedPassword(Hash.hashStringSHA256(loginPassword.getText().toString()));
+                login.setUserType(UserType.DEFAULT);
+                login.login(LoginActivity.this)
                         .thenAccept(LoginActivity.this::navigateToHome)
                         .exceptionally(LoginActivity.this::loginFailedHandler);
                 break;
@@ -194,10 +194,10 @@ public class LoginActivity extends AppCompatActivity
     private void handleResult(GoogleSignInResult result) {
         if (result.isSuccess()) {
             final GoogleSignInAccount account = result.getSignInAccount();
-            final User user = User.getInstance();
-            user.setAccessToken(account.getIdToken());
-            user.setUserType(UserType.GOOGLE);
-            user.login(LoginActivity.this)
+            final Login login = Login.getInstance();
+            login.setAccessToken(account.getIdToken());
+            login.setUserType(UserType.GOOGLE);
+            login.login(LoginActivity.this)
                     .thenAccept(LoginActivity.this::navigateToHome)
                     .exceptionally(LoginActivity.this::loginFailedHandler);
             /*

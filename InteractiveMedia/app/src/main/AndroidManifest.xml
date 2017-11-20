@@ -27,7 +27,13 @@
             android:name=".activties.HomeActivity"
             android:label="@string/title_activity_home"
             android:theme="@style/AppTheme.NoActionBar" />
-        <activity android:name=".activties.LoginActivity"></activity>
+        <activity android:name=".activties.LoginActivity" />
+
+        <provider
+            android:name=".contentprovider.DatabaseProvider"
+            android:authorities="com.media.interactive.cs3.hdm.interactivemedia.contentprovider" />
+
+        <activity android:name=".activties.AddGroupActivity"></activity>
     </application>
 
 </manifest>

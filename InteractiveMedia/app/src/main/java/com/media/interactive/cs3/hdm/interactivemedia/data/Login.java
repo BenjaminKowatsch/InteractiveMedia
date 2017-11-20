@@ -1,8 +1,11 @@
 package com.media.interactive.cs3.hdm.interactivemedia.data;
 
+import android.content.ContentResolver;
+import android.content.ContentValues;
 import android.content.Context;
+import android.database.Cursor;
+import android.net.Uri;
 import android.os.Build;
-import android.support.annotation.NonNull;
 import android.support.annotation.RequiresApi;
 import android.util.Log;
 
@@ -15,10 +18,10 @@ import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.auth.api.signin.GoogleSignInResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.OptionalPendingResult;
-import com.google.android.gms.common.api.ResultCallback;
-import com.google.android.gms.common.api.Status;
 import com.media.interactive.cs3.hdm.interactivemedia.R;
 import com.media.interactive.cs3.hdm.interactivemedia.RestRequestQueue;
+import com.media.interactive.cs3.hdm.interactivemedia.contentprovider.DatabaseProvider;
+import com.media.interactive.cs3.hdm.interactivemedia.contentprovider.tables.LoginTable;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -31,20 +34,21 @@ import static com.bumptech.glide.gifdecoder.GifHeaderParser.TAG;
  * Created by benny on 31.10.17.
  */
 
-public class User {
-    private static final User ourInstance = new User();
+public class Login {
+    private static final Login ourInstance = new Login();
     private long id;
     private String username = null;
     private String email = null;
     private String hashedPassword = null;
     private UserType userType = null;
-    private DatabaseHelper databaseHelper = null;
     private String accessToken = null;
+    //private DatabaseHelper databaseHelper = null;
+    private ContentResolver contentResolver = null;
 
-    private User() {
+    private Login() {
     }
 
-    public static User getInstance() {
+    public static Login getInstance() {
         return ourInstance;
     }
 
@@ -99,7 +103,7 @@ public class User {
 
     public boolean loginResponseHandler(JSONObject response) {
 
-        Log.d("User: ","loginResponseHandler: Thread Id: "+android.os.Process.getThreadPriority(android.os.Process.myTid()));
+        Log.d("User: ", "loginResponseHandler: Thread Id: " + android.os.Process.getThreadPriority(android.os.Process.myTid()));
         Log.d(TAG, "Response: " + response.toString());
         try {
             if (response.getBoolean("success")) {
@@ -107,7 +111,9 @@ public class User {
                 setAccessToken(payload.getString("accessToken"));
                 setUserType(UserType.values()[payload.getInt("authType")]);
                 Log.d(TAG, "Successfully registered and logged in with\naccessToken:" + accessToken + "\nuserType:" + userType + "\n");
-                databaseHelper.cacheCredentials(this);
+                if(id == 0) {
+                    cacheCredentials(this);
+                }
                 return true;
             }
 
@@ -119,11 +125,51 @@ public class User {
         return false;
     }
 
+    private boolean cacheCredentials(Login login) {
+        if (contentResolver != null) {
+            final ContentValues contentValues = new ContentValues();
+            contentValues.put(LoginTable.COLUMN_USERNAME, login.getUsername());
+            contentValues.put(LoginTable.COLUMN_HASHED_PASSWORD, login.getHashedPassword());
+            contentValues.put(LoginTable.COLUMN_LOGIN_TYPE, login.getUserType().getValue());
+            final Uri result = contentResolver.insert(DatabaseProvider.CONTENT_LOGIN_URI, contentValues);
+            Log.d(TAG, "cacheCredentials: Adding " + login + " to " + DatabaseProvider.CONTENT_LOGIN_URI);
+            long id = Long.parseLong(result.getLastPathSegment());
+            if(id > 0) {
+                login.setId(id);
+                return true;
+            } else {
+                Log.e(TAG, "Could not cache credentials, error at database.");
+                return false;
+            }
+        }
+        Log.e(TAG, "Could not cache credentials, contentResolver is null.");
+        return false;
+    }
+
+    private boolean checkForCachedCredentials(Login login) {
+        if (contentResolver != null) {
+            boolean result = false;
+            final Cursor cursor = contentResolver.query(DatabaseProvider.CONTENT_LOGIN_URI, null, null, null, LoginTable.COLUMN_CREATED_AT + " DESC LIMIT 1");
+            result = cursor.getCount() > 0;
+            while (cursor.moveToNext()) {
+                login.setId(cursor.getLong(0));
+                login.setUsername(cursor.getString(1));
+                login.setHashedPassword(cursor.getString(2));
+                login.setEmail(cursor.getString(3));
+                login.setUserType(UserType.values()[cursor.getInt(4)]);
+                Log.d(TAG, "Latest Credentials cache: " + cursor.getString(4) + " " + login);
+            }
+            return result;
+        }
+        Log.e(TAG, "Could not find cached credentials, contentResolver is null.");
+        return false;
+    }
+
     private boolean logoutResponseHandler(JSONObject response) {
         Log.d(TAG, "Response: " + response.toString());
         try {
             if (response.getBoolean("success")) {
-                databaseHelper.deleteUser(this);
+                deleteUser(this);
                 this.clear();
                 Log.d(TAG, "Received an successful answer from backend during logout.");
                 return true;
@@ -137,9 +183,21 @@ public class User {
         return false;
     }
 
+    private boolean deleteUser(Login login) {
+        if (contentResolver != null) {
+            final int result = contentResolver.delete(DatabaseProvider.CONTENT_LOGIN_URI, LoginTable.COLUMN_ID + "=?", new String[]{String.valueOf(login.getId())});
+            Log.d(TAG, "delete Login: Adding " + login + " to " + DatabaseProvider.CONTENT_LOGIN_URI+ "  "+ result);
+            return result > 0;
+        }
+        Log.e(TAG, "Could not cache credentials, contentResolver is null.");
+        return false;
+    }
+
     @RequiresApi(api = Build.VERSION_CODES.N)
     public CompletableFuture<Void> register(Context context) {
         final CompletableFuture<Void> future = new CompletableFuture<>();
+
+        contentResolver = context.getContentResolver();
 
         final String url = context.getResources().getString(R.string.web_service_url).concat("/register");
         Log.d(TAG, "url: " + url);
@@ -168,22 +226,19 @@ public class User {
         return future;
     }
 
-    public void setDatabaseHelper(DatabaseHelper databaseHelper) {
-        this.databaseHelper = databaseHelper;
-    }
-
-
     @RequiresApi(api = Build.VERSION_CODES.N)
     public CompletableFuture<Void> login(Context context) {
         final CompletableFuture<Void> future = new CompletableFuture<>();
+
+        contentResolver = context.getContentResolver();
 
         boolean usernameAndHashedPassword = username == null || username.length() <= 0 ||
                 hashedPassword == null || hashedPassword.length() <= 0;
         Log.d(TAG, "usernameAndHashedPassword: " + usernameAndHashedPassword);
         Log.d(TAG, "user: " + toString());
 
-        if(userType == null) {
-            databaseHelper.checkForCachedCredentials(this);
+        if (userType == null) {
+            checkForCachedCredentials(this);
 
             if (userType == null) {
                 future.completeExceptionally(new Throwable("No cached credentials available."));
@@ -214,7 +269,7 @@ public class User {
     private void cachedGoogleLogin(CompletableFuture<Void> future, Context context) {
         // Check if the accessToken is not set
         // If the accessToken is not set there is no need to check the cache
-        if(accessToken == null) {
+        if (accessToken == null) {
 
             final String serverClientId = context.getString(R.string.server_client_id);
             final GoogleSignInOptions signInOptions = new GoogleSignInOptions
@@ -258,7 +313,7 @@ public class User {
                     }
                 })
                 .exceptionally(error -> {
-                    Log.e("User: ","Exceptionally Thread Id: "+android.os.Process.getThreadPriority(android.os.Process.myTid()));
+                    Log.e("User: ", "Exceptionally Thread Id: " + android.os.Process.getThreadPriority(android.os.Process.myTid()));
                     future.completeExceptionally(error);
                     throw new RuntimeException(error.getMessage());
                 });
@@ -268,7 +323,7 @@ public class User {
     private void cachedFacebookLogin(CompletableFuture<Void> future, Context context) {
         // Check if the accessToken is not set
         // If the accessToken is not set there is no need to check the cache
-        if(accessToken == null) {
+        if (accessToken == null) {
             // If the access token is available already assign it.
             final AccessToken facebookAccessToken = AccessToken.getCurrentAccessToken();
 
@@ -299,7 +354,7 @@ public class User {
                     }
                 })
                 .exceptionally(error -> {
-                    Log.e("User: ","Exceptionally Thread Id: "+android.os.Process.getThreadPriority(android.os.Process.myTid()));
+                    Log.e("User: ", "Exceptionally Thread Id: " + android.os.Process.getThreadPriority(android.os.Process.myTid()));
                     future.completeExceptionally(error);
                     throw new RuntimeException(error.getMessage());
                 });
@@ -333,7 +388,7 @@ public class User {
                 })
                 .exceptionally(error -> {
 
-                    Log.e("User: ","Exceptionally Thread Id: "+android.os.Process.getThreadPriority(android.os.Process.myTid()));
+                    Log.e("User: ", "Exceptionally Thread Id: " + android.os.Process.getThreadPriority(android.os.Process.myTid()));
                     future.completeExceptionally(error);
                     throw new RuntimeException(error.getMessage());
                 });
@@ -355,7 +410,6 @@ public class User {
                 ", hashedPassword='" + hashedPassword + '\'' +
                 ", userType=" + userType +
                 ", accessToken=" + accessToken +
-                ", databaseHelper=" + databaseHelper +
                 '}';
     }
 
@@ -376,7 +430,7 @@ public class User {
                 .Builder(context)
                 .addApi(Auth.GOOGLE_SIGN_IN_API, signInOptions)
                 .build();
-        if( googleApiClient.isConnected()) {
+        if (googleApiClient.isConnected()) {
             Auth.GoogleSignInApi
                     .signOut(googleApiClient)
                     .setResultCallback((status) -> {

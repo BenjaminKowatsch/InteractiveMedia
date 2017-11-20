@@ -1,44 +1,36 @@
 package com.media.interactive.cs3.hdm.interactivemedia.fragments;
 
+import android.app.ListFragment;
+import android.app.LoaderManager;
+import android.content.ContentResolver;
+import android.content.ContentValues;
 import android.content.Context;
+import android.content.CursorLoader;
+import android.content.Loader;
+import android.database.Cursor;
 import android.os.Bundle;
-import android.app.Fragment;
-import android.support.v7.widget.GridLayoutManager;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.ListView;
+import android.widget.SimpleCursorAdapter;
 
 import com.media.interactive.cs3.hdm.interactivemedia.R;
-import com.media.interactive.cs3.hdm.interactivemedia.fragments.dummy.DummyContent;
-import com.media.interactive.cs3.hdm.interactivemedia.fragments.dummy.DummyContent.DummyItem;
-
-import java.util.List;
-
-/**
- * A fragment representing a list of Items.
- * <p/>
- * Activities containing this fragment MUST implement the {@link OnListFragmentInteractionListener}
- * interface.
- */
-public class GroupFragment extends Fragment {
+import com.media.interactive.cs3.hdm.interactivemedia.contentprovider.DatabaseProvider;
+import com.media.interactive.cs3.hdm.interactivemedia.contentprovider.tables.GroupTable;
 
 
+public class GroupFragment extends ListFragment implements LoaderManager.LoaderCallbacks<Cursor> {
 
-    @Override
-    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        inflater.inflate(R.menu.fragment_group, menu);
-        super.onCreateOptionsMenu(menu, inflater);
-    }
 
-    // TODO: Customize parameter argument names
-    private static final String ARG_COLUMN_COUNT = "column-count";
-    // TODO: Customize parameters
-    private int mColumnCount = 1;
-    private OnListFragmentInteractionListener mListener;
+    ContentValues dummyContentValues = new ContentValues();
+    private AdapterView.OnItemSelectedListener onItemSelectedListener;
+
+    private SimpleCursorAdapter simpleCursorAdapter;
+    private ContentResolver dummyContentResolver;
 
     /**
      * Mandatory empty constructor for the fragment manager to instantiate the
@@ -48,14 +40,15 @@ public class GroupFragment extends Fragment {
         setHasOptionsMenu(true);
     }
 
-    // TODO: Customize parameter initialization
-    @SuppressWarnings("unused")
-    public static GroupFragment newInstance(int columnCount) {
-        GroupFragment fragment = new GroupFragment();
-        Bundle args = new Bundle();
-        args.putInt(ARG_COLUMN_COUNT, columnCount);
-        fragment.setArguments(args);
-        return fragment;
+    private void addDummyData(int counter) {
+        dummyContentValues.put(GroupTable.COLUMN_NAME, "Gruppe " + counter);
+        dummyContentResolver.insert(DatabaseProvider.CONTENT_GROUP_URI, dummyContentValues);
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        inflater.inflate(R.menu.fragment_group, menu);
+        super.onCreateOptionsMenu(menu, inflater);
     }
 
     @Override
@@ -64,9 +57,19 @@ public class GroupFragment extends Fragment {
 
         setHasOptionsMenu(true);
 
-        if (getArguments() != null) {
-            mColumnCount = getArguments().getInt(ARG_COLUMN_COUNT);
+        dummyContentResolver = getActivity().getContentResolver();
+
+        for (int i = 0; i < 30; i++) {
+            addDummyData(i);
         }
+
+        // Initializing the SimpleCursorAdapter and the CursorLoader
+        String[] projection = new String[]{GroupTable.COLUMN_NAME, GroupTable.COLUMN_CREATED_AT};
+        getLoaderManager().initLoader(0, null, this);
+        simpleCursorAdapter = new SimpleCursorAdapter(getActivity(), R.layout.fragment_group, null, projection,
+                new int[]{R.id.group_title, R.id.group_creation_date}, 0);
+        setListAdapter(simpleCursorAdapter);
+
     }
 
     @Override
@@ -74,17 +77,6 @@ public class GroupFragment extends Fragment {
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_group_list, container, false);
 
-        // Set the adapter
-        if (view instanceof RecyclerView) {
-            Context context = view.getContext();
-            RecyclerView recyclerView = (RecyclerView) view;
-            if (mColumnCount <= 1) {
-                recyclerView.setLayoutManager(new LinearLayoutManager(context));
-            } else {
-                recyclerView.setLayoutManager(new GridLayoutManager(context, mColumnCount));
-            }
-            recyclerView.setAdapter(new MyGroupRecyclerViewAdapter(DummyContent.ITEMS, mListener));
-        }
         return view;
     }
 
@@ -92,32 +84,43 @@ public class GroupFragment extends Fragment {
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-        if (context instanceof OnListFragmentInteractionListener) {
-            mListener = (OnListFragmentInteractionListener) context;
-        } else {
-            throw new RuntimeException(context.toString()
-                    + " must implement OnListFragmentInteractionListener");
+        setHasOptionsMenu(true);
+        try {
+            onItemSelectedListener = (AdapterView.OnItemSelectedListener) context;
+        }catch (ClassCastException e){
+            throw new ClassCastException(
+                    context.toString()
+                            + " muss OnItemSelectedListener implementieren");
         }
     }
 
     @Override
     public void onDetach() {
         super.onDetach();
-        mListener = null;
+        onItemSelectedListener = null;
     }
 
-    /**
-     * This interface must be implemented by activities that contain this
-     * fragment to allow an interaction in this fragment to be communicated
-     * to the activity and potentially other fragments contained in that
-     * activity.
-     * <p/>
-     * See the Android Training lesson <a href=
-     * "http://developer.android.com/training/basics/fragments/communicating.html"
-     * >Communicating with Other Fragments</a> for more information.
-     */
-    public interface OnListFragmentInteractionListener {
-        // TODO: Update argument type and name
-        void onListFragmentInteraction(DummyItem item);
+    @Override
+    public void onListItemClick(ListView l, View v, int position, long id) {
+        super.onListItemClick(l, v, position, id);
+        onItemSelectedListener.onItemSelected(l,v,position,id);
     }
+
+    @Override
+    public Loader<Cursor> onCreateLoader(int id, Bundle args) {
+        final String[] projection = {GroupTable.COLUMN_ID, GroupTable.COLUMN_NAME, GroupTable.COLUMN_CREATED_AT};
+        final CursorLoader cursorLoader = new CursorLoader(getActivity(), DatabaseProvider.CONTENT_GROUP_URI, projection, null, null, null);
+        return cursorLoader;
+    }
+
+    @Override
+    public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
+        simpleCursorAdapter.swapCursor(data);
+    }
+
+    @Override
+    public void onLoaderReset(Loader<Cursor> loader) {
+        simpleCursorAdapter.swapCursor(null);
+    }
+
 }
