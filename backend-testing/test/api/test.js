@@ -39,7 +39,7 @@ describe('Register and login with username + password', function() {
   before(function() {});
   after(function() {});
 
- // POST - Register
+ // POST - Register new user
  it('should register new user', function() {
    return chai.request(host)
      .post('/register')
@@ -54,6 +54,22 @@ describe('Register and login with username + password', function() {
        expect(res.body.payload.authType).to.equal(0);
      });
  });
+
+  // POST - Register existing user
+  it('should fail to register existing user', function() {
+    return chai.request(host)
+      .post('/register')
+      .send({username: testData.users[0].username, password: testData.users[0].password})
+      .then(function(res) {
+        expect(res).to.have.status(200);
+        expect(res).to.be.json;
+        expect(res.body).to.be.an('object');
+        expect(res.body.success).to.be.false;
+        expect(res.body.payload).to.be.an('object');
+        expect(res.body.payload.dataPath).to.equal('username');
+        expect(res.body.payload.message).to.equal('Username already exists');
+      });
+  });
 
   // POST - Login
   it('should login', function() {
