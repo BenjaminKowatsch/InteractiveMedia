@@ -1,3 +1,3 @@
 exports.getHello = function(req, res) {
-  res.jsonp({'msg': new Date()});
+  res.jsonp({'status': 'up', 'currentDate': new Date()});
 };
