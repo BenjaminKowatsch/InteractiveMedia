@@ -32,6 +32,7 @@ import com.media.interactive.cs3.hdm.interactivemedia.R;
 import com.media.interactive.cs3.hdm.interactivemedia.RestRequestQueue;
 import com.media.interactive.cs3.hdm.interactivemedia.data.Login;
 import com.media.interactive.cs3.hdm.interactivemedia.fragments.GroupFragment;
+import com.media.interactive.cs3.hdm.interactivemedia.fragments.TransactionFragment;
 
 import org.json.JSONObject;
 
@@ -112,6 +113,10 @@ public class HomeActivity extends AppCompatActivity
                 Log.d(TAG, "item with id nav_groups was selected");
                 fragment = new GroupFragment();
                 break;
+            case R.id.nav_transactions:
+                Log.d(TAG, "item with id nav_transactions was selected");
+                fragment = new TransactionFragment();
+                break;
             case R.id.nav_logout:
                 Login.getInstance().logout(this)
                 .thenAccept((Void) -> {
@@ -158,7 +163,8 @@ public class HomeActivity extends AppCompatActivity
 
     @Override
     public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-        Toast.makeText(this, "Selected Group at position: " + position, Toast.LENGTH_SHORT).show();
+
+        Toast.makeText(this, parent.toString() + " Selected Group/Transaction at position: " + position, Toast.LENGTH_SHORT).show();
     }
 
     @Override

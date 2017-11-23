@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    >
+
+    <ImageView
+        android:id="@+id/transaction_icon"
+        android:layout_width="80dp"
+        android:layout_height="80dp"
+        android:contentDescription="Picture"
+        android:paddingLeft="10dp"
+        android:paddingRight="10dp"
+        android:src="@drawable/ic_menu_slideshow"
+        />
+
+    <TextView
+        android:id="@+id/transaction_title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_toRightOf="@+id/transaction_icon"
+        android:paddingBottom="10dp"
+        android:textSize="16dp" />
+
+    <TextView
+        android:id="@+id/transaction_creation_date"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/transaction_title"
+        android:layout_toRightOf="@+id/transaction_icon"
+        android:paddingLeft="2dp"
+        android:textSize="14dp" />
+
+    <TextView
+        android:id="@+id/transaction_location"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/transaction_title"
+        android:layout_toEndOf="@+id/transaction_creation_date"
+        android:paddingLeft="100dp"
+        android:textSize="14dp" />
+
+    <TextView
+        android:id="@+id/transaction_payed_by"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/transaction_location"
+        android:layout_alignParentEnd="true"
+        android:layout_marginEnd="34dp"
+        android:paddingLeft="100dp"
+        android:textSize="14dp" />
+
+    <TextView
+        android:id="@+id/transaction_amount"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignStart="@+id/transaction_payed_by"
+        android:layout_above="@+id/transaction_location"
+        android:paddingLeft="2dp"
+        android:textSize="14dp" />
+</RelativeLayout>

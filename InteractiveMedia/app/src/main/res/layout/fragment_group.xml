@@ -8,7 +8,7 @@
         android:id="@+id/group_icon"
         android:layout_width="80dp"
         android:layout_height="80dp"
-        android:contentDescription="Bild"
+        android:contentDescription="Picture"
         android:paddingLeft="10dp"
         android:paddingRight="10dp"
         android:src="@drawable/anonymoususer"

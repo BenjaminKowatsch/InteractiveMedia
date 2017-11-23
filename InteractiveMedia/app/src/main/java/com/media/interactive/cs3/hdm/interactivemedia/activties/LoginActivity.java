@@ -144,8 +144,17 @@ public class LoginActivity extends AppCompatActivity
     }
 
     private Void loginFailedHandler(Throwable error) {
-            Log.d(TAG,"Login failed");
-            throw new RuntimeException(error.getMessage());
+            Void nil = null;
+            Context context = getApplicationContext();
+            CharSequence text = "skipping login for dev only";
+            int duration = Toast.LENGTH_SHORT;
+
+            Toast toast = Toast.makeText(context, text, duration);
+            toast.show();
+            this.navigateToHome(nil);
+            //Log.d(TAG,"Login failed");
+            //throw new RuntimeException(error.getMessage());
+            return nil;
     }
 
     @RequiresApi(api = Build.VERSION_CODES.N)
