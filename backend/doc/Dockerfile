@@ -1,23 +1,10 @@
-#
-# ---- Base Node ----
-FROM node:6-alpine AS base
-
-# install tini
-RUN apk add --no-cache tini
+FROM node:6-alpine
 
 # Set working directory
 WORKDIR /app
 
-# Set tini as entrypoint
-ENTRYPOINT ["/sbin/tini", "--"]
-
 # copy project file
 COPY ./package.json .
-
-
-#
-# ---- Dependencies ----
-FROM base AS dependencies
 
 # disable progress bar to increase speed of npm install
 RUN npm set progress=false
@@ -31,5 +18,5 @@ RUN npm install --no-bin-links
 # copy app sources
 COPY . .
 
-# set starting point
+# execute apidoc generation
 CMD gulp apidoc
