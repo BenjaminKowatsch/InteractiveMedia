@@ -10,9 +10,9 @@ import android.util.Log;
 import android.widget.Toast;
 
 import com.media.interactive.cs3.hdm.interactivemedia.R;
-import com.media.interactive.cs3.hdm.interactivemedia.data.DatabaseHelper;
+import com.media.interactive.cs3.hdm.interactivemedia.contentprovider.DatabaseHelper;
 import com.media.interactive.cs3.hdm.interactivemedia.data.Hash;
-import com.media.interactive.cs3.hdm.interactivemedia.data.User;
+import com.media.interactive.cs3.hdm.interactivemedia.data.Login;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -32,16 +32,14 @@ public class MainActivity extends AppCompatActivity {
         databaseHelper.deleteAllUsers();
         databaseHelper.resetDatabase();
 
-        final User testUser = User.getInstance();
+        final Login testUser = Login.getInstance();
         testUser.setUsername("Test User");
         testUser.setEmail("user.test@gmail.com");
         testUser.setHashedPassword(Hash.hashStringSHA256("Passwort1234"));
         databaseHelper.deleteAllUsers();
 */
 
-        User.getInstance().clear();
-
-        User.getInstance().setDatabaseHelper(databaseHelper);
+        Login.getInstance().clear();
 
         appTag = getResources().getString(R.string.app_tag);
         hasRun = getResources().getString(R.string.has_run);
@@ -52,7 +50,7 @@ public class MainActivity extends AppCompatActivity {
 
     @RequiresApi(api = Build.VERSION_CODES.N)
     private void launchNextActivity() {
-       User.getInstance().login(MainActivity.this)
+       Login.getInstance().login(MainActivity.this)
                 .thenAccept(Void -> {
                     if (sharedPreferences.getBoolean(hasRun, false)) {
                         // This is not the first run
@@ -68,7 +66,7 @@ public class MainActivity extends AppCompatActivity {
                     Log.d(TAG, "Login failed due to " + error.getMessage());
                     Toast.makeText(getApplicationContext(), "Login failed", Toast.LENGTH_SHORT).show();
                         // Do first run stuff
-                    Log.d(TAG, "Launching Login Activity");
+                    Log.d(TAG, "Launching Login Activity"); // TODO: change intent to Login activity
                     final Intent intent = new Intent(MainActivity.this, LoginActivity.class);
                     intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
                     startActivity(intent);

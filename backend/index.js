@@ -1,14 +1,22 @@
+/**
+ * imports
+ * ===================
+ */
+var express = require('express');
+var bodyParser = require('body-parser');
+var morgan = require('morgan');
+
+var helloRoutes = require('./routes/hello');
 
 var config = require('./modules/config');
 var user = require('./modules/user');
-var html = require('./modules/html');
 var database = require('./modules/database');
 var emotionData = require('./modules/emotionData');
 var userDataInit = require('./modules/init_user');
 
-var MONGO_DB_CONNECTION_ERROR_CODE = 10;
+var requestValidator = require('./utils/validateHttpRequestData');
 
-/* Require schemata (Load the schema files once) */
+// Require schemata (Load the schema files once)
 var jsonSchema = {
   userData: require('./JSONSchema/userData.json'),
   googleFacebookLogin: require('./JSONSchema/googleFacebookLogin.json'),
@@ -17,6 +25,12 @@ var jsonSchema = {
   getStatistics: require('./JSONSchema/getStatistics.json')
 };
 
+var MONGO_DB_CONNECTION_ERROR_CODE = 10;
+
+/**
+ * Database connection
+ * ===================
+ */
 database.tryConnect(config.mongodbURL, function() {
   var createIndexCallback = function(err, indexname) {
     if (err === null) {
@@ -62,9 +76,64 @@ database.tryConnect(config.mongodbURL, function() {
   console.log('Not connected to database after maxRetries reached.');
 });
 
-html.init();
+/**
+ * Initialize express instance
+ * ===========================
+ */
+var app = express();
+var server;
 
-html.startServer();
+// initialize logger
+app.use(morgan('combined'));
+
+app.use(bodyParser.json());
+
+// Add headers
+app.use(function(req, res, next) {
+
+  // Website you wish to allow to connect
+  res.setHeader('Access-Control-Allow-Origin', config.origin);
+
+  // Request methods you wish to allow
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, PATCH, DELETE');
+
+  // Request headers you wish to allow
+  res.setHeader('Access-Control-Allow-Headers', 'X-Requested-With,content-type');
+
+  // Set to true if you need the website to include cookies in the requests sent
+  // to the API (e.g. in case you use sessions)
+  res.setHeader('Access-Control-Allow-Credentials', true);
+
+  // Pass to next layer of middleware
+  next();
+});
+
+app.use('/hello', helloRoutes);
+
+// Starts the http server and prints out the host and the port
+server = app.listen(config.port, function() {
+  var host = server.address().address;
+  var port = server.address().port;
+  console.log('Server listening on http://%s:%s', host, port);
+});
+
+/**
+ * ???????????????????
+ * ===================
+ */
+
+/**
+ * Function returns a callback handler for sending a responseData object
+ *
+ * @param  {Object} res   The response object of the REST method
+ * @return {function}     A callback function to be used for sending a responseData object
+ */
+function getSendResponseDataCallback(res) {
+  return function(responseData) {
+    console.log('Sending: ' + JSON.stringify(responseData));
+    res.send(responseData);
+  };
+}
 
 /**
  * This function is used to return a login callback handler based on the authentication type.
@@ -73,8 +142,7 @@ html.startServer();
  * @return {function}          A callback to handle the login behavior for google or facebook users
  */
 function getGoogleFacebookLoginHandler(authType) {
-  return function(userCollection, expiryDate, userId,
-                          req, res, responseData) {
+  return function(userCollection, expiryDate, userId, req, res, responseData) {
     if (user.AUTH_TYPE.GOOGLE === authType) {
       console.log('Google Login: expiryDate: ' +
         expiryDate + ' userId: ' + userId);
@@ -82,10 +150,10 @@ function getGoogleFacebookLoginHandler(authType) {
       console.log('Facebook Login: expiryDate: ' +
         expiryDate + ' userId: ' + userId);
     }
-    user.googleOrFacebookLogin(userCollection, responseData,
-          userId, expiryDate, authType, req.body.accessToken)
-    .then(html.getSendResponseDataCallback(res))
-    .catch(html.getSendResponseDataCallback(res));
+    user.googleOrFacebookLogin(userCollection, responseData, userId, expiryDate,
+       authType, req.body.accessToken)
+    .then(getSendResponseDataCallback(res))
+    .catch(getSendResponseDataCallback(res));
   };
 }
 
@@ -108,8 +176,9 @@ function getGoogleFacebookLoginHandler(authType) {
  */
 function registerLoggedInPostMethod(path, jsonSchema,
    onSuccessCallback, staticAuthType = null) {
-  html.registerPostMethodWithInputValidation(path,
-     jsonSchema, function(res, req,
+  registerPostMethodWithInputValidation(path,
+    jsonSchema,
+    function(res, req,
         responseData, authType) {
       verifyAccessToken(req.body.accessToken, authType)
     .then(function(promiseData) {
@@ -132,6 +201,33 @@ function registerLoggedInPostMethod(path, jsonSchema,
         }
       });
     }, staticAuthType);
+}
+
+/**
+ * Function to register a POST method with integrated request data validation
+ *
+ * @param  {string} path Path to register REST function
+ * @param  {JSONObject} jsonSchema JSON schema to validate incoming request data
+ * @param  {function} onSuccessCallback Callback to be called if input validation and verification of the accessToken were successful
+ *         {Object} reqy Request object of the REST method
+ *         {Object} res Response object of the REST method
+ *         {JSONObject} responseData Data object created during the request data validation containing the result
+ *         {user.AUTH_TYPE} authType An enumeration value, which specifies the current type of authentication
+ * @param  {user.AUTH_TYPE} [staticAuthType=null] Optional value, if set it will override the authType in the request
+ *                                                This value is used when registering the google and facebook login handlers,
+ *                                                because in those cases the request data does not contain a authentication type
+ */
+
+function registerPostMethodWithInputValidation(path, jsonSchema,
+  onSuccessCallback, staticAuthType = null) {
+  app.post(path, function(req, res) {
+    console.log('Post path: ' + path + ' data: ' + JSON.stringify(req.body));
+    requestValidator.validateRequestData(req, res, jsonSchema, function(responseData) {
+      // Use static authType if set
+      var authType = (staticAuthType !== null) ? staticAuthType : req.body.authType;
+      onSuccessCallback(res, req, responseData, authType);
+    });
+  });
 }
 
 /**
@@ -165,73 +261,78 @@ function verifyAccessToken(token, authType) {
   }
 }
 
-html.registerPostMethodWithInputValidation('/launometer_login', jsonSchema.userData,
- function(res, req, responseData, authType) {
+/**
+ * register routes
+ * ===============
+ */
+
+registerPostMethodWithInputValidation('/launometer_login', jsonSchema.userData,
+function(res, req, responseData, authType) {
   user.launometerLogin(database.collections.launometerUsers,
-     responseData, req.body.username, req.body.password)
-  .then(html.getSendResponseDataCallback(res))
-  .catch(html.getSendResponseDataCallback(res));
+    responseData, req.body.username, req.body.password)
+ .then(getSendResponseDataCallback(res))
+ .catch(getSendResponseDataCallback(res));
 });
 
-html.registerPostMethodWithInputValidation('/register', jsonSchema.userData,
- function(res, req, responseData, authType) {
+registerPostMethodWithInputValidation('/register', jsonSchema.userData,
+function(res, req, responseData, authType) {
   user.register(database.collections.launometerUsers,
-    responseData, req.body.username, req.body.password)
-  .then(html.getSendResponseDataCallback(res))
-  .catch(html.getSendResponseDataCallback(res));
+   responseData, req.body.username, req.body.password)
+ .then(getSendResponseDataCallback(res))
+ .catch(getSendResponseDataCallback(res));
 });
 
 registerLoggedInPostMethod('/google_login', jsonSchema.googleFacebookLogin,
- getGoogleFacebookLoginHandler(user.AUTH_TYPE.GOOGLE), user.AUTH_TYPE.GOOGLE);
+getGoogleFacebookLoginHandler(user.AUTH_TYPE.GOOGLE), user.AUTH_TYPE.GOOGLE);
 
 registerLoggedInPostMethod('/facebook_login', jsonSchema.googleFacebookLogin,
- getGoogleFacebookLoginHandler(user.AUTH_TYPE.FACEBOOK), user.AUTH_TYPE.FACEBOOK);
+getGoogleFacebookLoginHandler(user.AUTH_TYPE.FACEBOOK), user.AUTH_TYPE.FACEBOOK);
 
 registerLoggedInPostMethod('/logout', jsonSchema.accessToken,
- function(userCollection, expiryDate, userId, req, res, responseData) {
+function(userCollection, expiryDate, userId, req, res, responseData) {
   user.logout(userCollection, responseData, userId)
-  .then(html.getSendResponseDataCallback(res))
-  .catch(html.getSendResponseDataCallback(res));
+ .then(getSendResponseDataCallback(res))
+ .catch(getSendResponseDataCallback(res));
 });
 
 registerLoggedInPostMethod('/get_max_val', jsonSchema.accessToken,
- function(userCollection, expiryDate, userId, req, res, responseData) {
+function(userCollection, expiryDate, userId, req, res, responseData) {
   user.getMaxValue(userCollection, responseData, userId)
-  .then(html.getSendResponseDataCallback(res))
-  .catch(html.getSendResponseDataCallback(res));
+ .then(getSendResponseDataCallback(res))
+ .catch(getSendResponseDataCallback(res));
 });
 
 registerLoggedInPostMethod('/get_stat', jsonSchema.getStatistics,
- function(userCollection, expiryDate, userId, req, res, responseData) {
+function(userCollection, expiryDate, userId, req, res, responseData) {
   user.getStatistics(userCollection, responseData, userId, req.body.payload.min)
-  .then(html.getSendResponseDataCallback(res))
-  .catch(html.getSendResponseDataCallback(res));
+ .then(getSendResponseDataCallback(res))
+ .catch(getSendResponseDataCallback(res));
 });
 
 registerLoggedInPostMethod('/get_diary', jsonSchema.accessToken,
- function(userCollection, expiryDate, userId, req, res, responseData) {
+function(userCollection, expiryDate, userId, req, res, responseData) {
   user.getDiary(userCollection, responseData, userId)
-  .then(html.getSendResponseDataCallback(res))
-  .catch(html.getSendResponseDataCallback(res));
+ .then(getSendResponseDataCallback(res))
+ .catch(getSendResponseDataCallback(res));
 });
 
 registerLoggedInPostMethod('/insertData', jsonSchema.postData,
- function(userCollection, expiryDate, userId, req, res, responseData) {
+function(userCollection, expiryDate, userId, req, res, responseData) {
   user.createPost(userCollection, responseData, userId, req.body.payload)
-  .then(html.getSendResponseDataCallback(res))
-  .catch(html.getSendResponseDataCallback(res));
+ .then(getSendResponseDataCallback(res))
+ .catch(getSendResponseDataCallback(res));
 });
 
 registerLoggedInPostMethod('/getEmotion', jsonSchema.accessToken,
- function(userCollection, expiryDate, userId, req, res, responseData) {
+function(userCollection, expiryDate, userId, req, res, responseData) {
   user.getEmotion(database.collections.emotionData, responseData)
-  .then(html.getSendResponseDataCallback(res))
-  .catch(html.getSendResponseDataCallback(res));
+ .then(getSendResponseDataCallback(res))
+ .catch(getSendResponseDataCallback(res));
 });
 
 registerLoggedInPostMethod('/getCurrentMood', jsonSchema.accessToken,
- function(userCollection, expiryDate, userId, req, res, responseData) {
+function(userCollection, expiryDate, userId, req, res, responseData) {
   user.getCurrentMood(userCollection, database.collections.emotionData, responseData, userId)
-  .then(html.getSendResponseDataCallback(res))
-  .catch(html.getSendResponseDataCallback(res));
+    .then(getSendResponseDataCallback(res))
+    .catch(getSendResponseDataCallback(res));
 });

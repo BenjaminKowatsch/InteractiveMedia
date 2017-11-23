@@ -8,7 +8,9 @@ import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.RequiresApi;
+import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
+import android.support.design.widget.Snackbar;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
@@ -17,6 +19,8 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.AdapterView;
 import android.widget.Toast;
 
 import com.android.volley.Request;
@@ -26,14 +30,14 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.media.interactive.cs3.hdm.interactivemedia.R;
 import com.media.interactive.cs3.hdm.interactivemedia.RestRequestQueue;
-import com.media.interactive.cs3.hdm.interactivemedia.data.User;
+import com.media.interactive.cs3.hdm.interactivemedia.data.Login;
 import com.media.interactive.cs3.hdm.interactivemedia.fragments.GroupFragment;
-import com.media.interactive.cs3.hdm.interactivemedia.fragments.dummy.DummyContent;
 
 import org.json.JSONObject;
 
 public class HomeActivity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener, GroupFragment.OnListFragmentInteractionListener {
+        implements NavigationView.OnNavigationItemSelectedListener,
+                   AdapterView.OnItemSelectedListener{
 
     private static final String TAG = "HomeActivity";
 
@@ -46,6 +50,17 @@ public class HomeActivity extends AppCompatActivity
         setContentView(R.layout.activity_home);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+
+        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
+        fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                Log.d(TAG, "Launching AddGroupActivity");
+                final Intent intent = new Intent(HomeActivity.this, AddGroupActivity.class);
+                startActivity(intent);
+            }
+        });
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
 
@@ -98,7 +113,7 @@ public class HomeActivity extends AppCompatActivity
                 fragment = new GroupFragment();
                 break;
             case R.id.nav_logout:
-                User.getInstance().logout(this)
+                Login.getInstance().logout(this)
                 .thenAccept((Void) -> {
                     Log.d(TAG, "Successfully logged out.");
                     Toast.makeText(HomeActivity.this,"Sucessfully logged out.",Toast.LENGTH_SHORT).show();
@@ -142,7 +157,12 @@ public class HomeActivity extends AppCompatActivity
     }
 
     @Override
-    public void onListFragmentInteraction(DummyContent.DummyItem item) {
+    public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+        Toast.makeText(this, "Selected Group at position: " + position, Toast.LENGTH_SHORT).show();
+    }
 
+    @Override
+    public void onNothingSelected(AdapterView<?> parent) {
+        Toast.makeText(this, "Selected nothing ", Toast.LENGTH_SHORT).show();
     }
 }

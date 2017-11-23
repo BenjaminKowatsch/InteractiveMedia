@@ -1,9 +1,26 @@
 {
   "preset": "google",
+  "jsDoc" : {
+    "checkAnnotations": {
+      "preset": "jsduck5",
+      "extra": {
+        "api": "some",
+        "apiName": "some",
+        "apiGroup": "some",
+        "apiParam": "some",
+        "apiSuccess": "some",
+        "apiVersion": "some",
+        "apiDescription": "some"
+      }
+    }
+  },
   "maximumLineLength": {
-      "value": 100,
-      "allExcept": ["comments", "regex"]
-    },
+    "value": 100,
+    "allExcept": [
+      "comments",
+      "regex"
+    ]
+  },
   "requireCamelCaseOrUpperCaseIdentifiers": false,
   "fix": true
 }

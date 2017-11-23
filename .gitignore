@@ -10,3 +10,7 @@ node_modules/jwt-simple/
 frontend/npm-debug\.log
 
 .vagrant
+
+.idea/**/*
+
+backend-testing/node_modules/

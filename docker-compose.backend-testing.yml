@@ -1,0 +1,12 @@
+version: '2'
+services:
+  mongo:
+    image: mongo
+  backend:
+    image: localhost:5000/backend
+    depends_on:
+      - mongo
+  backend-testing:
+    build: ./backend/testing-api
+    depends_on: 
+      - backend
