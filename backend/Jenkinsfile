@@ -1,0 +1,17 @@
+pipeline {
+    agent any
+    stages {
+        stage('Checkout code') {
+            steps {
+                git credentialsId: '3ccd0e84-c917-4b30-b440-016c57545b2d', url: 'git@gitlab.mi.hdm-stuttgart.de:bk095/InteraktiveMedien.git'
+            }
+        }
+
+        stage('Generate doc') {
+            agent {dockerfile {customWorkspace '/backend' } }
+            steps {
+                sh 'gulp apidoc'
+            }
+        }
+    }
+}
