@@ -28,33 +28,8 @@ RUN npm config set depth 0
 # install ALL node_modules, including 'devDependencies'
 RUN npm install --no-bin-links
 
-
-#
-# ---- Unit tests and linters ----
-FROM dependencies AS test
-
-# add current folder
-COPY . .
-
-# ---- Release ----
-FROM base AS release
-
-# Set environment variables
-ENV PORT 8081
-ENV MONGODB_URL "mongodb://mongo/launometer"
-ENV ORIGIN  "http://localhost:8088"
-ENV GOOGLE_OAUTH_CLIENT_ID "908170470873-8151s7cvldroebdl7mcpg2houdgljgfg.apps.googleusercontent.com"
-ENV FACEBOOK_APP_TOKEN "1971379956470536|hIQ5dRDon3DJq2YzH1NU41byB-w"
-ENV JWT_SIMPLE_SECRET "A3xFr93Yl2qTn5"
-
-# copy production node_modules
-COPY --from=dependencies /app/prod_node_modules ./node_modules
-
 # copy app sources
 COPY . .
 
-# expose port
-EXPOSE $PORT
-
 # set starting point
-CMD npm run start
+CMD gulp apidoc
