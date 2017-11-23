@@ -22,3 +22,8 @@ docker-compose --version
 
 echo "==> create mongodb data directory"
 mkdir -p /data
+
+echo "==> allow ssh PasswordAuthentication"
+sed -i '$ d' /etc/ssh/sshd_config
+service ssh restart
+service sshd restart
