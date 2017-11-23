@@ -9,7 +9,7 @@ pipeline {
         }
 
         stage('Generate doc') {
-            agent {dockerfile {customWorkspace '/backend' } }
+            agent {dockerfile {dir  'backend' } }
             steps {
                 sh 'gulp apidoc'
             }
