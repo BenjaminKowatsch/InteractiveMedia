@@ -7,6 +7,6 @@ services:
     depends_on:
       - mongo
   backend-testing:
-    build: ./backend-testing
+    build: ./backend/testing-api
     depends_on: 
       - backend

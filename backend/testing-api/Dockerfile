@@ -18,4 +18,4 @@ RUN npm install
 COPY . .
 
 # run api test on container start
-CMD ["npm", "run", "api-test"]
+CMD ["npm", "run", "test"]
