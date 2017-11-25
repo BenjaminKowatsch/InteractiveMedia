@@ -18,7 +18,13 @@ pipeline {
 
         stage('Publish doc') {
             steps {
-                publishHTML([allowMissing: false, alwaysLinkToLastBuild: false, keepAll: false, reportDir: 'generated_doc', reportFiles: 'index.html', reportName: 'ApiDocs', reportTitles: ''])
+                publishHTML( [allowMissing: false,
+                    alwaysLinkToLastBuild: false,
+                    keepAll: false,
+                    reportDir: 'generated_doc',
+                    reportFiles: 'index.html',
+                    reportName: 'ApiDocs',
+                    reportTitles: ''])
             }
         }
     }
