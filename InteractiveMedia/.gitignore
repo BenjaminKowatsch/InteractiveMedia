@@ -12,6 +12,9 @@
 .gradle
 /build/
 
+#JavaDoc related ignores
+/javadoc
+
 # Ignore Gradle GUI config
 gradle-app.setting
 
