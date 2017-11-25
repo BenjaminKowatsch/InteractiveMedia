@@ -8,12 +8,20 @@ chai.use(require('chai-http'));
 var host = 'http://backend:8081';
 
 var testData = {
-  'users': [
-    {
-      'username': 'alex1',
-      'password': 'alexpassword'
-    }
-  ]
+  'users': {
+    'valid': [
+      {
+        'username': 'alex1',
+        'password': 'alexpassword'
+      }
+    ],
+    'invalid': [
+      {
+        'username': 'alex_invalid',
+        'password': 'passwordinvalid'
+      }
+    ]
+  }
 };
 
 describe('Dummy test', function() {
@@ -35,7 +43,7 @@ describe('Dummy test', function() {
   });
 });
 
-describe('Register and login with username + password', function() {
+describe('Register with username + password', function() {
   this.timeout(5000); // How long to wait for a response (ms)
 
   before(function() {});
@@ -45,7 +53,7 @@ describe('Register and login with username + password', function() {
   it('should register new user', function() {
     return chai.request(host)
      .post('/register')
-     .send({username: testData.users[0].username, password: testData.users[0].password})
+     .send({username: testData.users.valid[0].username, password: testData.users.valid[0].password})
      .then(function(res) {
         expect(res).to.have.status(200);
         expect(res).to.be.json;
@@ -61,7 +69,7 @@ describe('Register and login with username + password', function() {
   it('should fail to register existing user', function() {
     return chai.request(host)
       .post('/register')
-      .send({username: testData.users[0].username, password: testData.users[0].password})
+      .send({username: testData.users.valid[0].username, password: testData.users.valid[0].password})
       .then(function(res) {
         expect(res).to.have.status(200);
         expect(res).to.be.json;
@@ -72,12 +80,19 @@ describe('Register and login with username + password', function() {
         expect(res.body.payload.message).to.equal('Username already exists');
       });
   });
+});
+
+describe('Login with username + password', function() {
+  this.timeout(5000); // How long to wait for a response (ms)
+
+  before(function() {});
+  after(function() {});
 
   // POST - Login
   it('should login', function() {
     return chai.request(host)
       .post('/launometer_login')
-      .send({username: testData.users[0].username, password: testData.users[0].password})
+      .send({username: testData.users.valid[0].username, password: testData.users.valid[0].password})
       .then(function(res) {
         expect(res).to.have.status(200);
         expect(res).to.be.json;
@@ -89,4 +104,33 @@ describe('Register and login with username + password', function() {
       });
   });
 
+  // POST - Login
+  it('should fail to login with invalid username', function() {
+    return chai.request(host)
+      .post('/launometer_login')
+      .send({username: testData.users.invalid[0].username, password: testData.users.valid[0].password})
+      .then(function(res) {
+        expect(res).to.have.status(200);
+        expect(res).to.be.json;
+        expect(res.body).to.be.an('object');
+        expect(res.body.success).to.be.false;
+        expect(res.body.payload).to.be.an('object');
+        expect(res.body.payload).to.be.empty;
+      });
+  });
+
+  // POST - Login
+  it('should fail to login with invalid password', function() {
+    return chai.request(host)
+      .post('/launometer_login')
+      .send({username: testData.users.valid[0].username, password: testData.users.invalid[0].password})
+      .then(function(res) {
+        expect(res).to.have.status(200);
+        expect(res).to.be.json;
+        expect(res.body).to.be.an('object');
+        expect(res.body.success).to.be.false;
+        expect(res.body.payload).to.be.an('object');
+        expect(res.body.payload).to.be.empty;
+      });
+  });
 });
