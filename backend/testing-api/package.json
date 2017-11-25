@@ -3,13 +3,13 @@
   "version": "0.0.1",
   "description": "",
   "scripts": {
-    "test": "./node_modules/mocha/bin/mocha --reporter spec ./test"
+    "test": "./node_modules/mocha/bin/mocha --reporter spec ./test/**/*.js"
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
     "chai": "^4.0.2",
-    "chai-http": "^3.0.0",
+    "chai-http": "git+https://github.com/chaijs/chai-http.git#3ea4524",
     "mocha": "^3.4.2"
   }
 }
