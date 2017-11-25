@@ -15,7 +15,7 @@
     }
   },
   "maximumLineLength": {
-    "value": 100,
+    "value": 120,
     "allExcept": [
       "comments",
       "regex"
