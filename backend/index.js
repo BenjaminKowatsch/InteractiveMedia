@@ -7,6 +7,7 @@ var bodyParser = require('body-parser');
 var morgan = require('morgan');
 
 var helloRoutes = require('./routes/hello');
+var usersRoutes = require('./routes/users.routes');
 
 var config = require('./modules/config');
 var user = require('./modules/user');
@@ -14,7 +15,7 @@ var database = require('./modules/database');
 var emotionData = require('./modules/emotionData');
 var userDataInit = require('./modules/init_user');
 
-var requestValidator = require('./utils/validateHttpRequestData');
+var requestValidator = require('./services/validateHttpRequestData');
 
 // Require schemata (Load the schema files once)
 var jsonSchema = {
@@ -109,6 +110,7 @@ app.use(function(req, res, next) {
 });
 
 app.use('/hello', helloRoutes);
+app.use('/v1/users', usersRoutes);
 
 // Starts the http server and prints out the host and the port
 server = app.listen(config.port, function() {
