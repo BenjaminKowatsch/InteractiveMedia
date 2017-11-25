@@ -10,8 +10,15 @@ pipeline {
 
         stage('Generate doc') {
             steps {
-                sh 'docker build -f backend/doc/Dockerfile backend'
-                sh 'docker ps'
+                sh 'docker build -f backend/doc/Dockerfile -t apidoc:latest backend'
+                sh 'docker run apidoc:latest'
+                sh 'docker cp $(docker ps --latest --format "{{.ID}}"):/doc ./generated_doc'
+            }
+        }
+
+        stage('Publish doc') {
+            steps {
+                publishHTML([allowMissing: false, alwaysLinkToLastBuild: false, keepAll: false, reportDir: 'generated_doc', reportFiles: 'index.html', reportName: 'ApiDocs', reportTitles: ''])
             }
         }
     }
