@@ -1,16 +1,9 @@
-/data/
 /frontend/dist/*
 
-node_modules/js-cookie/
-
-node_modules/vue-stash/
-
-node_modules/jwt-simple/
-
-frontend/npm-debug\.log
+**/npm-debug\.log
 
 .vagrant
 
 .idea/**/*
 
-backend-testing/node_modules/
+**/node_modules/
