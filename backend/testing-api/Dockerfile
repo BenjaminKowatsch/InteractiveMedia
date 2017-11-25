@@ -18,7 +18,7 @@ COPY package.json .
 RUN npm set progress=false
 
 # install all dependencies
-RUN npm install
+RUN npm install --no-bin-links
 
 # add current folder
 COPY . .
