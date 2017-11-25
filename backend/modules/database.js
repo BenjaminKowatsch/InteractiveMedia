@@ -18,7 +18,7 @@ var tryConnectOptions = {
 };
 
 /**
- * Export access variablsefor interaction with the database
+ * Export access variablse for interaction with the database
  */
 database.collections = {
   'launometerUsers': undefined,
