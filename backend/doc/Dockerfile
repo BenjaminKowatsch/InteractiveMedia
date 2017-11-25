@@ -1,7 +1,4 @@
-FROM node:6.12.0
-
-# Set working directory
-WORKDIR /app
+FROM node:6-alpine
 
 # copy project file
 COPY ./package.json .
@@ -13,10 +10,11 @@ RUN npm set progress=false
 RUN npm config set depth 0
 
 # install ALL node_modules, including 'devDependencies'
-RUN npm install --no-bin-links
+RUN npm install
+RUN npm install gulp
 
 # copy app sources
 COPY . .
 
 # execute apidoc generation
-CMD gulp apidoc
+CMD "./node_modules/gulp/bin/gulp.js apidoc"

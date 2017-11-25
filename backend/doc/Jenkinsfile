@@ -9,12 +9,9 @@ pipeline {
         }
 
         stage('Generate doc') {
-            agent {dockerfile {
-                dir  'backend'
-                additionalBuildArgs '-f <backend/doc/Dockerfile>'}
-            }
             steps {
-                sh 'gulp apidoc'
+                sh 'docker build -f backend/doc/Dockerfile backend'
+                sh 'docker ps'
             }
         }
     }
