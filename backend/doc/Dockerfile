@@ -10,7 +10,7 @@ RUN npm set progress=false
 RUN npm config set depth 0
 
 # install ALL node_modules, including 'devDependencies'
-RUN npm install
+RUN npm install --no-bin-links
 
 # copy app sources
 COPY . .
