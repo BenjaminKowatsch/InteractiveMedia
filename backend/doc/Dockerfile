@@ -16,4 +16,4 @@ RUN npm install
 COPY . .
 
 # execute apidoc generation
-CMD ["./node_modules/gulp/bin/gulp.js", "apidoc"]
+CMD ["npm", "run", "generate-apidoc"]

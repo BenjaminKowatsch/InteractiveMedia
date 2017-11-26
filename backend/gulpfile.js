@@ -4,7 +4,7 @@ var    jscs = require('gulp-jscs');
 var stylish = require('gulp-jscs-stylish');
 var apidoc = require('gulp-apidoc');
 
-gulp.task('default', function() {
+gulp.task('static-code-analysis', function() {
   return gulp.src(['./*.js','./**/*.js',
                    '!node_modules/**','!prod_node_modules/**',
                     '!doc/**'])

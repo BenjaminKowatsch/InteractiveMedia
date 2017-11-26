@@ -5,8 +5,9 @@
   "main": "index.js",
   "scripts": {
     "unit-test": "./node_modules/mocha/bin/mocha --reporter spec ./testing-unit/test/**/*.js",
-    "static-code-analysis": "./node_modules/gulp/bin/gulp.js ",
-    "start": "node index.js"
+    "static-code-analysis": "./node_modules/gulp/bin/gulp.js static-code-analysis",
+    "start": "node index.js",
+    "generate-apidoc": "./node_modules/gulp/bin/gulp.js apidoc"
   },
   "author": "",
   "license": "ISC",
