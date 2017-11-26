@@ -1,5 +1,6 @@
 var user = module.exports = {};
 
+var winston = require('winston');
 /* Application configuration */
 var config = require('./config');
 /* JSON Web Token to create access tokens */
@@ -109,6 +110,7 @@ user.verifyGoogleAccessToken = function(userCollection, token) {
 user.verifyLaunometerAccessToken = function(userCollection, token) {
   return new Promise((resolve, reject) => {
     if (undefined === userCollection) {
+      winston.error('Error MONGO_DB_CONNECTION_ERROR_OBJECT');
       reject(MONGO_DB_CONNECTION_ERROR_OBJECT);
     } else {
       var payload = jwt.decode(token, config.jwtSimpleSecret);
@@ -128,6 +130,7 @@ user.verifyLaunometerAccessToken = function(userCollection, token) {
           };
           resolve(promiseData);
         } else {
+          winston.error('Error MONGO_DB_INTERNAL_ERROR');
           reject(error);
         }
       });
@@ -151,14 +154,15 @@ user.verifyLaunometerAccessToken = function(userCollection, token) {
 user.verifyFacebookAccessToken = function(userCollection, token) {
   return new Promise((resolve, reject) => {
     if (undefined === userCollection) {
+      winston.error('usercollection is not set ');
       reject(MONGO_DB_CONNECTION_ERROR_OBJECT);
     } else {
       var options = {
         host: 'graph.facebook.com',
         path: ('/v2.9/debug_token?access_token=' +
-               config.facebookAppToken + '&input_token=' + token)
+               config.facebookUrlAppToken + '&input_token=' + token)
       };
-
+      winston.info('verifing: https://' + options.host + options.path);
       https.get(options, function(response) {
         var responseMessage = '';
 
@@ -169,15 +173,15 @@ user.verifyFacebookAccessToken = function(userCollection, token) {
         response.on('end', function() {
           var data = JSON.parse(responseMessage);
           if (data.error !== undefined) {
+            winston.error('Received error response from facebook ');
             reject(data.error);
           } else {
-            var userId = data.data.user_id;
-            var expiryDate = new Date(data.data.expires_at * 1000);
             var promiseData = {
-              userCollection: userCollection,
-              expiryDate: expiryDate,
-              userId: userId
+              //userCollection: userCollection,
+              expiryDate: new Date(data.data.expires_at * 1000),
+              userId: data.data.user_id
             };
+            winston.info('returning: ' + JSON.stringify(promiseData));
             resolve(promiseData);
           }
         });

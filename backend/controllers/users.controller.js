@@ -11,17 +11,16 @@ var jsonSchema = {
 };
 
 exports.registerNewUser = function(req, res) {
+  winston.info('req.body', req.body);
 
-    winston.info('req.body', req.body);
+  // validate data in request body
+  var validationResult = jsonValidator.validateAgainstSchema(req.body, jsonSchema.userData);
 
-    // validate data in request body
-    var validationResult = jsonValidator.validateAgainstSchema(req.body, jsonSchema.userData);
+  if (validationResult.valid === true) {
+    // request body is valid
 
-    if (validationResult.valid === true) {
-      // request body is valid
-
-      // store user in mongo
-      user.register(database.collections.launometerUsers, {}, req.body.username, req.body.password)
+    // store user in mongo
+    user.register(database.collections.launometerUsers, {}, req.body.username, req.body.password)
       .then(function(registerResult) {
         // mongo update was successful
         var resBody = {'success': true, 'payload': registerResult.payload};
@@ -32,11 +31,18 @@ exports.registerNewUser = function(req, res) {
         var resBody = {'success': false, 'payload': registerResult.payload};
         httpResponder.sendHttpResponse(res, 400, resBody);
       });
+  } else {
+    // request body is invalid
+    var resBody = {'success': false, 'payload': validationResult.error};
+    httpResponder.sendHttpResponse(res, 400, resBody);
+  }
+};
 
-    } else {
-      // request body is invalid
-      var resBody = {'success': false, 'payload': validationResult.error};
-      httpResponder.sendHttpResponse(res, 400, resBody);
-    }
+exports.dummyFunction = function(req, res) {
+  winston.info('req.body', req.body);
 
-  };
+  winston.info('userId: ', res.locals.userId);
+
+  var resBody = {'success': true, 'payload': {}};
+  httpResponder.sendHttpResponse(res, 201, resBody);
+};

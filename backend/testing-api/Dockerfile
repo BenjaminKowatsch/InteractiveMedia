@@ -20,6 +20,8 @@ RUN npm set progress=false
 # install all dependencies
 RUN npm install --no-bin-links
 
+ENV FACEBOOK_URL_APP_TOKEN "1971379956470536%7ChIQ5dRDon3DJq2YzH1NU41byB-w"
+ENV FACEBOOK_APP_ID "1971379956470536"
 # add current folder
 COPY . .
 

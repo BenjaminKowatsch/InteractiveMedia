@@ -13,24 +13,7 @@
       "maximum": 2
     },
     "payload":{
-      "type": "object",
-      "properties": {
-        "date":{
-        },
-        "mood":{
-          "type": "number"
-        },
-        "emotion":{
-          "type": "string"
-        },
-        "colour":{
-          "type": "string"
-        },
-        "text":{
-          "type": "string"
-        }
-      },
-      "additionalProperties": false
+      "type": "object"
     }
   },
   "additionalProperties": false

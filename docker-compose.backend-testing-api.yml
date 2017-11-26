@@ -1,12 +1,21 @@
-version: '2'
+version: '2.1'
 services:
   mongo:
     image: mongo
+    ports:
+      - "27017:27017"
+    healthcheck:
+      test: echo 'db.stats().ok' | mongo localhost:27017/zenbrain --quiet
+      interval: 1s
+      timeout: 1s
+      retries: 12
   backend:
     image: localhost:5000/backend
     depends_on:
-      - mongo
+      mongo:
+        condition: service_healthy
   backend-testing:
     build: ./backend/testing-api
-    depends_on: 
+    depends_on:
+      - mongo
       - backend
