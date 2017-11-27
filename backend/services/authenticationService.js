@@ -58,15 +58,15 @@ function verifyAccessToken(token, authType) {
     case user.AUTH_TYPE.LAUNOMETER:
       winston.info('Verifing Launometer access token');
       // Verify launometer access token
-      return user.verifyLaunometerAccessToken(database.collections.launometerUsers, token);
+      return user.verifyLaunometerAccessToken(database.collections.users, token);
     case user.AUTH_TYPE.GOOGLE:
       winston.info('Verifing Google access token');
       // Verify google access token
-      return user.verifyGoogleAccessToken(database.collections.googleUsers, token);
+      return user.verifyGoogleAccessToken(database.collections.users, token, true);
     case user.AUTH_TYPE.FACEBOOK:
       winston.info('Verifing Facebook access token');
       // Verify facebook access token
-      return user.verifyFacebookAccessToken(database.collections.facebookUsers, token);
+      return user.verifyFacebookAccessToken(database.collections.users, token, true);
     default:
       winston.error('Unknown authType');
       return Promise.reject('Unknown authType');
