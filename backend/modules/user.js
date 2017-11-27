@@ -69,28 +69,59 @@ user.AUTH_TYPE = AUTH_TYPE;
  *                                                OR
  *                                                Google Error
  */
-user.verifyGoogleAccessToken = function(userCollection, token) {
+user.verifyGoogleAccessToken = function(userCollection, token, verifyDatabase) {
   return new Promise((resolve, reject) => {
-    if (undefined === userCollection) {
-      reject(MONGO_DB_CONNECTION_ERROR_OBJECT);
-    } else {
-      client.verifyIdToken(token, config.googleOAuthClientID,
-      function(error, login) {
-        if (error === null) {
-          var payload = login.getPayload();
-          var userId = payload.sub;
-          var expiryDate = new Date(payload.exp * 1000);
+    // verify google access token
+    client.verifyIdToken(token, config.googleOAuthClientID,
+    function(error, login) {
+      if (error === null) {
+        var payload = login.getPayload();
+        var userId = payload.sub;
+        var expiryDate = new Date(payload.exp * 1000);
+        // if verifyDatabase flag is set also check if expiryDate is valid
+        if (verifyDatabase === true) {
+          if (undefined === userCollection) {
+            winston.error('Error userCollection is not set');
+            reject(MONGO_DB_CONNECTION_ERROR_OBJECT);
+          } else {
+            // check database
+            var query = {
+              userId: userId,
+              authType: AUTH_TYPE.GOOGLE,
+              expiryDate: {
+                '$gte': expiryDate
+              }
+            };
+            winston.info('query:', query);
+            var options = {fields: {userId: 1, authType: 1, expiryDate: 1}};
+            userCollection.findOne(query, options, function(error, result) {
+              if (error === null && result !== null) {
+                var promiseData = {
+                  expiryDate: result.expiryDate,
+                  userId: result.userId
+                };
+                winston.info('returning:', promiseData);
+                resolve(promiseData);
+              } else {
+                // Invalid expiryDate or internal database error
+                winston.error('Error MONGO_DB_INTERNAL_ERROR');
+                reject(error);
+              }
+            });
+          }
+        } else {
           var promiseData = {
-            userCollection: userCollection,
             expiryDate: expiryDate,
             userId: userId
           };
+          winston.info('returning: ', promiseData);
           resolve(promiseData);
-        } else {
-          reject(error);
         }
-      });
-    }
+      } else {
+        winston.info('token declared invalid by google library: ', error);
+        reject(error);
+      }
+    });
   });
 };
 /**
@@ -116,6 +147,7 @@ user.verifyLaunometerAccessToken = function(userCollection, token) {
       var payload = jwt.decode(token, config.jwtSimpleSecret);
       var query = {
         userId: payload.userId,
+        authType: AUTH_TYPE.LAUNOMETER,
         expiryDate: {
           '$gt': new Date()
         }
@@ -124,7 +156,7 @@ user.verifyLaunometerAccessToken = function(userCollection, token) {
       userCollection.findOne(query, options, function(error, result) {
         if (error === null && result !== null) {
           var promiseData = {
-            userCollection: userCollection,
+            //  userCollection: userCollection,
             expiryDate: result.expiryDate,
             userId: result.userId
           };
@@ -151,42 +183,71 @@ user.verifyLaunometerAccessToken = function(userCollection, token) {
  *                                                OR
  *                                                Facebook Error
  */
-user.verifyFacebookAccessToken = function(userCollection, token) {
+user.verifyFacebookAccessToken = function(userCollection, token, verifyDatabase) {
   return new Promise((resolve, reject) => {
-    if (undefined === userCollection) {
-      winston.error('usercollection is not set ');
-      reject(MONGO_DB_CONNECTION_ERROR_OBJECT);
-    } else {
-      var options = {
-        host: 'graph.facebook.com',
-        path: ('/v2.9/debug_token?access_token=' +
-               config.facebookUrlAppToken + '&input_token=' + token)
-      };
-      winston.info('verifing: https://' + options.host + options.path);
-      https.get(options, function(response) {
-        var responseMessage = '';
+    var options = {
+      host: 'graph.facebook.com',
+      path: ('/v2.9/debug_token?access_token=' +
+             config.facebookUrlAppToken + '&input_token=' + token)
+    };
+    winston.info('verifing: https://' + options.host + options.path);
+    https.get(options, function(response) {
+      var responseMessage = '';
 
-        response.on('data', function(chunk) {
-          responseMessage += chunk;
-        });
+      response.on('data', function(chunk) {
+        responseMessage += chunk;
+      });
 
-        response.on('end', function() {
-          var data = JSON.parse(responseMessage);
-          if (data.error !== undefined) {
-            winston.error('Received error response from facebook ');
-            reject(data.error);
+      response.on('end', function() {
+        var data = JSON.parse(responseMessage);
+        if (data.error !== undefined) {
+          winston.error('Received error response from facebook ');
+          reject(data.error);
+        } else {
+          var expiryDate = new Date(data.data.expires_at * 1000);
+          var userId = data.data.user_id;
+          // if verifyDatabase flag is set also check if expiryDate is valid
+          if (verifyDatabase === true) {
+            if (undefined === userCollection) {
+              winston.error('usercollection is not set ');
+              reject(MONGO_DB_CONNECTION_ERROR_OBJECT);
+            } else {
+              // check database
+              var query = {
+                userId: userId,
+                authType: AUTH_TYPE.FACEBOOK,
+                expiryDate: {
+                  '$gte': expiryDate
+                }
+              };
+              winston.info('verify database: ', query);
+              var options = {fields: {userId: 1,  expiryDate: 1}};
+              userCollection.findOne(query, options, function(error, result) {
+                if (error === null && result !== null) {
+                  var promiseData = {
+                    expiryDate: result.expiryDate,
+                    userId: result.userId
+                  };
+                  winston.info('returning:', promiseData);
+                  resolve(promiseData);
+                } else {
+                  // Invalid expiryDate or internal database error
+                  winston.error('Error MONGO_DB_INTERNAL_ERROR: ', error);
+                  reject(error);
+                }
+              });
+            }
           } else {
             var promiseData = {
-              //userCollection: userCollection,
-              expiryDate: new Date(data.data.expires_at * 1000),
-              userId: data.data.user_id
+              expiryDate: expiryDate,
+              userId: userId
             };
-            winston.info('returning: ' + JSON.stringify(promiseData));
+            winston.info('returning: ', promiseData);
             resolve(promiseData);
           }
-        });
+        }
       });
-    }
+    });
   });
 };
 
@@ -213,9 +274,11 @@ user.googleOrFacebookLogin = function(userCollection,
   return new Promise((resolve, reject) => {
     // Upsert entry at db
     userCollection.updateOne({
-      'userId': userId
+      'userId': userId,
+      'authType': authType
     }, {
       'userId': userId,
+      'authType': authType,
       'expiryDate': expiryDate
     }, {
       upsert: true
@@ -312,14 +375,17 @@ user.launometerLogin = function(userCollection, responseData, username, password
  *                                                 {Boolean} success  Flag to indicate the unsuccessful request
  *                                                 {JSONObject} payload
  */
-user.logout = function(userCollection, responseData, userId) {
+user.logout = function(userCollection, responseData, userId, authType) {
   return new Promise((resolve, reject) => {
     var update = {
       '$set': {
         'expiryDate': new Date()
       }
     };
-    var query = {'userId': userId};
+    var query = {
+      'userId': userId,
+      'authType': authType
+    };
     userCollection.updateOne(query, update, function(err, result) {
       // Driver returns result as json string, not an object, so the json string has to be parsed into an object
       result = JSON.parse(result);
@@ -365,6 +431,7 @@ user.register = function(userCollection, responseData, username, password) {
       userData.password = password;
       userData.username = username;
       userData.userId = generateUUID();
+      userData.authType = AUTH_TYPE.LAUNOMETER;
 
       userCollection.insertOne(userData, function(err, result) {
         responseData.payload = {};

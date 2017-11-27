@@ -7,6 +7,10 @@ var authenticationService = require('../services/authenticationService');
 
 router.post('/', usersController.registerNewUser);
 
-router.post('/login', authenticationService.isAuthenticated, usersController.dummyFunction);
+router.post('/login', usersController.login);
+
+router.post('/logout', authenticationService.isAuthenticated, usersController.logout);
+
+router.post('/sendData', authenticationService.isAuthenticated, usersController.dummyFunction);
 
 module.exports = router;

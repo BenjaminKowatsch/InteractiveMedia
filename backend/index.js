@@ -42,6 +42,28 @@ database.tryConnect(config.mongodbURL, function() {
     }
   };
 
+  database.collections.users.createIndex({
+    username: 1,
+    password: 1
+  }, {
+    unique: true,
+    partialFilterExpression: {
+      username: {
+        '$exists': true
+      },
+      password: {
+        '$exists': true
+      }
+    }
+  }, createIndexCallback);
+
+  database.collections.users.createIndex({
+    userId: 1,
+    loginType: 1
+  }, {
+    unique: true
+  }, createIndexCallback);
+
   database.collections.launometerUsers.createIndex({
     username: 1,
     password: 1
@@ -92,7 +114,6 @@ app.use(bodyParser.json());
 
 // Add headers
 app.use(function(req, res, next) {
-
   // Website you wish to allow to connect
   res.setHeader('Access-Control-Allow-Origin', config.origin);
 
@@ -188,7 +209,7 @@ function registerLoggedInPostMethod(path, jsonSchema,
     .then(function(promiseData) {
         console.log('Verification of access token succeeded: ');
         onSuccessCallback(promiseData.userCollection, promiseData.expiryDate,
-           promiseData.userId, req, res, responseData);
+             promiseData.userId, req, res, responseData);
       })
     .catch(function(error) {
         console.log('Error: ' + JSON.stringify(error));
@@ -294,7 +315,7 @@ getGoogleFacebookLoginHandler(user.AUTH_TYPE.FACEBOOK), user.AUTH_TYPE.FACEBOOK)
 
 registerLoggedInPostMethod('/logout', jsonSchema.accessToken,
 function(userCollection, expiryDate, userId, req, res, responseData) {
-  user.logout(userCollection, responseData, userId)
+  user.logout(userCollection, responseData, userId, req.body.authType)
  .then(getSendResponseDataCallback(res))
  .catch(getSendResponseDataCallback(res));
 });
