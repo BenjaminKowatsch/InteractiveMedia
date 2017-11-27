@@ -9,6 +9,7 @@ var morgan = require('morgan');
 var helloRoutes = require('./routes/hello');
 var usersRoutes = require('./routes/users.routes');
 var versionRoutes = require('./routes/version.routes');
+var groupRoutes = require('./routes/groups.routes');
 
 var config = require('./modules/config');
 var user = require('./modules/user');
@@ -134,6 +135,7 @@ app.use(function(req, res, next) {
 app.use('/hello', helloRoutes);
 app.use('/v1/users', usersRoutes);
 app.use('/v1/version', versionRoutes);
+app.use('/v1/groups', groupRoutes);
 
 // Starts the http server and prints out the host and the port
 server = app.listen(config.port, function() {
