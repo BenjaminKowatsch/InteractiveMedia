@@ -57,7 +57,22 @@ public class HomeActivity extends AppCompatActivity
             @Override
             public void onClick(View view) {
 
-                Log.d(TAG, "Launching AddGroupActivity");
+
+
+
+//                if (getSupportFragmentManager().findFragmentById(R.id.drawer_layout) instanceof GroupFragment) {
+//                    if (fragmentA!= null) {
+//                        GroupFragment.fabOnClick();
+//                    }
+//                } else if ( instanceof TransactionFragment) {
+//                    if (TransactionFragment!= null)
+//                        TransactionFragment.fabOnClick();
+//                    }
+//                }
+
+
+
+                        Log.d(TAG, "Launching AddGroupActivity");
                 final Intent intent = new Intent(HomeActivity.this, AddGroupActivity.class);
                 startActivity(intent);
             }

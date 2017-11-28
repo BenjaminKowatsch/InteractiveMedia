@@ -6,9 +6,12 @@ import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.CursorLoader;
+import android.content.Intent;
 import android.content.Loader;
 import android.database.Cursor;
 import android.os.Bundle;
+import android.support.design.widget.FloatingActionButton;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -20,6 +23,8 @@ import android.widget.SimpleCursorAdapter;
 import android.widget.Toast;
 
 import com.media.interactive.cs3.hdm.interactivemedia.R;
+import com.media.interactive.cs3.hdm.interactivemedia.activties.AddGroupActivity;
+import com.media.interactive.cs3.hdm.interactivemedia.activties.AddTransactionActivity;
 import com.media.interactive.cs3.hdm.interactivemedia.contentprovider.DatabaseProvider;
 import com.media.interactive.cs3.hdm.interactivemedia.contentprovider.tables.TransactionTable;
 
@@ -27,6 +32,8 @@ import com.media.interactive.cs3.hdm.interactivemedia.contentprovider.tables.Tra
 public class TransactionFragment extends ListFragment implements LoaderManager.LoaderCallbacks<Cursor> {
 
     public static final String LIST_FRAGMENT_NAME = "transaction";
+    private static final String TAG = "TransactionFragment";
+
 
     ContentValues dummyContentValues = new ContentValues();
     private AdapterView.OnItemSelectedListener onItemSelectedListener;

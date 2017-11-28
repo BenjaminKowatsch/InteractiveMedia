@@ -6,9 +6,12 @@ import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.CursorLoader;
+import android.content.Intent;
 import android.content.Loader;
 import android.database.Cursor;
 import android.os.Bundle;
+import android.support.design.widget.FloatingActionButton;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -18,7 +21,10 @@ import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.SimpleCursorAdapter;
 
+import android.support.v7.app.AppCompatActivity;
+
 import com.media.interactive.cs3.hdm.interactivemedia.R;
+import com.media.interactive.cs3.hdm.interactivemedia.activties.AddGroupActivity;
 import com.media.interactive.cs3.hdm.interactivemedia.activties.HomeActivity;
 import com.media.interactive.cs3.hdm.interactivemedia.contentprovider.DatabaseProvider;
 import com.media.interactive.cs3.hdm.interactivemedia.contentprovider.tables.GroupTable;
@@ -27,6 +33,7 @@ import com.media.interactive.cs3.hdm.interactivemedia.contentprovider.tables.Gro
 public class GroupFragment extends ListFragment implements LoaderManager.LoaderCallbacks<Cursor> {
 
     public static final String LIST_FRAGMENT_NAME = "group";
+    private static final String TAG = "GroupFragment";
 
 
     ContentValues dummyContentValues = new ContentValues();
@@ -73,8 +80,13 @@ public class GroupFragment extends ListFragment implements LoaderManager.LoaderC
                 new int[]{R.id.group_title, R.id.group_creation_date}, 0);
         setListAdapter(simpleCursorAdapter);
 
-    }
 
+
+
+
+
+
+    }
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -102,8 +114,6 @@ public class GroupFragment extends ListFragment implements LoaderManager.LoaderC
         super.onDetach();
         onItemSelectedListener = null;
     }
-
-
 
     @Override
     public void onListItemClick(ListView l, View v, int position, long id) {

@@ -2,6 +2,7 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="fill_parent"
     android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     >
 
     <ImageView
@@ -58,4 +59,5 @@
         android:layout_above="@+id/transaction_location"
         android:paddingLeft="2dp"
         android:textSize="14dp" />
+
 </RelativeLayout>
