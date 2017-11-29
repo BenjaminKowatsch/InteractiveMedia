@@ -9,7 +9,7 @@ var minioClient = new Minio.Client({
   accessKey: config.minioAccessKey,
   secretKey: config.minioSecretKey
 });
-
+/*
 minioClient.bucketExists(config.minioBucketName, function(err) {
   if (err) {
     if (err.code === 'NoSuchBucket') {
@@ -25,7 +25,7 @@ minioClient.bucketExists(config.minioBucketName, function(err) {
     winston.info('Minio bucket ' + config.minioBucketName + ' already exists.');
   }
 });
-
+*/
 exports.upload = function(req, res) {
   winston.info('upload called');
   minioClient.putObject(config.minioBucketName, req.file.originalname, req.file.buffer, function(error, etag) {
