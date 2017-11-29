@@ -1,7 +1,7 @@
 /* jshint expr: true */
 
 var chai = require('chai');
-var fs = require('fs');
+//var fs = require('fs');
 var expect = require('chai').expect;
 
 chai.use(require('chai-http'));

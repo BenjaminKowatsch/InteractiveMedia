@@ -1,7 +1,7 @@
 var winston = require('winston');
 var config = require('../modules/config');
 var Minio = require('minio');
-
+/*
 var minioClient = new Minio.Client({
   endPoint: config.minioEndpoint,
   port: config.minioEndpointPort,
@@ -9,7 +9,7 @@ var minioClient = new Minio.Client({
   accessKey: config.minioAccessKey,
   secretKey: config.minioSecretKey
 });
-/*
+
 minioClient.bucketExists(config.minioBucketName, function(err) {
   if (err) {
     if (err.code === 'NoSuchBucket') {
