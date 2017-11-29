@@ -1,6 +1,7 @@
 /* jshint expr: true */
 
 var chai = require('chai');
+var fs = require('fs');
 var expect = require('chai').expect;
 
 chai.use(require('chai-http'));
@@ -69,7 +70,27 @@ function getFacebookTestAccessToken() {
     });
   });
 }
+/*
+describe('Test object storage api', function() {
+  // POST - Send facebook access token
+  it('Upload image', function() {
+    return chai.request(host)
+            .post('/v1/object-store' + '/upload?filename="image.png"')
+            .attach('uploadField', fs.readFileSync('image.png'), 'image.png')
+            .then(res => {
+              console.log(JSON.stringify(res));
+            });
+  });
 
+    it('Download image', function() {
+      return chai.request(host)
+              .get('/v1/object-store' + '/download')
+              .then(res => {
+                console.log(JSON.stringify(res));
+              });
+    });
+});
+*/
 describe('Login and send user data', function() {
   var facebookToken;
   var defaultToken;
@@ -277,7 +298,6 @@ describe('Login and send user data', function() {
             expect(res.body.payload).to.be.an('object');
           });
   });
-
 });
 
 describe('Register with username + password', function() {
