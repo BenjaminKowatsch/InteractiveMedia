@@ -122,7 +122,9 @@ var onLoadingFinished = function(){
          // and due to the redirect to the login page, you would run into an infinite loop
          var accessToken = Cookie.getJSONCookie('accessToken')
          if (accessToken !== '') {
-           var authOptions = ["Launometer","Google","Facebook"];
+           //var authOptions = ["Launometer","Google","Facebook"];
+           var authOptions = "Launometer";
+
            console.log(authOptions[accessToken.authType]+" Cookie exists. Redirecting ...");
            this.loginStatus = true;
          };
