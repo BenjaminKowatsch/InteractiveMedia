@@ -15,14 +15,14 @@ node {
     }
         
     stage ('Store images') {
-        sh 'docker-compose push'
+        sh 'docker-compose -f docker-compose.prod.yml push'
     }
     
     stage ('Deploy images') {
-        sh 'docker-compose stop'
-        sh 'docker-compose rm -sf'
-        sh 'docker-compose pull'
-        sh 'docker-compose up -d'
+        sh 'docker-compose -f docker-compose.prod.yml stop'
+        sh 'docker-compose -f docker-compose.prod.yml rm -sf'
+        sh 'docker-compose -f docker-compose.prod.yml pull'
+        sh 'docker-compose -f docker-compose.prod.yml up -d'
     }
     
     stage ('Notification'){
