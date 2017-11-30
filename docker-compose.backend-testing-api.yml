@@ -4,11 +4,19 @@ services:
     image: mongo
     ports:
       - "27017:27017"
+#    depends_on:
+#      - object-storage
     healthcheck:
       test: echo 'db.stats().ok' | mongo localhost:27017/zenbrain --quiet
       interval: 1s
       timeout: 1s
       retries: 12
+#  object-storage:
+#    build: ./minio
+#    volumes:
+#      - /minio-data:/data
+#    ports:
+#      - "9000:9000"
   backend:
     image: localhost:5000/backend
     depends_on:

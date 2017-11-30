@@ -4,6 +4,12 @@ services:
     image: mongo
     volumes:
       - /data:/data/db
+  object-storage:
+    build: ./minio
+    volumes:
+      - /minio-data:/data
+    ports:
+      - "9000:9000"
   backend:
     build: ./backend
     image: localhost:5000/backend
@@ -11,6 +17,7 @@ services:
       - "8081:8081"
     depends_on:
       - mongo
+      - object-storage
   web:
     build: 
       context: ./frontend

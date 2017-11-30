@@ -58,6 +58,12 @@ ENV ORIGIN  "http://localhost:8088"
 ENV GOOGLE_OAUTH_CLIENT_ID "908170470873-8151s7cvldroebdl7mcpg2houdgljgfg.apps.googleusercontent.com"
 ENV FACEBOOK_URL_APP_TOKEN "1971379956470536%7ChIQ5dRDon3DJq2YzH1NU41byB-w"
 ENV JWT_SIMPLE_SECRET "A3xFr93Yl2qTn5"
+ENV MINIO_ENDPOINT "object-storage"
+ENV MINIO_ENDPOINT_PORT "9000"
+ENV MINIO_ACCESS_KEY "AKIAIOSFODNN7EXAMPLE"
+ENV MINIO_SECRET_KEY "wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY"
+ENV MINIO_BUCKET_NAME "bucket"
+ENV MINIO_OBJECT_PREFIX "public"
 
 # copy production node_modules
 COPY --from=dependencies /app/prod_node_modules ./node_modules
