@@ -1,4 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE resources [
+    <!ENTITY bucketName "bucket">
+    <!ENTITY objectPrefix "public">
+    ]>
 <resources>
+
     <string name="app_name">InteractiveMedia</string>
     <string name="app_tag">com.media.interactive.cs3.hdm.interactivemedia</string>
     <string name="has_run">appHasRunBefore</string>
@@ -16,5 +22,12 @@
 
 
     <string name="web_service_url">http://10.0.2.2:8081</string>
+
+    <string name="object_storage_url">http://10.0.2.2:9000</string>
+    <string name="object_storage_access_key">AKIAIOSFODNN7EXAMPLE</string>
+    <string name="object_storage_secret_key">wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY</string>
+    <string name="object_storage_bucket_name">&bucketName;</string>
+    <string name="object_storage_object_prefix">&objectPrefix;</string>
+    <string name="object_storage_bucket_policy">{\"Version\":\"2012-10-17\",\"Statement\":[{\"Action\":[\"s3:GetBucketLocation\"],\"Effect\":\"Allow\",\"Principal\":{\"AWS\":[\"*\"]},\"Resource\":[\"arn:aws:s3:::&bucketName;\"],\"Sid\":\"\"},{\"Action\":[\"s3:ListBucket\"],\"Condition\":{\"StringEquals\":{\"s3:prefix\":[\"&objectPrefix;\"]}},\"Effect\":\"Allow\",\"Principal\":{\"AWS\":[\"*\"]},\"Resource\":[\"arn:aws:s3:::&bucketName;\"],\"Sid\":\"\"},{\"Action\":[\"s3:GetObject\"],\"Effect\":\"Allow\",\"Principal\":{\"AWS\":[\"*\"]},\"Resource\":[\"arn:aws:s3:::&bucketName;/&objectPrefix;*\"],\"Sid\":\"\"}]}</string>
 
 </resources>

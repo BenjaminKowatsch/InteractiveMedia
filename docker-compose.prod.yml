@@ -1,23 +1,56 @@
-version: '2'
+version: '2.1'
 services:
   mongo:
     image: mongo
     volumes:
       - /data:/data/db
+    healthcheck:
+      test: echo 'db.stats().ok' | mongo localhost:27017/launometer --quiet
+      interval: 1s
+      timeout: 1s
+      retries: 12
+
+  object-storage:
+    build: ./minio
+    volumes:
+      - /minio-data:/data
+    ports:
+      - "9000:9000"
+    healthcheck:
+      test: 'curl -H "User-Agent: Mozilla" -s -k -o /dev/null -I -w "%{http_code}" http://localhost:9000/minio/index.html | grep 200'
+      interval: 1s
+      timeout: 1s
+      retries: 12
+
   backend:
     build: ./backend
     image: localhost:5000/backend
     ports:
       - "8081:8081"
     depends_on:
-      - mongo
+      mongo:
+        condition: service_healthy
+      object-storage:
+        condition: service_healthy
+    healthcheck:
+      test: wget -O - http://localhost:8081/v1/version || exit 1
+      interval: 1s
+      timeout: 1s
+      retries: 12
+
   web:
-    build: 
+    build:
       context: ./frontend
       args:
-        - WEB_SERVICE_URL=http://cloudproject.mi.hdm-stuttgart.de:8081/
+        - WEB_SERVICE_URL=http://cloudproject.mi.hdm-stuttgart.de:8081
     image: localhost:5000/frontend
     ports:
       - 8088:80
     depends_on:
-      - backend
+      backend:
+        condition: service_healthy
+    healthcheck:
+      test: wget -O - http://localhost:80/ || exit 1
+      interval: 1s
+      timeout: 1s
+      retries: 12
