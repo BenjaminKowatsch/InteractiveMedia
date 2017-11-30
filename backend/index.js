@@ -8,6 +8,7 @@ var morgan = require('morgan');
 
 var helloRoutes = require('./routes/hello');
 var usersRoutes = require('./routes/users.routes');
+var objectStoreRoutes = require('./routes/object.store.routes');
 var versionRoutes = require('./routes/version.routes');
 var groupRoutes = require('./routes/groups.routes');
 
@@ -134,6 +135,7 @@ app.use(function(req, res, next) {
 
 app.use('/hello', helloRoutes);
 app.use('/v1/users', usersRoutes);
+app.use('/v1/object-store', objectStoreRoutes);
 app.use('/v1/version', versionRoutes);
 app.use('/v1/groups', groupRoutes);
 

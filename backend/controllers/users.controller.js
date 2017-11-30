@@ -69,7 +69,7 @@ exports.login = function(req, res) {
          req.body.username, req.body.password)
          .then(function(loginResult) {
           // mongo update was successful
-          resBody = {'success': true, 'payload': registerResult.payload};
+          resBody = {'success': true, 'payload': loginResult.payload};
           httpResponder.sendHttpResponse(res, 201, resBody);
         })
          .catch(function(loginErrorResult) {
@@ -98,7 +98,7 @@ exports.login = function(req, res) {
         })
       .then(function(loginResult) {
           // mongo update was successful
-          resBody = {'success': true, 'payload': registerResult.payload};
+          resBody = {'success': true, 'payload': loginResult.payload};
           httpResponder.sendHttpResponse(res, 201, resBody);
         })
       .catch(function(loginErrorResult) {
@@ -127,7 +127,7 @@ exports.login = function(req, res) {
         })
       .then(function(loginResult) {
           // mongo update was successful
-          resBody = {'success': true, 'payload': registerResult.payload};
+          resBody = {'success': true, 'payload': loginResult.payload};
           httpResponder.sendHttpResponse(res, 201, resBody);
         })
       .catch(function(loginErrorResult) {

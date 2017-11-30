@@ -9,7 +9,7 @@
       <f7-view id="main-view" navbar-through :dynamic-navbar="true" main>
         <!-- iOS Theme Navbar -->
         <f7-navbar v-if="$theme.ios">
-          <f7-nav-center sliding>Launometer</f7-nav-center>
+          <f7-nav-center sliding>Debts² admin panel</f7-nav-center>
         </f7-navbar>
         <!-- Pages -->
         <f7-pages>

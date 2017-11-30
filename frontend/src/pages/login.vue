@@ -31,26 +31,26 @@
 
       </f7-list-button>
     </f7-list>
-    <f7-list>
+    <!-- <f7-list>
       <googlesigninbutton @success="googleOnSignIn" @error="this.defaultErrorHandler">
         Login with Google
-      </googlesigninbutton>
+      </googlesigninbutton> -->
       <!-- Login with Google button which triggers the login function via Google plus account (see below in jscript area) -->
-    </f7-list>
+<!--     </f7-list>
     <f7-list>
       <facebooksigninbutton id="facebookLogin" :params="facebookparams" @success="facebookOnSignIn" @error="this.defaultErrorHandler">
         Login with Facebook
-      </facebooksigninbutton>
+      </facebooksigninbutton> -->
       <!-- Login with facebook button which triggers the login function via facebook account (see below in jscript area) -->
-    </f7-list>
+    <!-- </f7-list>
     <hr>
     <div class="register">
       <f7-list>
-        <f7-list-button title="Registrieren" v-on:click="redirect('/register', true, true, false)">
+        <f7-list-button title="Registrieren" v-on:click="redirect('/register', true, true, false)"> -->
         <!-- register button which redirects to register page -->
-        </f7-list-button>
+  <!--       </f7-list-button>
       </f7-list>
-    </div>
+    </div> -->
 
   </f7-page>
   <!-- END of Template Elements -->
@@ -62,8 +62,8 @@
 * imports Facebooksigninbutton, Googlesigninbutton, jwt, axios, Cookie, Config
 */
   import Mixins from '../mixins.js'
-  import Facebooksigninbutton from '@/components/facebooksigninbutton'
-  import Googlesigninbutton from '@/components/googlesigninbutton'
+ // import Facebooksigninbutton from '@/components/facebooksigninbutton'
+ // import Googlesigninbutton from '@/components/googlesigninbutton'
   import axios from 'axios'
   import Cookie from '../js/Cookie.js'
   import Config from '../js/Config.js'
@@ -72,8 +72,8 @@
     name: 'login',
     mixins: [ Mixins ],
     components: {
-      Googlesigninbutton,
-      Facebooksigninbutton
+      /*Googlesigninbutton,
+      Facebooksigninbutton*/
       // sets the signin buttons of Facebook and Google as Components to the View
     },
     data() {
@@ -82,10 +82,10 @@
         username: '',
         password: '',
         login: '',
-        facebookparams: {
+/*        facebookparams: {
           scope: 'email,user_likes',
           return_scopes: true
-        }
+        }*/
         // sets the variables and defines them
       }
     },
@@ -97,7 +97,7 @@
        * This accessToken will be send to the backend for verification and logging the user in
        * @param  {JSONObject} response The response from facebook for the login request
        */
-      facebookOnSignIn: function(response) {
+     /* facebookOnSignIn: function(response) {
         // Response Action on clicking the facebook signin button
           var access_token = response.authResponse.accessToken; // Send access token to backend
           axios.post(Config.webServiceURL+'/facebook_login', {
@@ -105,7 +105,7 @@
             })
             .then(this.loginResponseHandler)
             .catch(this.defaultErrorHandler);
-        },
+        },*/
         /**
          * Callback function which will be called when the google signin button component
          * executes the login request and receives the response from google.
@@ -113,7 +113,7 @@
          * This accessToken will be send to the backend for verification and logging the user in
          * @param  {Object} googleUser Object which contains the accessToken/idToken from google
          */
-        googleOnSignIn: function(googleUser) {
+       /* googleOnSignIn: function(googleUser) {
           // Response action on clicking the google signin button
           var idToken = googleUser.getAuthResponse().id_token; // Send id token to backend
           axios.post(Config.webServiceURL+'/google_login', {
@@ -121,7 +121,7 @@
             })
             .then(this.loginResponseHandler)
             .catch(this.defaultErrorHandler);
-        },
+        },*/
         /**
          * Callback function for printing out the error response of a POST request
          * @param  {JSONObject} error Object which holds error information
