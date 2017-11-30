@@ -13,12 +13,12 @@ COPY package.json .
 # ---- Unit tests and linters ----
 FROM base-build AS build
 
+
 ENV CLIENT_ID "908170470873-8151s7cvldroebdl7mcpg2houdgljgfg.apps.googleusercontent.com"
 ENV APP_ID "1971379956470536"
 ENV SPOTIFY_CLIENT_ID "1e7dcb239e2a49c4a7176cd1e21f3ea7"
 ENV FACEBOOK_API_VERSION "v2.9"
 ENV ORIGIN_URL "http://localhost:8088/"
-ENV WEB_SERVICE_URL "http://localhost:8081"
 ENV JWT_SIMPLE_SECRET "A3xFr93Yl2qTn5"
 
 # disable progress bar to increase speed of npm install
@@ -33,6 +33,8 @@ RUN npm install --only=dev --no-bin-links
 # add current folder
 COPY . .
 
+ARG WEB_SERVICE_URL
+RUN echo $WEB_SERVICE_URL
 # Build the static frontend files
 RUN npm run build
 
