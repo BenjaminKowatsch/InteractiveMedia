@@ -1,8 +1,12 @@
+const winston = require('winston');
+
 exports.getAll = function(req, res) {
-    res.status(404);
-  };
+  winston.info('Getting all groups');
+  res.status(404);
+};
 
 exports.getById = function(req, res) {
-    var groupId = req.params.groupid;
-    res.status(404);
-  };
+  const groupId = req.params.groupid;
+  winston.info('Getting group with id' + groupId);
+  res.status(404);
+};
