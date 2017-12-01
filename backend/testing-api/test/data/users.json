@@ -1,0 +1,28 @@
+{
+  "users": {
+    "valid": [
+      {
+        "username": "alex1",
+        "password": "alexpassword"
+      },
+      {
+        "username": "benny1",
+        "password": "benny1password"
+      }
+    ],
+    "invalid": {
+      "notExistingUser": {
+        "username": "alexinvalid",
+        "password": "pwdpwd"
+      },
+      "invalidUsername": {
+        "username": "s",
+        "password": "pwdpwd"
+      },
+      "invalidPassword": {
+        "username": "alex12",
+        "password": "p"
+      }
+    }
+  }
+}

@@ -15,34 +15,7 @@ var config = {
   'facebookAppId': process.env.FACEBOOK_APP_ID
 };
 
-var testData = {
-  'users': {
-    'valid': [
-      {
-        'username': 'alex1',
-        'password': 'alexpassword'
-      },
-      {
-        'username': 'benny1',
-        'password': 'benny1password'
-      }
-    ],
-    'invalid': {
-      'notExistingUser': {
-        'username': 'alexinvalid',
-        'password': 'pwdpwd'
-      },
-      'invalidUsername': {
-        'username': 's',
-        'password': 'pwdpwd'
-      },
-      'invalidPassword': {
-        'username': 'alex12',
-        'password': 'p'
-      }
-    }
-  }
-};
+const testData =  require('../data/users');
 
 function log(message) {
   console.log(message);
@@ -51,8 +24,8 @@ function log(message) {
 function getFacebookTestAccessToken() {
   return new Promise((resolve, reject) => {
     https.get('https://graph.facebook.com/v2.11/' + config.facebookAppId + '/' +
-    'accounts/test-users?access_token=' +
-    config.facebookUrlAppToken, function(response) {
+        'accounts/test-users?access_token=' +
+        config.facebookUrlAppToken, function(response) {
       var responseMessage = '';
 
       response.on('data', function(chunk) {
@@ -70,6 +43,7 @@ function getFacebookTestAccessToken() {
     });
   });
 }
+
 /*
 describe('Test object storage api', function() {
   // POST - Send facebook access token
