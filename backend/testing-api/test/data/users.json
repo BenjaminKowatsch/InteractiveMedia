@@ -8,6 +8,10 @@
       {
         "username": "benny1",
         "password": "benny1password"
+      },
+      {
+        "username": "maxi1",
+        "password": "maxi1password"
       }
     ],
     "invalid": {
