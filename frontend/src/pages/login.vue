@@ -156,7 +156,7 @@
               // sets the variables and defines them as the tiped in data
             };
             // Sending credentials to database
-            axios.post(Config.webServiceURL+'/launometer_login', credentials)
+            axios.post(Config.webServiceURL+'/login', credentials)
             .then(this.loginResponseHandler)
             .catch(this.defaultErrorHandler);
           } else {

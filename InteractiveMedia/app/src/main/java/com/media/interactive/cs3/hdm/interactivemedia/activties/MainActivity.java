@@ -11,8 +11,9 @@ import android.widget.Toast;
 
 import com.media.interactive.cs3.hdm.interactivemedia.R;
 import com.media.interactive.cs3.hdm.interactivemedia.contentprovider.DatabaseHelper;
-import com.media.interactive.cs3.hdm.interactivemedia.data.Hash;
 import com.media.interactive.cs3.hdm.interactivemedia.data.Login;
+
+import java.util.concurrent.ExecutionException;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -38,7 +39,6 @@ public class MainActivity extends AppCompatActivity {
         testUser.setHashedPassword(Hash.hashStringSHA256("Passwort1234"));
         databaseHelper.deleteAllUsers();
 */
-
         Login.getInstance().clear();
 
         appTag = getResources().getString(R.string.app_tag);
@@ -47,6 +47,8 @@ public class MainActivity extends AppCompatActivity {
 
         Log.e(TAG,"Exceptionally Thread Id: "+android.os.Process.getThreadPriority(android.os.Process.myTid()));
     }
+
+
 
     @RequiresApi(api = Build.VERSION_CODES.N)
     private void launchNextActivity() {
@@ -78,6 +80,8 @@ public class MainActivity extends AppCompatActivity {
                    finish();
                 });
     }
+
+
 
     @RequiresApi(api = Build.VERSION_CODES.N)
     @Override

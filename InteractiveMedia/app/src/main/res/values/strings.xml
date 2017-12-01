@@ -1,4 +1,5 @@
 <resources>
+
     <string name="app_name">InteractiveMedia</string>
     <string name="app_tag">com.media.interactive.cs3.hdm.interactivemedia</string>
     <string name="has_run">appHasRunBefore</string>

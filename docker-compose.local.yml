@@ -2,8 +2,8 @@ version: '2.1'
 services:
   mongo:
     image: mongo
-    ports:
-      - "27017:27017"
+    volumes:
+      - /data:/data/db
     healthcheck:
       test: echo 'db.stats().ok' | mongo localhost:27017/launometer --quiet
       interval: 1s
@@ -23,7 +23,10 @@ services:
       retries: 12
 
   backend:
+    build: ./backend
     image: localhost:5000/backend
+    ports:
+      - "8081:8081"
     depends_on:
       mongo:
         condition: service_healthy
@@ -35,8 +38,19 @@ services:
       timeout: 1s
       retries: 12
 
-  backend-testing:
-    build: ./backend/testing-api
+  web:
+    build: 
+      context: ./frontend
+      args:
+        - WEB_SERVICE_URL=http://localhost:8081
+    image: localhost:5000/frontend
+    ports:
+      - 8088:80
     depends_on:
       backend:
         condition: service_healthy
+    healthcheck:
+      test: wget -O - http://localhost:80/ || exit 1
+      interval: 1s
+      timeout: 1s
+      retries: 12

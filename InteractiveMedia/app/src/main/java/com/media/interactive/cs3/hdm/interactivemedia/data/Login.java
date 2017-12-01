@@ -199,7 +199,7 @@ public class Login {
 
         contentResolver = context.getContentResolver();
 
-        final String url = context.getResources().getString(R.string.web_service_url).concat("/register");
+        final String url = context.getResources().getString(R.string.web_service_url).concat("/v1/users/");
         Log.d(TAG, "url: " + url);
         final JSONObject data = new JSONObject();
         try {
@@ -292,7 +292,7 @@ public class Login {
 
         Log.d(TAG, "Google Token: " + accessToken);
 
-        final String url = context.getResources().getString(R.string.web_service_url).concat("/google_login");
+        final String url = context.getResources().getString(R.string.web_service_url).concat("/v1/users/login?type=1");
         Log.d(TAG, "url: " + url);
         final JSONObject data = new JSONObject();
         try {
@@ -333,7 +333,7 @@ public class Login {
             }
         }
         Log.d(TAG, "Facbook AccessToken: " + accessToken);
-        final String url = context.getResources().getString(R.string.web_service_url).concat("/facebook_login");
+        final String url = context.getResources().getString(R.string.web_service_url).concat("/v1/users/login?type=2");
         Log.d(TAG, "url: " + url);
         final JSONObject data = new JSONObject();
         try {
@@ -365,7 +365,7 @@ public class Login {
 
         // Send data to Backend and validate data
 
-        final String url = context.getResources().getString(R.string.web_service_url).concat("/launometer_login");
+        final String url = context.getResources().getString(R.string.web_service_url).concat("/v1/users/login?type=0");
         Log.d(TAG, "url: " + url);
         final JSONObject data = new JSONObject();
         try {
@@ -438,7 +438,7 @@ public class Login {
                     });
         }
         // Logout at backend
-        final String url = context.getResources().getString(R.string.web_service_url).concat("/logout");
+        final String url = context.getResources().getString(R.string.web_service_url).concat("/v1/users/logout");
         Log.d(TAG, "url: " + url);
         final JSONObject data = new JSONObject();
         try {
