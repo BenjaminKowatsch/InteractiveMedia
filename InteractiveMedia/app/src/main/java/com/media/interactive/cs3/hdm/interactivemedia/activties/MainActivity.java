@@ -11,6 +11,8 @@ import android.widget.Toast;
 
 import com.media.interactive.cs3.hdm.interactivemedia.R;
 import com.media.interactive.cs3.hdm.interactivemedia.contentprovider.DatabaseHelper;
+import com.media.interactive.cs3.hdm.interactivemedia.contentprovider.DummyDataAdder;
+import com.media.interactive.cs3.hdm.interactivemedia.data.Hash;
 import com.media.interactive.cs3.hdm.interactivemedia.data.Login;
 
 import java.util.concurrent.ExecutionException;
@@ -29,16 +31,21 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         databaseHelper = new DatabaseHelper(this);
 
-/*
-        databaseHelper.deleteAllUsers();
+
+        //databaseHelper.deleteAllUsers();
         databaseHelper.resetDatabase();
 
         final Login testUser = Login.getInstance();
         testUser.setUsername("Test User");
         testUser.setEmail("user.test@gmail.com");
         testUser.setHashedPassword(Hash.hashStringSHA256("Passwort1234"));
-        databaseHelper.deleteAllUsers();
-*/
+        //databaseHelper.deleteAllUsers();
+
+        DummyDataAdder dummyDataAdder = new DummyDataAdder(this);
+        dummyDataAdder.addTransactions(10);
+        dummyDataAdder.addGroups(4);
+
+
         Login.getInstance().clear();
 
         appTag = getResources().getString(R.string.app_tag);
@@ -80,7 +87,6 @@ public class MainActivity extends AppCompatActivity {
                    finish();
                 });
     }
-
 
 
     @RequiresApi(api = Build.VERSION_CODES.N)

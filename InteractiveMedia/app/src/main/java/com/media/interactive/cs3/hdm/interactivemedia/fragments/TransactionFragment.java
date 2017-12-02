@@ -25,21 +25,23 @@ import android.widget.Toast;
 import com.media.interactive.cs3.hdm.interactivemedia.R;
 import com.media.interactive.cs3.hdm.interactivemedia.activties.AddGroupActivity;
 import com.media.interactive.cs3.hdm.interactivemedia.activties.AddTransactionActivity;
+import com.media.interactive.cs3.hdm.interactivemedia.activties.HomeActivity;
+import com.media.interactive.cs3.hdm.interactivemedia.activties.MainActivity;
 import com.media.interactive.cs3.hdm.interactivemedia.contentprovider.DatabaseProvider;
 import com.media.interactive.cs3.hdm.interactivemedia.contentprovider.tables.TransactionTable;
 
 
-public class TransactionFragment extends ListFragment implements LoaderManager.LoaderCallbacks<Cursor> {
+public class TransactionFragment extends ListFragment implements LoaderManager.LoaderCallbacks<Cursor>, IMyFragment {
 
     public static final String LIST_FRAGMENT_NAME = "transaction";
     private static final String TAG = "TransactionFragment";
 
 
-    ContentValues dummyContentValues = new ContentValues();
+
     private AdapterView.OnItemSelectedListener onItemSelectedListener;
 
     private SimpleCursorAdapter simpleCursorAdapter;
-    private ContentResolver dummyContentResolver;
+    //private ContentResolver dummyContentResolver;
 
     /**
      * Mandatory empty constructor for the fragment manager to instantiate the
@@ -49,14 +51,6 @@ public class TransactionFragment extends ListFragment implements LoaderManager.L
         setHasOptionsMenu(true);
     }
 
-    private void addDummyData(int counter) {
-
-        dummyContentValues.put(TransactionTable.COLUMN_AMOUNT, ((counter*1494)%1111) );
-        dummyContentValues.put(TransactionTable.COLUMN_PAID_BY, 1);
-        dummyContentValues.put(TransactionTable.COLUMN_INFO_NAME, "Transaction " + counter);
-        dummyContentValues.put(TransactionTable.COLUMN_INFO_LOCATION, "Ghetto Netto");
-        dummyContentResolver.insert(DatabaseProvider.CONTENT_TRANSACTION_URI, dummyContentValues);
-    }
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
@@ -70,11 +64,7 @@ public class TransactionFragment extends ListFragment implements LoaderManager.L
 
         setHasOptionsMenu(true);
 
-        dummyContentResolver = getActivity().getContentResolver();
-
-        for (int i = 0; i < 30; i++) {
-            addDummyData(i);
-        }
+        //dummyContentResolver = getActivity().getContentResolver();
 
         // Initializing the SimpleCursorAdapter and the CursorLoader
         String[] projection = new String[]{TransactionTable.COLUMN_INFO_NAME, TransactionTable.COLUMN_INFO_CREATED_AT,
@@ -140,5 +130,16 @@ public class TransactionFragment extends ListFragment implements LoaderManager.L
     }
 
 
-
+    @Override
+    public View.OnClickListener getOnFabClickListener() {
+        return new View.OnClickListener(){
+            @Override
+            public void onClick(View view) {
+                Log.d(TAG, "Hello from "+TAG);
+                final Intent intent = new Intent(view.getContext(), AddTransactionActivity.class);
+                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+                startActivity(intent);
+            }
+        };
+    }
 }

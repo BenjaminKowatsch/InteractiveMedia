@@ -25,22 +25,21 @@ import android.support.v7.app.AppCompatActivity;
 
 import com.media.interactive.cs3.hdm.interactivemedia.R;
 import com.media.interactive.cs3.hdm.interactivemedia.activties.AddGroupActivity;
+import com.media.interactive.cs3.hdm.interactivemedia.activties.AddTransactionActivity;
 import com.media.interactive.cs3.hdm.interactivemedia.activties.HomeActivity;
 import com.media.interactive.cs3.hdm.interactivemedia.contentprovider.DatabaseProvider;
 import com.media.interactive.cs3.hdm.interactivemedia.contentprovider.tables.GroupTable;
 
 
-public class GroupFragment extends ListFragment implements LoaderManager.LoaderCallbacks<Cursor> {
+public class GroupFragment extends ListFragment implements LoaderManager.LoaderCallbacks<Cursor>, IMyFragment {
 
     public static final String LIST_FRAGMENT_NAME = "group";
     private static final String TAG = "GroupFragment";
 
 
-    ContentValues dummyContentValues = new ContentValues();
     private AdapterView.OnItemSelectedListener onItemSelectedListener;
 
     private SimpleCursorAdapter simpleCursorAdapter;
-    private ContentResolver dummyContentResolver;
 
     /**
      * Mandatory empty constructor for the fragment manager to instantiate the
@@ -50,10 +49,6 @@ public class GroupFragment extends ListFragment implements LoaderManager.LoaderC
         setHasOptionsMenu(true);
     }
 
-    private void addDummyData(int counter) {
-        dummyContentValues.put(GroupTable.COLUMN_NAME, "Gruppe " + counter);
-        dummyContentResolver.insert(DatabaseProvider.CONTENT_GROUP_URI, dummyContentValues);
-    }
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
@@ -66,12 +61,6 @@ public class GroupFragment extends ListFragment implements LoaderManager.LoaderC
         super.onCreate(savedInstanceState);
 
         setHasOptionsMenu(true);
-
-        dummyContentResolver = getActivity().getContentResolver();
-
-        for (int i = 0; i < 30; i++) {
-            addDummyData(i);
-        }
 
         // Initializing the SimpleCursorAdapter and the CursorLoader
         String[] projection = new String[]{GroupTable.COLUMN_NAME, GroupTable.COLUMN_CREATED_AT};
@@ -138,4 +127,16 @@ public class GroupFragment extends ListFragment implements LoaderManager.LoaderC
         simpleCursorAdapter.swapCursor(null);
     }
 
+    @Override
+    public View.OnClickListener getOnFabClickListener() {
+        return  new View.OnClickListener(){
+            @Override
+            public void onClick(View view) {
+                Log.d(TAG, "Hello from Groupfragment ");
+                final Intent intent = new Intent(view.getContext(), AddGroupActivity.class);
+                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+                startActivity(intent);
+            }
+        };
+    }
 }

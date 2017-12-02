@@ -31,7 +31,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     public DatabaseHelper(Context context) {
         super(context, DATABASE_NAME, null, DB_VERSION);
-
     }
 
     // RESET Database for test purposes
@@ -50,8 +49,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         db.execSQL(DebtTable.DATABASE_DROP);
         db.execSQL(GroupUserTable.DATABASE_DROP);
         db.execSQL(GroupTransactionTable.DATABASE_DROP);
+
         // Enable foreign keys
-        db.execSQL("PRAGMA foreign_keys=ON;");
+        //db.execSQL("PRAGMA foreign_keys=ON;");
         // Call table onCreate methods
         LoginTable.onCreate(db);
         GroupTable.onCreate(db);

@@ -62,7 +62,9 @@ public class DatabaseProvider extends android.content.ContentProvider {
 
     @Override
     public boolean onCreate() {
+        Log.d(TAG, "***************** Init DB Provider + Rest all DBs ****************");
         databaseHelper = new DatabaseHelper(getContext());
+        //databaseHelper.resetDatabase();
         return false;
     }
 

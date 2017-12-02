@@ -32,6 +32,7 @@ import com.media.interactive.cs3.hdm.interactivemedia.R;
 import com.media.interactive.cs3.hdm.interactivemedia.RestRequestQueue;
 import com.media.interactive.cs3.hdm.interactivemedia.data.Login;
 import com.media.interactive.cs3.hdm.interactivemedia.fragments.GroupFragment;
+import com.media.interactive.cs3.hdm.interactivemedia.fragments.IMyFragment;
 import com.media.interactive.cs3.hdm.interactivemedia.fragments.TransactionFragment;
 
 import org.json.JSONObject;
@@ -42,7 +43,7 @@ public class HomeActivity extends AppCompatActivity
 
     private static final String TAG = "HomeActivity";
 
-
+    private FloatingActionButton fab;
 
     @RequiresApi(api = Build.VERSION_CODES.N)
     @Override
@@ -52,31 +53,8 @@ public class HomeActivity extends AppCompatActivity
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
+        fab = (FloatingActionButton) findViewById(R.id.fab);
 
-
-
-
-//                if (getSupportFragmentManager().findFragmentById(R.id.drawer_layout) instanceof GroupFragment) {
-//                    if (fragmentA!= null) {
-//                        GroupFragment.fabOnClick();
-//                    }
-//                } else if ( instanceof TransactionFragment) {
-//                    if (TransactionFragment!= null)
-//                        TransactionFragment.fabOnClick();
-//                    }
-//                }
-
-
-
-                        Log.d(TAG, "Launching AddGroupActivity");
-                final Intent intent = new Intent(HomeActivity.this, AddGroupActivity.class);
-                startActivity(intent);
-            }
-        });
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
 
@@ -125,10 +103,13 @@ public class HomeActivity extends AppCompatActivity
 
         switch (id) {
             case R.id.nav_groups:
+
+                fab.show();
                 Log.d(TAG, "item with id nav_groups was selected");
                 fragment = new GroupFragment();
                 break;
             case R.id.nav_transactions:
+                fab.show();
                 Log.d(TAG, "item with id nav_transactions was selected");
                 fragment = new TransactionFragment();
                 break;
@@ -151,10 +132,13 @@ public class HomeActivity extends AppCompatActivity
 
                 break;
             default:
+                fab.hide();
                 Log.e(TAG, "No item id was selected");
                 break;
         }
         if (fragment != null) {
+            IMyFragment myFragment = (IMyFragment) fragment;
+            fab.setOnClickListener(myFragment.getOnFabClickListener());
             FragmentTransaction fragmentTransaction = getFragmentManager().beginTransaction();
             fragmentTransaction.replace(R.id.content_home, fragment);
             fragmentTransaction.commit();
