@@ -23,18 +23,19 @@ import com.media.interactive.cs3.hdm.interactivemedia.RestRequestQueue;
 import com.media.interactive.cs3.hdm.interactivemedia.contentprovider.DatabaseProvider;
 import com.media.interactive.cs3.hdm.interactivemedia.contentprovider.tables.LoginTable;
 
+import java.util.concurrent.CompletableFuture;
+
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.util.concurrent.CompletableFuture;
 
-import static com.bumptech.glide.gifdecoder.GifHeaderParser.TAG;
 
 /**
  * Created by benny on 31.10.17.
  */
 
 public class Login {
+    private static final String TAG = "Login";
     private static final Login ourInstance = new Login();
     private long id;
     private String username = null;
@@ -103,15 +104,17 @@ public class Login {
 
     public boolean loginResponseHandler(JSONObject response) {
 
-        Log.d("User: ", "loginResponseHandler: Thread Id: " + android.os.Process.getThreadPriority(android.os.Process.myTid()));
+        Log.d("User: ", "loginResponseHandler: Thread Id: "
+            + android.os.Process.getThreadPriority(android.os.Process.myTid()));
         Log.d(TAG, "Response: " + response.toString());
         try {
             if (response.getBoolean("success")) {
                 final JSONObject payload = response.getJSONObject("payload");
                 setAccessToken(payload.getString("accessToken"));
                 setUserType(UserType.values()[payload.getInt("authType")]);
-                Log.d(TAG, "Successfully registered and logged in with\naccessToken:" + accessToken + "\nuserType:" + userType + "\n");
-                if(id == 0) {
+                Log.d(TAG, "Successfully registered and logged in with\naccessToken:"
+                    + accessToken + "\nuserType:" + userType + "\n");
+                if (id == 0) {
                     cacheCredentials(this);
                 }
                 return true;
@@ -134,7 +137,7 @@ public class Login {
             final Uri result = contentResolver.insert(DatabaseProvider.CONTENT_LOGIN_URI, contentValues);
             Log.d(TAG, "cacheCredentials: Adding " + login + " to " + DatabaseProvider.CONTENT_LOGIN_URI);
             long id = Long.parseLong(result.getLastPathSegment());
-            if(id > 0) {
+            if (id > 0) {
                 login.setId(id);
                 return true;
             } else {
@@ -149,7 +152,9 @@ public class Login {
     private boolean checkForCachedCredentials(Login login) {
         if (contentResolver != null) {
             boolean result = false;
-            final Cursor cursor = contentResolver.query(DatabaseProvider.CONTENT_LOGIN_URI, null, null, null, LoginTable.COLUMN_CREATED_AT + " DESC LIMIT 1");
+            final Cursor cursor = contentResolver.query(DatabaseProvider.CONTENT_LOGIN_URI,
+                null, null, null,
+                LoginTable.COLUMN_CREATED_AT + " DESC LIMIT 1");
             result = cursor.getCount() > 0;
             while (cursor.moveToNext()) {
                 login.setId(cursor.getLong(0));
@@ -185,8 +190,10 @@ public class Login {
 
     private boolean deleteUser(Login login) {
         if (contentResolver != null) {
-            final int result = contentResolver.delete(DatabaseProvider.CONTENT_LOGIN_URI, LoginTable.COLUMN_ID + "=?", new String[]{String.valueOf(login.getId())});
-            Log.d(TAG, "delete Login: Adding " + login + " to " + DatabaseProvider.CONTENT_LOGIN_URI+ "  "+ result);
+            final int result = contentResolver.delete(DatabaseProvider.CONTENT_LOGIN_URI,
+                LoginTable.COLUMN_ID + "=?", new String[] {String.valueOf(login.getId())});
+            Log.d(TAG, "delete Login: Adding " + login + " to "
+                + DatabaseProvider.CONTENT_LOGIN_URI + "  " + result);
             return result > 0;
         }
         Log.e(TAG, "Could not cache credentials, contentResolver is null.");
@@ -211,18 +218,18 @@ public class Login {
         Log.d(TAG, "data: " + data.toString());
 
         RestRequestQueue.getInstance(context)
-                .send(url, Request.Method.POST, data)
-                .thenApply(this::loginResponseHandler)
-                .thenAccept(loginResult -> {
-                    if (loginResult) {
-                        future.complete(null);
-                    } else {
-                        future.completeExceptionally(new Throwable("Login Failed"));
-                    }
-                })
-                .exceptionally(error -> {
-                    throw new RuntimeException(error.getMessage(), error.getCause());
-                });
+            .send(url, Request.Method.POST, data)
+            .thenApply(this::loginResponseHandler)
+            .thenAccept(loginResult -> {
+                if (loginResult) {
+                    future.complete(null);
+                } else {
+                    future.completeExceptionally(new Throwable("Login Failed"));
+                }
+            })
+            .exceptionally(error -> {
+                throw new RuntimeException(error.getMessage(), error.getCause());
+            });
         return future;
     }
 
@@ -232,8 +239,8 @@ public class Login {
 
         contentResolver = context.getContentResolver();
 
-        boolean usernameAndHashedPassword = username == null || username.length() <= 0 ||
-                hashedPassword == null || hashedPassword.length() <= 0;
+        boolean usernameAndHashedPassword = username == null || username.length() <= 0
+            || hashedPassword == null || hashedPassword.length() <= 0;
         Log.d(TAG, "usernameAndHashedPassword: " + usernameAndHashedPassword);
         Log.d(TAG, "user: " + toString());
 
@@ -273,16 +280,17 @@ public class Login {
 
             final String serverClientId = context.getString(R.string.server_client_id);
             final GoogleSignInOptions signInOptions = new GoogleSignInOptions
-                    .Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-                    .requestIdToken(serverClientId)
-                    .requestEmail()
-                    .build();
+                .Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                .requestIdToken(serverClientId)
+                .requestEmail()
+                .build();
             final GoogleApiClient googleApiClient = new GoogleApiClient
-                    .Builder(context)
-                    .addApi(Auth.GOOGLE_SIGN_IN_API, signInOptions)
-                    .build();
+                .Builder(context)
+                .addApi(Auth.GOOGLE_SIGN_IN_API, signInOptions)
+                .build();
 
-            final OptionalPendingResult<GoogleSignInResult> pendingResult = Auth.GoogleSignInApi.silentSignIn(googleApiClient);
+            final OptionalPendingResult<GoogleSignInResult> pendingResult = Auth.GoogleSignInApi
+                .silentSignIn(googleApiClient);
             if (pendingResult.isDone()) {
                 final GoogleSignInResult result = pendingResult.get();
                 final GoogleSignInAccount account = result.getSignInAccount();
@@ -303,20 +311,21 @@ public class Login {
         Log.d(TAG, "data: " + data.toString());
 
         RestRequestQueue.getInstance(context)
-                .send(url, Request.Method.POST, data)
-                .thenApply(this::loginResponseHandler)
-                .thenAccept(loginResult -> {
-                    if (loginResult) {
-                        future.complete(null);
-                    } else {
-                        future.completeExceptionally(new Throwable("Google Login failed"));
-                    }
-                })
-                .exceptionally(error -> {
-                    Log.e("User: ", "Exceptionally Thread Id: " + android.os.Process.getThreadPriority(android.os.Process.myTid()));
-                    future.completeExceptionally(error);
-                    throw new RuntimeException(error.getMessage());
-                });
+            .send(url, Request.Method.POST, data)
+            .thenApply(this::loginResponseHandler)
+            .thenAccept(loginResult -> {
+                if (loginResult) {
+                    future.complete(null);
+                } else {
+                    future.completeExceptionally(new Throwable("Google Login failed"));
+                }
+            })
+            .exceptionally(error -> {
+                Log.e("User: ", "Exceptionally Thread Id: "
+                    + android.os.Process.getThreadPriority(android.os.Process.myTid()));
+                future.completeExceptionally(error);
+                throw new RuntimeException(error.getMessage());
+            });
     }
 
     @RequiresApi(api = Build.VERSION_CODES.N)
@@ -344,20 +353,21 @@ public class Login {
         Log.d(TAG, "data: " + data.toString());
 
         RestRequestQueue.getInstance(context)
-                .send(url, Request.Method.POST, data)
-                .thenApply(this::loginResponseHandler)
-                .thenAccept(loginResult -> {
-                    if (loginResult) {
-                        future.complete(null);
-                    } else {
-                        future.completeExceptionally(new Throwable("Facebook Login failed"));
-                    }
-                })
-                .exceptionally(error -> {
-                    Log.e("User: ", "Exceptionally Thread Id: " + android.os.Process.getThreadPriority(android.os.Process.myTid()));
-                    future.completeExceptionally(error);
-                    throw new RuntimeException(error.getMessage());
-                });
+            .send(url, Request.Method.POST, data)
+            .thenApply(this::loginResponseHandler)
+            .thenAccept(loginResult -> {
+                if (loginResult) {
+                    future.complete(null);
+                } else {
+                    future.completeExceptionally(new Throwable("Facebook Login failed"));
+                }
+            })
+            .exceptionally(error -> {
+                Log.e("User: ", "Exceptionally Thread Id: "
+                    + android.os.Process.getThreadPriority(android.os.Process.myTid()));
+                future.completeExceptionally(error);
+                throw new RuntimeException(error.getMessage());
+            });
     }
 
     @RequiresApi(api = Build.VERSION_CODES.N)
@@ -377,21 +387,22 @@ public class Login {
         Log.d(TAG, "data: " + data.toString());
 
         RestRequestQueue.getInstance(context)
-                .send(url, Request.Method.POST, data)
-                .thenApply(this::loginResponseHandler)
-                .thenAccept(loginResult -> {
-                    if (loginResult) {
-                        future.complete(null);
-                    } else {
-                        future.completeExceptionally(new Throwable("Default Logout failed"));
-                    }
-                })
-                .exceptionally(error -> {
+            .send(url, Request.Method.POST, data)
+            .thenApply(this::loginResponseHandler)
+            .thenAccept(loginResult -> {
+                if (loginResult) {
+                    future.complete(null);
+                } else {
+                    future.completeExceptionally(new Throwable("Default Logout failed"));
+                }
+            })
+            .exceptionally(error -> {
 
-                    Log.e("User: ", "Exceptionally Thread Id: " + android.os.Process.getThreadPriority(android.os.Process.myTid()));
-                    future.completeExceptionally(error);
-                    throw new RuntimeException(error.getMessage());
-                });
+                Log.e("User: ", "Exceptionally Thread Id: "
+                    + android.os.Process.getThreadPriority(android.os.Process.myTid()));
+                future.completeExceptionally(error);
+                throw new RuntimeException(error.getMessage());
+            });
     }
 
     public String getAccessToken() {
@@ -404,13 +415,13 @@ public class Login {
 
     @Override
     public String toString() {
-        return "User{" +
-                "id='" + id + '\'' +
-                ", username='" + username + '\'' +
-                ", hashedPassword='" + hashedPassword + '\'' +
-                ", userType=" + userType +
-                ", accessToken=" + accessToken +
-                '}';
+        return "User{"
+            + "id='" + id + '\''
+            + ", username='" + username + '\''
+            + ", hashedPassword='" + hashedPassword + '\''
+            + ", userType=" + userType
+            + ", accessToken=" + accessToken
+            + '}';
     }
 
     @RequiresApi(api = Build.VERSION_CODES.N)
@@ -422,20 +433,20 @@ public class Login {
         // Local Google logout
         final String serverClientId = context.getString(R.string.server_client_id);
         final GoogleSignInOptions signInOptions = new GoogleSignInOptions
-                .Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-                .requestIdToken(serverClientId)
-                .requestEmail()
-                .build();
+            .Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+            .requestIdToken(serverClientId)
+            .requestEmail()
+            .build();
         final GoogleApiClient googleApiClient = new GoogleApiClient
-                .Builder(context)
-                .addApi(Auth.GOOGLE_SIGN_IN_API, signInOptions)
-                .build();
+            .Builder(context)
+            .addApi(Auth.GOOGLE_SIGN_IN_API, signInOptions)
+            .build();
         if (googleApiClient.isConnected()) {
             Auth.GoogleSignInApi
-                    .signOut(googleApiClient)
-                    .setResultCallback((status) -> {
-                        Log.i(TAG, "Google signed out.");
-                    });
+                .signOut(googleApiClient)
+                .setResultCallback((status) -> {
+                    Log.i(TAG, "Google signed out.");
+                });
         }
         // Logout at backend
         final String url = context.getResources().getString(R.string.web_service_url).concat("/v1/users/logout");
@@ -450,19 +461,19 @@ public class Login {
         Log.d(TAG, "data: " + data.toString());
 
         RestRequestQueue.getInstance(context)
-                .send(url, Request.Method.POST, data)
-                .thenApply(this::logoutResponseHandler)
-                .thenAccept(loginResult -> {
-                    if (loginResult) {
-                        future.complete(null);
-                    } else {
-                        future.completeExceptionally(new Throwable("Default Login failed"));
-                    }
-                })
-                .exceptionally(error -> {
-                    future.completeExceptionally(error);
-                    throw new RuntimeException(error.getMessage());
-                });
+            .send(url, Request.Method.POST, data)
+            .thenApply(this::logoutResponseHandler)
+            .thenAccept(loginResult -> {
+                if (loginResult) {
+                    future.complete(null);
+                } else {
+                    future.completeExceptionally(new Throwable("Default Login failed"));
+                }
+            })
+            .exceptionally(error -> {
+                future.completeExceptionally(error);
+                throw new RuntimeException(error.getMessage());
+            });
 
 
         return future;

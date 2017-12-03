@@ -2,15 +2,12 @@ package com.media.interactive.cs3.hdm.interactivemedia.fragments;
 
 import android.app.ListFragment;
 import android.app.LoaderManager;
-import android.content.ContentResolver;
-import android.content.ContentValues;
 import android.content.Context;
 import android.content.CursorLoader;
 import android.content.Intent;
 import android.content.Loader;
 import android.database.Cursor;
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -21,12 +18,8 @@ import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.SimpleCursorAdapter;
 
-import android.support.v7.app.AppCompatActivity;
-
 import com.media.interactive.cs3.hdm.interactivemedia.R;
 import com.media.interactive.cs3.hdm.interactivemedia.activties.AddGroupActivity;
-import com.media.interactive.cs3.hdm.interactivemedia.activties.AddTransactionActivity;
-import com.media.interactive.cs3.hdm.interactivemedia.activties.HomeActivity;
 import com.media.interactive.cs3.hdm.interactivemedia.contentprovider.DatabaseProvider;
 import com.media.interactive.cs3.hdm.interactivemedia.contentprovider.tables.GroupTable;
 
@@ -63,19 +56,15 @@ public class GroupFragment extends ListFragment implements LoaderManager.LoaderC
         setHasOptionsMenu(true);
 
         // Initializing the SimpleCursorAdapter and the CursorLoader
-        String[] projection = new String[]{GroupTable.COLUMN_NAME, GroupTable.COLUMN_CREATED_AT};
+        String[] projection = new String[] {GroupTable.COLUMN_NAME, GroupTable.COLUMN_CREATED_AT};
         getLoaderManager().initLoader(0, null, this);
         simpleCursorAdapter = new SimpleCursorAdapter(getActivity(), R.layout.fragment_group, null, projection,
-                new int[]{R.id.group_title, R.id.group_creation_date}, 0);
+            new int[] {R.id.group_title, R.id.group_creation_date}, 0);
         setListAdapter(simpleCursorAdapter);
 
 
-
-
-
-
-
     }
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -91,10 +80,10 @@ public class GroupFragment extends ListFragment implements LoaderManager.LoaderC
         setHasOptionsMenu(true);
         try {
             onItemSelectedListener = (AdapterView.OnItemSelectedListener) context;
-        }catch (ClassCastException e){
+        } catch (ClassCastException e) {
             throw new ClassCastException(
-                    context.toString()
-                            + " muss OnItemSelectedListener implementieren");
+                context.toString()
+                    + " muss OnItemSelectedListener implementieren");
         }
     }
 
@@ -107,13 +96,16 @@ public class GroupFragment extends ListFragment implements LoaderManager.LoaderC
     @Override
     public void onListItemClick(ListView l, View v, int position, long id) {
         super.onListItemClick(l, v, position, id);
-        onItemSelectedListener.onItemSelected(l,v,position,id);
+        onItemSelectedListener.onItemSelected(l, v, position, id);
     }
 
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
         final String[] projection = {GroupTable.COLUMN_ID, GroupTable.COLUMN_NAME, GroupTable.COLUMN_CREATED_AT};
-        final CursorLoader cursorLoader = new CursorLoader(getActivity(), DatabaseProvider.CONTENT_GROUP_URI, projection, null, null, null);
+        final CursorLoader cursorLoader = new CursorLoader(getActivity(),
+            DatabaseProvider.CONTENT_GROUP_URI,
+            projection, null,
+            null, null);
         return cursorLoader;
     }
 
@@ -129,7 +121,7 @@ public class GroupFragment extends ListFragment implements LoaderManager.LoaderC
 
     @Override
     public View.OnClickListener getOnFabClickListener() {
-        return  new View.OnClickListener(){
+        return new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 Log.d(TAG, "Hello from Groupfragment ");

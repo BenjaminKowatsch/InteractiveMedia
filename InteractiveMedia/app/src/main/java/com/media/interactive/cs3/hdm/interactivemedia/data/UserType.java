@@ -10,6 +10,7 @@ public enum UserType {
     FACEBOOK(2);
 
     private final int value;
+
     private UserType(int value) {
         this.value = value;
     }

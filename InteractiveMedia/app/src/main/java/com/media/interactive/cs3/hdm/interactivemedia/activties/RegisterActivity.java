@@ -17,7 +17,7 @@ import com.media.interactive.cs3.hdm.interactivemedia.data.Login;
 import com.media.interactive.cs3.hdm.interactivemedia.data.UserType;
 
 public class RegisterActivity extends AppCompatActivity
-        implements View.OnClickListener {
+    implements View.OnClickListener {
 
     private static final String TAG = "RegisterActivity";
 
@@ -47,21 +47,21 @@ public class RegisterActivity extends AppCompatActivity
                 login.setUsername(registerUsername.getText().toString());
                 login.setUserType(UserType.DEFAULT);
                 login.setEmail(registerEmail.getText().toString());
-                login.setHashedPassword(Hash.hashStringSHA256(registerPassword.getText().toString()));
+                login.setHashedPassword(Hash.hashStringSha256(registerPassword.getText().toString()));
                 login.register(RegisterActivity.this)
-                        .thenAccept((Void) -> {
-                            Toast.makeText(getApplicationContext(),
-                                    "Success fully logged in",
-                                    Toast.LENGTH_SHORT).show();
-                            final Intent toHome = new Intent(RegisterActivity.this, HomeActivity.class);
-                            toHome.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
-                            startActivity(toHome);
-                            finish();
-                        })
-                        .exceptionally((error) -> {
-                            Log.e(TAG, "error: "+ error.getMessage());
-                            throw new RuntimeException(error.getMessage());
-                        });
+                    .thenAccept((voidParam) -> {
+                        Toast.makeText(getApplicationContext(),
+                            "Success fully logged in",
+                            Toast.LENGTH_SHORT).show();
+                        final Intent toHome = new Intent(RegisterActivity.this, HomeActivity.class);
+                        toHome.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+                        startActivity(toHome);
+                        finish();
+                    })
+                    .exceptionally((error) -> {
+                        Log.e(TAG, "error: " + error.getMessage());
+                        throw new RuntimeException(error.getMessage());
+                    });
 
                 break;
             default:

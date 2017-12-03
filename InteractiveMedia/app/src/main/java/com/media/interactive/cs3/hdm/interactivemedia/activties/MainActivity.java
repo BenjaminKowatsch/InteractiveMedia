@@ -15,8 +15,6 @@ import com.media.interactive.cs3.hdm.interactivemedia.contentprovider.DummyDataA
 import com.media.interactive.cs3.hdm.interactivemedia.data.Hash;
 import com.media.interactive.cs3.hdm.interactivemedia.data.Login;
 
-import java.util.concurrent.ExecutionException;
-
 public class MainActivity extends AppCompatActivity {
 
     private static final String TAG = "MainActivity";
@@ -38,7 +36,7 @@ public class MainActivity extends AppCompatActivity {
         final Login testUser = Login.getInstance();
         testUser.setUsername("Test User");
         testUser.setEmail("user.test@gmail.com");
-        testUser.setHashedPassword(Hash.hashStringSHA256("Passwort1234"));
+        testUser.setHashedPassword(Hash.hashStringSha256("Passwort1234"));
         //databaseHelper.deleteAllUsers();
 
         DummyDataAdder dummyDataAdder = new DummyDataAdder(this);
@@ -52,40 +50,39 @@ public class MainActivity extends AppCompatActivity {
         hasRun = getResources().getString(R.string.has_run);
         sharedPreferences = getSharedPreferences(appTag, MODE_PRIVATE);
 
-        Log.e(TAG,"Exceptionally Thread Id: "+android.os.Process.getThreadPriority(android.os.Process.myTid()));
+        Log.e(TAG, "Exceptionally Thread Id: " + android.os.Process.getThreadPriority(android.os.Process.myTid()));
     }
-
 
 
     @RequiresApi(api = Build.VERSION_CODES.N)
     private void launchNextActivity() {
-       Login.getInstance().login(MainActivity.this)
-                .thenAccept(Void -> {
-                    if (sharedPreferences.getBoolean(hasRun, false)) {
-                        // This is not the first run
-                        Log.d(TAG, "Launching Home Activity");
-                        final Intent intent = new Intent(MainActivity.this, HomeActivity.class);
-                        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
-                        startActivity(intent);
-                    } else {
-                        throw new RuntimeException("Not first run");
-                    }
-                })
-                .exceptionally(error -> {
-                    Log.d(TAG, "Login failed due to " + error.getMessage());
-                    Toast.makeText(getApplicationContext(), "Login failed", Toast.LENGTH_SHORT).show();
-                        // Do first run stuff
-                    Log.d(TAG, "Launching Login Activity"); // TODO: change intent to Login activity
-                    final Intent intent = new Intent(MainActivity.this, LoginActivity.class);
+        Login.getInstance().login(MainActivity.this)
+            .thenAccept(Void -> {
+                if (sharedPreferences.getBoolean(hasRun, false)) {
+                    // This is not the first run
+                    Log.d(TAG, "Launching Home Activity");
+                    final Intent intent = new Intent(MainActivity.this, HomeActivity.class);
                     intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
                     startActivity(intent);
-                    sharedPreferences.edit()
-                            .putBoolean(hasRun, true)
-                            .commit();
-                    throw new RuntimeException(error.getMessage());
-                }).thenAccept((result) -> {
-                   finish();
-                });
+                } else {
+                    throw new RuntimeException("Not first run");
+                }
+            })
+            .exceptionally(error -> {
+                Log.d(TAG, "Login failed due to " + error.getMessage());
+                Toast.makeText(getApplicationContext(), "Login failed", Toast.LENGTH_SHORT).show();
+                // Do first run stuff
+                Log.d(TAG, "Launching Login Activity"); // TODO: change intent to Login activity
+                final Intent intent = new Intent(MainActivity.this, LoginActivity.class);
+                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+                startActivity(intent);
+                sharedPreferences.edit()
+                    .putBoolean(hasRun, true)
+                    .commit();
+                throw new RuntimeException(error.getMessage());
+            }).thenAccept((result) -> {
+                finish();
+            });
     }
 
 

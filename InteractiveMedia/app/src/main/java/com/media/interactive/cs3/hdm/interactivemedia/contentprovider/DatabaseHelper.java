@@ -1,12 +1,8 @@
 package com.media.interactive.cs3.hdm.interactivemedia.contentprovider;
 
-import android.content.ContentValues;
 import android.content.Context;
-import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
-import android.database.sqlite.SQLiteStatement;
-import android.util.Log;
 
 import com.media.interactive.cs3.hdm.interactivemedia.contentprovider.tables.DebtTable;
 import com.media.interactive.cs3.hdm.interactivemedia.contentprovider.tables.GroupTable;
@@ -15,8 +11,6 @@ import com.media.interactive.cs3.hdm.interactivemedia.contentprovider.tables.Gro
 import com.media.interactive.cs3.hdm.interactivemedia.contentprovider.tables.LoginTable;
 import com.media.interactive.cs3.hdm.interactivemedia.contentprovider.tables.TransactionTable;
 import com.media.interactive.cs3.hdm.interactivemedia.contentprovider.tables.UserTable;
-import com.media.interactive.cs3.hdm.interactivemedia.data.Login;
-import com.media.interactive.cs3.hdm.interactivemedia.data.UserType;
 
 /**
  * Created by benny on 31.10.17.

@@ -1,12 +1,11 @@
 package com.media.interactive.cs3.hdm.interactivemedia.activties;
 
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 
 import com.media.interactive.cs3.hdm.interactivemedia.R;
 
 public class AddGroupActivity extends AppCompatActivity {
-
 
 
     @Override

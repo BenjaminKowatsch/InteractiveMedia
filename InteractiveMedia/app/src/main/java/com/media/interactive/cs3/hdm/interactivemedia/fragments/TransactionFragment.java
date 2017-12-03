@@ -2,15 +2,12 @@ package com.media.interactive.cs3.hdm.interactivemedia.fragments;
 
 import android.app.ListFragment;
 import android.app.LoaderManager;
-import android.content.ContentResolver;
-import android.content.ContentValues;
 import android.content.Context;
 import android.content.CursorLoader;
 import android.content.Intent;
 import android.content.Loader;
 import android.database.Cursor;
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -20,13 +17,9 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.SimpleCursorAdapter;
-import android.widget.Toast;
 
 import com.media.interactive.cs3.hdm.interactivemedia.R;
-import com.media.interactive.cs3.hdm.interactivemedia.activties.AddGroupActivity;
 import com.media.interactive.cs3.hdm.interactivemedia.activties.AddTransactionActivity;
-import com.media.interactive.cs3.hdm.interactivemedia.activties.HomeActivity;
-import com.media.interactive.cs3.hdm.interactivemedia.activties.MainActivity;
 import com.media.interactive.cs3.hdm.interactivemedia.contentprovider.DatabaseProvider;
 import com.media.interactive.cs3.hdm.interactivemedia.contentprovider.tables.TransactionTable;
 
@@ -35,7 +28,6 @@ public class TransactionFragment extends ListFragment implements LoaderManager.L
 
     public static final String LIST_FRAGMENT_NAME = "transaction";
     private static final String TAG = "TransactionFragment";
-
 
 
     private AdapterView.OnItemSelectedListener onItemSelectedListener;
@@ -67,12 +59,12 @@ public class TransactionFragment extends ListFragment implements LoaderManager.L
         //dummyContentResolver = getActivity().getContentResolver();
 
         // Initializing the SimpleCursorAdapter and the CursorLoader
-        String[] projection = new String[]{TransactionTable.COLUMN_INFO_NAME, TransactionTable.COLUMN_INFO_CREATED_AT,
-                TransactionTable.COLUMN_AMOUNT, TransactionTable.COLUMN_PAID_BY, TransactionTable.COLUMN_INFO_LOCATION};
+        String[] projection = new String[] {TransactionTable.COLUMN_INFO_NAME, TransactionTable.COLUMN_INFO_CREATED_AT,
+            TransactionTable.COLUMN_AMOUNT, TransactionTable.COLUMN_PAID_BY, TransactionTable.COLUMN_INFO_LOCATION};
         getLoaderManager().initLoader(0, null, this);
         simpleCursorAdapter = new SimpleCursorAdapter(getActivity(), R.layout.fragment_transaction, null, projection,
-                new int[]{R.id.transaction_title, R.id.transaction_creation_date,
-                        R.id.transaction_amount, R.id.transaction_payed_by, R.id.transaction_location}, 0);
+            new int[] {R.id.transaction_title, R.id.transaction_creation_date,
+                R.id.transaction_amount, R.id.transaction_payed_by, R.id.transaction_location}, 0);
         setListAdapter(simpleCursorAdapter);
 
     }
@@ -92,10 +84,10 @@ public class TransactionFragment extends ListFragment implements LoaderManager.L
         setHasOptionsMenu(true);
         try {
             onItemSelectedListener = (AdapterView.OnItemSelectedListener) context;
-        }catch (ClassCastException e){
+        } catch (ClassCastException e) {
             throw new ClassCastException(
-                    context.toString()
-                            + " muss OnItemSelectedListener implementieren");
+                context.toString()
+                    + " muss OnItemSelectedListener implementieren");
         }
     }
 
@@ -108,14 +100,21 @@ public class TransactionFragment extends ListFragment implements LoaderManager.L
     @Override
     public void onListItemClick(ListView l, View v, int position, long id) {
         super.onListItemClick(l, v, position, id);
-        onItemSelectedListener.onItemSelected(l,v,position,id);
+        onItemSelectedListener.onItemSelected(l, v, position, id);
     }
 
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-        String[] projection = new String[]{TransactionTable.COLUMN_ID, TransactionTable.COLUMN_INFO_NAME, TransactionTable.COLUMN_INFO_CREATED_AT,
-                TransactionTable.COLUMN_AMOUNT, TransactionTable.COLUMN_PAID_BY, TransactionTable.COLUMN_INFO_LOCATION};
-        final CursorLoader cursorLoader = new CursorLoader(getActivity(), DatabaseProvider.CONTENT_TRANSACTION_URI, projection, null, null, null);
+        String[] projection = new String[] {
+            TransactionTable.COLUMN_ID,
+            TransactionTable.COLUMN_INFO_NAME,
+            TransactionTable.COLUMN_INFO_CREATED_AT,
+            TransactionTable.COLUMN_AMOUNT,
+            TransactionTable.COLUMN_PAID_BY,
+            TransactionTable.COLUMN_INFO_LOCATION};
+        final CursorLoader cursorLoader = new CursorLoader(getActivity(),
+            DatabaseProvider.CONTENT_TRANSACTION_URI, projection,
+            null, null, null);
         return cursorLoader;
     }
 
@@ -132,10 +131,10 @@ public class TransactionFragment extends ListFragment implements LoaderManager.L
 
     @Override
     public View.OnClickListener getOnFabClickListener() {
-        return new View.OnClickListener(){
+        return new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Log.d(TAG, "Hello from "+TAG);
+                Log.d(TAG, "Hello from " + TAG);
                 final Intent intent = new Intent(view.getContext(), AddTransactionActivity.class);
                 intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
                 startActivity(intent);

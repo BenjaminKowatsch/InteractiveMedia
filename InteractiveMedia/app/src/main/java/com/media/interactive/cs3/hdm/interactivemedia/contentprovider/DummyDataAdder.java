@@ -13,8 +13,8 @@ import com.media.interactive.cs3.hdm.interactivemedia.contentprovider.tables.Tra
 
 public class DummyDataAdder {
 
-    private Context context;
     ContentResolver dummyContentResolver;
+    private Context context;
 
 
     public DummyDataAdder(Context context) {
@@ -25,7 +25,7 @@ public class DummyDataAdder {
     private void addSingleTransaction(int counter) {
 
         ContentValues dummyContentValues = new ContentValues();
-        dummyContentValues.put(TransactionTable.COLUMN_AMOUNT, ((counter*1494)%1111) );
+        dummyContentValues.put(TransactionTable.COLUMN_AMOUNT, ((counter * 1494) % 1111));
         dummyContentValues.put(TransactionTable.COLUMN_PAID_BY, 1);
         dummyContentValues.put(TransactionTable.COLUMN_INFO_NAME, "Transaction " + counter);
         dummyContentValues.put(TransactionTable.COLUMN_INFO_LOCATION, "Ghetto Netto");
@@ -39,13 +39,13 @@ public class DummyDataAdder {
     }
 
     public void addTransactions(int nrOfTransactions) {
-        for (int i=0; i<nrOfTransactions; i++ ) {
+        for (int i = 0; i < nrOfTransactions; i++) {
             addSingleTransaction(i);
         }
     }
 
     public void addGroups(int nrOfGroups) {
-        for (int i=0; i<nrOfGroups; i++ ) {
+        for (int i = 0; i < nrOfGroups; i++) {
             addSingleGroup(i);
         }
     }

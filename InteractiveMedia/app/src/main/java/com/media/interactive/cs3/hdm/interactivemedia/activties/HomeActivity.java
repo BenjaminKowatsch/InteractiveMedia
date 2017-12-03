@@ -1,7 +1,5 @@
 package com.media.interactive.cs3.hdm.interactivemedia.activties;
 
-
-import android.app.Activity;
 import android.app.Fragment;
 import android.app.FragmentTransaction;
 import android.content.Intent;
@@ -10,7 +8,6 @@ import android.os.Bundle;
 import android.support.annotation.RequiresApi;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
-import android.support.design.widget.Snackbar;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
@@ -23,23 +20,15 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Toast;
 
-import com.android.volley.Request;
-import com.android.volley.RequestQueue;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
-import com.android.volley.toolbox.JsonObjectRequest;
 import com.media.interactive.cs3.hdm.interactivemedia.R;
-import com.media.interactive.cs3.hdm.interactivemedia.RestRequestQueue;
 import com.media.interactive.cs3.hdm.interactivemedia.data.Login;
 import com.media.interactive.cs3.hdm.interactivemedia.fragments.GroupFragment;
 import com.media.interactive.cs3.hdm.interactivemedia.fragments.IMyFragment;
 import com.media.interactive.cs3.hdm.interactivemedia.fragments.TransactionFragment;
 
-import org.json.JSONObject;
-
 public class HomeActivity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener,
-                   AdapterView.OnItemSelectedListener{
+    implements NavigationView.OnNavigationItemSelectedListener,
+    AdapterView.OnItemSelectedListener {
 
     private static final String TAG = "HomeActivity";
 
@@ -59,7 +48,7 @@ public class HomeActivity extends AppCompatActivity
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
 
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
-                this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+            this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         drawer.addDrawerListener(toggle);
         toggle.syncState();
 
@@ -115,19 +104,19 @@ public class HomeActivity extends AppCompatActivity
                 break;
             case R.id.nav_logout:
                 Login.getInstance().logout(this)
-                .thenAccept((Void) -> {
-                    Log.d(TAG, "Successfully logged out.");
-                    Toast.makeText(HomeActivity.this,"Sucessfully logged out.",Toast.LENGTH_SHORT).show();
-                    final Intent toLogin = new Intent(HomeActivity.this, LoginActivity.class);
-                    toLogin.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
-                    startActivity(toLogin);
-                    finish();
-                })
-                .exceptionally(error -> {
-                    Log.d(TAG, "Failed during logout.");
-                    Toast.makeText(HomeActivity.this,"Logout failed",Toast.LENGTH_SHORT).show();
-                    throw new RuntimeException(error.getMessage());
-                });
+                    .thenAccept((voidParam) -> {
+                        Log.d(TAG, "Successfully logged out.");
+                        Toast.makeText(HomeActivity.this, "Sucessfully logged out.", Toast.LENGTH_SHORT).show();
+                        final Intent toLogin = new Intent(HomeActivity.this, LoginActivity.class);
+                        toLogin.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+                        startActivity(toLogin);
+                        finish();
+                    })
+                    .exceptionally(error -> {
+                        Log.d(TAG, "Failed during logout.");
+                        Toast.makeText(HomeActivity.this, "Logout failed", Toast.LENGTH_SHORT).show();
+                        throw new RuntimeException(error.getMessage());
+                    });
 
 
                 break;
@@ -163,7 +152,8 @@ public class HomeActivity extends AppCompatActivity
     @Override
     public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
 
-        Toast.makeText(this, parent.toString() + " Selected Group/Transaction at position: " + position, Toast.LENGTH_SHORT).show();
+        Toast.makeText(this, parent.toString()
+            + " Selected Group/Transaction at position: " + position, Toast.LENGTH_SHORT).show();
     }
 
     @Override

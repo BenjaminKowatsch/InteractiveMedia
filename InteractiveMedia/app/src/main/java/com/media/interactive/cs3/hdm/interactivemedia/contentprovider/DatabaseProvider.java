@@ -22,33 +22,33 @@ import com.media.interactive.cs3.hdm.interactivemedia.contentprovider.tables.Use
 
 public class DatabaseProvider extends android.content.ContentProvider {
 
-    private static final String TAG ="DatabaseProvider";
-
-
-    private DatabaseHelper databaseHelper;
+    private static final String TAG = "DatabaseProvider";
     // Constants
-    private static final String AUTHORITY = "com.media.interactive.cs3.hdm.interactivemedia.contentprovider";
-
+    private static final String AUTHORITY =
+        "com.media.interactive.cs3.hdm.interactivemedia.contentprovider";
+    public static final Uri CONTENT_DEBT_URI = Uri.parse("content://"
+        + AUTHORITY + "/" + DebtTable.TABLE_NAME);
+    public static final Uri CONTENT_GROUP_URI = Uri.parse("content://"
+        + AUTHORITY + "/" + GroupTable.TABLE_NAME);
+    public static final Uri CONTENT_LOGIN_URI = Uri.parse("content://"
+        + AUTHORITY + "/" + LoginTable.TABLE_NAME);
+    public static final Uri CONTENT_TRANSACTION_URI = Uri.parse("content://"
+        + AUTHORITY + "/" + TransactionTable.TABLE_NAME);
+    public static final Uri CONTENT_USER_URI = Uri.parse("content://"
+        + AUTHORITY + "/" + UserTable.TABLE_NAME);
+    public static final Uri CONTENT_GROUP_TRANSACTION_URI = Uri.parse("content://"
+        + AUTHORITY + "/" + GroupTransactionTable.TABLE_NAME);
+    public static final Uri CONTENT_GROUP_USER_URI = Uri.parse("content://"
+        + AUTHORITY + "/" + GroupUserTable.TABLE_NAME);
     private static final int DEBT_CODE = 0;
     private static final int GROUP_CODE = 1;
     private static final int LOGIN_CODE = 2;
     private static final int TRANSACTION_CODE = 3;
     private static final int USER_CODE = 4;
-
     private static final int GROUP_TRANSACTION_CODE = 5;
     private static final int GROUP_USER_CODE = 6;
-
-    public static final Uri CONTENT_DEBT_URI = Uri.parse("content://" + AUTHORITY + "/" + DebtTable.TABLE_NAME);
-    public static final Uri CONTENT_GROUP_URI = Uri.parse("content://" + AUTHORITY + "/" + GroupTable.TABLE_NAME);
-    public static final Uri CONTENT_LOGIN_URI = Uri.parse("content://" + AUTHORITY + "/" + LoginTable.TABLE_NAME);
-    public static final Uri CONTENT_TRANSACTION_URI = Uri.parse("content://" + AUTHORITY + "/" + TransactionTable.TABLE_NAME);
-    public static final Uri CONTENT_USER_URI = Uri.parse("content://" + AUTHORITY + "/" + UserTable.TABLE_NAME);
-
-    public static final Uri CONTENT_GROUP_TRANSACTION_URI = Uri.parse("content://" + AUTHORITY + "/" + GroupTransactionTable.TABLE_NAME);
-    public static final Uri CONTENT_GROUP_USER_URI = Uri.parse("content://" + AUTHORITY + "/" + GroupUserTable.TABLE_NAME);
-
-
     private static final UriMatcher mUriMatcher = new UriMatcher(UriMatcher.NO_MATCH);
+
     static {
         mUriMatcher.addURI(AUTHORITY, DebtTable.TABLE_NAME, DEBT_CODE);
         mUriMatcher.addURI(AUTHORITY, GroupTable.TABLE_NAME, GROUP_CODE);
@@ -59,6 +59,8 @@ public class DatabaseProvider extends android.content.ContentProvider {
         mUriMatcher.addURI(AUTHORITY, GroupTransactionTable.TABLE_NAME, GROUP_TRANSACTION_CODE);
         mUriMatcher.addURI(AUTHORITY, GroupUserTable.TABLE_NAME, GROUP_USER_CODE);
     }
+
+    private DatabaseHelper databaseHelper;
 
     @Override
     public boolean onCreate() {
@@ -73,8 +75,7 @@ public class DatabaseProvider extends android.content.ContentProvider {
 
         SQLiteQueryBuilder sqLiteQueryBuilder = new SQLiteQueryBuilder();
         //checkColumns(projection);
-        switch (mUriMatcher.match(uri))
-        {
+        switch (mUriMatcher.match(uri)) {
             case DEBT_CODE:
                 sqLiteQueryBuilder.setTables(DebtTable.TABLE_NAME);
                 break;
@@ -97,17 +98,17 @@ public class DatabaseProvider extends android.content.ContentProvider {
                 sqLiteQueryBuilder.setTables(GroupUserTable.TABLE_NAME);
                 break;
             default:
-                Log.e(TAG,"Error: Calling query method at DatabaseProvider with invalid uri.");
+                Log.e(TAG, "Error: Calling query method at DatabaseProvider with invalid uri.");
                 break;
         }
         Cursor cursor = sqLiteQueryBuilder.query(databaseHelper.getWritableDatabase(),
-                projection,
-                selection,
-                selectionArgs,
-                null,
-                null,
-                sortOrder);
-        cursor.setNotificationUri(getContext().getContentResolver(),uri);
+            projection,
+            selection,
+            selectionArgs,
+            null,
+            null,
+            sortOrder);
+        cursor.setNotificationUri(getContext().getContentResolver(), uri);
         return cursor;
     }
 
@@ -120,9 +121,8 @@ public class DatabaseProvider extends android.content.ContentProvider {
     public Uri insert(Uri uri, ContentValues values) {
         SQLiteDatabase sqLiteDatabase = databaseHelper.getWritableDatabase();
         long id = 0;
-        String tablename="";
-        switch (mUriMatcher.match(uri))
-        {
+        String tablename = "";
+        switch (mUriMatcher.match(uri)) {
             case DEBT_CODE:
                 tablename = DebtTable.TABLE_NAME;
                 break;
@@ -133,58 +133,57 @@ public class DatabaseProvider extends android.content.ContentProvider {
                 tablename = LoginTable.TABLE_NAME;
                 break;
             case TRANSACTION_CODE:
-                tablename=TransactionTable.TABLE_NAME;
+                tablename = TransactionTable.TABLE_NAME;
                 break;
             case USER_CODE:
-                tablename=UserTable.TABLE_NAME;
+                tablename = UserTable.TABLE_NAME;
                 break;
             case GROUP_TRANSACTION_CODE:
-                tablename=GroupTransactionTable.TABLE_NAME;
+                tablename = GroupTransactionTable.TABLE_NAME;
                 break;
             case GROUP_USER_CODE:
-                tablename=GroupUserTable.TABLE_NAME;
+                tablename = GroupUserTable.TABLE_NAME;
                 break;
             default:
-                Log.e(TAG,"Error: Calling insert method at DatabaseProvider with invalid uri.");
+                Log.e(TAG, "Error: Calling insert method at DatabaseProvider with invalid uri.");
                 break;
         }
-        id = sqLiteDatabase.insert(tablename,null,values);
-        getContext().getContentResolver().notifyChange(uri,null);
-        return Uri.parse(tablename+"/"+id);
+        id = sqLiteDatabase.insert(tablename, null, values);
+        getContext().getContentResolver().notifyChange(uri, null);
+        return Uri.parse(tablename + "/" + id);
     }
 
     @Override
     public int delete(Uri uri, String selection, String[] selectionArgs) {
         SQLiteDatabase sqLiteDatabase = databaseHelper.getWritableDatabase();
         int rowsDeleted = 0;
-        switch (mUriMatcher.match(uri))
-        {
+        switch (mUriMatcher.match(uri)) {
             case DEBT_CODE:
-                rowsDeleted = sqLiteDatabase.delete(DebtTable.TABLE_NAME,selection,selectionArgs);
+                rowsDeleted = sqLiteDatabase.delete(DebtTable.TABLE_NAME, selection, selectionArgs);
                 break;
             case GROUP_CODE:
-                rowsDeleted = sqLiteDatabase.delete(GroupTable.TABLE_NAME,selection,selectionArgs);
+                rowsDeleted = sqLiteDatabase.delete(GroupTable.TABLE_NAME, selection, selectionArgs);
                 break;
             case LOGIN_CODE:
-                rowsDeleted = sqLiteDatabase.delete(LoginTable.TABLE_NAME,selection,selectionArgs);
+                rowsDeleted = sqLiteDatabase.delete(LoginTable.TABLE_NAME, selection, selectionArgs);
                 break;
             case TRANSACTION_CODE:
-                rowsDeleted = sqLiteDatabase.delete(TransactionTable.TABLE_NAME,selection,selectionArgs);
+                rowsDeleted = sqLiteDatabase.delete(TransactionTable.TABLE_NAME, selection, selectionArgs);
                 break;
             case USER_CODE:
-                rowsDeleted = sqLiteDatabase.delete(UserTable.TABLE_NAME,selection,selectionArgs);
+                rowsDeleted = sqLiteDatabase.delete(UserTable.TABLE_NAME, selection, selectionArgs);
                 break;
             case GROUP_TRANSACTION_CODE:
-                rowsDeleted = sqLiteDatabase.delete(GroupTransactionTable.TABLE_NAME,selection,selectionArgs);
+                rowsDeleted = sqLiteDatabase.delete(GroupTransactionTable.TABLE_NAME, selection, selectionArgs);
                 break;
             case GROUP_USER_CODE:
-                rowsDeleted = sqLiteDatabase.delete(GroupUserTable.TABLE_NAME,selection,selectionArgs);
+                rowsDeleted = sqLiteDatabase.delete(GroupUserTable.TABLE_NAME, selection, selectionArgs);
                 break;
             default:
-                Log.e(TAG,"Error: Calling delete method at DatabaseProvider with invalid uri.");
+                Log.e(TAG, "Error: Calling delete method at DatabaseProvider with invalid uri.");
                 break;
         }
-        getContext().getContentResolver().notifyChange(uri,null);
+        getContext().getContentResolver().notifyChange(uri, null);
         return rowsDeleted;
     }
 
@@ -192,8 +191,7 @@ public class DatabaseProvider extends android.content.ContentProvider {
     public int update(Uri uri, ContentValues values, String selection, String[] selectionArgs) {
         SQLiteDatabase sqLiteDatabase = databaseHelper.getWritableDatabase();
         int rowsUpdated = 0;
-        switch (mUriMatcher.match(uri))
-        {
+        switch (mUriMatcher.match(uri)) {
             case DEBT_CODE:
                 rowsUpdated = sqLiteDatabase.update(DebtTable.TABLE_NAME, values, selection, selectionArgs);
                 break;
@@ -216,10 +214,10 @@ public class DatabaseProvider extends android.content.ContentProvider {
                 rowsUpdated = sqLiteDatabase.update(GroupUserTable.TABLE_NAME, values, selection, selectionArgs);
                 break;
             default:
-                Log.e(TAG,"Error: Calling update method at DatabaseProvider with invalid uri.");
+                Log.e(TAG, "Error: Calling update method at DatabaseProvider with invalid uri.");
                 break;
         }
-        getContext().getContentResolver().notifyChange(uri,null);
+        getContext().getContentResolver().notifyChange(uri, null);
         return rowsUpdated;
     }
 }

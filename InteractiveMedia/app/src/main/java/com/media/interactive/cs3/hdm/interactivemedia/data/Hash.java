@@ -9,7 +9,7 @@ import java.security.NoSuchAlgorithmException;
 
 public class Hash {
 
-    public static String hashStringSHA256(String toHash) {
+    public static String hashStringSha256(String toHash) {
         String result = null;
         MessageDigest md;
         try {
@@ -17,7 +17,7 @@ public class Hash {
 
             md.update(toHash.getBytes());
 
-            byte byteData[] = md.digest();
+            byte[] byteData = md.digest();
 
             //convert the byte to hex format method 1
             final StringBuffer sb = new StringBuffer();
