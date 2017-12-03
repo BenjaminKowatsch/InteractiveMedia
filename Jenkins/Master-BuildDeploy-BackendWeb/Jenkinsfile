@@ -39,6 +39,27 @@ pipeline {
                         reportFiles: 'index.html',
                         reportName: 'JavaDoc',
                         reportTitles: ''])
+		    publishHTML( [allowMissing: false,
+			alwaysLinkToLastBuild: false,
+			keepAll: false,
+			reportDir: 'app/build/outputs/checkstyle/',
+			reportFiles: 'google_checks-output.html',
+			reportName: 'HTML Google Checks Report',
+			reportTitles: ''])
+		    publishHTML( [allowMissing: false,
+			alwaysLinkToLastBuild: false,
+			keepAll: false,
+			reportDir: 'app/build/outputs/findbugs/',
+			reportFiles: 'findbugs-output.html',
+			reportName: 'HTML Findbugs Report',
+			reportTitles: ''])
+		    publishHTML( [allowMissing: false,
+			alwaysLinkToLastBuild: false,
+			keepAll: false,
+			reportDir: 'app/build/reports/',
+			reportFiles: 'lint-results.html',
+			reportName: 'HTML Android Lint Report',
+			reportTitles: ''])
                 }
                 sh 'docker build -f backend/doc/Dockerfile -t apidoc:latest backend'
                 sh 'docker run apidoc:latest'
