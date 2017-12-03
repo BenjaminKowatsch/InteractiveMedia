@@ -1,4 +1,7 @@
 pipeline {
+    tools {
+        gradle "Gradle 4.3"
+    }
     agent any
     stages {
         stage ('Checkout code') {
@@ -7,9 +10,12 @@ pipeline {
             }
         }
         
-        stage ('Build images') {
+        stage ('Build') {
             steps {
                 sh 'docker-compose -f docker-compose.prod.yml build'
+                dir('InteractiveMedia') {
+                    sh 'gradle build'
+                }
             }            
         }
         
@@ -22,13 +28,13 @@ pipeline {
             }            
         }
             
-        stage ('Store images') {
+        stage ('Store artefacts') {
             steps {
                 sh 'docker-compose -f docker-compose.prod.yml push'
             }            
         }
         
-        stage ('Deploy images') {
+        stage ('Deploy artefacts') {
             steps {
                 sh 'docker-compose -f docker-compose.prod.yml stop'
                 sh 'docker-compose -f docker-compose.prod.yml rm -sf'
