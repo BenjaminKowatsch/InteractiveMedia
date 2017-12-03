@@ -27,6 +27,31 @@ pipeline {
                 sh 'docker-compose -f docker-compose.backend-testing-api.yml rm -fsv'
             }            
         }
+
+        stage ('Generate docu') {
+            steps {
+                dir('InteractiveMedia') {
+                    sh 'gradle javadoc'
+                    publishHTML( [allowMissing: false,
+                        alwaysLinkToLastBuild: false,
+                        keepAll: false,
+                        reportDir: 'javadoc',
+                        reportFiles: 'index.html',
+                        reportName: 'JavaDoc',
+                        reportTitles: ''])
+                }
+                sh 'docker build -f backend/doc/Dockerfile -t apidoc:latest backend'
+                sh 'docker run apidoc:latest'
+                sh 'docker cp $(docker ps --latest --format "{{.ID}}"):/doc ./generated_doc'
+                publishHTML( [allowMissing: false,
+                    alwaysLinkToLastBuild: false,
+                    keepAll: false,
+                    reportDir: 'generated_doc',
+                    reportFiles: 'index.html',
+                    reportName: 'ApiDocs',
+                    reportTitles: ''])
+            }
+        }
             
         stage ('Store artefacts') {
             steps {
