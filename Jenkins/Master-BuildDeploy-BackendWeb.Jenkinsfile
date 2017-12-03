@@ -36,11 +36,14 @@ pipeline {
                 sh 'docker-compose -f docker-compose.prod.yml up -d'
             }            
         }
-        
-        stage ('Notification'){
-            steps {
-                slackSend channel: '#jenkins', message: 'Backend and Web on master were released successfully'
-            }            
+    }
+
+    post {
+        success {
+            slackSend (channel: '#jenkins', color: '#00C853', message: "Success: Job ${env.JOB_NAME}. Check it out <${env.BUILD_URL}|${env.BUILD_NUMBER}>")
+        }
+        failure {
+            slackSend (channel: '#jenkins', color: '#D50000', message: "Failure: Job ${env.JOB_NAME}. Check it out <${env.BUILD_URL}|${env.BUILD_NUMBER}>")
         }
     }
 }
