@@ -1,4 +1,4 @@
-/*jshint expr: true*/
+/* jshint expr: true */
 
 const chai = require('chai');
 const expect = require('chai').expect;
@@ -16,13 +16,13 @@ describe('Get groups', function() {
   var defaultToken;
   before(function(done) {
     // first register a new default user
-    chai.request(host).
-        post(loginUrl).
-        send({
+    chai.request(host)
+        .post(loginUrl)
+        .send({
           username: testData.users.valid[2].username,
-          password: testData.users.valid[2].password,
-        }).
-        then(function(res) {
+          password: testData.users.valid[2].password
+        })
+        .then(function(res) {
           defaultToken = res.body.payload.accessToken;
           done();
         })
@@ -35,10 +35,10 @@ describe('Get groups', function() {
 
   it('should respond with 403 if all groups are accessed as nonAdmin',
       function() {
-        return chai.request(host).
-            get(baseUrl + '/').
-            send({'accessToken': defaultToken, 'authType': 0}).
-            then(function(res) {
+        return chai.request(host)
+            .get(baseUrl + '/')
+            .send({'accessToken': defaultToken, 'authType': 0})
+            .then(function(res) {
               expect(res).to.have.status(403);
               expect(res).to.be.json;
               expect(res.body).to.be.an('object');
@@ -46,5 +46,26 @@ describe('Get groups', function() {
               expect(res.body.success).to.be.false;
             });
       });
-})
-;
+  it('should respond with 200 if data is correct',
+          function() {
+            return chai.request(host)
+                .post(baseUrl + '/group')
+                .send({
+                  'accessToken': defaultToken,
+                  'authType': 0,
+                  'payload': {
+                    'objectId': null,
+                    'createdAt': null,
+                    'name': 'Group 1',
+                    'imageUrl': 'http://blabla.de/bla.png',
+                    'users': [],
+                    'transactions': []
+                  }
+                })
+                .then(function(res) {
+                  expect(res).to.have.status(201);
+                  expect(res).to.be.json;
+                  expect(res.body).to.be.an('object');
+                });
+          });
+});

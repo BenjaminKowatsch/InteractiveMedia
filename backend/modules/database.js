@@ -22,6 +22,7 @@ var tryConnectOptions = {
  */
 database.collections = {
   'users': undefined,
+  'groups': undefined,
   'launometerUsers': undefined,
   'facebookUsers': undefined,
   'googleUsers': undefined,
@@ -78,6 +79,7 @@ function connect(resolve, reject) {
       database.collections.facebookUsers = db.collection('facebookUsers');
       database.collections.emotionData = db.collection('emotionData');
       database.collections.users = db.collection('users');
+      database.collections.groups = db.collection('groups');
       resolve();
     } else {
       console.log('Database connection failed with error: ' + err);
@@ -86,6 +88,7 @@ function connect(resolve, reject) {
       database.collections.facebookUsers = undefined;
       database.collections.emotionData = undefined;
       database.collections.users = undefined;
+      database.collections.groups = undefined;
       database.db = undefined;
       reject();
     }

@@ -3,6 +3,7 @@ var user = module.exports = {};
 var winston = require('winston');
 /* Application configuration */
 var config = require('./config');
+var util = require('./util');
 /* JSON Web Token to create access tokens */
 var jwt = require('jwt-simple');
 var https = require('https');
@@ -16,11 +17,6 @@ var MONGO_DB_CONNECTION_ERROR_CODE = 10;
 var MONGO_DB_REQUEST_ERROR_CODE = 9;
 
 var MONGO_DB_CONNECTION_ERROR_OBJECT = {'errorCode': MONGO_DB_CONNECTION_ERROR_CODE};
-
-/* Month Names */
-var MONTH_NAMES_GER = ['Jan', 'Feb', 'Mär', 'Apr', 'Mai', 'Jun',
-  'Jul', 'Aug', 'Sep', 'Okt', 'Nov', 'Dez'
-];
 
 var AUTH_TYPE = {
   'LAUNOMETER': 0,
@@ -37,20 +33,6 @@ function getNewTokenExpiryDate() {
   var time = new Date().getTime();
   time += 3600000;
   return new Date(time);
-}
-/**
- * Generates a new Universal Unique Identifier
- *
- * @return {String} Generated new Universal Unique Identifier
- */
-function generateUUID() {
-  var d = new Date().getTime();
-  var uuid = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
-    var r = (d + Math.random() * 16) % 16 | 0;
-    d = Math.floor(d / 16);
-    return (c == 'x' ? r : (r & 0x3 | 0x8)).toString(16);
-  });
-  return uuid;
 }
 
 user.AUTH_TYPE = AUTH_TYPE;
@@ -430,7 +412,7 @@ user.register = function(userCollection, responseData, username, password) {
       userData.expiryDate = getNewTokenExpiryDate(); // now + 1h
       userData.password = password;
       userData.username = username;
-      userData.userId = generateUUID();
+      userData.userId = util.generateUUID();
       userData.authType = AUTH_TYPE.LAUNOMETER;
 
       userCollection.insertOne(userData, function(err, result) {
