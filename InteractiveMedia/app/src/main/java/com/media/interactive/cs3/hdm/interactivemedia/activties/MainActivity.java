@@ -40,8 +40,7 @@ public class MainActivity extends AppCompatActivity {
         //databaseHelper.deleteAllUsers();
 
         DummyDataAdder dummyDataAdder = new DummyDataAdder(this);
-        dummyDataAdder.addTransactions(10);
-        dummyDataAdder.addGroups(4);
+        dummyDataAdder.addAllDummyData();
 
 
         Login.getInstance().clear();

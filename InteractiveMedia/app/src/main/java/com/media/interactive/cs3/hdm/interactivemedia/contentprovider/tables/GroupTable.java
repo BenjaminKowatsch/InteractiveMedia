@@ -25,13 +25,20 @@ public class GroupTable {
      * Fourth attribute, type TIMESTAMP DEFAULT CURRENT_TIMESTAMP.
      */
     public static final String COLUMN_CREATED_AT = "created_at";
+    /**
+     * Fifth attribute, type INTEGER references
+     */
+    public static final String COLUMN_ADMIN_ID = "admin_id";
 
     public static final String DATABASE_CREATE =
-        "create table if not exists " + TABLE_NAME + "("
-          + COLUMN_ID + " integer unique primary key AUTOINCREMENT,"
-          + COLUMN_NAME + " TEXT NOT NULL,"
-          + COLUMN_IMAGE_URL + " TEXT,"
-          + COLUMN_CREATED_AT + " TIMESTAMP DEFAULT CURRENT_TIMESTAMP)";
+
+        "create table if not exists "+ TABLE_NAME +"(" +
+                COLUMN_ID+" integer unique primary key AUTOINCREMENT," +
+                COLUMN_NAME+" TEXT NOT NULL," +
+                COLUMN_IMAGE_URL+" TEXT," +
+                COLUMN_CREATED_AT+" TIMESTAMP DEFAULT CURRENT_TIMESTAMP," +
+                COLUMN_ADMIN_ID +" INTEGER references "+UserTable.TABLE_NAME+" ("+UserTable.COLUMN_ID+") on delete cascade on update cascade)";
+
 
     public static final String DATABASE_DROP = "drop table if exists " + TABLE_NAME;
 

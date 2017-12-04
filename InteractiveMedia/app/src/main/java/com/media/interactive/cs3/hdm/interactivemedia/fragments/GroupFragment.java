@@ -2,6 +2,7 @@ package com.media.interactive.cs3.hdm.interactivemedia.fragments;
 
 import android.app.ListFragment;
 import android.app.LoaderManager;
+import android.content.ContentResolver;
 import android.content.Context;
 import android.content.CursorLoader;
 import android.content.Intent;
@@ -17,11 +18,13 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.SimpleCursorAdapter;
+import android.widget.Toast;
 
 import com.media.interactive.cs3.hdm.interactivemedia.R;
 import com.media.interactive.cs3.hdm.interactivemedia.activties.AddGroupActivity;
 import com.media.interactive.cs3.hdm.interactivemedia.contentprovider.DatabaseProvider;
 import com.media.interactive.cs3.hdm.interactivemedia.contentprovider.tables.GroupTable;
+import com.media.interactive.cs3.hdm.interactivemedia.contentprovider.tables.GroupUserTable;
 
 
 public class GroupFragment extends ListFragment implements LoaderManager.LoaderCallbacks<Cursor>, IMyFragment {
@@ -60,6 +63,7 @@ public class GroupFragment extends ListFragment implements LoaderManager.LoaderC
         getLoaderManager().initLoader(0, null, this);
         simpleCursorAdapter = new SimpleCursorAdapter(getActivity(), R.layout.fragment_group, null, projection,
             new int[] {R.id.group_title, R.id.group_creation_date}, 0);
+
         setListAdapter(simpleCursorAdapter);
 
 
@@ -95,8 +99,26 @@ public class GroupFragment extends ListFragment implements LoaderManager.LoaderC
 
     @Override
     public void onListItemClick(ListView l, View v, int position, long id) {
-        super.onListItemClick(l, v, position, id);
-        onItemSelectedListener.onItemSelected(l, v, position, id);
+        //super.onListItemClick(l, v, position, id);
+        //onItemSelectedListener.onItemSelected(l, v, position, id);
+        ContentResolver dummyContentResolver = getContext().getContentResolver();
+
+        final String[] projection = {GroupUserTable.COLUMN_USER_ID, GroupUserTable.COLUMN_GROUP_ID};
+        final String selection = GroupUserTable.COLUMN_GROUP_ID + " = ?";
+        String[] selectionArgs = {String.valueOf(id)};
+
+        Cursor query = dummyContentResolver.query(DatabaseProvider.CONTENT_GROUP_USER_URI, projection, selection , selectionArgs, null);
+
+        String ids = " IDs: ";
+
+        while (query.moveToNext()) {
+            String user_id =query.getString(0);
+            String group_id = query.getString(1);
+            ids += user_id + ", ";
+
+        }
+
+        Toast.makeText(v.getContext(), "Selected Group: "+id+ ids, Toast.LENGTH_SHORT).show();
     }
 
     @Override

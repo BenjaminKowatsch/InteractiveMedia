@@ -46,6 +46,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
         // Enable foreign keys
         //db.execSQL("PRAGMA foreign_keys=ON;");
+
         // Call table onCreate methods
         LoginTable.onCreate(db);
         GroupTable.onCreate(db);
