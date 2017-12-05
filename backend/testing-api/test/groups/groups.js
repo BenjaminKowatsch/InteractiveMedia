@@ -15,6 +15,8 @@ describe('Get groups', function() {
   this.timeout(5000); // How long to wait for a response (ms)
   var defaultToken;
   var alternativeToken;
+  var groupId;
+
   before(function(done) {
     // first register a new default user
     chai.request(host).post(loginUrl).send({
@@ -27,6 +29,22 @@ describe('Get groups', function() {
         .catch((error) => {
           console.log('Facbook Login Error: ' + error);
         });
+    chai.request(host).post(baseUrl + '/').send({
+      'accessToken': defaultToken,
+      'authType': 0,
+      'payload': {
+        'objectId': null,
+        'createdAt': null,
+        'name': 'TestGroup without user 2',
+        'imageUrl': 'http://blabla.de/bla.png',
+        'users': [],
+        'transactions': [],
+      },
+    }).then(function(res) {
+      groupId = res.body.objectId;
+    }).catch((error) => {
+      console.log('Group creation error:' + error);
+    });
     chai.request(host).post(loginUrl).send({
       username: testData.users.valid[3].username,
       password: testData.users.valid[3].password,
@@ -39,7 +57,8 @@ describe('Get groups', function() {
           console.log('Facbook Login Error: ' + error);
           done();
         });
-  });
+  })
+  ;
 
   it('should respond with 403 if all groups are accessed as nonAdmin',
       function() {
@@ -78,7 +97,7 @@ describe('Get groups', function() {
   it('should deny access to users not in group',
       function() {
         return chai.request(host).
-            get(baseUrl + '/nonExistingGroup').
+            get(baseUrl + '/' + groupId).
             send({'accessToken': alternativeToken, 'authType': 0}).
             then(function(res) {
               expect(res).to.have.status(403);
