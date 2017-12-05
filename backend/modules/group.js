@@ -46,3 +46,26 @@ group.createNewGroup = function(groupCollection, groupData) {
     });
   });
 };
+
+group.verifyGroupContainsUser = function(groupCollection, groupId, userId) {
+  return new Promise((resolve, reject) => {
+    let query = {groupId: groupId};
+    let options = {fields: {groupId: true, users: true}};
+    groupCollection.findOne(query, options, function(error, result) {
+      if (error === null && result !== null) {
+        let promiseData = {
+          groupId: result.groupId,
+          users: result.users,
+        };
+        if (result.users.indexOf(userId) > 0) {
+          resolve(promiseData);
+        } else {
+          reject(promiseData);
+        }
+      } else {
+        winston.error('Error MONGO_DB_INTERNAL_ERROR: ', error);
+        reject(error);
+      }
+    });
+  });
+};

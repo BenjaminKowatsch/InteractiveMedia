@@ -1,6 +1,7 @@
 const express = require('express');
 
 const database = require('../modules/database');
+const group = require('../modules/group');
 const winston = require('winston');
 const httpResponder = require('./sendHttpResonse');
 
@@ -8,7 +9,7 @@ exports.isAuthorizedAdmin = function(req, res, next) {
   winston.info('Authorizing request as admin');
   let admin = 'admin';
   if (isAuthenticated(req, res)) {
-    const userId = res.locals.userId;
+    let userId = res.locals.userId;
     verifyRole(userId, admin).
         then(promise => next()).
         catch((error) => {
@@ -17,6 +18,31 @@ exports.isAuthorizedAdmin = function(req, res, next) {
           const resBody = {'success': false, 'payload': error.message};
           httpResponder.sendHttpResponse(res, 403, resBody);
         });
+  } else {
+    let error = 'Authorization failed due to missing authentication';
+    let resBody = {'success': false, 'payload': error};
+    httpResponder.sendHttpResponse(res, 500, resBody);
+  }
+};
+
+exports.isAuthorizedUser = function(req, res, next) {
+  winston.info('Authorizing request as user');
+  if (isAuthenticated(req, res)) {
+    let userId = res.locals.userId;
+    if (req.path.contains('groups')) {
+      let groupId = req.params.groupid;
+      verifyUserInGroup(userId, groupId).then((promiseData) => {
+        res.locals.groupId = promiseData.groupId;
+        next();
+      }).catch((error) => {
+        winston.error('User ' + userId + ' could not be authorized for group ' +
+            groupId);
+        const resBody = {'success': false, 'payload': error.message};
+        httpResponder.sendHttpResponse(res, 403, resBody);
+      });
+    } else {
+      next();
+    }
   } else {
     let error = 'Authorization failed due to missing authentication';
     let resBody = {'success': false, 'payload': error};
@@ -42,4 +68,9 @@ function verifyRole(userId, roleId) {
   } else {
     return Promise.resolve({authorizedAdmin: true});
   }
+}
+
+function verifyUserInGroup(userId, groupId) {
+  return group.verifyGroupContainsUser(database.collections.groups, groupId,
+      userId);
 }
