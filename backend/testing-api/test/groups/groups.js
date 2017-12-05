@@ -57,7 +57,7 @@ describe('Get groups', function() {
 
   it('should respond with 200 if post data is correct',
       function() {
-        return chai.request(host).post(baseUrl + '/group').send({
+        return chai.request(host).post(baseUrl + '/').send({
           'accessToken': defaultToken,
           'authType': 0,
           'payload': {
@@ -78,7 +78,7 @@ describe('Get groups', function() {
   it('should deny access to users not in group'),
       function() {
         return chai.request(host).
-            get(baseUrl + '/group').
+            get(baseUrl + '/nonExistingGroup').
             send({'accessToken': alternativeToken, 'authType': 0}).
             then(function(res) {
               expect(res).to.have.status(403);

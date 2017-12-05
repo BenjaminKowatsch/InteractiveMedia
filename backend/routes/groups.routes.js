@@ -7,10 +7,13 @@ const authenticationService = require('../services/authenticationService');
 
 //base route: host:8081/groups
 
-router.get('/', authenticationService.isAuthenticated, authorizationService.isAuthorizedAdmin, groupsController.getAll);
+router.get('/', authenticationService.isAuthenticated,
+    authorizationService.isAuthorizedAdmin, groupsController.getAll);
 
-router.get('/:groupid', authenticationService.isAuthenticated, authorizationService.isAuthorizedUser, groupsController.getById);
+router.get('/:groupid', authenticationService.isAuthenticated,
+    authorizationService.isAuthorizedUser, groupsController.getById);
 
-router.post('/group', authenticationService.isAuthenticated, groupsController.createNewGroup);
+router.post('/', authenticationService.isAuthenticated,
+    groupsController.createNewGroup);
 
 module.exports = router;
