@@ -156,7 +156,8 @@
               // sets the variables and defines them as the tiped in data
             };
             // Sending credentials to database
-            axios.post(Config.webServiceURL+'/login', credentials)
+            axios.post(Config.webServiceURL+'/v1/users/login?type=0', credentials)
+
             .then(this.loginResponseHandler)
             .catch(this.defaultErrorHandler);
           } else {
