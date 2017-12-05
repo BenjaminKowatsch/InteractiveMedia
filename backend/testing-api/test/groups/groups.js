@@ -75,7 +75,7 @@ describe('Get groups', function() {
         });
       });
 
-  it('should deny access to users not in group'),
+  it('should deny access to users not in group',
       function() {
         return chai.request(host).
             get(baseUrl + '/nonExistingGroup').
@@ -83,5 +83,5 @@ describe('Get groups', function() {
             then(function(res) {
               expect(res).to.have.status(403);
             });
-      };
+      });
 });
