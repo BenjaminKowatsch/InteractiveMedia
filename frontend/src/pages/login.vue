@@ -13,20 +13,20 @@
     <!-- title of the login view -->
     <f7-list form>
       <f7-list-item>
-        <f7-label>Nutzername</f7-label>
+        <f7-label>Username</f7-label>
         <!-- label for username entry textfield -->
         <f7-input name="username" placeholder="Nutzername" type="text" v-model="username" @keyup.enter="checkLogin()"></f7-input>
         <!-- input field for username -->
       </f7-list-item>
       <f7-list-item>
-        <f7-label>Passwort</f7-label>
+        <f7-label>Password</f7-label>
         <!-- label for password entry textfield -->
         <f7-input name="password" type="password" placeholder="Passwort" v-model="password" @keyup.enter="checkLogin()"></f7-input>
         <!-- input field for password -->
       </f7-list-item>
     </f7-list>
     <f7-list>
-      <f7-list-button title="Einloggen" v-on:click="checkLogin()">
+      <f7-list-button title="Login" v-on:click="checkLogin()">
       <!-- Login Button which triggers the login function (see below in jscript area) -->
 
       </f7-list-button>

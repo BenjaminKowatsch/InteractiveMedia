@@ -23,7 +23,9 @@ services:
       retries: 12
 
   backend:
-    build: ./backend
+    build: ./backend 
+    environment: 
+      - ORIGIN=http://cloudproject.mi.hdm-stuttgart.de:8088
     image: localhost:5000/backend
     ports:
       - "8081:8081"
@@ -43,6 +45,7 @@ services:
       context: ./frontend
       args:
         - WEB_SERVICE_URL=http://cloudproject.mi.hdm-stuttgart.de:8081
+        - ORIGIN_URL=http://cloudproject.mi.hdm-stuttgart.de:8088
     image: localhost:5000/frontend
     ports:
       - 8088:80

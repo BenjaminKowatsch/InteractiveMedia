@@ -28,12 +28,13 @@ RUN npm config set depth 0
 # install only node packages required for production
 RUN npm install --only=production --no-bin-links
 
+#ARG ORIGIN
+
 # copy production node_modules aside
 RUN cp -R node_modules prod_node_modules
 
 # install ALL node_modules, including 'devDependencies'
 RUN npm install --no-bin-links
-
 
 #
 # ---- Unit tests and linters ----
@@ -42,11 +43,12 @@ FROM dependencies AS test
 # add current folder
 COPY . .
 
+#add origin adress from docker-compose file (prod or local)
+
 RUN npm run static-code-analysis
 # RUN npm run lint
 # RUN npm run setup
 RUN npm run unit-test
-
 
 # ---- Release ----
 FROM base AS release
@@ -54,7 +56,7 @@ FROM base AS release
 # Set environment variables
 ENV PORT 8081
 ENV MONGODB_URL "mongodb://mongo/launometer"
-ENV ORIGIN "http://cloudproject.mi.hdm-stuttgart.de:8088"
+#ENV ORIGIN "http://localhost:8088"
 ENV GOOGLE_OAUTH_CLIENT_ID "908170470873-8151s7cvldroebdl7mcpg2houdgljgfg.apps.googleusercontent.com"
 ENV FACEBOOK_URL_APP_TOKEN "1971379956470536%7ChIQ5dRDon3DJq2YzH1NU41byB-w"
 ENV JWT_SIMPLE_SECRET "A3xFr93Yl2qTn5"
@@ -71,8 +73,10 @@ COPY --from=dependencies /app/prod_node_modules ./node_modules
 # copy app sources
 COPY . .
 
+
 # expose port
 EXPOSE $PORT
 
 # set starting point
 CMD npm run start
+
