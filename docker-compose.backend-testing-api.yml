@@ -17,6 +17,8 @@ services:
       retries: 12
 
   backend:
+    environment:
+      - ORIGIN=http://localhost:8088
     image: localhost:5000/backend
     depends_on:
       mongo:
