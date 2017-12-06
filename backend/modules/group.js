@@ -49,12 +49,12 @@ group.createNewGroup = function(groupCollection, groupData) {
 
 group.verifyGroupContainsUser = function(groupCollection, groupId, userId) {
   return new Promise((resolve, reject) => {
-    let query = {groupId: groupId};
-    let options = {fields: {groupId: true, users: true}};
+    let query = {objectId: groupId};
+    let options = {fields: {objectId: true, users: true}};
     groupCollection.findOne(query, options, function(error, result) {
       if (error === null && result !== null) {
         let promiseData = {
-          groupId: result.groupId,
+          groupId: result.objectId,
           users: result.users,
         };
         if (result.users.indexOf(userId) > 0) {

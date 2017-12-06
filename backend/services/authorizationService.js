@@ -29,7 +29,7 @@ exports.isAuthorizedUser = function(req, res, next) {
   winston.info('Authorizing request as user');
   if (isAuthenticated(req, res)) {
     let userId = res.locals.userId;
-    if (req.path.contains('groups')) {
+    if (req.path.includes('groups')) {
       let groupId = req.params.groupid;
       verifyUserInGroup(userId, groupId).then((promiseData) => {
         res.locals.groupId = promiseData.groupId;

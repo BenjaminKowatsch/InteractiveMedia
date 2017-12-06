@@ -41,7 +41,8 @@ describe('Get groups', function() {
         'transactions': [],
       },
     }).then(function(res) {
-      groupId = res.body.objectId;
+      winston.info('res');
+      groupId = res.payload.objectId;
     }).catch((error) => {
       console.log('Group creation error:' + error);
     });
@@ -97,7 +98,7 @@ describe('Get groups', function() {
   it('should deny access to users not in group',
       function() {
         return chai.request(host).
-            get(baseUrl + '/' + groupId).
+            get(baseUrl + '/' + groupId + '/').
             send({'accessToken': alternativeToken, 'authType': 0}).
             then(function(res) {
               expect(res).to.have.status(403);

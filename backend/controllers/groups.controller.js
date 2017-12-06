@@ -39,11 +39,11 @@ exports.createNewGroup = function(req, res) {
 
 exports.getAll = function(req, res) {
   winston.info('Getting all groups');
-  httpResponder.sendHttpResponse(res, 404, resBody);
+  httpResponder.sendHttpResponse(res, 404, 'Not implemented');
 };
 
 exports.getById = function(req, res) {
   const groupId = req.params.groupid;
-  winston.info('Getting group with id' + groupId);
-  httpResponder.sendHttpResponse(res, 404, resBody);
+  winston.info('Getting group with id ' + groupId);
+  httpResponder.sendHttpResponse(res, 404, 'Not implemented');
 };
