@@ -9,23 +9,75 @@ pipeline {
                 git branch: 'master', credentialsId: '3ccd0e84-c917-4b30-b440-016c57545b2d', url: 'git@gitlab.mi.hdm-stuttgart.de:bk095/InteraktiveMedien.git'
             }
         }
-        
+
         stage ('Build') {
             steps {
                 sh 'docker-compose -f docker-compose.prod.yml build'
                 dir('InteractiveMedia') {
+                    sh 'gradle clean'
+                    sh 'mkdir -p app/build/outputs/checkstyle'
+                    sh 'mkdir -p app/build/outputs/findbugs'
+                    sh 'mkdir -p app/build/reports'
+                    sh 'mkdir -p app/build/reports/tests/testDebugUnitTest'
+                    sh 'mkdir -p app/build/reports/tests/testReleaseUnitTest'
+                    sh 'cp -f ../Jenkins/Master-BuildDeploy-BackendWeb/failure_report.html app/build/outputs/checkstyle/google_checks-output.html'
+                    sh 'cp -f ../Jenkins/Master-BuildDeploy-BackendWeb/failure_report.html app/build/outputs/findbugs/findbugs-output.html'
+                    sh 'cp -f ../Jenkins/Master-BuildDeploy-BackendWeb/failure_report.html app/build/reports/lint-results.html'
+                    sh 'cp -f ../Jenkins/Master-BuildDeploy-BackendWeb/failure_report.html app/build/reports/tests/testDebugUnitTest/index.html'
+                    sh 'cp -f ../Jenkins/Master-BuildDeploy-BackendWeb/failure_report.html app/build/reports/tests/testReleaseUnitTest/index.html'
                     sh 'gradle build'
                 }
-            }            
+            }
+            post {
+        always {
+                dir('InteractiveMedia') {
+                    publishHTML( [allowMissing: false,
+                  alwaysLinkToLastBuild: false,
+                  keepAll: false,
+                  reportDir: 'app/build/outputs/checkstyle/',
+                  reportFiles: 'google_checks-output.html',
+                  reportName: 'HTML Google Checks Report',
+                  reportTitles: ''])
+                publishHTML( [allowMissing: false,
+                  alwaysLinkToLastBuild: false,
+                  keepAll: false,
+                  reportDir: 'app/build/outputs/findbugs/',
+                  reportFiles: 'findbugs-output.html',
+                  reportName: 'HTML Findbugs Report',
+                  reportTitles: ''])
+                publishHTML( [allowMissing: false,
+                  alwaysLinkToLastBuild: false,
+                  keepAll: false,
+                  reportDir: 'app/build/reports/',
+                  reportFiles: 'lint-results.html',
+                  reportName: 'HTML Android Lint Report',
+                  reportTitles: ''])
+                publishHTML( [allowMissing: false,
+                  alwaysLinkToLastBuild: false,
+                  keepAll: false,
+                  reportDir: 'app/build/reports/tests/testDebugUnitTest/',
+                  reportFiles: 'index.html',
+                  reportName: 'HTML JUnit Debug Report',
+                  reportTitles: ''])
+                publishHTML( [allowMissing: false,
+                  alwaysLinkToLastBuild: false,
+                  keepAll: false,
+                  reportDir: 'app/build/reports/tests/testReleaseUnitTest/',
+                  reportFiles: 'index.html',
+                  reportName: 'HTML JUnit Release Report',
+                  reportTitles: ''])
+                }
         }
-        
+    }
+        }
+
         stage ('API tests') {
             steps {
                 sh 'docker-compose -f docker-compose.backend-testing-api.yml rm -fsv'
                 sh 'docker-compose -f docker-compose.backend-testing-api.yml build'
                 sh 'docker-compose -f docker-compose.backend-testing-api.yml up --abort-on-container-exit'
                 sh 'docker-compose -f docker-compose.backend-testing-api.yml rm -fsv'
-            }            
+            }
         }
 
         stage ('Generate docu') {
@@ -39,27 +91,6 @@ pipeline {
                         reportFiles: 'index.html',
                         reportName: 'JavaDoc',
                         reportTitles: ''])
-		    publishHTML( [allowMissing: false,
-			alwaysLinkToLastBuild: false,
-			keepAll: false,
-			reportDir: 'app/build/outputs/checkstyle/',
-			reportFiles: 'google_checks-output.html',
-			reportName: 'HTML Google Checks Report',
-			reportTitles: ''])
-		    publishHTML( [allowMissing: false,
-			alwaysLinkToLastBuild: false,
-			keepAll: false,
-			reportDir: 'app/build/outputs/findbugs/',
-			reportFiles: 'findbugs-output.html',
-			reportName: 'HTML Findbugs Report',
-			reportTitles: ''])
-		    publishHTML( [allowMissing: false,
-			alwaysLinkToLastBuild: false,
-			keepAll: false,
-			reportDir: 'app/build/reports/',
-			reportFiles: 'lint-results.html',
-			reportName: 'HTML Android Lint Report',
-			reportTitles: ''])
                 }
                 sh 'docker build -f backend/doc/Dockerfile -t apidoc:latest backend'
                 sh 'docker run apidoc:latest'
@@ -73,20 +104,20 @@ pipeline {
                     reportTitles: ''])
             }
         }
-            
+
         stage ('Store artefacts') {
             steps {
                 sh 'docker-compose -f docker-compose.prod.yml push'
-            }            
+            }
         }
-        
+
         stage ('Deploy artefacts') {
             steps {
                 sh 'docker-compose -f docker-compose.prod.yml stop'
                 sh 'docker-compose -f docker-compose.prod.yml rm -sf'
                 sh 'docker-compose -f docker-compose.prod.yml pull'
                 sh 'docker-compose -f docker-compose.prod.yml up -d'
-            }            
+            }
         }
     }
 
