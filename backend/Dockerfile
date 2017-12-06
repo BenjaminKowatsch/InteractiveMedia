@@ -54,7 +54,7 @@ FROM base AS release
 # Set environment variables
 ENV PORT 8081
 ENV MONGODB_URL "mongodb://mongo/launometer"
-ENV ORIGIN  "http://cloudproject.mi.hdm-stuttgart.de:8088/"
+ENV ORIGIN "http://cloudproject.mi.hdm-stuttgart.de:8088"
 ENV GOOGLE_OAUTH_CLIENT_ID "908170470873-8151s7cvldroebdl7mcpg2houdgljgfg.apps.googleusercontent.com"
 ENV FACEBOOK_URL_APP_TOKEN "1971379956470536%7ChIQ5dRDon3DJq2YzH1NU41byB-w"
 ENV JWT_SIMPLE_SECRET "A3xFr93Yl2qTn5"
