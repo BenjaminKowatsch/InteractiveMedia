@@ -16,8 +16,6 @@ var config = require('./modules/config');
 var user = require('./modules/user');
 var database = require('./modules/database');
 
-var requestValidator = require('./services/validateHttpRequestData');
-
 var MONGO_DB_CONNECTION_ERROR_CODE = 10;
 
 /**

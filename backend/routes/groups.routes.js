@@ -2,8 +2,8 @@ const express = require('express');
 const router = express.Router();
 
 const groupsController = require('../controllers/groups.controller');
-const authorizationService = require('../services/authorizationService');
-const authenticationService = require('../services/authenticationService');
+const authorizationService = require('../services/authorization.service');
+const authenticationService = require('../services/authentication.service');
 
 //base route: host:8081/groups
 

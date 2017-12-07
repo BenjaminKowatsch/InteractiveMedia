@@ -5,8 +5,8 @@ var winston = require('winston');
 
 var user = require('../modules/user');
 var database = require('../modules/database');
-var jsonValidator = require('./validateJson');
-var httpResponder = require('./sendHttpResonse');
+var validateJsonService = require('./validateJson.service');
+var httpResonseService = require('./httpResonse.service');
 
 var jsonSchema = {
   postData: require('../JSONSchema/postData.json')
@@ -16,7 +16,7 @@ exports.isAuthenticated = function(req, res, next) {
   winston.info('req.body', req.body);
 
   // validate data in request body
-  var validationResult = jsonValidator.validateAgainstSchema(req.body, jsonSchema.postData);
+  var validationResult = validateJsonService.validateAgainstSchema(req.body, jsonSchema.postData);
 
   if (validationResult.valid === true) {
     winston.info('Request body is valid');
@@ -32,13 +32,13 @@ exports.isAuthenticated = function(req, res, next) {
       // access token is invalid, unauthorized
       winston.error('Invalid access Token ');
       var resBody = {'success': false, 'payload': error};
-      httpResponder.sendHttpResponse(res, 401, resBody);
+      httpResonseService.sendHttpResponse(res, 401, resBody);
     });
   } else {
     // request body is invalid
     winston.error('Request body is invalid ');
     var resBody = {'success': false, 'payload': validationResult.error};
-    httpResponder.sendHttpResponse(res, 400, resBody);
+    httpResonseService.sendHttpResponse(res, 400, resBody);
   }
 };
 

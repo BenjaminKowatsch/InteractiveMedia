@@ -1,6 +1,6 @@
-var appVersion = require('../services/getAppVersion');
+var appVersionService = require('../services/appVersion.service');
 
 exports.getVersion = function(req, res) {
-  currentAppVersion = appVersion.getAppVersion();
+  currentAppVersion = appVersionService.getAppVersion();
   res.status(200).json(currentAppVersion);
 };
