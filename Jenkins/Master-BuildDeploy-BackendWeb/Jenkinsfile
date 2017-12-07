@@ -75,14 +75,8 @@ pipeline {
             steps {
 				sh 'docker-compose -f docker-compose.backend-testing-api.yml rm -fsv'
 				sh 'docker-compose -f docker-compose.backend-testing-api.yml build'
-				testResult = sh (script: 'docker-compose -f docker-compose.backend-testing-api.yml up --abort-on-container-exit',
-					returnStatus: true)
+				sh 'docker-compose -f docker-compose.backend-testing-api.yml up --abort-on-container-exit'
 				sh 'docker-compose -f docker-compose.backend-testing-api.yml rm -fsv'
-				script {
-					if(testResult != 0) {
-						currentBuild.result = 'UNSTABLE'
-					}
-				}
             }
         }
 
