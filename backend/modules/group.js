@@ -3,7 +3,7 @@ var group = module.exports = {};
 var winston = require('winston');
 /* Application configuration */
 var config = require('./config');
-var util = require('./util');
+var uuidService = require('../services/uuid.service');
 
 var MONGO_DB_CONNECTION_ERROR_CODE = 10;
 var MONGO_DB_REQUEST_ERROR_CODE = 9;
@@ -23,7 +23,7 @@ var MONGO_DB_CONNECTION_ERROR_OBJECT = {'errorCode': MONGO_DB_CONNECTION_ERROR_C
 group.createNewGroup = function(groupCollection, groupData) {
   return new Promise((resolve, reject) => {
     var responseData = {};
-    groupData.objectId = util.generateUUID();
+    groupData.objectId = uuidService.generateUUID();
     groupData.createdAt = new Date();
 
     groupCollection.insert(groupData, function(err, result) {

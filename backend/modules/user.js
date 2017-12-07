@@ -3,7 +3,7 @@ var user = module.exports = {};
 var winston = require('winston');
 /* Application configuration */
 var config = require('./config');
-var util = require('./util');
+var uuidService = require('../services/uuid.service');
 /* JSON Web Token to create access tokens */
 var jwt = require('jwt-simple');
 var https = require('https');
@@ -412,7 +412,7 @@ user.register = function(userCollection, responseData, username, password) {
       userData.expiryDate = getNewTokenExpiryDate(); // now + 1h
       userData.password = password;
       userData.username = username;
-      userData.userId = util.generateUUID();
+      userData.userId = uuidService.generateUUID();
       userData.authType = AUTH_TYPE.LAUNOMETER;
 
       userCollection.insertOne(userData, function(err, result) {
