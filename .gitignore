@@ -7,5 +7,3 @@
 .idea/**/*
 
 **/node_modules/
-
-docker-compose.local.yml
