@@ -11,7 +11,7 @@ router.get('/', authenticationService.isAuthenticated,
     authorizationService.isAuthorizedAdmin, groupsController.getAll);
 
 router.get('/:groupid', authenticationService.isAuthenticated,
-    authorizationService.isAuthorizedUser, groupsController.getById);
+    authorizationService.isGroupMember, groupsController.getById);
 
 router.post('/', authenticationService.isAuthenticated,
     groupsController.createNewGroup);

@@ -25,7 +25,7 @@ exports.isAuthorizedAdmin = function(req, res, next) {
   }
 };
 
-exports.isAuthorizedUser = function(req, res, next) {
+exports.isGroupMember = function(req, res, next) {
   winston.info('Authorizing request as user');
   if (isAuthenticated(req, res)) {
     let userId = res.locals.userId;
@@ -37,7 +37,7 @@ exports.isAuthorizedUser = function(req, res, next) {
       }).catch((error) => {
         winston.error('User ' + userId + ' could not be authorized for group ' +
             groupId);
-        const resBody = {'success': false, 'payload': error.message};
+        let resBody = {'success': false, 'payload': error.message};
         httpResponder.sendHttpResponse(res, 403, resBody);
       });
     } else {

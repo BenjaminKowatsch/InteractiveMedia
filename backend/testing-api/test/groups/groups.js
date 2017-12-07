@@ -2,6 +2,7 @@
 
 const chai = require('chai');
 const expect = require('chai').expect;
+const winston = require('winston');
 
 chai.use(require('chai-http'));
 
@@ -41,7 +42,7 @@ describe('Get groups', function() {
         'transactions': [],
       },
     }).then(function(res) {
-      winston.info('res');
+      winston.info(res);
       groupId = res.payload.objectId;
     }).catch((error) => {
       console.log('Group creation error:' + error);
