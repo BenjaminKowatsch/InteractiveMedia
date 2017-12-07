@@ -6,7 +6,6 @@ import android.content.Context;
 import android.net.Uri;
 import android.util.Log;
 
-import com.google.android.gms.common.server.converter.StringToIntConverter;
 import com.media.interactive.cs3.hdm.interactivemedia.contentprovider.tables.GroupTable;
 import com.media.interactive.cs3.hdm.interactivemedia.contentprovider.tables.GroupUserTable;
 import com.media.interactive.cs3.hdm.interactivemedia.contentprovider.tables.TransactionTable;
