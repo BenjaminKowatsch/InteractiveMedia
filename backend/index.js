@@ -15,8 +15,6 @@ var groupRoutes = require('./routes/groups.routes');
 var config = require('./modules/config');
 var user = require('./modules/user');
 var database = require('./modules/database');
-var emotionData = require('./modules/emotionData');
-var userDataInit = require('./modules/init_user');
 
 var requestValidator = require('./services/validateHttpRequestData');
 
