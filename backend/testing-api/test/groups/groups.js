@@ -2,7 +2,6 @@
 
 const chai = require('chai');
 const expect = require('chai').expect;
-const winston = require('winston');
 
 chai.use(require('chai-http'));
 
@@ -16,8 +15,6 @@ describe('Get groups', function() {
   this.timeout(5000); // How long to wait for a response (ms)
   var defaultToken;
   var alternativeToken;
-  var groupId;
-
   before(function(done) {
     // first register a new default user
     chai.request(host).post(loginUrl).send({
@@ -30,23 +27,6 @@ describe('Get groups', function() {
         .catch((error) => {
           console.log('Facbook Login Error: ' + error);
         });
-    chai.request(host).post(baseUrl + '/').send({
-      'accessToken': defaultToken,
-      'authType': 0,
-      'payload': {
-        'objectId': null,
-        'createdAt': null,
-        'name': 'TestGroup without user 2',
-        'imageUrl': 'http://blabla.de/bla.png',
-        'users': [],
-        'transactions': [],
-      },
-    }).then(function(res) {
-      winston.info(res);
-      groupId = res.payload.objectId;
-    }).catch((error) => {
-      console.log('Group creation error:' + error);
-    });
     chai.request(host).post(loginUrl).send({
       username: testData.users.valid[3].username,
       password: testData.users.valid[3].password,
@@ -59,8 +39,7 @@ describe('Get groups', function() {
           console.log('Facbook Login Error: ' + error);
           done();
         });
-  })
-  ;
+  });
 
   it('should respond with 403 if all groups are accessed as nonAdmin',
       function() {
@@ -75,10 +54,10 @@ describe('Get groups', function() {
               expect(res.body.success).to.be.false;
             });
       });
-
+  /*
   it('should respond with 200 if post data is correct',
       function() {
-        return chai.request(host).post(baseUrl + '/').send({
+        return chai.request(host).post(baseUrl + '/group').send({
           'accessToken': defaultToken,
           'authType': 0,
           'payload': {
@@ -90,19 +69,20 @@ describe('Get groups', function() {
             'transactions': [],
           },
         }).then(function(res) {
+          console.log('group-response: ' + JSON.stringify(res));
           expect(res).to.have.status(201);
           expect(res).to.be.json;
           expect(res.body).to.be.an('object');
         });
       });
-
-  it('should deny access to users not in group',
+*/
+  it('should deny access to users not in group'),
       function() {
         return chai.request(host).
-            get(baseUrl + '/' + groupId + '/').
+            get(baseUrl + '/group').
             send({'accessToken': alternativeToken, 'authType': 0}).
             then(function(res) {
               expect(res).to.have.status(403);
             });
-      });
+      };
 });
