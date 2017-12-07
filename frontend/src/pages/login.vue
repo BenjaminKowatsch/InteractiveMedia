@@ -15,13 +15,13 @@
       <f7-list-item>
         <f7-label>Username</f7-label>
         <!-- label for username entry textfield -->
-        <f7-input name="username" placeholder="Nutzername" type="text" v-model="username" @keyup.enter="checkLogin()"></f7-input>
+        <f7-input name="username" placeholder="Username" type="text" v-model="username" @keyup.enter="checkLogin()"></f7-input>
         <!-- input field for username -->
       </f7-list-item>
       <f7-list-item>
         <f7-label>Password</f7-label>
         <!-- label for password entry textfield -->
-        <f7-input name="password" type="password" placeholder="Passwort" v-model="password" @keyup.enter="checkLogin()"></f7-input>
+        <f7-input name="password" type="password" placeholder="Password" v-model="password" @keyup.enter="checkLogin()"></f7-input>
         <!-- input field for password -->
       </f7-list-item>
     </f7-list>
