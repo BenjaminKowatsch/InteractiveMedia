@@ -20,11 +20,11 @@ pipeline {
                     sh 'mkdir -p app/build/reports'
                     sh 'mkdir -p app/build/reports/tests/testDebugUnitTest'
                     sh 'mkdir -p app/build/reports/tests/testReleaseUnitTest'
-                    sh 'cp -f ../Jenkins/Master-BuildDeploy-BackendWeb/failure_report.html app/build/outputs/checkstyle/google_checks-output.html'
-                    sh 'cp -f ../Jenkins/Master-BuildDeploy-BackendWeb/failure_report.html app/build/outputs/findbugs/findbugs-output.html'
-                    sh 'cp -f ../Jenkins/Master-BuildDeploy-BackendWeb/failure_report.html app/build/reports/lint-results.html'
-                    sh 'cp -f ../Jenkins/Master-BuildDeploy-BackendWeb/failure_report.html app/build/reports/tests/testDebugUnitTest/index.html'
-                    sh 'cp -f ../Jenkins/Master-BuildDeploy-BackendWeb/failure_report.html app/build/reports/tests/testReleaseUnitTest/index.html'
+                    sh 'cp -f ../Jenkins/Master-BuildDeploy-JohnnyDebt/failure_report.html app/build/outputs/checkstyle/google_checks-output.html'
+                    sh 'cp -f ../Jenkins/Master-BuildDeploy-JohnnyDebt/failure_report.html app/build/outputs/findbugs/findbugs-output.html'
+                    sh 'cp -f ../Jenkins/Master-BuildDeploy-JohnnyDebt/failure_report.html app/build/reports/lint-results.html'
+                    sh 'cp -f ../Jenkins/Master-BuildDeploy-JohnnyDebt/failure_report.html app/build/reports/tests/testDebugUnitTest/index.html'
+                    sh 'cp -f ../Jenkins/Master-BuildDeploy-JohnnyDebt/failure_report.html app/build/reports/tests/testReleaseUnitTest/index.html'
                     sh 'gradle build'
                 }
             }
