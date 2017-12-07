@@ -73,10 +73,16 @@ pipeline {
 
         stage ('API tests') {
             steps {
-                sh 'docker-compose -f docker-compose.backend-testing-api.yml rm -fsv'
-                sh 'docker-compose -f docker-compose.backend-testing-api.yml build'
-                sh 'docker-compose -f docker-compose.backend-testing-api.yml up --abort-on-container-exit'
-                sh 'docker-compose -f docker-compose.backend-testing-api.yml rm -fsv'
+				sh 'docker-compose -f docker-compose.backend-testing-api.yml rm -fsv'
+				sh 'docker-compose -f docker-compose.backend-testing-api.yml build'
+				try {
+					sh 'docker-compose -f docker-compose.backend-testing-api.yml up --abort-on-container-exit'
+					sh 'docker-compose -f docker-compose.backend-testing-api.yml rm -fsv'
+					currentBuild.result = 'SUCCESS'
+				} catch (Exception e) {
+					currentBuild.result = 'UNSTABLE'
+					echo e
+				}
             }
         }
 
