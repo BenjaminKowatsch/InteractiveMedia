@@ -3,7 +3,7 @@ services:
   mongo:
     image: mongo
     healthcheck:
-      test: echo 'db.stats().ok' | mongo localhost:27017/launometer --quiet
+      test: echo 'db.stats().ok' | mongo localhost:27017/debtsquared --quiet
       interval: 1s
       timeout: 1s
       retries: 12
