@@ -1,17 +1,21 @@
-var winston = require('winston');
-var jwt = require('jwt-simple');
-var https = require('https');
-var querystring = require('querystring');
-var GoogleAuth = require('google-auth-library');
+const winston = require('winston');
+const jwt = require('jwt-simple');
+const https = require('https');
+const querystring = require('querystring');
+const GoogleAuth = require('google-auth-library');
 
-var config = require('./config');
-var uuidService = require('../services/uuid.service');
-var tokenService = require('../services/token.service');
+const config = require('./config');
+const uuidService = require('../services/uuid.service');
+const tokenService = require('../services/token.service');
+const database = require('../modules/database');
 
-var MONGO_DB_CONNECTION_ERROR_CODE = 10;
-var MONGO_DB_REQUEST_ERROR_CODE = 9;
+const MONGO_ERRCODE = {
+  'DUPLICATEKEY': 11000
+};
+const MONGO_DB_CONNECTION_ERROR_CODE = 10;
+const MONGO_DB_REQUEST_ERROR_CODE = 9;
 
-var MONGO_DB_CONNECTION_ERROR_OBJECT = {'errorCode': MONGO_DB_CONNECTION_ERROR_CODE};
+const MONGO_DB_CONNECTION_ERROR_OBJECT = {'errorCode': MONGO_DB_CONNECTION_ERROR_CODE};
 
 const AUTH_TYPE = {
   'PASSWORD': 0,
@@ -23,8 +27,8 @@ exports.AUTH_TYPE = AUTH_TYPE;
 // 60 minutes in ms
 const validTimeOfTokenInMs = 3600000;
 
-var auth = new GoogleAuth();
-var client = new auth.OAuth2(config.googleOAuthClientID, '', '');
+const googleAuth = new GoogleAuth();
+const googleAuthClient = new googleAuth.OAuth2(config.googleOAuthClientID, '', '');
 
 /**
  * Function to verify an access token from google.
@@ -43,7 +47,7 @@ var client = new auth.OAuth2(config.googleOAuthClientID, '', '');
 exports.verifyGoogleAccessToken = function(userCollection, token, verifyDatabase) {
   return new Promise((resolve, reject) => {
     // verify google access token
-    client.verifyIdToken(token, config.googleOAuthClientID,
+    googleAuthClient.verifyIdToken(token, config.googleOAuthClientID,
     function(error, login) {
       if (error === null) {
         var payload = login.getPayload();
@@ -334,10 +338,8 @@ exports.passwordLogin = function(userCollection, responseData, username, passwor
   });
 };
 /**
- * Function to logout a user independent of the authType
+ * Function to logout a user independent of authType
  *
- * @param {Object} userCollection  Reference to the database collection based on the authentication type
- * @param {JSONObject} responseData Data object created during the request data validation containing the result.
  * @param {String} userId String to uniquely identify the user, to find the user at the database
  * @return {Promise}                then: {JSONObject} promiseData Is a modified version of the responseData object
  *                                                 {Boolean} success  Flag to indicate the successful request
@@ -346,7 +348,7 @@ exports.passwordLogin = function(userCollection, responseData, username, passwor
  *                                                 {Boolean} success  Flag to indicate the unsuccessful request
  *                                                 {JSONObject} payload
  */
-exports.logout = function(userCollection, responseData, userId, authType) {
+exports.logout = function(userId, authType) {
   return new Promise((resolve, reject) => {
     var update = {
       '$set': {
@@ -357,26 +359,24 @@ exports.logout = function(userCollection, responseData, userId, authType) {
       'userId': userId,
       'authType': authType
     };
-    userCollection.updateOne(query, update, function(err, result) {
-      // Driver returns result as json string, not an object, so the json string has to be parsed into an object
+    database.collections.users.updateOne(query, update, function(err, result) {
+      // Parse driver result from string to json an object
       result = JSON.parse(result);
       if (err === null && result.n === 1 && result.ok === 1) {
-        // Successfully updated the expiryDate
-        console.log('Logout successful');
-        resolve(responseData);
+        // update successful
+        winston.debug('Logout successful');
+        resolve();
       } else {
-        responseData.success = false;
-        console.log('Logout failed ');
-        reject(responseData);
+        winston.debug('Logout failed');
+        reject();
       }
     });
   });
 };
+
 /**
  * Function to register a new user at the database
  *
- * @param {Object} userCollection  Reference to the database collection based on the authentication type
- * @param {JSONObject} responseData Data object created during the request data validation containing the result.
  * @param  {String} username       The name of the new user
  * @param  {String} password       The password of the new user
  * @return {Promise}                then: {JSONObject} promiseData Is a modified version of the responseData object
@@ -384,48 +384,44 @@ exports.logout = function(userCollection, responseData, userId, authType) {
  *                                                 {JSONObject} payload
  *                                  catch: {JSONObject} error Is a modified version of the responseData object
  *                                                {Boolean} success  Flag to indicate the unsuccessful request
- *                                                {Number} errorCode  Enumeration to specify the error
  *                                                {JSONObject} payload
  */
-exports.register = function(userCollection, responseData, username, password) {
+exports.register = function(username, password) {
   return new Promise((resolve, reject) => {
-    var userData = {};
-    if (undefined === userCollection) {
-      responseData.success = false;
-      responseData.errorCode = MONGO_DB_CONNECTION_ERROR_CODE;
-      console.log('Error code: ' + MONGO_DB_CONNECTION_ERROR_CODE);
-      reject(responseData);
-    } else {
-      console.log('User will be created');
-      // Setup userData
-      userData.expiryDate = tokenService.getNewExpiryDate(validTimeOfTokenInMs);
-      userData.password = password;
-      userData.username = username;
-      userData.userId = uuidService.generateUUID();
-      userData.authType = AUTH_TYPE.PASSWORD;
 
-      userCollection.insertOne(userData, function(err, result) {
-        responseData.payload = {};
-        if (err != null && err.code === 11000) {
-          responseData.payload.dataPath = 'username';
-          responseData.payload.message = 'Username already exists';
-          responseData.success = false;
+    const userToRegister = {
+      'expiryDate': tokenService.getNewExpiryDate(validTimeOfTokenInMs),
+      'password': password,
+      'username': username,
+      'userId': uuidService.generateUUID(),
+      'authType': AUTH_TYPE.PASSWORD
+    };
 
-          console.log('Registration/Login failed ');
-          reject(responseData);
-        } else {
-          responseData.payload = {};
-          var payload = {
-            'userId': userData.userId,
-            'expiryDate': userData.expiryDate
-          };
-
-          responseData.payload.accessToken = jwt.encode(payload, config.jwtSimpleSecret);
-          responseData.payload.authType = AUTH_TYPE.PASSWORD;
-          console.log('Registration/Login successful');
-          resolve(responseData);
-        }
-      });
-    }
+    database.collections.users.insertOne(userToRegister, function(err, result) {
+      let responseData = {
+        'success': false,
+        'payload': {}
+      };
+      if (err != null && err.code === MONGO_ERRCODE.DUPLICATEKEY) {
+        // error: duplicated key
+        responseData.payload.dataPath = 'username';
+        responseData.payload.message = 'Username already exists';
+        responseData.success = false;
+        winston.error('Registration failed. Duplicated key');
+        reject(responseData);
+      } else {
+        // update successful
+        const toEncode = {
+          'userId': userToRegister.userId,
+          'expiryDate': userToRegister.expiryDate
+        };
+        responseData.payload = {
+          'accessToken': tokenService.generateAccessToken(toEncode),
+          'authType': AUTH_TYPE.PASSWORD
+        };
+        winston.info('Registration successful');
+        resolve(responseData);
+      }
+    });
   });
 };

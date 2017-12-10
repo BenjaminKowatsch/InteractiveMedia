@@ -12,7 +12,7 @@ var jsonSchema = {
 };
 
 exports.registerNewUser = function(req, res) {
-  winston.info('req.body', req.body);
+  winston.debug('req.body', req.body);
 
   // validate data in request body
   var validationResult = validateJsonService.validateAgainstSchema(req.body, jsonSchema.userData);
@@ -21,7 +21,7 @@ exports.registerNewUser = function(req, res) {
     // request body is valid
 
     // store user in mongo
-    user.register(database.collections.users, {}, req.body.username, req.body.password)
+    user.register(req.body.username, req.body.password)
       .then(function(registerResult) {
         // mongo update was successful
         var resBody = {'success': true, 'payload': registerResult.payload};
@@ -152,16 +152,14 @@ exports.login = function(req, res) {
 };
 
 exports.logout = function(req, res) {
-  winston.info('req.body', req.body);
+  winston.debug('req.body', req.body);
+  winston.debug('userId: ', res.locals.userId);
+  winston.debug('authType: ', req.body.authType);
 
-  winston.info('userId: ', res.locals.userId);
-  winston.info('authType: ', req.body.authType);
-
-  user.logout(database.collections.users, {},
-    res.locals.userId, req.body.authType)
+  user.logout(res.locals.userId, req.body.authType)
     .then(function() {
       var resBody = {'success': true, 'payload': {}};
-      httpResonseService.sendHttpResponse(res, 201, resBody);
+      httpResonseService.sendHttpResponse(res, 200, resBody);
     })
     .catch(function() {
       var resBody = {'success': true, 'payload': {}};

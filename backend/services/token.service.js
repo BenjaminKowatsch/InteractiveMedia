@@ -1,3 +1,7 @@
+const jwt = require('jwt-simple');
+
+const config = require('../modules/config');
+
 /**
  * Function to calculate a new expiry date for tokens.
  *
@@ -13,4 +17,8 @@ exports.getNewExpiryDate = function(validTime, startDate) {
       newExpDate = new Date().getTime() + validTime;
     }
     return new Date(newExpDate);
+  };
+
+exports.generateAccessToken = function(toEncode) {
+    return jwt.encode(toEncode, config.jwtSimpleSecret);
   };
