@@ -3,8 +3,8 @@ var winston = require('winston');
 var user = require('../modules/user');
 var database = require('../modules/database');
 
-var jsonValidator = require('../services/validateJson');
-var httpResponder = require('../services/sendHttpResonse');
+const validateJsonService = require('../services/validateJson.service');
+var httpResonseService = require('../services/httpResonse.service');
 
 var jsonSchema = {
   userData: require('../JSONSchema/userData.json'),
@@ -15,7 +15,7 @@ exports.registerNewUser = function(req, res) {
   winston.info('req.body', req.body);
 
   // validate data in request body
-  var validationResult = jsonValidator.validateAgainstSchema(req.body, jsonSchema.userData);
+  var validationResult = validateJsonService.validateAgainstSchema(req.body, jsonSchema.userData);
 
   if (validationResult.valid === true) {
     // request body is valid
@@ -25,17 +25,17 @@ exports.registerNewUser = function(req, res) {
       .then(function(registerResult) {
         // mongo update was successful
         var resBody = {'success': true, 'payload': registerResult.payload};
-        httpResponder.sendHttpResponse(res, 201, resBody);
+        httpResonseService.sendHttpResponse(res, 201, resBody);
       })
       .catch(function(registerResult) {
         // mongo update failed
         var resBody = {'success': false, 'payload': registerResult.payload};
-        httpResponder.sendHttpResponse(res, 400, resBody);
+        httpResonseService.sendHttpResponse(res, 400, resBody);
       });
   } else {
     // request body is invalid
     var resBody = {'success': false, 'payload': validationResult.error};
-    httpResponder.sendHttpResponse(res, 400, resBody);
+    httpResonseService.sendHttpResponse(res, 400, resBody);
   }
 };
 
@@ -46,7 +46,7 @@ exports.dummyFunction = function(req, res) {
   winston.info('authType: ', req.body.authType);
 
   var resBody = {'success': true, 'payload': {}};
-  httpResponder.sendHttpResponse(res, 201, resBody);
+  httpResonseService.sendHttpResponse(res, 201, resBody);
 };
 
 exports.login = function(req, res) {
@@ -61,7 +61,7 @@ exports.login = function(req, res) {
     case user.AUTH_TYPE.LAUNOMETER: {
       winston.info('loginType: LAUNOMETER');
       // validate data in request body
-      validationResult = jsonValidator.validateAgainstSchema(req.body, jsonSchema.userData);
+      validationResult = validateJsonService.validateAgainstSchema(req.body, jsonSchema.userData);
 
       if (validationResult.valid === true) {
         // request body is valid
@@ -70,24 +70,24 @@ exports.login = function(req, res) {
          .then(function(loginResult) {
           // mongo update was successful
           resBody = {'success': true, 'payload': loginResult.payload};
-          httpResponder.sendHttpResponse(res, 201, resBody);
+          httpResonseService.sendHttpResponse(res, 201, resBody);
         })
          .catch(function(loginErrorResult) {
           // mongo update was successful
           resBody = {'success': true, 'payload': loginErrorResult};
-          httpResponder.sendHttpResponse(res, 201, resBody);
+          httpResonseService.sendHttpResponse(res, 201, resBody);
         });
       } else {
         // request body is invalid
         resBody = {'success': false, 'payload': validationResult.error};
-        httpResponder.sendHttpResponse(res, 400, resBody);
+        httpResonseService.sendHttpResponse(res, 400, resBody);
       }
       break;
     }
     case user.AUTH_TYPE.GOOGLE: {
       winston.info('loginType: GOOGLE');
       // validate data in request body
-      validationResult = jsonValidator.validateAgainstSchema(req.body, jsonSchema.googleFacebookLogin);
+      validationResult = validateJsonService.validateAgainstSchema(req.body, jsonSchema.googleFacebookLogin);
 
       if (validationResult.valid === true) {
         user.verifyGoogleAccessToken(database.collections.users, req.body.accessToken, false)
@@ -99,24 +99,24 @@ exports.login = function(req, res) {
       .then(function(loginResult) {
           // mongo update was successful
           resBody = {'success': true, 'payload': loginResult.payload};
-          httpResponder.sendHttpResponse(res, 201, resBody);
+          httpResonseService.sendHttpResponse(res, 201, resBody);
         })
       .catch(function(loginErrorResult) {
           // mongo update was successful
           resBody = {'success': true, 'payload': loginErrorResult};
-          httpResponder.sendHttpResponse(res, 201, resBody);
+          httpResonseService.sendHttpResponse(res, 201, resBody);
         });
       } else {
         // request body is invalid
         resBody = {'success': false, 'payload': validationResult.error};
-        httpResponder.sendHttpResponse(res, 400, resBody);
+        httpResonseService.sendHttpResponse(res, 400, resBody);
       }
       break;
     }
     case user.AUTH_TYPE.FACEBOOK: {
       winston.info('loginType: FACEBOOK');
       // validate data in request body
-      validationResult = jsonValidator.validateAgainstSchema(req.body, jsonSchema.googleFacebookLogin);
+      validationResult = validateJsonService.validateAgainstSchema(req.body, jsonSchema.googleFacebookLogin);
 
       if (validationResult.valid === true) {
         user.verifyFacebookAccessToken(database.collections.users, req.body.accessToken, false)
@@ -128,24 +128,24 @@ exports.login = function(req, res) {
       .then(function(loginResult) {
           // mongo update was successful
           resBody = {'success': true, 'payload': loginResult.payload};
-          httpResponder.sendHttpResponse(res, 201, resBody);
+          httpResonseService.sendHttpResponse(res, 201, resBody);
         })
       .catch(function(loginErrorResult) {
           // mongo update was successful
           resBody = {'success': true, 'payload': loginErrorResult};
-          httpResponder.sendHttpResponse(res, 201, resBody);
+          httpResonseService.sendHttpResponse(res, 201, resBody);
         });
       } else {
         // request body is invalid
         resBody = {'success': false, 'payload': validationResult.error};
-        httpResponder.sendHttpResponse(res, 400, resBody);
+        httpResonseService.sendHttpResponse(res, 400, resBody);
       }
       break;
     }
     default: {
       // invalid login type
       resBody = {'success': false, 'payload': 'invalid login type'};
-      httpResponder.sendHttpResponse(res, 400, resBody);
+      httpResonseService.sendHttpResponse(res, 400, resBody);
       break;
     }
   }
@@ -161,10 +161,10 @@ exports.logout = function(req, res) {
     res.locals.userId, req.body.authType)
     .then(function() {
       var resBody = {'success': true, 'payload': {}};
-      httpResponder.sendHttpResponse(res, 201, resBody);
+      httpResonseService.sendHttpResponse(res, 201, resBody);
     })
     .catch(function() {
       var resBody = {'success': true, 'payload': {}};
-      httpResponder.sendHttpResponse(res, 400, resBody);
+      httpResonseService.sendHttpResponse(res, 400, resBody);
     });
 };

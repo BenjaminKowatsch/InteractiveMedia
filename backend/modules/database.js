@@ -22,11 +22,7 @@ var tryConnectOptions = {
  */
 database.collections = {
   'users': undefined,
-  'groups': undefined,
-  'launometerUsers': undefined,
-  'facebookUsers': undefined,
-  'googleUsers': undefined,
-  'emotionData': undefined
+  'groups': undefined
 };
 database.db = undefined;
 
@@ -74,19 +70,11 @@ function connect(resolve, reject) {
       console.log('Database connection established');
       // Initialize database and collection access variables
       database.db = db;
-      database.collections.launometerUsers = db.collection('launometerUsers');
-      database.collections.googleUsers = db.collection('googleUsers');
-      database.collections.facebookUsers = db.collection('facebookUsers');
-      database.collections.emotionData = db.collection('emotionData');
       database.collections.users = db.collection('users');
       database.collections.groups = db.collection('groups');
       resolve();
     } else {
       console.log('Database connection failed with error: ' + err);
-      database.collections.launometerUsers = undefined;
-      database.collections.googleUsers = undefined;
-      database.collections.facebookUsers = undefined;
-      database.collections.emotionData = undefined;
       database.collections.users = undefined;
       database.collections.groups = undefined;
       database.db = undefined;

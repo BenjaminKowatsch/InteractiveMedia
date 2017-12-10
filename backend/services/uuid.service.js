@@ -1,10 +1,9 @@
-var util = module.exports = {};
 /**
  * Generates a new Universal Unique Identifier
  *
  * @return {String} Generated new Universal Unique Identifier
  */
-util.generateUUID = function() {
+exports.generateUUID = function() {
   var d = new Date().getTime();
   var uuid = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
     var r = (d + Math.random() * 16) % 16 | 0;
