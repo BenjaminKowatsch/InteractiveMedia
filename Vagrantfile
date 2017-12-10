@@ -36,6 +36,9 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   # mongodb
   config.vm.network "forwarded_port", guest:27017, host: 27017, auto_correct: false
 
+  # minio
+  config.vm.network "forwarded_port", guest:9000, host: 9000, auto_correct: false
+
 
   # Sync Folder Configuration
   #
