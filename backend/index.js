@@ -97,29 +97,6 @@ database.tryConnect(config.mongodbURL, function() {
     unique: true
   }, createIndexCallback);
 
-  database.collections.launometerUsers.createIndex({
-    username: 1,
-    password: 1
-  }, {
-    unique: true
-  }, createIndexCallback);
-
-  database.collections.launometerUsers.createIndex({
-    userId: 1
-  }, {
-    unique: true
-  }, createIndexCallback);
-
-  database.collections.launometerUsers.remove({username: 'admin'})
-    .then(function() {
-      console.log('Removed admin document from userdata');
-      return database.collections.launometerUsers.insertMany(userDataInit.data);
-    }).then(function() {
-      console.log('Added admin document to userData');
-    }).catch(function() {
-      console.log('Error during Inserting default data');
-    });
-
   startServer();
 
 }, function() {
