@@ -32,7 +32,7 @@ group.createNewGroup = function(groupCollection, groupData) {
         responseData.payload.message = 'Error: ' + err;
         responseData.success = false;
 
-        winston.info('Creating a new group failed ');
+        winston.debug('Creating a new group failed ');
         reject(responseData);
       } else {
         responseData.payload = groupData;
@@ -40,7 +40,7 @@ group.createNewGroup = function(groupCollection, groupData) {
 
         delete responseData.payload._id;
 
-        winston.info('Creating a new group successful');
+        winston.debug('Creating a new group successful');
         resolve(responseData);
       }
     });

@@ -15,7 +15,7 @@ exports.validateAgainstSchema = function(inputData, jsonSchema) {
 
   if (validationResult === true) {
     // validation was successful
-    winston.info('Success: json is valid');
+    winston.debug('Success: json is valid');
     returnValue.valid = true;
   } else {
     // validation failed
@@ -23,7 +23,7 @@ exports.validateAgainstSchema = function(inputData, jsonSchema) {
       dataPath: tv4.error.dataPath.replace('/', ''),
       message: tv4.error.message
     };
-    winston.error('Error: validation failed', refinedErrorObj);
+    winston.debug('Error: validation failed', refinedErrorObj);
     returnValue.valid = false;
     returnValue.error = refinedErrorObj;
   }

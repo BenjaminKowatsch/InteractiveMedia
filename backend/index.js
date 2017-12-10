@@ -5,6 +5,7 @@
 var express = require('express');
 var bodyParser = require('body-parser');
 var morgan = require('morgan');
+var winston = require('winston');
 
 var usersRoutes = require('./routes/users.routes');
 var objectStoreRoutes = require('./routes/object.store.routes');
@@ -16,6 +17,12 @@ var user = require('./modules/user');
 var database = require('./modules/database');
 
 var MONGO_DB_CONNECTION_ERROR_CODE = 10;
+
+/**
+ * Configure logger
+ * ===========================
+ */
+winston.level = 'info';
 
 /**
  * Initialize express instance
@@ -58,7 +65,7 @@ function startServer() {
   server = app.listen(config.port, function() {
     var host = server.address().address;
     var port = server.address().port;
-    console.log('Server listening on http://%s:%s', host, port);
+    winston.info('Server listening on http://%s:%s', host, port);
   });
 }
 
@@ -69,9 +76,9 @@ function startServer() {
 database.tryConnect(config.mongodbURL, function() {
   var createIndexCallback = function(err, indexname) {
     if (err === null) {
-      console.log('Created index + ' + indexname);
+      winston.debug('Created index + ' + indexname);
     } else {
-      console.log('Creation of index + ' + indexname + ' failed');
+      winston.debug('Creation of index + ' + indexname + ' failed');
     }
   };
 
@@ -100,5 +107,5 @@ database.tryConnect(config.mongodbURL, function() {
   startServer();
 
 }, function() {
-  console.log('Not connected to database after maxRetries reached.');
+  winston.error('Not connected to database after maxRetries reached.');
 });

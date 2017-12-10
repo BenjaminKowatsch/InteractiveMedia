@@ -6,7 +6,7 @@ const winston = require('winston');
 const httpResonseService = require('./httpResonse.service');
 
 exports.isAuthorizedAdmin = function(req, res, next) {
-  winston.info('Authorizing request as admin');
+  winston.debug('Authorizing request as admin');
   let admin = 'admin';
   if (isAuthenticated(req, res)) {
     let userId = res.locals.userId;
@@ -26,7 +26,7 @@ exports.isAuthorizedAdmin = function(req, res, next) {
 };
 
 exports.isGroupMember = function(req, res, next) {
-  winston.info('Authorizing request as user');
+  winston.debug('Authorizing request as user');
   if (isAuthenticated(req, res)) {
     let userId = res.locals.userId;
     if (req.path.includes('groups')) {

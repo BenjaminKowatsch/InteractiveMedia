@@ -11,7 +11,7 @@ const jsonSchema = {
 };
 
 exports.createNewGroup = function(req, res) {
-  winston.info('Creating a new group');
+  winston.debug('Creating a new group');
   // validate data in request body
   var validationResult = validateJsonService.validateAgainstSchema(req.body.payload, jsonSchema.groupData);
 
@@ -38,12 +38,12 @@ exports.createNewGroup = function(req, res) {
 };
 
 exports.getAll = function(req, res) {
-  winston.info('Getting all groups');
+  winston.debug('Getting all groups');
   httpResonseService.sendHttpResponse(res, 404, 'Not implemented');
 };
 
 exports.getById = function(req, res) {
   const groupId = req.params.groupid;
-  winston.info('Getting group with id ' + groupId);
+  winston.debug('Getting group with id ' + groupId);
   httpResonseService.sendHttpResponse(res, 404, 'Not implemented');
 };

@@ -13,30 +13,30 @@ var jsonSchema = {
 };
 
 exports.isAuthenticated = function(req, res, next) {
-  winston.info('req.body', req.body);
+  winston.debug('req.body', req.body);
 
   // validate data in request body
   var validationResult = validateJsonService.validateAgainstSchema(req.body, jsonSchema.postData);
 
   if (validationResult.valid === true) {
-    winston.info('Request body is valid');
+    winston.debug('Request body is valid');
 
     // request body is valid
     verifyAccessToken(req.body.accessToken, req.body.authType)
     .then((promiseData) => {
-      winston.info('VerifyAccessToken result: ' + JSON.stringify(promiseData));
+      winston.debug('VerifyAccessToken result: ' + JSON.stringify(promiseData));
       res.locals.userId = promiseData.userId;
       next();
     })
     .catch((error) => {
       // access token is invalid, unauthorized
-      winston.error('Invalid access Token ');
+      winston.debug('Invalid access Token ');
       var resBody = {'success': false, 'payload': error};
       httpResonseService.sendHttpResponse(res, 401, resBody);
     });
   } else {
     // request body is invalid
-    winston.error('Request body is invalid ');
+    winston.debug('Request body is invalid ');
     var resBody = {'success': false, 'payload': validationResult.error};
     httpResonseService.sendHttpResponse(res, 400, resBody);
   }
@@ -56,15 +56,15 @@ exports.isAuthenticated = function(req, res, next) {
 function verifyAccessToken(token, authType) {
   switch (authType) {
     case user.AUTH_TYPE.PASSWORD:
-      winston.info('Verifing Password access token');
+      winston.debug('Verifing Password access token');
       // Verify password access token
       return user.verifyPasswordAccessToken(database.collections.users, token);
     case user.AUTH_TYPE.GOOGLE:
-      winston.info('Verifing Google access token');
+      winston.debug('Verifing Google access token');
       // Verify google access token
       return user.verifyGoogleAccessToken(database.collections.users, token, true);
     case user.AUTH_TYPE.FACEBOOK:
-      winston.info('Verifing Facebook access token');
+      winston.debug('Verifing Facebook access token');
       // Verify facebook access token
       return user.verifyFacebookAccessToken(database.collections.users, token, true);
     default:

@@ -14,7 +14,7 @@ describe('Upload and download images', function() {
 
   before(function(done) {
     imageData = fs.readFileSync('image.png');
-    console.log('imageData size: ' + imageData.size);
+    // console.log('imageData size: ' + imageData.size);
     done();
   });
 
@@ -23,7 +23,7 @@ describe('Upload and download images', function() {
             .post(baseUrl + '/upload?filename=image.png')
             .attach('uploadField', imageData, 'image.png')
             .then(res => {
-              console.log(JSON.stringify(res));
+              // console.log(JSON.stringify(res));
             });
   });
 
@@ -31,8 +31,8 @@ describe('Upload and download images', function() {
     return chai.request(host)
             .get(baseUrl + '/download?filename=image.png')
             .then(res => {
-              console.log('Image comparison: ' + (imageData === res.text));
-              console.log(JSON.stringify(res));
+              // console.log('Image comparison: ' + (imageData === res.text));
+              // console.log(JSON.stringify(res));
             });
   });
 });

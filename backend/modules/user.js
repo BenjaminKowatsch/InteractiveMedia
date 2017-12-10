@@ -67,7 +67,7 @@ exports.verifyGoogleAccessToken = function(userCollection, token, verifyDatabase
                 '$gte': expiryDate
               }
             };
-            winston.info('query:', query);
+            winston.debug('query:', query);
             var options = {fields: {userId: 1, authType: 1, expiryDate: 1}};
             userCollection.findOne(query, options, function(error, result) {
               if (error === null && result !== null) {
@@ -75,7 +75,7 @@ exports.verifyGoogleAccessToken = function(userCollection, token, verifyDatabase
                   expiryDate: result.expiryDate,
                   userId: result.userId
                 };
-                winston.info('returning:', promiseData);
+                winston.debug('returning:', promiseData);
                 resolve(promiseData);
               } else {
                 // Invalid expiryDate or internal database error
@@ -89,11 +89,11 @@ exports.verifyGoogleAccessToken = function(userCollection, token, verifyDatabase
             expiryDate: expiryDate,
             userId: userId
           };
-          winston.info('returning: ', promiseData);
+          winston.debug('returning: ', promiseData);
           resolve(promiseData);
         }
       } else {
-        winston.info('token declared invalid by google library: ', error);
+        winston.debug('token declared invalid by google library: ', error);
         reject(error);
       }
     });
@@ -165,7 +165,7 @@ exports.verifyFacebookAccessToken = function(userCollection, token, verifyDataba
       path: ('/v2.9/debug_token?access_token=' +
              config.facebookUrlAppToken + '&input_token=' + token)
     };
-    winston.info('verifing: https://' + options.host + options.path);
+    winston.debug('verifing: https://' + options.host + options.path);
     https.get(options, function(response) {
       var responseMessage = '';
 
@@ -195,7 +195,7 @@ exports.verifyFacebookAccessToken = function(userCollection, token, verifyDataba
                   '$gte': expiryDate
                 }
               };
-              winston.info('verify database: ', query);
+              winston.debug('verify database: ', query);
               var options = {fields: {userId: 1,  expiryDate: 1}};
               userCollection.findOne(query, options, function(error, result) {
                 if (error === null && result !== null) {
@@ -203,7 +203,7 @@ exports.verifyFacebookAccessToken = function(userCollection, token, verifyDataba
                     expiryDate: result.expiryDate,
                     userId: result.userId
                   };
-                  winston.info('returning:', promiseData);
+                  winston.debug('returning:', promiseData);
                   resolve(promiseData);
                 } else {
                   // Invalid expiryDate or internal database error
@@ -217,7 +217,7 @@ exports.verifyFacebookAccessToken = function(userCollection, token, verifyDataba
               expiryDate: expiryDate,
               userId: userId
             };
-            winston.info('returning: ', promiseData);
+            winston.debug('returning: ', promiseData);
             resolve(promiseData);
           }
         }
@@ -261,13 +261,13 @@ exports.googleOrFacebookLogin = function(userCollection,
       function(err, result) {
         if (err !== null) {
           responseData.success = false;
-          console.log('Login failed');
+          winston.error('Login failed');
           reject(responseData);
         } else {
           responseData.payload = {};
           responseData.payload.authType = authType;
           responseData.payload.accessToken = accessToken;
-          console.log('Login successful ');
+          winston.debug('Login successful ');
           resolve(responseData);
         }
       });
@@ -294,7 +294,7 @@ exports.passwordLogin = function(userCollection, responseData, username, passwor
     if (undefined === userCollection) {
       responseData.success = false;
       responseData.errorCode = MONGO_DB_CONNECTION_ERROR_CODE;
-      console.log('Error code: ' + MONGO_DB_CONNECTION_ERROR_CODE);
+      winston.debug('Error code: ' + MONGO_DB_CONNECTION_ERROR_CODE);
       reject(responseData);
     } else {
       var newExpiryDate = tokenService.getNewExpiryDate(validTimeOfTokenInMs);
@@ -318,19 +318,19 @@ exports.passwordLogin = function(userCollection, responseData, username, passwor
       userCollection.findOneAndUpdate(query, update, options, function(err, result) {
         if (err === null && result.value !== null && result.ok === 1) {
           responseData.payload = {};
-          console.log(result.value);
+          winston.debug(result.value);
           // Successfully logged in and created new expiry date
           // Generate Access Token
           // Remove the database id from the json object
           delete result.value._id;
           responseData.payload.authType = AUTH_TYPE.PASSWORD;
           responseData.payload.accessToken = jwt.encode(result.value, config.jwtSimpleSecret);
-          console.log('Login successful ');
+          winston.debug('Login successful ');
           resolve(responseData);
         } else {
           // Error handling
           responseData.success = false;
-          console.log('Login failed ');
+          winston.debug('Login failed ');
           resolve(responseData);
         }
       });
@@ -419,7 +419,7 @@ exports.register = function(username, password) {
           'accessToken': tokenService.generateAccessToken(toEncode),
           'authType': AUTH_TYPE.PASSWORD
         };
-        winston.info('Registration successful');
+        winston.debug('Registration successful');
         resolve(responseData);
       }
     });
