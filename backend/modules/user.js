@@ -120,7 +120,7 @@ user.verifyGoogleAccessToken = function(userCollection, token, verifyDatabase) {
  *                                                OR
  *                                                MongoDB Error
  */
-user.verifyLaunometerAccessToken = function(userCollection, token) {
+user.verifyPasswordAccessToken = function(userCollection, token) {
   return new Promise((resolve, reject) => {
     if (undefined === userCollection) {
       winston.error('Error MONGO_DB_CONNECTION_ERROR_OBJECT');
@@ -282,7 +282,7 @@ user.googleOrFacebookLogin = function(userCollection,
 };
 
 /**
- * Function to login a launometer user.
+ * Function to login a user with password.
  *
  * @param {Object} userCollection  Reference to the database collection based on the authentication type
  * @param {JSONObject} responseData Data object created during the request data validation containing the result.
@@ -296,7 +296,7 @@ user.googleOrFacebookLogin = function(userCollection,
  *                                                 {Boolean} success  Flag to indicate the unsuccessful request
  *                                                 {JSONObject} payload
  */
-user.launometerLogin = function(userCollection, responseData, username, password) {
+user.passwordLogin = function(userCollection, responseData, username, password) {
   return new Promise((resolve, reject) => {
     if (undefined === userCollection) {
       responseData.success = false;
@@ -384,7 +384,7 @@ user.logout = function(userCollection, responseData, userId, authType) {
   });
 };
 /**
- * Function to register a new launometer user at the database
+ * Function to register a new user at the database
  *
  * @param {Object} userCollection  Reference to the database collection based on the authentication type
  * @param {JSONObject} responseData Data object created during the request data validation containing the result.

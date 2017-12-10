@@ -43,10 +43,10 @@ exports.isAuthenticated = function(req, res, next) {
 };
 
 /**
- * Function to verify each type of access token (google, facebook or launometer)
+ * Function to verify each type of access token (google, facebook or password)
  *
  * @param  {String} token    AccessToken to be verified
- * @param  {user.AUTH_TYPE} authType Authentication type specifing whether the user belongs to google, facebook or launometer authentication
+ * @param  {user.AUTH_TYPE} authType Authentication type specifing whether the user belongs to google, facebook or password authentication
  * @return {Promise}          then: {JSONObject} promiseData JSON object containing the following properties:
  *                                                 {Object} userCollection  Reference to the database collection based on the authentication type
  *                                                 {Date} expiryDate Date to indicate the expiration of the accessToken
@@ -56,9 +56,9 @@ exports.isAuthenticated = function(req, res, next) {
 function verifyAccessToken(token, authType) {
   switch (authType) {
     case user.AUTH_TYPE.PASSWORD:
-      winston.info('Verifing Launometer access token');
+      winston.info('Verifing Password access token');
       // Verify password access token
-      return user.verifyLaunometerAccessToken(database.collections.users, token);
+      return user.verifyPasswordAccessToken(database.collections.users, token);
     case user.AUTH_TYPE.GOOGLE:
       winston.info('Verifing Google access token');
       // Verify google access token

@@ -65,7 +65,7 @@ exports.login = function(req, res) {
 
       if (validationResult.valid === true) {
         // request body is valid
-        user.launometerLogin(database.collections.users, {},
+        user.passwordLogin(database.collections.users, {},
          req.body.username, req.body.password)
          .then(function(loginResult) {
           // mongo update was successful
