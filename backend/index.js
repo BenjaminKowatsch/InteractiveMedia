@@ -4,8 +4,8 @@
  */
 var express = require('express');
 var bodyParser = require('body-parser');
-var morgan = require('morgan');
 var winston = require('winston');
+const expressWinston = require('express-winston');
 
 var usersRoutes = require('./routes/users.routes');
 var objectStoreRoutes = require('./routes/object.store.routes');
@@ -32,7 +32,12 @@ var app = express();
 var server;
 
 // initialize logger
-app.use(morgan('combined'));
+app.use(expressWinston.logger({
+  winstonInstance: winston,
+  expressFormat: false,
+  meta: true,
+  ignoreRoute: function(req, res) { return false; } // optional: allows to skip some log messages based on request and/or response
+}));
 
 app.use(bodyParser.json());
 
