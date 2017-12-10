@@ -1,7 +1,7 @@
 version: '2.1'
 services:
   mongo:
-    image: mongo
+    build: ./mongo
     healthcheck:
       test: echo 'db.stats().ok' | mongo localhost:27017/debtsquared --quiet
       interval: 1s
