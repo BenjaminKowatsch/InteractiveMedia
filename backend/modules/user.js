@@ -6,6 +6,7 @@ var GoogleAuth = require('google-auth-library');
 
 var config = require('./config');
 var uuidService = require('../services/uuid.service');
+var tokenService = require('../services/token.service');
 
 var MONGO_DB_CONNECTION_ERROR_CODE = 10;
 var MONGO_DB_REQUEST_ERROR_CODE = 9;
@@ -17,22 +18,13 @@ const AUTH_TYPE = {
   'GOOGLE': 1,
   'FACEBOOK': 2
 };
-
 exports.AUTH_TYPE = AUTH_TYPE;
+
+// 60 minutes in ms
+const validTimeOfTokenInMs = 3600000;
 
 var auth = new GoogleAuth();
 var client = new auth.OAuth2(config.googleOAuthClientID, '', '');
-
-/**
- * Gets a date one hour from now
- *
- * @return {Date} A date one hour in the future
- */
-function getNewTokenExpiryDate() {
-  var time = new Date().getTime();
-  time += 3600000;
-  return new Date(time);
-}
 
 /**
  * Function to verify an access token from google.
@@ -301,7 +293,7 @@ exports.passwordLogin = function(userCollection, responseData, username, passwor
       console.log('Error code: ' + MONGO_DB_CONNECTION_ERROR_CODE);
       reject(responseData);
     } else {
-      var newExpiryDate = getNewTokenExpiryDate();
+      var newExpiryDate = tokenService.getNewExpiryDate(validTimeOfTokenInMs);
       var query = {
         'username': username,
         'password': password
@@ -406,7 +398,7 @@ exports.register = function(userCollection, responseData, username, password) {
     } else {
       console.log('User will be created');
       // Setup userData
-      userData.expiryDate = getNewTokenExpiryDate(); // now + 1h
+      userData.expiryDate = tokenService.getNewExpiryDate(validTimeOfTokenInMs);
       userData.password = password;
       userData.username = username;
       userData.userId = uuidService.generateUUID();
