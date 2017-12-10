@@ -58,8 +58,8 @@ exports.login = function(req, res) {
   winston.info('loginType: ', loginType);
   // validate request body depending on login type
   switch (Number(loginType)) {
-    case user.AUTH_TYPE.LAUNOMETER: {
-      winston.info('loginType: LAUNOMETER');
+    case user.AUTH_TYPE.PASSWORD: {
+      winston.info('loginType: Password');
       // validate data in request body
       validationResult = validateJsonService.validateAgainstSchema(req.body, jsonSchema.userData);
 

@@ -55,9 +55,9 @@ exports.isAuthenticated = function(req, res, next) {
  */
 function verifyAccessToken(token, authType) {
   switch (authType) {
-    case user.AUTH_TYPE.LAUNOMETER:
+    case user.AUTH_TYPE.PASSWORD:
       winston.info('Verifing Launometer access token');
-      // Verify launometer access token
+      // Verify password access token
       return user.verifyLaunometerAccessToken(database.collections.users, token);
     case user.AUTH_TYPE.GOOGLE:
       winston.info('Verifing Google access token');

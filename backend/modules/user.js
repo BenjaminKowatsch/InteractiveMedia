@@ -19,7 +19,7 @@ var MONGO_DB_REQUEST_ERROR_CODE = 9;
 var MONGO_DB_CONNECTION_ERROR_OBJECT = {'errorCode': MONGO_DB_CONNECTION_ERROR_CODE};
 
 var AUTH_TYPE = {
-  'LAUNOMETER': 0,
+  'PASSWORD': 0,
   'GOOGLE': 1,
   'FACEBOOK': 2
 };
@@ -107,7 +107,7 @@ user.verifyGoogleAccessToken = function(userCollection, token, verifyDatabase) {
   });
 };
 /**
- * Function to verify an own access token from launometer.
+ * Function to verify an own access token.
  *
  * @param {Object} userCollection  Reference to the database collection based on the authentication type
  * @param  {String} token    AccessToken to be verified
@@ -129,7 +129,7 @@ user.verifyLaunometerAccessToken = function(userCollection, token) {
       var payload = jwt.decode(token, config.jwtSimpleSecret);
       var query = {
         userId: payload.userId,
-        authType: AUTH_TYPE.LAUNOMETER,
+        authType: AUTH_TYPE.PASSWORD,
         expiryDate: {
           '$gt': new Date()
         }
@@ -330,7 +330,7 @@ user.launometerLogin = function(userCollection, responseData, username, password
           // Generate Access Token
           // Remove the database id from the json object
           delete result.value._id;
-          responseData.payload.authType = AUTH_TYPE.LAUNOMETER;
+          responseData.payload.authType = AUTH_TYPE.PASSWORD;
           responseData.payload.accessToken = jwt.encode(result.value, config.jwtSimpleSecret);
           console.log('Login successful ');
           resolve(responseData);
@@ -413,7 +413,7 @@ user.register = function(userCollection, responseData, username, password) {
       userData.password = password;
       userData.username = username;
       userData.userId = uuidService.generateUUID();
-      userData.authType = AUTH_TYPE.LAUNOMETER;
+      userData.authType = AUTH_TYPE.PASSWORD;
 
       userCollection.insertOne(userData, function(err, result) {
         responseData.payload = {};
@@ -432,7 +432,7 @@ user.register = function(userCollection, responseData, username, password) {
           };
 
           responseData.payload.accessToken = jwt.encode(payload, config.jwtSimpleSecret);
-          responseData.payload.authType = AUTH_TYPE.LAUNOMETER;
+          responseData.payload.authType = AUTH_TYPE.PASSWORD;
           console.log('Registration/Login successful');
           resolve(responseData);
         }
