@@ -6,7 +6,6 @@ var express = require('express');
 var bodyParser = require('body-parser');
 var morgan = require('morgan');
 
-var helloRoutes = require('./routes/hello');
 var usersRoutes = require('./routes/users.routes');
 var objectStoreRoutes = require('./routes/object.store.routes');
 var versionRoutes = require('./routes/version.routes');
@@ -49,7 +48,6 @@ app.use(function(req, res, next) {
   next();
 });
 
-app.use('/hello', helloRoutes);
 app.use('/v1/users', usersRoutes);
 app.use('/v1/object-store', objectStoreRoutes);
 app.use('/v1/version', versionRoutes);
