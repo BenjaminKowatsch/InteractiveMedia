@@ -44,35 +44,6 @@ function getFacebookTestAccessToken() {
   });
 }
 
-describe('Test object storage api', function() {
-  // POST - Send facebook access token
-  var imageData;
-
-  before(function(done) {
-    imageData = fs.readFileSync('image.png');
-    console.log('imageData size: ' + imageData.size);
-    done();
-  });
-
-  it('Upload image', function() {
-    return chai.request(host)
-            .post('/v1/object-store' + '/upload?filename=image.png')
-            .attach('uploadField', imageData, 'image.png')
-            .then(res => {
-              console.log(JSON.stringify(res));
-            });
-  });
-
-  it('Download image', function() {
-    return chai.request(host)
-            .get('/v1/object-store' + '/download?filename=image.png')
-            .then(res => {
-              console.log('Image comparison: ' + (imageData === res.text));
-              console.log(JSON.stringify(res));
-            });
-  });
-});
-
 describe('Login and send user data', function() {
   var facebookToken;
   var defaultToken;
