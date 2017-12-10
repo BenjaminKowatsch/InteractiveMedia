@@ -11,6 +11,7 @@ var usersRoutes = require('./routes/users.routes');
 var objectStoreRoutes = require('./routes/object.store.routes');
 var versionRoutes = require('./routes/version.routes');
 var groupRoutes = require('./routes/groups.routes');
+var statusRoutes = require('./routes/status.routes');
 
 var config = require('./modules/config');
 var user = require('./modules/user');
@@ -36,7 +37,12 @@ app.use(expressWinston.logger({
   winstonInstance: winston,
   expressFormat: false,
   meta: true,
-  ignoreRoute: function(req, res) { return false; } // optional: allows to skip some log messages based on request and/or response
+  skip: function(req, res) {
+    if (req.url == '/v1/status' && req.method == 'GET' && res.statusCode == 200) {
+      return true;
+    }
+    return false;
+  }
 }));
 
 app.use(bodyParser.json());
@@ -64,6 +70,7 @@ app.use('/v1/users', usersRoutes);
 app.use('/v1/object-store', objectStoreRoutes);
 app.use('/v1/version', versionRoutes);
 app.use('/v1/groups', groupRoutes);
+app.use('/v1/status', statusRoutes);
 
 function startServer() {
   // Starts the http server and prints out the host and the port
