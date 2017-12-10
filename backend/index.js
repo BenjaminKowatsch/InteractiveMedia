@@ -110,16 +110,6 @@ database.tryConnect(config.mongodbURL, function() {
     unique: true
   }, createIndexCallback);
 
-  console.log('Inserting default data');
-  database.collections.emotionData.remove({}).then(function() {
-    console.log('Removed all documents from emotionData');
-    return database.collections.emotionData.insertMany(emotionData.data);
-  }).then(function() {
-    console.log('Added all documents to emotionData');
-  }).catch(function() {
-    console.log('Error during Inserting default data');
-  });
-
   database.collections.launometerUsers.remove({username: 'admin'})
     .then(function() {
       console.log('Removed admin document from userdata');

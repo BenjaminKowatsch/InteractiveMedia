@@ -25,8 +25,7 @@ database.collections = {
   'groups': undefined,
   'launometerUsers': undefined,
   'facebookUsers': undefined,
-  'googleUsers': undefined,
-  'emotionData': undefined
+  'googleUsers': undefined
 };
 database.db = undefined;
 
@@ -77,7 +76,6 @@ function connect(resolve, reject) {
       database.collections.launometerUsers = db.collection('launometerUsers');
       database.collections.googleUsers = db.collection('googleUsers');
       database.collections.facebookUsers = db.collection('facebookUsers');
-      database.collections.emotionData = db.collection('emotionData');
       database.collections.users = db.collection('users');
       database.collections.groups = db.collection('groups');
       resolve();
@@ -86,7 +84,6 @@ function connect(resolve, reject) {
       database.collections.launometerUsers = undefined;
       database.collections.googleUsers = undefined;
       database.collections.facebookUsers = undefined;
-      database.collections.emotionData = undefined;
       database.collections.users = undefined;
       database.collections.groups = undefined;
       database.db = undefined;
