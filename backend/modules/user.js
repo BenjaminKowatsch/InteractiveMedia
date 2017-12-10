@@ -1,28 +1,27 @@
-var user = module.exports = {};
-
 var winston = require('winston');
-/* Application configuration */
-var config = require('./config');
-var uuidService = require('../services/uuid.service');
-/* JSON Web Token to create access tokens */
 var jwt = require('jwt-simple');
 var https = require('https');
 var querystring = require('querystring');
-/* Google Auth Library */
 var GoogleAuth = require('google-auth-library');
-var auth = new GoogleAuth();
-var client = new auth.OAuth2(config.googleOAuthClientID, '', '');
+
+var config = require('./config');
+var uuidService = require('../services/uuid.service');
 
 var MONGO_DB_CONNECTION_ERROR_CODE = 10;
 var MONGO_DB_REQUEST_ERROR_CODE = 9;
 
 var MONGO_DB_CONNECTION_ERROR_OBJECT = {'errorCode': MONGO_DB_CONNECTION_ERROR_CODE};
 
-var AUTH_TYPE = {
+const AUTH_TYPE = {
   'PASSWORD': 0,
   'GOOGLE': 1,
   'FACEBOOK': 2
 };
+
+exports.AUTH_TYPE = AUTH_TYPE;
+
+var auth = new GoogleAuth();
+var client = new auth.OAuth2(config.googleOAuthClientID, '', '');
 
 /**
  * Gets a date one hour from now
@@ -34,8 +33,6 @@ function getNewTokenExpiryDate() {
   time += 3600000;
   return new Date(time);
 }
-
-user.AUTH_TYPE = AUTH_TYPE;
 
 /**
  * Function to verify an access token from google.
@@ -51,7 +48,7 @@ user.AUTH_TYPE = AUTH_TYPE;
  *                                                OR
  *                                                Google Error
  */
-user.verifyGoogleAccessToken = function(userCollection, token, verifyDatabase) {
+exports.verifyGoogleAccessToken = function(userCollection, token, verifyDatabase) {
   return new Promise((resolve, reject) => {
     // verify google access token
     client.verifyIdToken(token, config.googleOAuthClientID,
@@ -120,7 +117,7 @@ user.verifyGoogleAccessToken = function(userCollection, token, verifyDatabase) {
  *                                                OR
  *                                                MongoDB Error
  */
-user.verifyPasswordAccessToken = function(userCollection, token) {
+exports.verifyPasswordAccessToken = function(userCollection, token) {
   return new Promise((resolve, reject) => {
     if (undefined === userCollection) {
       winston.error('Error MONGO_DB_CONNECTION_ERROR_OBJECT');
@@ -165,7 +162,7 @@ user.verifyPasswordAccessToken = function(userCollection, token) {
  *                                                OR
  *                                                Facebook Error
  */
-user.verifyFacebookAccessToken = function(userCollection, token, verifyDatabase) {
+exports.verifyFacebookAccessToken = function(userCollection, token, verifyDatabase) {
   return new Promise((resolve, reject) => {
     var options = {
       host: 'graph.facebook.com',
@@ -251,7 +248,7 @@ user.verifyFacebookAccessToken = function(userCollection, token, verifyDatabase)
  *                                                 {Boolean} success  Flag to indicate the unsuccessful request
  *                                                 {JSONObject} payload
  */
-user.googleOrFacebookLogin = function(userCollection,
+exports.googleOrFacebookLogin = function(userCollection,
    responseData, userId, expiryDate, authType, accessToken) {
   return new Promise((resolve, reject) => {
     // Upsert entry at db
@@ -296,7 +293,7 @@ user.googleOrFacebookLogin = function(userCollection,
  *                                                 {Boolean} success  Flag to indicate the unsuccessful request
  *                                                 {JSONObject} payload
  */
-user.passwordLogin = function(userCollection, responseData, username, password) {
+exports.passwordLogin = function(userCollection, responseData, username, password) {
   return new Promise((resolve, reject) => {
     if (undefined === userCollection) {
       responseData.success = false;
@@ -357,7 +354,7 @@ user.passwordLogin = function(userCollection, responseData, username, password) 
  *                                                 {Boolean} success  Flag to indicate the unsuccessful request
  *                                                 {JSONObject} payload
  */
-user.logout = function(userCollection, responseData, userId, authType) {
+exports.logout = function(userCollection, responseData, userId, authType) {
   return new Promise((resolve, reject) => {
     var update = {
       '$set': {
@@ -398,7 +395,7 @@ user.logout = function(userCollection, responseData, userId, authType) {
  *                                                {Number} errorCode  Enumeration to specify the error
  *                                                {JSONObject} payload
  */
-user.register = function(userCollection, responseData, username, password) {
+exports.register = function(userCollection, responseData, username, password) {
   return new Promise((resolve, reject) => {
     var userData = {};
     if (undefined === userCollection) {
