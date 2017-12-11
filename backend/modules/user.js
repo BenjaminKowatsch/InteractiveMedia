@@ -89,8 +89,9 @@ exports.verifyGoogleAccessToken = function(userCollection, token, verifyDatabase
           }
         } else {
           var promiseData = {
-            expiryDate: expiryDate,
-            userId: userId
+            'expiryDate': expiryDate,
+            'email': email,
+            'userId': userId
           };
           winston.debug('returning: ', promiseData);
           resolve(promiseData);
