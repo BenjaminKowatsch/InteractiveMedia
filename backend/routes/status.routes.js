@@ -3,8 +3,24 @@ var router = express.Router();
 
 var statusController = require('../controllers/status.controller');
 
-//base route: host:8081/status
-
+/**
+ * @api {GET} /v1/status/ Get current status
+ * @apiName GetStatus
+ * @apiGroup status
+ * @apiVersion  0.1.0
+ *
+ * @apiSuccess (200) {String} success Request successful
+ * @apiSuccess (200) {String} payload.status Current status
+ *
+ * @apiSuccessExample {json} Success-Response:
+   {
+       "success": true,
+       "payload": {
+           "status": "healthy"
+       }
+   }
+ *
+ */
 router.get('/', statusController.getStatus);
 
 module.exports = router;
