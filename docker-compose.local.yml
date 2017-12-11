@@ -1,7 +1,7 @@
 version: '2.1'
 services:
   mongo:
-    image: mongo
+    build: ./mongo
     volumes:
       - /data:/data/db
     ports: 
