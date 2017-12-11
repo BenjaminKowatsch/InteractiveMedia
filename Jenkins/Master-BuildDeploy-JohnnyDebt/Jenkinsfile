@@ -92,6 +92,7 @@ pipeline {
                         reportName: 'JavaDoc',
                         reportTitles: ''])
                 }
+                sh 'rm -r ./generated_doc'
                 sh 'docker build -f backend/doc/Dockerfile -t apidoc:latest backend'
                 sh 'docker run apidoc:latest'
                 sh 'docker cp $(docker ps --latest --format "{{.ID}}"):/doc ./generated_doc'
