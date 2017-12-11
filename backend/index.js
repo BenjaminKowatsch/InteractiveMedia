@@ -93,6 +93,11 @@ database.tryConnect(config.mongodbURL, function() {
       winston.debug('Creation of index + ' + indexname + ' failed');
     }
   };
+  database.collections.users.createIndex({
+    email: 1
+  }, {
+    unique: true
+  }, createIndexCallback);
 
   database.collections.users.createIndex({
     username: 1,
@@ -117,7 +122,6 @@ database.tryConnect(config.mongodbURL, function() {
   }, createIndexCallback);
 
   startServer();
-
 }, function() {
   winston.error('Not connected to database after maxRetries reached.');
 });

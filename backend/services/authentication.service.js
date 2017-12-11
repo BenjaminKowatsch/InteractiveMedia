@@ -66,7 +66,7 @@ function verifyAccessToken(token, authType) {
     case user.AUTH_TYPE.FACEBOOK:
       winston.debug('Verifing Facebook access token');
       // Verify facebook access token
-      return user.verifyFacebookAccessToken(database.collections.users, token, true);
+      return user.verifyFacebookAccessToken(database.collections.users, token, true, false);
     default:
       winston.error('Unknown authType');
       return Promise.reject('Unknown authType');

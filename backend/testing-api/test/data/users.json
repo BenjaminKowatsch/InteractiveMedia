@@ -3,36 +3,44 @@
     "valid": [
       {
         "username": "alex1",
+        "email": "alex1@alex.de",
         "password": "alexpassword"
       },
       {
         "username": "benny1",
+        "email": "benny1@alex.de",
         "password": "benny1password"
       },
       {
         "username": "maxi1",
+        "email": "maxi1@alex.de",
         "password": "maxi1password"
       },
       {
         "username": "maxi2",
+        "email": "maxi2@alex.de",
         "password": "maxi2password"
       },
       {
         "username": "alex2",
+        "email": "alex2@alex.de",
         "password": "alex2password"
       }
     ],
     "invalid": {
       "notExistingUser": {
         "username": "alexinvalid",
+        "email": "alexinvalid@alex.de",
         "password": "pwdpwd"
       },
       "invalidUsername": {
         "username": "s",
+        "email": "s@alex.de",
         "password": "pwdpwd"
       },
       "invalidPassword": {
         "username": "alex12",
+        "email": "alex12@alex.de",
         "password": "p"
       }
     }

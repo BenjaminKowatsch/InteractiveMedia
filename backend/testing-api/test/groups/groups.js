@@ -19,6 +19,7 @@ describe('Get groups', function() {
     // first register a new default user
     chai.request(host).post(loginUrl).send({
       username: testData.users.valid[2].username,
+      email: testData.users.valid[2].email,
       password: testData.users.valid[2].password,
     }).then(function(res) {
       defaultToken = res.body.payload.accessToken;
@@ -29,6 +30,7 @@ describe('Get groups', function() {
         });
     chai.request(host).post(loginUrl).send({
       username: testData.users.valid[3].username,
+      email: testData.users.valid[3].email,
       password: testData.users.valid[3].password,
     }).then(function(res) {
       alternativeToken = res.body.payload.accessToken;

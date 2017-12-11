@@ -15,7 +15,7 @@ var config = {
   'facebookAppId': process.env.FACEBOOK_APP_ID
 };
 
-const testData =  require('../data/users');
+const testData = require('../data/users');
 
 function getFacebookTestAccessToken() {
   return new Promise((resolve, reject) => {
@@ -126,11 +126,12 @@ describe('Auth-Type: Facebook', function() {
 
 describe('Auth-Type: Password', function() {
   describe('Register', function() {
-
     it('should register new user', function() {
       return chai.request(host)
         .post(baseUrl + '/')
-        .send({username: testData.users.valid[0].username, password: testData.users.valid[0].password})
+        .send({username: testData.users.valid[0].username,
+          email: testData.users.valid[0].email,
+          password: testData.users.valid[0].password})
         .then(function(res) {
           expect(res).to.have.status(201);
           expect(res).to.be.json;
@@ -145,7 +146,9 @@ describe('Auth-Type: Password', function() {
     it('should fail to register existing user', function() {
       return chai.request(host)
           .post(baseUrl + '/')
-          .send({username: testData.users.valid[0].username, password: testData.users.valid[0].password})
+          .send({username: testData.users.valid[0].username,
+            email: testData.users.valid[0].email,
+            password: testData.users.valid[0].password})
           .then(function(res) {
             expect(res).to.have.status(400);
             expect(res).to.be.json;
@@ -161,6 +164,7 @@ describe('Auth-Type: Password', function() {
       return chai.request(host)
           .post(baseUrl + '/')
           .send({username: testData.users.invalid.invalidUsername.username,
+            email: testData.users.invalid.invalidUsername.email,
             password: testData.users.invalid.invalidUsername.password})
           .then(function(res) {
             expect(res).to.have.status(400);
@@ -176,6 +180,7 @@ describe('Auth-Type: Password', function() {
       return chai.request(host)
           .post(baseUrl + '/')
           .send({username: testData.users.invalid.invalidPassword.username,
+            email: testData.users.invalid.invalidPassword.email,
             password: testData.users.invalid.invalidPassword.password})
           .then(function(res) {
             expect(res).to.have.status(400);
@@ -195,7 +200,9 @@ describe('Auth-Type: Password', function() {
     before(function(done) {
       chai.request(host)
         .post(baseUrl + '/')
-        .send({username: testData.users.valid[1].username, password: testData.users.valid[1].password})
+        .send({username: testData.users.valid[1].username,
+          email: testData.users.valid[1].email,
+          password: testData.users.valid[1].password})
         .then((res) => {
           defaultToken = res.body.payload.accessToken;
           done();
@@ -205,7 +212,9 @@ describe('Auth-Type: Password', function() {
     it('should login as default user', function() {
       return chai.request(host)
               .post(baseUrl + '/login?type=0')
-              .send({username: testData.users.valid[1].username, password: testData.users.valid[1].password})
+              .send({username: testData.users.valid[1].username,
+                email: testData.users.valid[1].email,
+                password: testData.users.valid[1].password})
               .then(res => {
                 expect(res).to.have.status(201);
                 expect(res).to.be.json;
@@ -214,7 +223,6 @@ describe('Auth-Type: Password', function() {
                 expect(res.body.payload).to.be.an('object');
               });
     });
-
   });
 
   describe('Logout', function() {
@@ -224,7 +232,9 @@ describe('Auth-Type: Password', function() {
     before(function(done) {
       chai.request(host)
         .post(baseUrl + '/')
-        .send({username: testData.users.valid[4].username, password: testData.users.valid[4].password})
+        .send({username: testData.users.valid[4].username,
+          email: testData.users.valid[4].email,
+          password: testData.users.valid[4].password})
         .then((res) => {
           defaultToken = res.body.payload.accessToken;
           done();
@@ -263,7 +273,9 @@ describe('Auth-Type: Password', function() {
     it('should re-login', function() {
       return chai.request(host)
               .post(baseUrl + '/login?type=0')
-              .send({username: testData.users.valid[4].username, password: testData.users.valid[4].password})
+              .send({username: testData.users.valid[4].username,
+                email: testData.users.valid[4].email,
+                password: testData.users.valid[4].password})
               .then(res => {
                 expect(res).to.have.status(201);
                 expect(res).to.be.json;
@@ -272,6 +284,5 @@ describe('Auth-Type: Password', function() {
                 expect(res.body.payload).to.be.an('object');
               });
     });
-
   });
 });

@@ -52,6 +52,7 @@ exports.verifyGoogleAccessToken = function(userCollection, token, verifyDatabase
       if (error === null) {
         var payload = login.getPayload();
         var userId = payload.sub;
+        var email = payload.email;
         var expiryDate = new Date(payload.exp * 1000);
         // if verifyDatabase flag is set also check if expiryDate is valid
         if (verifyDatabase === true) {
@@ -61,19 +62,21 @@ exports.verifyGoogleAccessToken = function(userCollection, token, verifyDatabase
           } else {
             // check database
             var query = {
-              userId: userId,
-              authType: AUTH_TYPE.GOOGLE,
-              expiryDate: {
+              'userId': userId,
+              'email': email,
+              'authType': AUTH_TYPE.GOOGLE,
+              'expiryDate': {
                 '$gte': expiryDate
               }
             };
             winston.debug('query:', query);
-            var options = {fields: {userId: 1, authType: 1, expiryDate: 1}};
+            var options = {fields: {userId: 1, authType: 1, email: 1, expiryDate: 1}};
             userCollection.findOne(query, options, function(error, result) {
               if (error === null && result !== null) {
                 var promiseData = {
-                  expiryDate: result.expiryDate,
-                  userId: result.userId
+                  'expiryDate': result.expiryDate,
+                  'email': result.email,
+                  'userId': result.userId
                 };
                 winston.debug('returning:', promiseData);
                 resolve(promiseData);
@@ -144,6 +147,90 @@ exports.verifyPasswordAccessToken = function(userCollection, token) {
     }
   });
 };
+
+/**
+ * [httpsGetRequest description]
+ *
+ * @param  {[type]} options [description]
+ * @return {[type]}         [description]
+ */
+function httpsGetRequest(options) {
+  return new Promise((resolve, reject) => {
+    winston.debug('get: https://' + options.host + options.path);
+    https.get(options, function(response) {
+      var responseMessage = '';
+
+      response.on('data', function(chunk) {
+        responseMessage += chunk;
+      });
+
+      response.on('end', () => {
+        winston.info('Received data ' + responseMessage);
+        resolve(JSON.parse(responseMessage));
+      });
+      response.on('error', (err) => {
+        winston.info('Error data ' + err);
+        reject(err);
+      });
+    });
+  });
+}
+
+function verifyFacbookTokenAtDatabase(data, userCollection, verifyDatabase) {
+  return new Promise((resolve, reject) => {
+    var expiryDate = new Date(data.data.expires_at * 1000);
+    var userId = data.data.user_id;
+    // if verifyDatabase flag is set also check if expiryDate is valid
+    if (verifyDatabase === true) {
+      if (undefined === userCollection) {
+        winston.error('usercollection is not set ');
+        reject(MONGO_DB_CONNECTION_ERROR_OBJECT);
+      } else {
+        // check database
+        var query = {
+          userId: userId,
+          authType: AUTH_TYPE.FACEBOOK,
+          expiryDate: {
+            '$gte': expiryDate
+          }
+        };
+        winston.debug('verify database: ', query);
+        var options = {fields: {userId: 1, expiryDate: 1}};
+        userCollection.findOne(query, options, function(error, result) {
+          if (error === null && result !== null) {
+            var promiseData = {
+              expiryDate: result.expiryDate,
+              userId: result.userId
+            };
+            winston.debug('returning:', promiseData);
+            resolve(promiseData);
+          } else {
+            // Invalid expiryDate or internal database error
+            winston.error('Error MONGO_DB_INTERNAL_ERROR: ', error);
+            reject(error);
+          }
+        });
+      }
+    } else {
+      var promiseData = {
+        expiryDate: expiryDate,
+        userId: userId
+      };
+      winston.debug('returning: ', promiseData);
+      if (verifyEmail === true) {
+        verifyFacbookEmail(token).then((emailResult) => {
+          promiseData.email = emailResult.email;
+          resolve(promiseData);
+        }).catch((err) => {
+          reject(err);
+        });
+      } else {
+        resolve(promiseData);
+      }
+    }
+  });
+}
+
 /**
  * Function to verify a access token from facebook.
  *
@@ -154,75 +241,44 @@ exports.verifyPasswordAccessToken = function(userCollection, token) {
  *                                                 {Date} expiryDate Date to indicate the expiration of the accessToken
  *                                                 {String} userId String to uniquely identify the user
  *                                  catch: {JSONObject} error Containing the following properties:
- *                                                 {String} message String containing the error message
- *                                                OR
- *                                                Facebook Error
+ *                                                 {String} message String containing the error message or facebook error
  */
-exports.verifyFacebookAccessToken = function(userCollection, token, verifyDatabase) {
-  return new Promise((resolve, reject) => {
-    var options = {
-      host: 'graph.facebook.com',
-      path: ('/v2.9/debug_token?access_token=' +
-             config.facebookUrlAppToken + '&input_token=' + token)
+exports.verifyFacebookAccessToken = function(userCollection, token, verifyDatabase, verifyEmail) {
+  var options = {
+    host: 'graph.facebook.com',
+    path: ('/v2.9/debug_token?access_token=' +
+            config.facebookUrlAppToken + '&input_token=' + token)
+  };
+  return httpsGetRequest(options)
+  .then((data) => {
+    winston.debug('resolving https promise: ' + JSON.stringify(data));
+    var expiryDate = new Date(data.data.expires_at * 1000);
+    var userId = data.data.user_id;
+    var promiseData = {
+      expiryDate: expiryDate,
+      userId: userId
     };
-    winston.debug('verifing: https://' + options.host + options.path);
-    https.get(options, function(response) {
-      var responseMessage = '';
-
-      response.on('data', function(chunk) {
-        responseMessage += chunk;
-      });
-
-      response.on('end', function() {
-        var data = JSON.parse(responseMessage);
-        if (data.error !== undefined) {
-          winston.error('Received error response from facebook ');
-          reject(data.error);
-        } else {
-          var expiryDate = new Date(data.data.expires_at * 1000);
-          var userId = data.data.user_id;
-          // if verifyDatabase flag is set also check if expiryDate is valid
-          if (verifyDatabase === true) {
-            if (undefined === userCollection) {
-              winston.error('usercollection is not set ');
-              reject(MONGO_DB_CONNECTION_ERROR_OBJECT);
-            } else {
-              // check database
-              var query = {
-                userId: userId,
-                authType: AUTH_TYPE.FACEBOOK,
-                expiryDate: {
-                  '$gte': expiryDate
-                }
-              };
-              winston.debug('verify database: ', query);
-              var options = {fields: {userId: 1,  expiryDate: 1}};
-              userCollection.findOne(query, options, function(error, result) {
-                if (error === null && result !== null) {
-                  var promiseData = {
-                    expiryDate: result.expiryDate,
-                    userId: result.userId
-                  };
-                  winston.debug('returning:', promiseData);
-                  resolve(promiseData);
-                } else {
-                  // Invalid expiryDate or internal database error
-                  winston.error('Error MONGO_DB_INTERNAL_ERROR: ', error);
-                  reject(error);
-                }
-              });
-            }
-          } else {
-            var promiseData = {
-              expiryDate: expiryDate,
-              userId: userId
-            };
-            winston.debug('returning: ', promiseData);
-            resolve(promiseData);
-          }
-        }
-      });
-    });
+    if (verifyDatabase === true) {
+      return verifyFacbookTokenAtDatabase(data, userCollection, verifyDatabase);
+    } else {
+      return promiseData;
+    }
+  }).then((result) => {
+    winston.debug('resolving database promise: ' + JSON.stringify(result));
+    if (verifyEmail === true) {
+      var emailOptions = {
+        host: 'graph.facebook.com',
+        path: ('/v2.9/me?fields=name,email&access_token=' + token)
+      };
+      return httpsGetRequest(emailOptions)
+          .then((emailResult) => {
+            winston.debug('resolving email promise: ' + JSON.stringify(emailResult));
+            result.email = emailResult.email;
+            return result;
+          });
+    } else {
+      return result;
+    }
   });
 };
 
@@ -245,14 +301,16 @@ exports.verifyFacebookAccessToken = function(userCollection, token, verifyDataba
  *                                                 {JSONObject} payload
  */
 exports.googleOrFacebookLogin = function(userCollection,
-   responseData, userId, expiryDate, authType, accessToken) {
+   responseData, userId, expiryDate, authType, accessToken, email) {
   return new Promise((resolve, reject) => {
     // Upsert entry at db
     userCollection.updateOne({
       'userId': userId,
+      'email': email,
       'authType': authType
     }, {
       'userId': userId,
+      'email': email,
       'authType': authType,
       'expiryDate': expiryDate
     }, {
@@ -386,13 +444,13 @@ exports.logout = function(userId, authType) {
  *                                                {Boolean} success  Flag to indicate the unsuccessful request
  *                                                {JSONObject} payload
  */
-exports.register = function(username, password) {
+exports.register = function(username, password, email) {
   return new Promise((resolve, reject) => {
-
     const userToRegister = {
       'expiryDate': tokenService.getNewExpiryDate(validTimeOfTokenInMs),
       'password': password,
       'username': username,
+      'email': email,
       'userId': uuidService.generateUUID(),
       'authType': AUTH_TYPE.PASSWORD
     };
