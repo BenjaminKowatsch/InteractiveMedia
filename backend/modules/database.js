@@ -1,5 +1,7 @@
 var database = module.exports = {};
 
+const winston = require('winston');
+
 /* MongoDB Client */
 var MongoClient = require('mongodb').MongoClient;
 
@@ -42,7 +44,7 @@ database.tryConnect = function(url, resolve, reject) {
  */
 function tryToConnectToDatabase() {
   tryConnectOptions.currentRetryCount += 1;
-  console.log('Database connection try number: ' + tryConnectOptions.currentRetryCount);
+  winston.debug('Database connection try number: ' + tryConnectOptions.currentRetryCount);
   connect(function() {
     tryConnectOptions.resolve();
   }, function() {
@@ -67,14 +69,14 @@ function connect(resolve, reject) {
 
   MongoClient.connect(tryConnectOptions.url, mongoConnectConfig, function(err, db) {
     if (err === null) {
-      console.log('Database connection established');
+      winston.debug('Database connection established');
       // Initialize database and collection access variables
       database.db = db;
       database.collections.users = db.collection('users');
       database.collections.groups = db.collection('groups');
       resolve();
     } else {
-      console.log('Database connection failed with error: ' + err);
+      winston.error('Database connection failed with error: ' + err);
       database.collections.users = undefined;
       database.collections.groups = undefined;
       database.db = undefined;

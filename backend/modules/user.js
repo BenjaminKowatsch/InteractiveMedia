@@ -1,41 +1,34 @@
-var user = module.exports = {};
+const winston = require('winston');
+const jwt = require('jwt-simple');
+const https = require('https');
+const querystring = require('querystring');
+const GoogleAuth = require('google-auth-library');
 
-var winston = require('winston');
-/* Application configuration */
-var config = require('./config');
-var uuidService = require('../services/uuid.service');
-/* JSON Web Token to create access tokens */
-var jwt = require('jwt-simple');
-var https = require('https');
-var querystring = require('querystring');
-/* Google Auth Library */
-var GoogleAuth = require('google-auth-library');
-var auth = new GoogleAuth();
-var client = new auth.OAuth2(config.googleOAuthClientID, '', '');
+const config = require('./config');
+const uuidService = require('../services/uuid.service');
+const tokenService = require('../services/token.service');
+const database = require('../modules/database');
 
-var MONGO_DB_CONNECTION_ERROR_CODE = 10;
-var MONGO_DB_REQUEST_ERROR_CODE = 9;
+const MONGO_ERRCODE = {
+  'DUPLICATEKEY': 11000
+};
+const MONGO_DB_CONNECTION_ERROR_CODE = 10;
+const MONGO_DB_REQUEST_ERROR_CODE = 9;
 
-var MONGO_DB_CONNECTION_ERROR_OBJECT = {'errorCode': MONGO_DB_CONNECTION_ERROR_CODE};
+const MONGO_DB_CONNECTION_ERROR_OBJECT = {'errorCode': MONGO_DB_CONNECTION_ERROR_CODE};
 
-var AUTH_TYPE = {
-  'LAUNOMETER': 0,
+const AUTH_TYPE = {
+  'PASSWORD': 0,
   'GOOGLE': 1,
   'FACEBOOK': 2
 };
+exports.AUTH_TYPE = AUTH_TYPE;
 
-/**
- * Gets a date one hour from now
- *
- * @return {Date} A date one hour in the future
- */
-function getNewTokenExpiryDate() {
-  var time = new Date().getTime();
-  time += 3600000;
-  return new Date(time);
-}
+// 60 minutes in ms
+const validTimeOfTokenInMs = 3600000;
 
-user.AUTH_TYPE = AUTH_TYPE;
+const googleAuth = new GoogleAuth();
+const googleAuthClient = new googleAuth.OAuth2(config.googleOAuthClientID, '', '');
 
 /**
  * Function to verify an access token from google.
@@ -51,10 +44,10 @@ user.AUTH_TYPE = AUTH_TYPE;
  *                                                OR
  *                                                Google Error
  */
-user.verifyGoogleAccessToken = function(userCollection, token, verifyDatabase) {
+exports.verifyGoogleAccessToken = function(userCollection, token, verifyDatabase) {
   return new Promise((resolve, reject) => {
     // verify google access token
-    client.verifyIdToken(token, config.googleOAuthClientID,
+    googleAuthClient.verifyIdToken(token, config.googleOAuthClientID,
     function(error, login) {
       if (error === null) {
         var payload = login.getPayload();
@@ -74,7 +67,7 @@ user.verifyGoogleAccessToken = function(userCollection, token, verifyDatabase) {
                 '$gte': expiryDate
               }
             };
-            winston.info('query:', query);
+            winston.debug('query:', query);
             var options = {fields: {userId: 1, authType: 1, expiryDate: 1}};
             userCollection.findOne(query, options, function(error, result) {
               if (error === null && result !== null) {
@@ -82,7 +75,7 @@ user.verifyGoogleAccessToken = function(userCollection, token, verifyDatabase) {
                   expiryDate: result.expiryDate,
                   userId: result.userId
                 };
-                winston.info('returning:', promiseData);
+                winston.debug('returning:', promiseData);
                 resolve(promiseData);
               } else {
                 // Invalid expiryDate or internal database error
@@ -96,18 +89,18 @@ user.verifyGoogleAccessToken = function(userCollection, token, verifyDatabase) {
             expiryDate: expiryDate,
             userId: userId
           };
-          winston.info('returning: ', promiseData);
+          winston.debug('returning: ', promiseData);
           resolve(promiseData);
         }
       } else {
-        winston.info('token declared invalid by google library: ', error);
+        winston.debug('token declared invalid by google library: ', error);
         reject(error);
       }
     });
   });
 };
 /**
- * Function to verify an own access token from launometer.
+ * Function to verify an own access token.
  *
  * @param {Object} userCollection  Reference to the database collection based on the authentication type
  * @param  {String} token    AccessToken to be verified
@@ -120,7 +113,7 @@ user.verifyGoogleAccessToken = function(userCollection, token, verifyDatabase) {
  *                                                OR
  *                                                MongoDB Error
  */
-user.verifyLaunometerAccessToken = function(userCollection, token) {
+exports.verifyPasswordAccessToken = function(userCollection, token) {
   return new Promise((resolve, reject) => {
     if (undefined === userCollection) {
       winston.error('Error MONGO_DB_CONNECTION_ERROR_OBJECT');
@@ -129,7 +122,7 @@ user.verifyLaunometerAccessToken = function(userCollection, token) {
       var payload = jwt.decode(token, config.jwtSimpleSecret);
       var query = {
         userId: payload.userId,
-        authType: AUTH_TYPE.LAUNOMETER,
+        authType: AUTH_TYPE.PASSWORD,
         expiryDate: {
           '$gt': new Date()
         }
@@ -165,14 +158,14 @@ user.verifyLaunometerAccessToken = function(userCollection, token) {
  *                                                OR
  *                                                Facebook Error
  */
-user.verifyFacebookAccessToken = function(userCollection, token, verifyDatabase) {
+exports.verifyFacebookAccessToken = function(userCollection, token, verifyDatabase) {
   return new Promise((resolve, reject) => {
     var options = {
       host: 'graph.facebook.com',
       path: ('/v2.9/debug_token?access_token=' +
              config.facebookUrlAppToken + '&input_token=' + token)
     };
-    winston.info('verifing: https://' + options.host + options.path);
+    winston.debug('verifing: https://' + options.host + options.path);
     https.get(options, function(response) {
       var responseMessage = '';
 
@@ -202,7 +195,7 @@ user.verifyFacebookAccessToken = function(userCollection, token, verifyDatabase)
                   '$gte': expiryDate
                 }
               };
-              winston.info('verify database: ', query);
+              winston.debug('verify database: ', query);
               var options = {fields: {userId: 1,  expiryDate: 1}};
               userCollection.findOne(query, options, function(error, result) {
                 if (error === null && result !== null) {
@@ -210,7 +203,7 @@ user.verifyFacebookAccessToken = function(userCollection, token, verifyDatabase)
                     expiryDate: result.expiryDate,
                     userId: result.userId
                   };
-                  winston.info('returning:', promiseData);
+                  winston.debug('returning:', promiseData);
                   resolve(promiseData);
                 } else {
                   // Invalid expiryDate or internal database error
@@ -224,7 +217,7 @@ user.verifyFacebookAccessToken = function(userCollection, token, verifyDatabase)
               expiryDate: expiryDate,
               userId: userId
             };
-            winston.info('returning: ', promiseData);
+            winston.debug('returning: ', promiseData);
             resolve(promiseData);
           }
         }
@@ -251,7 +244,7 @@ user.verifyFacebookAccessToken = function(userCollection, token, verifyDatabase)
  *                                                 {Boolean} success  Flag to indicate the unsuccessful request
  *                                                 {JSONObject} payload
  */
-user.googleOrFacebookLogin = function(userCollection,
+exports.googleOrFacebookLogin = function(userCollection,
    responseData, userId, expiryDate, authType, accessToken) {
   return new Promise((resolve, reject) => {
     // Upsert entry at db
@@ -268,13 +261,13 @@ user.googleOrFacebookLogin = function(userCollection,
       function(err, result) {
         if (err !== null) {
           responseData.success = false;
-          console.log('Login failed');
+          winston.error('Login failed');
           reject(responseData);
         } else {
           responseData.payload = {};
           responseData.payload.authType = authType;
           responseData.payload.accessToken = accessToken;
-          console.log('Login successful ');
+          winston.debug('Login successful ');
           resolve(responseData);
         }
       });
@@ -282,7 +275,7 @@ user.googleOrFacebookLogin = function(userCollection,
 };
 
 /**
- * Function to login a launometer user.
+ * Function to login a user with password.
  *
  * @param {Object} userCollection  Reference to the database collection based on the authentication type
  * @param {JSONObject} responseData Data object created during the request data validation containing the result.
@@ -296,15 +289,15 @@ user.googleOrFacebookLogin = function(userCollection,
  *                                                 {Boolean} success  Flag to indicate the unsuccessful request
  *                                                 {JSONObject} payload
  */
-user.launometerLogin = function(userCollection, responseData, username, password) {
+exports.passwordLogin = function(userCollection, responseData, username, password) {
   return new Promise((resolve, reject) => {
     if (undefined === userCollection) {
       responseData.success = false;
       responseData.errorCode = MONGO_DB_CONNECTION_ERROR_CODE;
-      console.log('Error code: ' + MONGO_DB_CONNECTION_ERROR_CODE);
+      winston.debug('Error code: ' + MONGO_DB_CONNECTION_ERROR_CODE);
       reject(responseData);
     } else {
-      var newExpiryDate = getNewTokenExpiryDate();
+      var newExpiryDate = tokenService.getNewExpiryDate(validTimeOfTokenInMs);
       var query = {
         'username': username,
         'password': password
@@ -325,19 +318,19 @@ user.launometerLogin = function(userCollection, responseData, username, password
       userCollection.findOneAndUpdate(query, update, options, function(err, result) {
         if (err === null && result.value !== null && result.ok === 1) {
           responseData.payload = {};
-          console.log(result.value);
+          winston.debug(result.value);
           // Successfully logged in and created new expiry date
           // Generate Access Token
           // Remove the database id from the json object
           delete result.value._id;
-          responseData.payload.authType = AUTH_TYPE.LAUNOMETER;
+          responseData.payload.authType = AUTH_TYPE.PASSWORD;
           responseData.payload.accessToken = jwt.encode(result.value, config.jwtSimpleSecret);
-          console.log('Login successful ');
+          winston.debug('Login successful ');
           resolve(responseData);
         } else {
           // Error handling
           responseData.success = false;
-          console.log('Login failed ');
+          winston.debug('Login failed ');
           resolve(responseData);
         }
       });
@@ -345,10 +338,8 @@ user.launometerLogin = function(userCollection, responseData, username, password
   });
 };
 /**
- * Function to logout a user independent of the authType
+ * Function to logout a user independent of authType
  *
- * @param {Object} userCollection  Reference to the database collection based on the authentication type
- * @param {JSONObject} responseData Data object created during the request data validation containing the result.
  * @param {String} userId String to uniquely identify the user, to find the user at the database
  * @return {Promise}                then: {JSONObject} promiseData Is a modified version of the responseData object
  *                                                 {Boolean} success  Flag to indicate the successful request
@@ -357,7 +348,7 @@ user.launometerLogin = function(userCollection, responseData, username, password
  *                                                 {Boolean} success  Flag to indicate the unsuccessful request
  *                                                 {JSONObject} payload
  */
-user.logout = function(userCollection, responseData, userId, authType) {
+exports.logout = function(userId, authType) {
   return new Promise((resolve, reject) => {
     var update = {
       '$set': {
@@ -368,26 +359,24 @@ user.logout = function(userCollection, responseData, userId, authType) {
       'userId': userId,
       'authType': authType
     };
-    userCollection.updateOne(query, update, function(err, result) {
-      // Driver returns result as json string, not an object, so the json string has to be parsed into an object
+    database.collections.users.updateOne(query, update, function(err, result) {
+      // Parse driver result from string to json an object
       result = JSON.parse(result);
       if (err === null && result.n === 1 && result.ok === 1) {
-        // Successfully updated the expiryDate
-        console.log('Logout successful');
-        resolve(responseData);
+        // update successful
+        winston.debug('Logout successful');
+        resolve();
       } else {
-        responseData.success = false;
-        console.log('Logout failed ');
-        reject(responseData);
+        winston.debug('Logout failed');
+        reject();
       }
     });
   });
 };
+
 /**
- * Function to register a new launometer user at the database
+ * Function to register a new user at the database
  *
- * @param {Object} userCollection  Reference to the database collection based on the authentication type
- * @param {JSONObject} responseData Data object created during the request data validation containing the result.
  * @param  {String} username       The name of the new user
  * @param  {String} password       The password of the new user
  * @return {Promise}                then: {JSONObject} promiseData Is a modified version of the responseData object
@@ -395,333 +384,42 @@ user.logout = function(userCollection, responseData, userId, authType) {
  *                                                 {JSONObject} payload
  *                                  catch: {JSONObject} error Is a modified version of the responseData object
  *                                                {Boolean} success  Flag to indicate the unsuccessful request
- *                                                {Number} errorCode  Enumeration to specify the error
  *                                                {JSONObject} payload
  */
-user.register = function(userCollection, responseData, username, password) {
+exports.register = function(username, password) {
   return new Promise((resolve, reject) => {
-    var userData = {};
-    if (undefined === userCollection) {
-      responseData.success = false;
-      responseData.errorCode = MONGO_DB_CONNECTION_ERROR_CODE;
-      console.log('Error code: ' + MONGO_DB_CONNECTION_ERROR_CODE);
-      reject(responseData);
-    } else {
-      console.log('User will be created');
-      // Setup userData
-      userData.expiryDate = getNewTokenExpiryDate(); // now + 1h
-      userData.password = password;
-      userData.username = username;
-      userData.userId = uuidService.generateUUID();
-      userData.authType = AUTH_TYPE.LAUNOMETER;
 
-      userCollection.insertOne(userData, function(err, result) {
-        responseData.payload = {};
-        if (err != null && err.code === 11000) {
-          responseData.payload.dataPath = 'username';
-          responseData.payload.message = 'Username already exists';
-          responseData.success = false;
-
-          console.log('Registration/Login failed ');
-          reject(responseData);
-        } else {
-          responseData.payload = {};
-          var payload = {
-            'userId': userData.userId,
-            'expiryDate': userData.expiryDate
-          };
-
-          responseData.payload.accessToken = jwt.encode(payload, config.jwtSimpleSecret);
-          responseData.payload.authType = AUTH_TYPE.LAUNOMETER;
-          console.log('Registration/Login successful');
-          resolve(responseData);
-        }
-      });
-    }
-  });
-};
-/**
- * Function to get the maximal statistic value.
- *
- * @param {Object} userCollection  Reference to the database collection based on the authentication type
- * @param {JSONObject} responseData Data object created during the request data validation containing the result.
- * @param {String} userId String to uniquely identify the user, to find the user at the database
- * @return {Promise}                then: {JSONObject} promiseData Is a modified version of the responseData object
- *                                                {Boolean} success  Flag to indicate the successful request
- *                                                {JSONObject} payload
- *                                  catch: {JSONObject} error Is a modified version of the responseData object
- *                                                {Boolean} success  Flag to indicate the unsuccessful request
- *                                                {Number} errorCode  Enumeration to specify the error
- *                                                {JSONObject} payload
- */
-user.getMaxValue = function(userCollection, responseData, userId) {
-  return new Promise((resolve, reject) => {
-    userCollection.find({
-      userId: userId
-    }, {
-      posts: 1
-    }).toArray().then(function(docs) {
-      var dataExists;
-      var maxVal;
-      var values = [];
-
-      if (docs.length > 0) {
-        dataExists = true;
-        maxVal = docs[0].posts.length;
-        values.push(dataExists);
-        values.push(maxVal);
-      } else {
-        dataExists = false;
-        maxVal = 0;
-        values.push(dataExists);
-        values.push(maxVal);
-      }
-      responseData.payload = values;
-      resolve(responseData);
-    }).catch(function() {
-      responseData.success = false;
-      responseData.errorCode = MONGO_DB_REQUEST_ERROR_CODE;
-      console.log('Error code: ' + MONGO_DB_REQUEST_ERROR_CODE);
-      reject(responseData);
-    });
-  });
-};
-
-/**
- * Function to get five statistic values.
- *
- * @param {Object} userCollection  Reference to the database collection based on the authentication type
- * @param {JSONObject} responseData Data object created during the request data validation containing the result.
- * @param {String} userId String to uniquely identify the user, to find the user at the database
- * @param {Number} minValue A number to specify how many entries at the database shall be skipped
- * @return {Promise}                then: {JSONObject} promiseData Is a modified version of the responseData object
- *                                                 {Boolean} success  Flag to indicate the successful request
- *                                                 {JSONObject} payload
- *                                  catch: {JSONObject} error Is a modified version of the responseData object
- *                                                 {Boolean} success  Flag to indicate the unsuccessful request
- *                                                 {Number} errorCode  Enumeration to specify the error
- *                                                 {JSONObject} payload
- */
-user.getStatistics = function(userCollection, responseData, userId, minValue) {
-  return new Promise((resolve, reject) => {
-    userCollection.find({
-      userId: userId
-    }, {
-      posts: {
-        $slice: [minValue, 5]
-      }
-    }).toArray().then(function(docs) {
-      var labels = [];
-      var colors = [];
-      var percentage = [];
-      var dataExists;
-      var moodData = new Array(labels, colors, percentage);
-      if (docs.length > 0) {
-        for (var i = 0; i < docs[0].posts.length; i++) {
-          var year = JSON.stringify(new Date(docs[0].posts[i].date).getFullYear());
-          var month = JSON.stringify(new Date(docs[0].posts[i].date).getMonth() + 1);
-          var day = JSON.stringify(new Date(docs[0].posts[i].date).getDate());
-
-          var date = day.concat('.', month, '.', year);
-
-          dataExists = true;
-          labels.push(date);
-          colors.push(docs[0].posts[i].colour.toString());
-          percentage.push(JSON.stringify(docs[0].posts[i].mood));
-          moodData.push(dataExists);
-        }
-      } else {
-        dataExists = false;
-        moodData.push(dataExists);
-      }
-      responseData.payload = moodData;
-      resolve(responseData);
-    }).catch(function() {
-      responseData.success = false;
-      responseData.errorCode = MONGO_DB_REQUEST_ERROR_CODE;
-      console.log('Error code: ' + MONGO_DB_REQUEST_ERROR_CODE);
-      reject(responseData);
-    });
-  });
-};
-/**
- * Function to get all posts from the database.
- *
- * @param {Object} userCollection  Reference to the database collection based on the authentication type
- * @param {JSONObject} responseData Data object created during the request data validation containing the result.
- * @param {String} userId String to uniquely identify the user, to find the user at the database
- * @return {Promise}                then: {JSONObject} promiseData Is a modified version of the responseData object
- *                                                 {Boolean} success  Flag to indicate the successful request
- *                                                 {JSONObject} payload
- *                                  catch: {JSONObject} error Is a modified version of the responseData object
- *                                                 {Boolean} success  Flag to indicate the unsuccessful request
- *                                                 {Number} errorCode  Enumeration to specify the error
- *                                                 {JSONObject} payload
- */
-user.getDiary = function(userCollection, responseData, userId) {
-  return new Promise((resolve, reject) => {
-    var diaryEntry = [];
-    var dataExists;
-    var data = [];
-    userCollection.aggregate([{$match: {userId: userId}}, {$project: {
-      posts: {$filter: {
-        input: '$posts',
-        as: 'post',
-        cond: {$ne: ['$$post.text', null]}
-      }}
-    }}], function(error, result) {
-      if (error === null) {
-        if (result[0].posts.length > 0) {
-          for (var i = 0; i < result[0].posts.length; i++) {
-            if (result[0].posts[i].text !== null) {
-              var entry = JSON.stringify({
-                day: new Date(result[0].posts[i].date).getDate().toString(),
-                month: MONTH_NAMES_GER[new Date(result[0].posts[i].date).getMonth()],
-                message: result[0].posts[i].text
-              });
-
-              dataExists = true;
-
-              diaryEntry.push(JSON.parse(entry));
-            }
-          }
-          data.push(dataExists);
-          data.push(diaryEntry);
-        } else {
-          dataExists = false;
-          data.push(dataExists);
-        }
-        responseData.payload = data;
-        resolve(responseData);
-      } else {
-        console.log('Error: ' + JSON.stringify(error));
-        responseData.success = false;
-        reject(responseData);
-      }
-    });
-  });
-};
-/**
- * Function to store a post at the database.
- *
- * @param {Object} userCollection  Reference to the database collection based on the authentication type
- * @param {JSONObject} responseData Data object created during the request data validation containing the result.
- * @param {String} userId String to uniquely identify the user, to find the user at the database
- * @param {JSONObject} post JSON object containing the following values:
- *                    {Number} date A timestamp specifing the date of the post
- *                    {Number} mood A number specifing the mood of user
- *                    {String} emotion A String containing an emotion
- *                    {String} colour A HEX String of a color for the specified emotion
- *                    {String} text An optional text to describe the current mood
- * @return {Promise}                then: {JSONObject} promiseData Is a modified version of the responseData object
- *                                                 {Boolean} success  Flag to indicate the successful request
- *                                                 {JSONObject} payload
- *                                  catch: {JSONObject} error Is a modified version of the responseData object
- *                                                 {Boolean} success  Flag to indicate the unsuccessful request
- *                                                 {Number} errorCode  Enumeration to specify the error
- *                                                 {JSONObject} payload
- */
-user.createPost = function(userCollection, responseData, userId, post) {
-  return new Promise((resolve, reject) => {
-    var query = {
-      userId: userId
-    };
-    var update = {
-      $addToSet: {
-        posts: {
-          date: post.date,
-          mood: parseInt(post.mood, 10),
-          emotion: post.emotion,
-          colour: post.colour,
-          text: post.text
-        }
-      }
+    const userToRegister = {
+      'expiryDate': tokenService.getNewExpiryDate(validTimeOfTokenInMs),
+      'password': password,
+      'username': username,
+      'userId': uuidService.generateUUID(),
+      'authType': AUTH_TYPE.PASSWORD
     };
 
-    userCollection.update(query, update,
-    function(err, result) {
-      if (err === null && result.result.nModified === 1) {
-        console.log(result.result.nModified + ' record updated');
-        resolve(responseData);
-      } else {
+    database.collections.users.insertOne(userToRegister, function(err, result) {
+      let responseData = {
+        'success': false,
+        'payload': {}
+      };
+      if (err != null && err.code === MONGO_ERRCODE.DUPLICATEKEY) {
+        // error: duplicated key
+        responseData.payload.dataPath = 'username';
+        responseData.payload.message = 'Username already exists';
         responseData.success = false;
-        console.log('Inerting data failed ');
-        reject(responseData);
-      }
-    });
-  });
-};
-/**
- * Gets the current mood of the user by userId. Since the posts data is in german
- * A mapping has to be applied to get the english version of the mood. Therfore a second database request is initiated
- *
- * @param {Object} userCollection  Reference to the database collection based on the authentication type
- * @param  {Object} emotionDataCollection  Shall be the collection 'emotionData' containing the mapping of the emotion from german to english
- * @param {JSONObject} responseData Data object created during the request data validation containing the result.
- * @param {String} userId String to uniquely identify the user, to find the user at the database
- * @return {Promise}                then:  {JSONObject} promiseData Is a modified version of the responseData object
- *                                                 {Boolean} success  Flag to indicate the successful request
- *                                                 {JSONObject} payload
- *                                  catch: {JSONObject} error Is a modified version of the responseData object
- *                                                 {Boolean} success  Flag to indicate the unsuccessful request
- *                                                 {Number} errorCode  Enumeration to specify the error
- *                                                 {JSONObject} payload
- */
-user.getCurrentMood = function(userCollection, emotionDataCollection, responseData, userId) {
-  return new Promise((resolve, reject) => {
-    // Find the latest mood of the user
-    userCollection.aggregate([
-        {$match: {userId: userId}},
-        {$project: {'_id': 0, 'posts.date': 1, 'posts.emotion': 1}},
-        {$unwind: '$posts'},
-        {$sort: {'posts.date': -1}},
-        {$limit: 1}
-    ], function(error, result) {
-      if (error === null) {
-        responseData.payload.emotionDe = result[0].posts.emotion;
-        // Get mapping from DE to EN emotion
-        emotionDataCollection.findOne({name: result[0].posts.emotion}, function(error, result) {
-          if (error === null && result !== null) {
-            responseData.payload.emotion = result.nameEn;
-            resolve(responseData);
-          } else {
-            console.log('Error: ' + JSON.stringify(error));
-            responseData.success = false;
-            reject(responseData);
-          }
-        });
-      } else {
-        console.log('Error: ' + JSON.stringify(error));
-        responseData.success = false;
-        reject(responseData);
-      }
-    });
-  });
-};
-
-/**
- * Gets the emotion JSON documents at the database
- *
- * @param  {Object} collection   Shall be the collection 'emotionData'
- * @param {JSONObject} responseData Data object created during the request data validation containing the result.
- * @return {Promise}                then:  {JSONObject} promiseData Is a modified version of the responseData object
- *                                                {Boolean} success  Flag to indicate the successful request
- *                                                {JSONObject} payload
- *                                  catch: {JSONObject} error Is a modified version of the responseData object
- *                                                {Boolean} success  Flag to indicate the unsuccessful request
- *                                                {Number} errorCode  Enumeration to specify the error
- *                                                {JSONObject} payload
- */
-user.getEmotion = function(collection, responseData) {
-  return new Promise((resolve, reject) => {
-    collection.find({}).toArray(function(err, docs) {
-      if (err !== null) {
-        responseData.success = false;
-        responseData.errorCode = MONGO_DB_REQUEST_ERROR_CODE;
-        console.log('Error code: ' + MONGO_DB_REQUEST_ERROR_CODE);
+        winston.error('Registration failed. Duplicated key');
         reject(responseData);
       } else {
-        responseData.payload = docs;
+        // update successful
+        const toEncode = {
+          'userId': userToRegister.userId,
+          'expiryDate': userToRegister.expiryDate
+        };
+        responseData.payload = {
+          'accessToken': tokenService.generateAccessToken(toEncode),
+          'authType': AUTH_TYPE.PASSWORD
+        };
+        winston.debug('Registration successful');
         resolve(responseData);
       }
     });

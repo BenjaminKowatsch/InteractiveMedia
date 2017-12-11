@@ -16,6 +16,10 @@
       {
         "username": "maxi2",
         "password": "maxi2password"
+      },
+      {
+        "username": "alex2",
+        "password": "alex2password"
       }
     ],
     "invalid": {

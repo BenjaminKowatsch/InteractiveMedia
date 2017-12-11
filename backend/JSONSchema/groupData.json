@@ -1,6 +1,5 @@
 {
   "$schema": "http://json-schema.org/draft-04/schema#",
-  "id": "http://launometer.com/groupData.json",
   "type": "object",
   "properties": {
     "objectId": {
