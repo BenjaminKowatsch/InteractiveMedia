@@ -134,6 +134,8 @@
          * @param  {JSONObject} response Containing the valid accessToken for the session and an authentication type to be stored into a cookie
          */
         loginResponseHandler: function(response) {
+          console.log('loginResponseHandler');
+          console.log(response);
           this.checkServerResponse(response, payload =>{
             console.log('Correct'); // logs to console when the login data was correct with the database
             this.loginUser(payload); // response to the logged in user
@@ -156,10 +158,21 @@
               // sets the variables and defines them as the tiped in data
             };
             // Sending credentials to database
-            axios.post(Config.webServiceURL+'/launometer_login', credentials)
-
+            
+            //mocking!!!!!
+            this.loginResponseHandler({
+              "data":{
+                "success": true,
+                "payload": {
+                  "accessToken": "this_is_the_token_lol",
+                  "authType": 0
+                },
+              "status": 201
+              }
+            });
+            /* axios.post(Config.webServiceURL+'/v1/users/login?type=0', credentials)
             .then(this.loginResponseHandler)
-            .catch(this.defaultErrorHandler);
+            .catch(this.defaultErrorHandler); */
           } else {
             this.$f7.alert('Username oder Passwort darf nicht leer sein', 'Launometer');
           }
