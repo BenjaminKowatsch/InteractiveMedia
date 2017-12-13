@@ -100,10 +100,8 @@ exports.verifyGoogleAccessToken = function(token, verifyDatabase) {
 /**
  * Function to verify an own access token.
  *
- * @param {Object} userCollection  Reference to the database collection based on the authentication type
  * @param  {String} token    AccessToken to be verified
  * @return {Promise}                then: {JSONObject} promiseData Containing the following properties:
- *                                                 {Object} userCollection  Reference to the database collection based on the authentication type
  *                                                 {Date} expiryDate Date to indicate the expiration of the accessToken
  *                                                 {String} userId String to uniquely identify the user
  *                                  catch: {JSONObject} error Containing the following properties:
@@ -111,35 +109,30 @@ exports.verifyGoogleAccessToken = function(token, verifyDatabase) {
  *                                                OR
  *                                                MongoDB Error
  */
-exports.verifyPasswordAccessToken = function(userCollection, token) {
+exports.verifyPasswordAccessToken = function(token) {
   return new Promise((resolve, reject) => {
-    if (undefined === userCollection) {
-      winston.error('Error MONGO_DB_CONNECTION_ERROR_OBJECT');
-      reject(MONGO_DB_CONNECTION_ERROR_OBJECT);
-    } else {
-      var payload = jwt.decode(token, config.jwtSimpleSecret);
-      var query = {
-        userId: payload.userId,
-        authType: AUTH_TYPE.PASSWORD,
-        expiryDate: {
-          '$gt': new Date()
-        }
-      };
-      var options = {fields: {userId: 1, expiryDate: 1}};
-      userCollection.findOne(query, options, function(error, result) {
-        if (error === null && result !== null) {
-          var promiseData = {
-            //  userCollection: userCollection,
-            expiryDate: result.expiryDate,
-            userId: result.userId
-          };
-          resolve(promiseData);
-        } else {
-          winston.error('Error MONGO_DB_INTERNAL_ERROR');
-          reject(error);
-        }
-      });
-    }
+    var payload = tokenService.decodeToken(token);
+    var query = {
+      userId: payload.userId,
+      authType: AUTH_TYPE.PASSWORD,
+      expiryDate: {
+        '$gt': new Date()
+      }
+    };
+    var options = {fields: {userId: 1, expiryDate: 1}};
+    database.collections.users.findOne(query, options, function(error, result) {
+      if (error === null && result !== null) {
+        var promiseData = {
+          //  userCollection: userCollection,
+          expiryDate: result.expiryDate,
+          userId: result.userId
+        };
+        resolve(promiseData);
+      } else {
+        winston.error('Error MONGO_DB_INTERNAL_ERROR');
+        reject(error);
+      }
+    });
   });
 };
 

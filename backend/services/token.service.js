@@ -22,3 +22,7 @@ exports.getNewExpiryDate = function(validTime, startDate) {
 exports.generateAccessToken = function(toEncode) {
     return jwt.encode(toEncode, config.jwtSimpleSecret);
   };
+
+exports.decodeToken = function(token) {
+  return jwt.decode(token, config.jwtSimpleSecret);
+};
