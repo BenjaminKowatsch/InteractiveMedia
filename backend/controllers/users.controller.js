@@ -1,7 +1,6 @@
 var winston = require('winston');
 
 var user = require('../modules/user');
-var database = require('../modules/database');
 
 const validateJsonService = require('../services/validateJson.service');
 var httpResonseService = require('../services/httpResonse.service');
@@ -88,23 +87,23 @@ exports.login = function(req, res) {
       let validationResult = validateJsonService.validateAgainstSchema(req.body, jsonSchema.googleFacebookLogin);
 
       if (validationResult.valid === true) {
-        user.verifyGoogleAccessToken(database.collections.users, req.body.accessToken, false)
-      .then(function(tokenValidationResult) {
-          winston.debug('GoogleAccessToken: is valid');
-          return user.googleOrFacebookLogin(database.collections.users, {}, tokenValidationResult.userId,
-                           tokenValidationResult.expiryDate, user.AUTH_TYPE.GOOGLE, req.body.accessToken,
-                           tokenValidationResult.email);
-        })
-      .then(function(loginResult) {
-          // mongo update was successful
-          resBody = {'success': true, 'payload': loginResult.payload};
-          httpResonseService.sendHttpResponse(res, 201, resBody);
-        })
-      .catch(function(loginErrorResult) {
-          // mongo update was successful
-          resBody = {'success': true, 'payload': loginErrorResult};
-          httpResonseService.sendHttpResponse(res, 201, resBody);
-        });
+        user.verifyGoogleAccessToken(req.body.accessToken, false)
+          .then(function(tokenValidationResult) {
+              winston.debug('GoogleAccessToken: is valid');
+              return user.googleOrFacebookLogin(tokenValidationResult.userId,
+                              tokenValidationResult.expiryDate, user.AUTH_TYPE.GOOGLE, req.body.accessToken,
+                              tokenValidationResult.email);
+            })
+          .then(function(loginResult) {
+              // mongo update was successful
+              resBody = {'success': true, 'payload': loginResult};
+              httpResonseService.sendHttpResponse(res, 200, resBody);
+            })
+          .catch(function(loginErrorResult) {
+              // mongo update failed
+              resBody = {'success': false, 'payload': loginErrorResult};
+              httpResonseService.sendHttpResponse(res, 401, resBody);
+            });
       } else {
         // request body is invalid
         resBody = {'success': false, 'payload': validationResult.error};
@@ -118,23 +117,24 @@ exports.login = function(req, res) {
       let validationResult = validateJsonService.validateAgainstSchema(req.body, jsonSchema.googleFacebookLogin);
 
       if (validationResult.valid === true) {
-        user.verifyFacebookAccessToken(database.collections.users, req.body.accessToken, false, true)
-      .then(function(tokenValidationResult) {
-          winston.debug('FacebookAccessToken: is valid');
-          return user.googleOrFacebookLogin(database.collections.users, {}, tokenValidationResult.userId,
-                           tokenValidationResult.expiryDate, user.AUTH_TYPE.FACEBOOK, req.body.accessToken,
-                           tokenValidationResult.email);
-        })
-      .then(function(loginResult) {
-          // mongo update was successful
-          resBody = {'success': true, 'payload': loginResult.payload};
-          httpResonseService.sendHttpResponse(res, 201, resBody);
-        })
-      .catch(function(loginErrorResult) {
-          // mongo update was successful
-          resBody = {'success': true, 'payload': loginErrorResult};
-          httpResonseService.sendHttpResponse(res, 201, resBody);
-        });
+        user.verifyFacebookAccessToken(req.body.accessToken, false, true)
+          .then(function(tokenValidationResult) {
+              winston.debug('FacebookAccessToken: is valid');
+              return user.googleOrFacebookLogin(tokenValidationResult.userId,
+                              tokenValidationResult.expiryDate, user.AUTH_TYPE.FACEBOOK, req.body.accessToken,
+                              tokenValidationResult.email);
+            })
+          .then(function(loginResult) {
+              // mongo update was successful
+              resBody = {'success': true, 'payload': loginResult};
+              httpResonseService.sendHttpResponse(res, 200, resBody);
+            })
+          .catch(function(loginErrorResult) {
+              // mongo update failed
+              winston.info('loginErrorResult', loginErrorResult);
+              resBody = {'success': false, 'payload': loginErrorResult};
+              httpResonseService.sendHttpResponse(res, 401, resBody);
+            });
       } else {
         // request body is invalid
         resBody = {'success': false, 'payload': validationResult.error};

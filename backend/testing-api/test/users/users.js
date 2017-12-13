@@ -60,11 +60,13 @@ describe('Auth-Type: Facebook', function() {
           .post(baseUrl + '/login?type=2')
           .send({'accessToken': facebookToken})
           .then(res => {
-            expect(res).to.have.status(201);
+            expect(res).to.have.status(200);
             expect(res).to.be.json;
             expect(res.body).to.be.an('object');
             expect(res.body.success).to.be.true;
             expect(res.body.payload).to.be.an('object');
+            expect(res.body.payload.authType).to.be.equal(2);
+            expect(res.body.payload.accessToken).to.have.lengthOf.above(1);
           });
   });
 
@@ -115,11 +117,53 @@ describe('Auth-Type: Facebook', function() {
           .post(baseUrl + '/login?type=2')
           .send({'accessToken': facebookToken})
           .then(res => {
-            expect(res).to.have.status(201);
+            expect(res).to.have.status(200);
             expect(res).to.be.json;
             expect(res.body).to.be.an('object');
             expect(res.body.success).to.be.true;
             expect(res.body.payload).to.be.an('object');
+          });
+  });
+
+  it.skip('should fail to login with invalid token', function() {
+    return chai.request(host)
+          .post(baseUrl + '/login?type=2')
+          .send({'accessToken': 'XXXXX'})
+          .then(res => {
+            expect(res).to.have.status(401);
+            expect(res).to.be.json;
+            expect(res.body).to.be.an('object');
+            expect(res.body.success).to.be.false;
+            expect(res.body.payload.dataPath).to.equal('login');
+            expect(res.body.payload.message).to.equal('login failed');
+          });
+  });
+
+  it('should fail to login with empty token', function() {
+    return chai.request(host)
+          .post(baseUrl + '/login?type=2')
+          .send({'accessToken': ''})
+          .then(res => {
+            expect(res).to.have.status(400);
+            expect(res).to.be.json;
+            expect(res.body).to.be.an('object');
+            expect(res.body.success).to.be.false;
+            expect(res.body.payload).to.be.an('object');
+            expect(res.body.payload.dataPath).to.equal('accessToken');
+          });
+  });
+
+  it('should fail to login with no body', function() {
+    return chai.request(host)
+          .post(baseUrl + '/login?type=2')
+          .send({})
+          .then(res => {
+            expect(res).to.have.status(400);
+            expect(res).to.be.json;
+            expect(res.body).to.be.an('object');
+            expect(res.body.success).to.be.false;
+            expect(res.body.payload).to.be.an('object');
+            expect(res.body.payload.message).to.be.equal('empty input');
           });
   });
 });

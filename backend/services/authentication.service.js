@@ -62,11 +62,11 @@ function verifyAccessToken(token, authType) {
     case user.AUTH_TYPE.GOOGLE:
       winston.debug('Verifing Google access token');
       // Verify google access token
-      return user.verifyGoogleAccessToken(database.collections.users, token, true);
+      return user.verifyGoogleAccessToken(token, true);
     case user.AUTH_TYPE.FACEBOOK:
       winston.debug('Verifing Facebook access token');
       // Verify facebook access token
-      return user.verifyFacebookAccessToken(database.collections.users, token, true, false);
+      return user.verifyFacebookAccessToken(token, true, false);
     default:
       winston.error('Unknown authType');
       return Promise.reject('Unknown authType');

@@ -17,7 +17,7 @@ router.post('/', usersController.registerNewUser);
  * @apiParam (type) {string} type Login type with type=(0: Password, 1:Google, 2: Facebook)
  * @apiParam (password) {string} username Username
  * @apiParam (password) {string} password Hash of a password
- * @apiParam (facebook) {string} TODO TODO
+ * @apiParam (facebook) {string} accessToken Access token requested from by Facebook after successful login
  * @apiParam (google) {string} TODO TODO
  *
  * @apiSuccess (Success) {string} success Request successful
@@ -38,8 +38,7 @@ router.post('/', usersController.registerNewUser);
     }
  * @apiParamExample  {type} Facebook
     {
-     "TODO" : "TODO",
-     "TODO" : "TODO"
+     "accessToken" : "DeUBZBpAr9KCBZB3knwe1eGvcur"
     }
  * @apiParamExample  {type} Google
     {
