@@ -35,4 +35,16 @@ describe('Test service "validateJson"', function() {
     expect(result).to.be.an('object');
     expect(result.valid).to.be.false;
   });
+
+  it('should return false for null input', function() {
+    var result = validateJsonService.validateAgainstSchema(null, jsonSchema.userData);
+    expect(result).to.be.an('object');
+    expect(result.valid).to.be.false;
+  });
+
+  it('should return false for empty input', function() {
+    var result = validateJsonService.validateAgainstSchema({}, jsonSchema.userData);
+    expect(result).to.be.an('object');
+    expect(result.valid).to.be.false;
+  });
 });
