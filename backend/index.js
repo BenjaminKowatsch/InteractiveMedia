@@ -72,6 +72,30 @@ app.use('/v1/version', versionRoutes);
 app.use('/v1/groups', groupRoutes);
 app.use('/v1/status', statusRoutes);
 
+// error handling: unknown routes
+// this has to be last route to be added, otherwise it will not work
+app.all('*', function(req, res, next) {
+  var err = new Error();
+  err.status = 404;
+  next(err);
+});
+
+app.use(function(err, req, res, next) {
+  if (err.status !== 404) {
+    return next();
+  }
+  const dataPath = req.method + ' ' + req.url;
+  const notFoundResponse = {
+    'success': false,
+    'payload': {
+      'message': 'Not found',
+      'dataPath': dataPath
+    }
+  };
+  winston.error('Endpoint not found:' + dataPath);
+  res.status(404).send(notFoundResponse);
+});
+
 function startServer() {
   // Starts the http server and prints out the host and the port
   server = app.listen(config.port, function() {
