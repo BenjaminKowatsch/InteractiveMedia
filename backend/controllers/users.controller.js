@@ -144,7 +144,12 @@ exports.login = function(req, res) {
     }
     default: {
       // invalid login type
-      resBody = {'success': false, 'payload': 'invalid login type'};
+      resBody = {
+        'success': false,
+        'payload': {
+          'dataPath': 'authType',
+          'message': 'invalid auth type'
+        }};
       httpResonseService.sendHttpResponse(res, 400, resBody);
       break;
     }

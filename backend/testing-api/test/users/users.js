@@ -371,3 +371,39 @@ describe('Auth-Type: Password', function() {
     });
   });
 });
+
+describe('Invalid Auth-Type', function() {
+  it('should fail with an invalid auth type', function() {
+    return chai.request(host)
+            .post(baseUrl + '/login?type=99')
+            .send({username: testData.users.valid[1].username,
+              email: testData.users.valid[1].email,
+              password: testData.users.valid[1].password})
+            .then(res => {
+              expect(res).to.have.status(400);
+              expect(res).to.be.json;
+              expect(res.body).to.be.an('object');
+              expect(res.body.success).to.be.false;
+              expect(res.body.payload).to.be.an('object');
+              expect(res.body.payload.dataPath).to.equal('authType');
+              expect(res.body.payload.message).to.equal('invalid auth type');
+            });
+  });
+
+  it('should fail with no auth type', function() {
+    return chai.request(host)
+            .post(baseUrl + '/login')
+            .send({username: testData.users.valid[1].username,
+              email: testData.users.valid[1].email,
+              password: testData.users.valid[1].password})
+            .then(res => {
+              expect(res).to.have.status(400);
+              expect(res).to.be.json;
+              expect(res.body).to.be.an('object');
+              expect(res.body.success).to.be.false;
+              expect(res.body.payload).to.be.an('object');
+              expect(res.body.payload.dataPath).to.equal('authType');
+              expect(res.body.payload.message).to.equal('invalid auth type');
+            });
+  });
+});

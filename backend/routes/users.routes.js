@@ -27,7 +27,8 @@ router.post('/', usersController.registerNewUser);
  * @apiError (Error) {string} success Request failed
  * @apiError (Error) {string} payload.dataPath Describe the error location
  * @apiError (Error) {string} payload.message Specify the error
- * @apiError (Error400) {String}  BadRequest Request is malformed
+ * @apiError (Error400) {String}  BadRequest Missing or malformed credentials
+ * @apiError (Error400) {String}  BadRequest Missing or unknown type parameter
  * @apiError (Error401) {String}  Unauthorized Credentials are invalid
  *
  * @apiParamExample  {type} Password
