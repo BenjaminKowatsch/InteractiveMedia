@@ -209,20 +209,105 @@ describe('Auth-Type: Password', function() {
         });
     });
 
-    it('should login as default user', function() {
+    it('should login as registered user', function() {
       return chai.request(host)
               .post(baseUrl + '/login?type=0')
               .send({username: testData.users.valid[1].username,
                 email: testData.users.valid[1].email,
                 password: testData.users.valid[1].password})
               .then(res => {
-                expect(res).to.have.status(201);
+                expect(res).to.have.status(200);
                 expect(res).to.be.json;
                 expect(res.body).to.be.an('object');
                 expect(res.body.success).to.be.true;
                 expect(res.body.payload).to.be.an('object');
+                expect(res.body.payload.authType).to.equal(0);
+                expect(res.body.payload.accessToken).to.have.lengthOf(84);
               });
     });
+
+    it('should fail to login with invalid password', function() {
+      return chai.request(host)
+              .post(baseUrl + '/login?type=0')
+              .send({username: testData.users.valid[1].username,
+                email: testData.users.valid[1].email,
+                password: 'XXXXX'})
+              .then(res => {
+                expect(res).to.have.status(401);
+                expect(res).to.be.json;
+                expect(res.body).to.be.an('object');
+                expect(res.body.success).to.be.false;
+                expect(res.body.payload).to.be.an('object');
+                expect(res.body.payload.dataPath).to.equal('login');
+                expect(res.body.payload.message).to.equal('login failed');
+              });
+    });
+
+    it('should fail to login with empty password', function() {
+      return chai.request(host)
+              .post(baseUrl + '/login?type=0')
+              .send({username: testData.users.valid[1].username,
+                email: testData.users.valid[1].email,
+                password: ''})
+              .then(res => {
+                expect(res).to.have.status(400);
+                expect(res).to.be.json;
+                expect(res.body).to.be.an('object');
+                expect(res.body.success).to.be.false;
+                expect(res.body.payload).to.be.an('object');
+                expect(res.body.payload.dataPath).to.equal('password');
+              });
+    });
+
+    it('should fail to login with no password', function() {
+      return chai.request(host)
+              .post(baseUrl + '/login?type=0')
+              .send({username: testData.users.valid[1].username,
+                email: testData.users.valid[1].email})
+              .then(res => {
+                expect(res).to.have.status(401);
+                expect(res).to.be.json;
+                expect(res.body).to.be.an('object');
+                expect(res.body.success).to.be.false;
+                expect(res.body.payload).to.be.an('object');
+                expect(res.body.payload.dataPath).to.equal('login');
+                expect(res.body.payload.message).to.equal('login failed');
+              });
+    });
+
+    it('should fail to login with no username', function() {
+      return chai.request(host)
+              .post(baseUrl + '/login?type=0')
+              .send({email: testData.users.valid[1].email,
+                password: testData.users.valid[2].password})
+              .then(res => {
+                expect(res).to.have.status(401);
+                expect(res).to.be.json;
+                expect(res.body).to.be.an('object');
+                expect(res.body.success).to.be.false;
+                expect(res.body.payload).to.be.an('object');
+                expect(res.body.payload.dataPath).to.equal('login');
+                expect(res.body.payload.message).to.equal('login failed');
+              });
+    });
+
+    it('should fail to login with unknown username', function() {
+      return chai.request(host)
+              .post(baseUrl + '/login?type=0')
+              .send({username: 'unknownUsername',
+                email: 'unknownEmail@example.de',
+                password: 'passwordX'})
+              .then(res => {
+                expect(res).to.have.status(401);
+                expect(res).to.be.json;
+                expect(res.body).to.be.an('object');
+                expect(res.body.success).to.be.false;
+                expect(res.body.payload).to.be.an('object');
+                expect(res.body.payload.dataPath).to.equal('login');
+                expect(res.body.payload.message).to.equal('login failed');
+              });
+    });
+
   });
 
   describe('Logout', function() {
@@ -277,7 +362,7 @@ describe('Auth-Type: Password', function() {
                 email: testData.users.valid[4].email,
                 password: testData.users.valid[4].password})
               .then(res => {
-                expect(res).to.have.status(201);
+                expect(res).to.have.status(200);
                 expect(res).to.be.json;
                 expect(res.body).to.be.an('object');
                 expect(res.body.success).to.be.true;

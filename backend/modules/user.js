@@ -336,64 +336,55 @@ exports.googleOrFacebookLogin = function(userCollection,
 /**
  * Function to login a user with password.
  *
- * @param {Object} userCollection  Reference to the database collection based on the authentication type
- * @param {JSONObject} responseData Data object created during the request data validation containing the result.
- *                                  Will be used to save the result from this login function.
  * @param  {String} username       The name of the user
  * @param  {String} password       The password of the user
- * @return {Promise}                then: {JSONObject} promiseData Is a modified version of the responseData object
- *                                                 {Boolean} success  Flag to indicate the successful request
- *                                                 {JSONObject} payload
- *                                  catch:  {JSONObject} error Is a modified version of the responseData object
- *                                                 {Boolean} success  Flag to indicate the unsuccessful request
- *                                                 {JSONObject} payload
+ * @return {Promise}                then:  {JSONObject} object containing access token and auth type
+ *                                  catch:  {JSONObject} object containing an error message
  */
-exports.passwordLogin = function(userCollection, responseData, username, password) {
+exports.passwordLogin = function(username, password) {
   return new Promise((resolve, reject) => {
-    if (undefined === userCollection) {
-      responseData.success = false;
-      responseData.errorCode = MONGO_DB_CONNECTION_ERROR_CODE;
-      winston.debug('Error code: ' + MONGO_DB_CONNECTION_ERROR_CODE);
-      reject(responseData);
-    } else {
-      var newExpiryDate = tokenService.getNewExpiryDate(validTimeOfTokenInMs);
-      var query = {
-        'username': username,
-        'password': password
-      };
-      var update = {
-        '$set': {
-          'expiryDate': newExpiryDate
-        }
-      };
-      var options = {
-        projection: {
-          userId: 1,
-          expiryDate: 1
-        },
-        returnOriginal: false
-      };
+    const newExpiryDate = tokenService.getNewExpiryDate(validTimeOfTokenInMs);
+    const query = {
+      'username': username,
+      'password': password
+    };
+    const update = {
+      '$set': {
+        'expiryDate': newExpiryDate
+      }
+    };
+    const options = {
+      projection: {
+        userId: 1,
+        expiryDate: 1
+      },
+      returnOriginal: false
+    };
 
-      userCollection.findOneAndUpdate(query, update, options, function(err, result) {
-        if (err === null && result.value !== null && result.ok === 1) {
-          responseData.payload = {};
-          winston.debug(result.value);
-          // Successfully logged in and created new expiry date
-          // Generate Access Token
-          // Remove the database id from the json object
-          delete result.value._id;
-          responseData.payload.authType = AUTH_TYPE.PASSWORD;
-          responseData.payload.accessToken = jwt.encode(result.value, config.jwtSimpleSecret);
-          winston.debug('Login successful ');
-          resolve(responseData);
-        } else {
-          // Error handling
-          responseData.success = false;
-          winston.debug('Login failed ');
-          resolve(responseData);
-        }
-      });
-    }
+    database.collections.users.findOneAndUpdate(query, update, options, function(err, result) {
+      let responseData = {};
+      if (err === null && result.value !== null && result.ok === 1) {
+        // Successfully logged in and created new expiry date
+        const toEncode = {
+          'userId': result.userId,
+          'expiryDate': result.expiryDate
+        };
+        responseData = {
+          'accessToken': tokenService.generateAccessToken(toEncode),
+          'authType': AUTH_TYPE.PASSWORD
+        };
+        winston.debug('Login successful');
+        resolve(responseData);
+      } else {
+        // Error handling
+        winston.debug('Login failed');
+        responseData = {
+          'dataPath': 'login',
+          'message': 'login failed'
+        };
+        reject(responseData);
+      }
+    });
   });
 };
 /**
