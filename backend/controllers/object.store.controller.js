@@ -1,6 +1,7 @@
 var winston = require('winston');
 var config = require('../modules/config');
 var Minio = require('minio');
+const httpResonseService = require('../services/httpResonse.service');
 
 var minioClient = new Minio.Client({
   endPoint: config.minioEndpoint,
@@ -34,11 +35,18 @@ exports.upload = function(req, res) {
   winston.debug('storing file: ' + req.file.originalname + ' at bucket: ' + config.minioBucketName);
 
   minioClient.putObject(config.minioBucketName, req.file.originalname, req.file.buffer, function(error, etag) {
-    winston.debug('minio putObject callback');
     if (error) {
-      return winston.error(error);
+      const errorResponse = {
+        'success': false,
+        'payload': {
+          'dataPath': 'storeObject',
+          'message': 'store object failed'
+        }
+      };
+      httpResonseService.sendHttpResponse(res, 500, errorResponse);
+    } else {
+      httpResonseService.sendHttpResponse(res, 201, {'success': true});
     }
-    res.send(req.file);
   });
 };
 
@@ -47,8 +55,16 @@ exports.download = function(req, res) {
 
   minioClient.getObject(config.minioBucketName, req.query.filename, function(error, stream) {
     if (error) {
-      return res.status(500).send(error);
+      const errorResponse = {
+        'success': false,
+        'payload': {
+          'dataPath': 'getObject',
+          'message': 'failed to get object'
+        }
+      };
+      httpResonseService.sendHttpResponse(res, 500, errorResponse);
+    } else {
+      stream.pipe(res);
     }
-    stream.pipe(res);
   });
 };
