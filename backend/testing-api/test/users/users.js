@@ -15,7 +15,7 @@ var config = {
   'facebookAppId': process.env.FACEBOOK_APP_ID
 };
 
-const testData = require('../data/users');
+const testData = require('../data/user.data');
 
 function getFacebookTestAccessToken() {
   return new Promise((resolve, reject) => {

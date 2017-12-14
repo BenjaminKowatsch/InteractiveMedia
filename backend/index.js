@@ -86,42 +86,9 @@ function startServer() {
  * ===================
  */
 database.tryConnect(config.mongodbURL, function() {
-  var createIndexCallback = function(err, indexname) {
-    if (err === null) {
-      winston.debug('Created index + ' + indexname);
-    } else {
-      winston.debug('Creation of index + ' + indexname + ' failed');
-    }
-  };
-  database.collections.users.createIndex({
-    email: 1
-  }, {
-    unique: true
-  }, createIndexCallback);
-
-  database.collections.users.createIndex({
-    username: 1,
-    password: 1
-  }, {
-    unique: true,
-    partialFilterExpression: {
-      username: {
-        '$exists': true
-      },
-      password: {
-        '$exists': true
-      }
-    }
-  }, createIndexCallback);
-
-  database.collections.users.createIndex({
-    userId: 1,
-    loginType: 1
-  }, {
-    unique: true
-  }, createIndexCallback);
 
   startServer();
+
 }, function() {
   winston.error('Not connected to database after maxRetries reached.');
 });

@@ -1,9 +1,11 @@
-var group = module.exports = {};
+'use strict';
+const group = module.exports = {};
 
-var winston = require('winston');
+const winston = require('winston');
 /* Application configuration */
-var config = require('./config');
-var uuidService = require('../services/uuid.service');
+const config = require('./config');
+const uuidService = require('../services/uuid.service');
+const database = require('../modules/database');
 
 var MONGO_DB_CONNECTION_ERROR_CODE = 10;
 var MONGO_DB_REQUEST_ERROR_CODE = 9;
@@ -12,46 +14,40 @@ var MONGO_DB_CONNECTION_ERROR_OBJECT = {'errorCode': MONGO_DB_CONNECTION_ERROR_C
 /**
  * [description]
  *
- * @param  {Object} groupCollection reference to the database collection
  * @param  {JSONObject} groupData   group to be inserted into the database
  *                                  {String} 'name'
  *                                  {String} 'imageUrl'
- *                                  {JSONArray} 'users' consisting of userId Strings
- *                                  {JSONArray} 'transactions' consisting of transaction JSONObjects
- * @return {[type]}                 [description]
+ *                                  {JSONArray} 'users' consisting of userEmail Strings
+ * @return {Promise}                 [description]
  */
-group.createNewGroup = function(groupCollection, groupData) {
+group.createNewGroup = function(groupData) {
+  winston.info('Hello from createNewGroup');
   return new Promise((resolve, reject) => {
     var responseData = {};
-    groupData.objectId = uuidService.generateUUID();
+    groupData.groupId = uuidService.generateUUID();
     groupData.createdAt = new Date();
 
-    groupCollection.insert(groupData, function(err, result) {
-      responseData.payload = {};
-      if (err != null) {
-        responseData.payload.message = 'Error: ' + err;
-        responseData.success = false;
-
-        winston.debug('Creating a new group failed ');
-        reject(responseData);
-      } else {
-        responseData.payload = groupData;
-        responseData.success = true;
-
-        delete responseData.payload._id;
-
-        winston.debug('Creating a new group successful');
-        resolve(responseData);
-      }
+    responseData.payload = {};
+    database.collections.groups.insertOne(groupData).then(result => {
+      responseData.payload = groupData;
+      delete responseData.payload._id;
+      responseData.success = true;
+      winston.debug('Creating a new group successful');
+      resolve(responseData);
+    }).catch(err => {
+      responseData.payload.message = 'Error: ' + err;
+      responseData.success = false;
+      winston.debug('Creating a new group failed ');
+      reject(responseData);
     });
   });
 };
 
-group.verifyGroupContainsUser = function(groupCollection, groupId, userId) {
+group.verifyGroupContainsUser = function(userId, groupId) {
   return new Promise((resolve, reject) => {
     let query = {objectId: groupId};
     let options = {fields: {objectId: true, users: true}};
-    groupCollection.findOne(query, options, function(error, result) {
+    database.collections.groups.findOne(query, options, function(error, result) {
       if (error === null && result !== null) {
         let promiseData = {
           groupId: result.objectId,
@@ -69,3 +65,4 @@ group.verifyGroupContainsUser = function(groupCollection, groupId, userId) {
     });
   });
 };
+
