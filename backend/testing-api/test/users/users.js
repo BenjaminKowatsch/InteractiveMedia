@@ -125,7 +125,7 @@ describe('Auth-Type: Facebook', function() {
           });
   });
 
-  it.skip('should fail to login with invalid token', function() {
+  it('should fail to login with invalid token', function() {
     return chai.request(host)
           .post(baseUrl + '/login?type=2')
           .send({'accessToken': 'XXXXX'})

@@ -242,9 +242,7 @@ exports.verifyFacebookAccessToken = function(token, verifyDatabase, verifyEmail)
           'dataPath': 'login',
           'message': 'login failed'
         };
-
-        // TODO: abort due to invalid token
-
+        return Promise.reject(errorResponse);
       }
 
       const expiryDate = new Date(data.data.expires_at * 1000);
