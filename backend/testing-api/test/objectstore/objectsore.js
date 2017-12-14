@@ -9,7 +9,7 @@ chai.use(require('chai-http'));
 var host = 'http://backend:8081';
 var baseUrl = '/v1/object-store';
 
-describe.only('Object-store', function() {
+describe('Object-store', function() {
 
   describe('Upload image', function() {
     var imageData;
