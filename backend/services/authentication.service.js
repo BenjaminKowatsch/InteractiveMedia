@@ -4,7 +4,6 @@ var router = express.Router();
 var winston = require('winston');
 
 var user = require('../modules/user');
-var database = require('../modules/database');
 var validateJsonService = require('./validateJson.service');
 var httpResonseService = require('./httpResonse.service');
 
@@ -48,7 +47,6 @@ exports.isAuthenticated = function(req, res, next) {
  * @param  {String} token    AccessToken to be verified
  * @param  {user.AUTH_TYPE} authType Authentication type specifing whether the user belongs to google, facebook or password authentication
  * @return {Promise}          then: {JSONObject} promiseData JSON object containing the following properties:
- *                                                 {Object} userCollection  Reference to the database collection based on the authentication type
  *                                                 {Date} expiryDate Date to indicate the expiration of the accessToken
  *                                                 {String} userId String to uniquely identify the user
  *                            catch: {JSONObject} error JSON object containing the following properties:
@@ -58,15 +56,15 @@ function verifyAccessToken(token, authType) {
     case user.AUTH_TYPE.PASSWORD:
       winston.debug('Verifing Password access token');
       // Verify password access token
-      return user.verifyPasswordAccessToken(database.collections.users, token);
+      return user.verifyPasswordAccessToken(token);
     case user.AUTH_TYPE.GOOGLE:
       winston.debug('Verifing Google access token');
       // Verify google access token
-      return user.verifyGoogleAccessToken(database.collections.users, token, true);
+      return user.verifyGoogleAccessToken(token, true);
     case user.AUTH_TYPE.FACEBOOK:
       winston.debug('Verifing Facebook access token');
       // Verify facebook access token
-      return user.verifyFacebookAccessToken(database.collections.users, token, true, false);
+      return user.verifyFacebookAccessToken(token, true, false);
     default:
       winston.error('Unknown authType');
       return Promise.reject('Unknown authType');
