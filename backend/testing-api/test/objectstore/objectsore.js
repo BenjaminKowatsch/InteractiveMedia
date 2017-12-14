@@ -20,12 +20,12 @@ describe.only('Object-store', function() {
 
     it('should upload a new image', function() {
       return chai.request(host)
-              .post(baseUrl + '/upload?filename=image.png')
-              .attach('uploadField', imageData, 'image.png')
-              .then(res => {
-                expect(res).to.have.status(201);
-                expect(res.body.success).to.be.true;
-              });
+        .post(baseUrl + '/upload?filename=image.png')
+        .attach('uploadField', imageData, 'image.png')
+        .then(res => {
+          expect(res).to.have.status(201);
+          expect(res.body.success).to.be.true;
+        });
     });
 
   });
@@ -33,24 +33,24 @@ describe.only('Object-store', function() {
   describe('Download image', function() {
       it('should download an existing image', function() {
         return chai.request(host)
-                .get(baseUrl + '/download?filename=image.png')
-                .then(res => {
-                  expect(res).to.have.status(200);
-                });
+          .get(baseUrl + '/download?filename=image.png')
+          .then(res => {
+            expect(res).to.have.status(200);
+          });
       });
 
       it('should fail to download a missing image', function() {
         return chai.request(host)
-                .get(baseUrl + '/download?filename=missingimage.png')
-                .then(res => {
-                  expect(res).to.have.status(500);
-                  expect(res).to.be.json;
-                  expect(res.body).to.be.an('object');
-                  expect(res.body.success).to.be.false;
-                  expect(res.body.payload).to.be.an('object');
-                  expect(res.body.payload.dataPath).to.equal('getObject');
-                  expect(res.body.payload.message).to.equal('failed to get object');
-                });
+          .get(baseUrl + '/download?filename=missingimage.png')
+          .then(res => {
+            expect(res).to.have.status(500);
+            expect(res).to.be.json;
+            expect(res.body).to.be.an('object');
+            expect(res.body.success).to.be.false;
+            expect(res.body.payload).to.be.an('object');
+            expect(res.body.payload.dataPath).to.equal('getObject');
+            expect(res.body.payload.message).to.equal('failed to get object');
+          });
       });
     });
 });
