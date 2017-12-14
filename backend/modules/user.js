@@ -12,10 +12,6 @@ const database = require('../modules/database');
 const MONGO_ERRCODE = {
   'DUPLICATEKEY': 11000
 };
-const MONGO_DB_CONNECTION_ERROR_CODE = 10;
-const MONGO_DB_REQUEST_ERROR_CODE = 9;
-
-const MONGO_DB_CONNECTION_ERROR_OBJECT = {'errorCode': MONGO_DB_CONNECTION_ERROR_CODE};
 
 const AUTH_TYPE = {
   'PASSWORD': 0,
