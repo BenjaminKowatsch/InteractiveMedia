@@ -20,10 +20,11 @@ var MONGO_DB_CONNECTION_ERROR_OBJECT = {'errorCode': MONGO_DB_CONNECTION_ERROR_C
  *                                  {JSONArray} 'users' consisting of userEmail Strings
  * @return {Promise}                 [description]
  */
-group.createNewGroup = function(groupData) {
-  winston.info('Hello from createNewGroup');
+group.createNewGroup = function(requestBody) {
   return new Promise((resolve, reject) => {
-    var responseData = {};
+    winston.debug('Hello from createNewGroup');
+    let responseData = {};
+    let groupData = requestBody.payload;
     groupData.groupId = uuidService.generateUUID();
     groupData.createdAt = new Date();
 
@@ -32,12 +33,14 @@ group.createNewGroup = function(groupData) {
       responseData.payload = groupData;
       delete responseData.payload._id;
       responseData.success = true;
+      responseData.statusCode = 201;
       winston.debug('Creating a new group successful');
       resolve(responseData);
     }).catch(err => {
       responseData.payload.message = 'Error: ' + err;
       responseData.success = false;
-      winston.debug('Creating a new group failed ');
+      responseData.statusCode = 400;
+      winston.error('Creating a new group failed ');
       reject(responseData);
     });
   });

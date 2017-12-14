@@ -9,7 +9,7 @@
   "license": "ISC",
   "dependencies": {
     "chai": "^4.0.2",
-    "chai-http": "^3.0.0",
+    "chai-http": "git+https://github.com/chaijs/chai-http.git#3ea4524",
     "mocha": "^3.4.2",
     "winston": "^2.4.0",
     "mongodb": "^2.2.25"

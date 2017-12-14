@@ -15,5 +15,9 @@
       "type": "object"
     }
   },
+  "required": [
+    "accessToken",
+    "authType"
+  ],
   "additionalProperties": false
 }

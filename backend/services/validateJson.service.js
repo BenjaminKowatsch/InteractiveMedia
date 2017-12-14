@@ -49,3 +49,34 @@ exports.validateAgainstSchema = function(inputData, jsonSchema) {
   }
   return returnValue;
 };
+
+exports.againstSchema = function(inputData, jsonSchema) {
+  // Validate the received json data from the request with the predefined json schema
+  return new Promise((resolve,reject) => {
+    var validationResult = tv4.validate(inputData, jsonSchema);
+    var returnValue = {
+      isValidationResult: true
+    };
+    if (validationResult === true) {
+      // validation was successful
+      winston.debug('Success: json is valid');
+      returnValue.valid = true;
+      resolve(returnValue);
+    } else {
+      // validation failed
+      var refinedErrorObj = {
+        dataPath: tv4.error.dataPath.replace('/', ''),
+        message: tv4.error.message
+      };
+      winston.debug('Error: validation failed', refinedErrorObj);
+      returnValue.valid = false;
+      returnValue.success = false;
+      returnValue.error = refinedErrorObj;
+      returnValue.payload = {
+        'dataPath': 'validation',
+        'message': 'Invalide body'
+      };
+      reject(returnValue);
+    }
+  });
+};

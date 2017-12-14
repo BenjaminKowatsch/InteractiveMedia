@@ -7,35 +7,21 @@ const validateJsonService = require('../services/validateJson.service');
 const httpResonseService = require('../services/httpResonse.service');
 
 const jsonSchema = {
-  groupPayloadData: require('../JSONSchema/groupPayloadData.json')
+  groupPayloadData: require('../JSONSchema/groupPayloadData.json'),
+  postData: require('../JSONSchema/postData.json')
 };
 
 exports.createNewGroup = function(req, res) {
   winston.debug('Creating a new group');
   // validate data in request body
-  var validationResult = validateJsonService.validateAgainstSchema(req.body.payload, jsonSchema.groupPayloadData);
-
-  if (validationResult.valid === true) {
-    // request body is valid
-
-    // create new group
-    group.createNewGroup(req.body.payload)
-        .then(function(registerResult) {
-          // mongo update was successful
-          var resBody = {'success': true, 'payload': registerResult.payload};
-          httpResonseService.sendHttpResponse(res, 201, resBody);
-        })
-        .catch(function(registerResult) {
-          // mongo update failed
-          winston.error(registerResult);
-          var resBody = {'success': false, 'payload': registerResult.payload};
-          httpResonseService.sendHttpResponse(res, 400, resBody);
-        });
-  } else {
-    // request body is invalid
-    var resBody = {'success': false, 'payload': validationResult.error};
-    httpResonseService.sendHttpResponse(res, 400, resBody);
-  }
+  validateJsonService.againstSchema(req.body.payload, jsonSchema.groupPayloadData).then(validationResult => {
+    return group.createNewGroup(req.body);
+  }).then(registerResult =>  {
+    httpResonseService.sendHttpResponse(res, registerResult.statusCode, registerResult);
+  }).catch(result => {
+    winston.debug(errorResult);
+    httpResonseService.sendHttpResponse(res, errorResult.statusCode, errorResult);
+  });
 };
 
 exports.getAll = function(req, res) {
