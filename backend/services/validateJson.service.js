@@ -69,9 +69,8 @@ exports.againstSchema = function(inputData, jsonSchema) {
         message: tv4.error.message
       };
       winston.debug('Error: validation failed', refinedErrorObj);
-      returnValue.valid = false;
       returnValue.success = false;
-      returnValue.error = refinedErrorObj;
+      returnValue.statusCode = 400;
       returnValue.payload = {
         'dataPath': 'validation',
         'message': 'Invalide body'

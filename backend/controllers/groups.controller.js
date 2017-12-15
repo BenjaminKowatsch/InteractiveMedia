@@ -18,7 +18,7 @@ exports.createNewGroup = function(req, res) {
     return group.createNewGroup(req.body);
   }).then(registerResult =>  {
     httpResonseService.sendHttpResponse(res, registerResult.statusCode, registerResult);
-  }).catch(result => {
+  }).catch(errorResult => {
     winston.debug(errorResult);
     httpResonseService.sendHttpResponse(res, errorResult.statusCode, errorResult);
   });

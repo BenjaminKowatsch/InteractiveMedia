@@ -17,7 +17,7 @@ module.exports = [
     createDuplicatedUser: {
       name: 'test_gruppe_1',
       imageUrl: null,
-      users: [userData.users.valid[0].email, userData.users.valid[1].email]
+      users: [userData.users.valid[0].email, userData.users.valid[0].email]
     },
     createWithoutCreatorUser: {
       name: 'test_gruppe_1',

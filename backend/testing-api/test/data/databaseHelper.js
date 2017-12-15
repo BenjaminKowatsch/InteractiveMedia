@@ -66,12 +66,14 @@ module.exports.resetDB = function() {
       }, createIndexCallback);
 
       winston.info('Database successfully cleaned');
+      db.close();
       resolve();
     }).catch(err => {
       winston.error('Database connection failed with error: ' + err);
       database.collections.users = undefined;
       database.collections.groups = undefined;
       database.db = undefined;
+      db.close();
       reject();
     });
   });

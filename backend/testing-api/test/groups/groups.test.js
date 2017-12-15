@@ -25,7 +25,7 @@ var registerUser = index => chai.request(HOST).post(URL.REGISTER_USER).send({
   password: userData.users.valid[index].password
 });
 
-describe.only('Groups-Controller', () => {
+describe('Groups-Controller', () => {
   describe('Create new Group', () => {
     before('register User 0 and 1', done => {
       tokens = {};
@@ -53,13 +53,22 @@ describe.only('Groups-Controller', () => {
         .then(function(res) {
           expect(res).to.have.status(201);
           expect(res).to.be.json;
+          expect(res.body).to.be.an('object');
+          expect(res.body.success).to.be.true;
+          expect(res.body.payload).to.be.an('object');
+          expect(res.body.payload.name).to.equal(groupScenarios[0].create.name);
+          expect(res.body.payload.imageUrl).to.equal(groupScenarios[0].create.imageUrl);
+          expect(res.body.payload.users).to.have.lengthOf(groupScenarios[0].create.users.length);
+          expect(res.body.payload.transactions).to.be.empty;
+          expect(res.body.payload.groupId).to.be.an('string').and.not.to.be.empty;
+          expect(res.body.payload.createdAt).to.be.an('string').and.not.to.be.empty;
         });
       });
     });
 
-    describe('must fail', () => {
+    describe('with error', () => {
       it('should not create a new group due to referencing a not existing user', () => {
-        return chai.request(HOST)
+        chai.request(HOST)
         .post(URL.BASE_GROUP)
         .send({'accessToken': tokens[0], 'authType': 0, payload: groupScenarios[0].createWrongUser})
         .then(res => {
@@ -68,8 +77,8 @@ describe.only('Groups-Controller', () => {
           expect(res.body).to.be.an('object');
           expect(res.body.success).to.be.false;
           expect(res.body.payload).to.be.an('object');
-          expect(res.body.payload.dataPath).to.equal('users');
-          expect(res.body.payload.message).to.equal('Unknow user: ' + groupScenarios[0].createWrongUser.users[0]);
+          expect(res.body.payload.dataPath).to.equal('groupUsers');
+          expect(res.body.payload.message).to.equal('Unknown user: ' + groupScenarios[0].createWrongUser.users[0]);
         });
       });
 
@@ -83,8 +92,8 @@ describe.only('Groups-Controller', () => {
           expect(res.body).to.be.an('object');
           expect(res.body.success).to.be.false;
           expect(res.body.payload).to.be.an('object');
-          //expect(res.body.payload.dataPath).to.equal('sdffdsaf');
-          //expect(res.body.payload.message).to.equal('dsafads');
+          expect(res.body.payload.dataPath).to.equal('groupUsers');
+          expect(res.body.payload.message).to.equal('Duplicated groupUsers');
         });
       });
 
@@ -98,8 +107,8 @@ describe.only('Groups-Controller', () => {
           expect(res.body).to.be.an('object');
           expect(res.body.success).to.be.false;
           expect(res.body.payload).to.be.an('object');
-          //expect(res.body.payload.dataPath).to.equal('sdffdsaf');
-          //expect(res.body.payload.message).to.equal('dsafads');
+          expect(res.body.payload.dataPath).to.equal('groupUsers');
+          expect(res.body.payload.message).to.equal('GroupCreator must be part of groupUsers');
         });
       });
 
@@ -113,8 +122,8 @@ describe.only('Groups-Controller', () => {
           expect(res.body).to.be.an('object');
           expect(res.body.success).to.be.false;
           expect(res.body.payload).to.be.an('object');
-          //expect(res.body.payload.dataPath).to.equal('sdffdsaf');
-          //expect(res.body.payload.message).to.equal('dsafads');
+          expect(res.body.payload.dataPath).to.equal('groupUsers');
+          expect(res.body.payload.message).to.equal('GroupCreator must be part of groupUsers');
         });
       });
 
@@ -128,8 +137,8 @@ describe.only('Groups-Controller', () => {
           expect(res.body).to.be.an('object');
           expect(res.body.success).to.be.false;
           expect(res.body.payload).to.be.an('object');
-          //expect(res.body.payload.dataPath).to.equal('sdffdsaf');
-          //expect(res.body.payload.message).to.equal('dsafads');
+          expect(res.body.payload.dataPath).to.equal('validation');
+          expect(res.body.payload.message).to.equal('Invalide body');
         });
       });
 
