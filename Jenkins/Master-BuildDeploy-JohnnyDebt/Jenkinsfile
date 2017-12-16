@@ -77,6 +77,15 @@ pipeline {
 				sh 'docker-compose -f docker-compose.backend-testing-api.yml build'
 				sh 'docker-compose -f docker-compose.backend-testing-api.yml up --abort-on-container-exit'
 				sh 'docker-compose -f docker-compose.backend-testing-api.yml rm -fsv'
+                sh 'rm -r ./report-be-apitest/'
+                sh 'docker cp $(docker ps --latest --format "{{.ID}}"):/app/mochawesome-report ./report-be-apitest/'
+                publishHTML( [allowMissing: false,
+                    alwaysLinkToLastBuild: false,
+                    keepAll: false,
+                    reportDir: 'report-be-apitest',
+                    reportFiles: 'mochawesome.html',
+                    reportName: 'API-Tests',
+                    reportTitles: ''])
             }
         }
 
