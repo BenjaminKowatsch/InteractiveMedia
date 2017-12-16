@@ -29,7 +29,7 @@ describe('Groups-Controller', () => {
   describe('Create new Group', () => {
     before('register User 0 and 1', done => {
       tokens = {};
-      databaseHelper.resetDB().then(()=> {
+      databaseHelper.promiseResetDB().then(()=> {
         return registerUser(0);
       }).then(res => {
         tokens[0] = res.body.payload.accessToken;

@@ -42,16 +42,9 @@ function getFacebookTestAccessToken() {
 }
 
 describe('User-Controller', () => {
-  before('Clean DB', done => {
-    tokens = {};
-    databaseHelper.resetDB().then(()=> {
-      done();
-    }).catch((error) => {
-      console.log('DB Error: ' + error);
-    });
-  });
 
   describe('Auth-Type: Facebook', function() {
+    before('Clean DB', databaseHelper.cbResetDB);
     var facebookToken;
     before(function(done) {
       getFacebookTestAccessToken()

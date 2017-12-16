@@ -16,7 +16,7 @@ function createIndexCallback(err, indexname) {
   }
 }
 
-module.exports.resetDB = function() {
+function promiseResetDB() {
   return new Promise((resolve,reject) => {
     var db;
     MongoClient.connect('mongodb://mongo/debtsquared', mongoConnectConfig).then(_db => {
@@ -77,4 +77,13 @@ module.exports.resetDB = function() {
       reject();
     });
   });
+}
+module.exports.promiseResetDB = promiseResetDB;
+
+module.exports.cbResetDB = function(done) {
+  promiseResetDB().then(() => {
+      done();
+    }).catch((error) => {
+      winston.err('DB Error: ' + error);
+    });
 };
