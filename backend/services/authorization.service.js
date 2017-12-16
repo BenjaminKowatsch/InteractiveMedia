@@ -71,6 +71,5 @@ function verifyRole(userId, roleId) {
 }
 
 function verifyUserInGroup(userId, groupId) {
-  return group.verifyGroupContainsUser(database.collections.groups, groupId,
-      userId);
+  return group.verifyGroupContainsUser(userId, groupId);
 }

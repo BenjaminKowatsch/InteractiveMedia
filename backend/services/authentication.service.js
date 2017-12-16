@@ -15,6 +15,7 @@ exports.isAuthenticated = function(req, res, next) {
   winston.debug('req.body', req.body);
 
   // validate data in request body
+  //TODO: Refactor
   var validationResult = validateJsonService.validateAgainstSchema(req.body, jsonSchema.postData);
 
   if (validationResult.valid === true) {
@@ -30,13 +31,26 @@ exports.isAuthenticated = function(req, res, next) {
     .catch((error) => {
       // access token is invalid, unauthorized
       winston.debug('Invalid access Token ');
-      var resBody = {'success': false, 'payload': error};
+      var resBody = {
+        'success': false,
+        'payload': {
+          'dataPath': 'token',
+          'message': 'Invalide access token'
+        }
+      };
       httpResonseService.sendHttpResponse(res, 401, resBody);
     });
   } else {
     // request body is invalid
     winston.debug('Request body is invalid ');
-    var resBody = {'success': false, 'payload': validationResult.error};
+    //not neccessary if promise schema validation is used
+    var resBody = {
+      'success': false,
+      'payload': {
+        'dataPath': 'validation',
+        'message': 'Invalide body'
+      }
+    };
     httpResonseService.sendHttpResponse(res, 400, resBody);
   }
 };
