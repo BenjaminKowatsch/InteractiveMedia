@@ -76,7 +76,6 @@ pipeline {
 				sh 'docker-compose -f docker-compose.backend-testing-api.yml rm -fsv'
 				sh 'docker-compose -f docker-compose.backend-testing-api.yml build'
 				sh 'docker-compose -f docker-compose.backend-testing-api.yml up --abort-on-container-exit'
-				sh 'docker-compose -f docker-compose.backend-testing-api.yml rm -fsv'
                 script {
                     if (fileExists('./report-be-apitest/mochawesome.html')) {
                         sh 'rm -r ./report-be-apitest/'
@@ -90,6 +89,7 @@ pipeline {
                     reportFiles: 'mochawesome.html',
                     reportName: 'API-Tests',
                     reportTitles: ''])
+				sh 'docker-compose -f docker-compose.backend-testing-api.yml rm -fsv'
             }
         }
 
