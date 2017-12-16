@@ -4,13 +4,14 @@ var router = express.Router();
 var statusController = require('../controllers/status.controller');
 
 /**
- * @api {GET} /v1/status/ Get current status
+ * @api {GET} /v1/status/ Get status
  * @apiName GetStatus
  * @apiGroup status
  * @apiVersion  0.1.0
  *
- * @apiSuccess (200) {String} success Request successful
- * @apiSuccess (200) {String} payload.status Current status
+ * @apiSuccess (SuccessCode) {200} Success Status is healthy
+ * @apiUse successBodySuccess
+ * @apiSuccess (Success) {String} payload.status Current status
  *
  * @apiSuccessExample {json} Success-Response:
    {
