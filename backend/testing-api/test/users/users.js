@@ -42,16 +42,9 @@ function getFacebookTestAccessToken() {
 }
 
 describe('User-Controller', () => {
-  before('Clean DB', done => {
-    tokens = {};
-    databaseHelper.resetDB().then(()=> {
-      done();
-    }).catch((error) => {
-      console.log('DB Error: ' + error);
-    });
-  });
 
   describe('Auth-Type: Facebook', function() {
+    before('Clean DB', databaseHelper.cbResetDB);
     var facebookToken;
     before(function(done) {
       getFacebookTestAccessToken()
@@ -181,6 +174,7 @@ describe('User-Controller', () => {
 
   describe('Auth-Type: Password', function() {
     describe('Register', function() {
+      before('Clean DB', databaseHelper.cbResetDB);
       it('should register new user', function() {
         return chai.request(host)
           .post(baseUrl + '/')
@@ -249,7 +243,7 @@ describe('User-Controller', () => {
     });
 
     describe('Login', function() {
-      // TODO: drop and recreate database
+      before('Clean DB', databaseHelper.cbResetDB);
       let defaultToken;
 
       before(function(done) {
@@ -380,7 +374,7 @@ describe('User-Controller', () => {
     });
 
     describe('Logout', function() {
-      // TODO: drop and recreate database
+      before('Clean DB', databaseHelper.cbResetDB);
       let defaultToken;
 
       before(function(done) {
@@ -442,6 +436,7 @@ describe('User-Controller', () => {
   });
 
   describe('Invalid Auth-Type', function() {
+    before('Clean DB', databaseHelper.cbResetDB);
     it('should fail with an invalid auth type', function() {
       return chai.request(host)
               .post(baseUrl + '/login?type=99')
