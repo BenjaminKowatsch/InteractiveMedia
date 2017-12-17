@@ -391,7 +391,6 @@ describe('User-Controller', () => {
 
       // POST - Logout as default user
       it('should logout', function() {
-        console.log('defaultToken', defaultToken);
         return chai.request(host)
           .post(baseUrl + '/logout')
           .send({'accessToken': defaultToken, 'authType': 0})

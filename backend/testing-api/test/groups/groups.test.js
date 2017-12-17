@@ -153,7 +153,7 @@ describe('Groups-Controller', () => {
           expect(res.body.success).to.be.false;
           expect(res.body.payload).to.be.an('object');
           expect(res.body.payload.dataPath).to.equal('token');
-          expect(res.body.payload.message).to.equal('Invalide access token');
+          expect(res.body.payload.message).to.equal('invalid access token');
         });
       });
 
@@ -167,7 +167,7 @@ describe('Groups-Controller', () => {
           expect(res.body.success).to.be.false;
           expect(res.body.payload).to.be.an('object');
           expect(res.body.payload.dataPath).to.equal('validation');
-          expect(res.body.payload.message).to.equal('Invalide body');
+          expect(res.body.payload.message).to.equal('missing authType');
         });
       });
     });

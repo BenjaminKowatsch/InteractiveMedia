@@ -2,6 +2,7 @@ var winston = require('winston');
 var config = require('../modules/config');
 var Minio = require('minio');
 const httpResonseService = require('../services/httpResonse.service');
+const uuidService = require('../services/uuid.service');
 
 var minioClient = new Minio.Client({
   endPoint: config.minioEndpoint,
@@ -31,10 +32,10 @@ minioClient.bucketExists(config.minioBucketName, function(err) {
   }
 });
 
-exports.upload = function(req, res) {
-  winston.debug('storing file: ' + req.file.originalname + ' at bucket: ' + config.minioBucketName);
-
-  minioClient.putObject(config.minioBucketName, req.file.originalname, req.file.buffer, function(error, etag) {
+module.exports.upload = function(req, res) {
+  const filename = uuidService.generateUUID() + '.' + req.file.originalname;
+  winston.debug('storing file: ' + filename + ' at bucket: ' + config.minioBucketName);
+  minioClient.putObject(config.minioBucketName, filename, req.file.buffer, function(error, etag) {
     if (error) {
       const errorResponse = {
         'success': false,
@@ -45,12 +46,18 @@ exports.upload = function(req, res) {
       };
       httpResonseService.sendHttpResponse(res, 500, errorResponse);
     } else {
-      httpResonseService.sendHttpResponse(res, 201, {'success': true});
+      successReponse = {
+        'success': true,
+        'payload': {
+          'path': filename
+        }
+      };
+      httpResonseService.sendHttpResponse(res, 201, successReponse);
     }
   });
 };
 
-exports.download = function(req, res) {
+module.exports.download = function(req, res) {
   winston.debug('download file: ' + req.query.filename + ' at bucket: ' + config.minioBucketName);
 
   minioClient.getObject(config.minioBucketName, req.query.filename, function(error, stream) {

@@ -11,47 +11,58 @@ var jsonSchema = {
   postData: require('../JSONSchema/postData.json')
 };
 
-exports.isAuthenticated = function(req, res, next) {
-  winston.debug('req.body', req.body);
+module.exports.isAuthenticated = function(req, res, next) {
+  let resErrorBody = {
+    'success': false,
+    'payload': {
+      'dataPath': 'validation',
+      'message': ''
+    }
+  };
 
-  // validate data in request body
-  //TODO: Refactor
-  var validationResult = validateJsonService.validateAgainstSchema(req.body, jsonSchema.postData);
+  if ('authType' in req.body) {
+    const parsedAuthType = parseInt(req.body.authType);
+    if (!isNaN(parsedAuthType)) {
+      req.body.authType = parsedAuthType;
 
-  if (validationResult.valid === true) {
-    winston.debug('Request body is valid');
+      //TODO: Refactor
+      // validate data in request body
+      var validationResult = validateJsonService.validateAgainstSchema(req.body, jsonSchema.postData);
 
-    // request body is valid
-    verifyAccessToken(req.body.accessToken, req.body.authType)
-    .then((promiseData) => {
-      winston.debug('VerifyAccessToken result: ' + JSON.stringify(promiseData));
-      res.locals.userId = promiseData.userId;
-      next();
-    })
-    .catch((error) => {
-      // access token is invalid, unauthorized
-      winston.debug('Invalid access Token ');
-      var resBody = {
-        'success': false,
-        'payload': {
-          'dataPath': 'token',
-          'message': 'Invalide access token'
-        }
-      };
-      httpResonseService.sendHttpResponse(res, 401, resBody);
-    });
-  } else {
-    // request body is invalid
-    winston.debug('Request body is invalid ');
-    //not neccessary if promise schema validation is used
-    var resBody = {
-      'success': false,
-      'payload': {
-        'dataPath': 'validation',
-        'message': 'Invalide body'
+      if (validationResult.valid === true) {
+        winston.debug('Request body is valid');
+
+        // request body is valid
+        verifyAccessToken(req.body.accessToken, req.body.authType)
+        .then((promiseData) => {
+          winston.debug('VerifyAccessToken result: ' + JSON.stringify(promiseData));
+          res.locals.userId = promiseData.userId;
+          next();
+        })
+        .catch((error) => {
+          // access token is invalid, unauthorized
+          winston.debug('Invalid access Token');
+          resErrorBody.payload.dataPath = 'token';
+          resErrorBody.payload.message = 'invalid access token';
+          httpResonseService.sendHttpResponse(res, 401, resErrorBody);
+        });
+      } else {
+        // request body is invalid
+        winston.debug('invalid request body');
+        resErrorBody.payload.message = 'invalid request body';
+        httpResonseService.sendHttpResponse(res, 400, resErrorBody);
       }
-    };
-    httpResonseService.sendHttpResponse(res, 400, resBody);
+    } else {
+      // failed to convert authType to int
+      winston.debug('invalid authType');
+      resErrorBody.payload.message = 'invalid authType';
+      httpResonseService.sendHttpResponse(res, 400, resErrorBody);
+    }
+  } else {
+    // authType is missing to request body
+    winston.debug('missing authType');
+    resErrorBody.payload.message = 'missing authType';
+    httpResonseService.sendHttpResponse(res, 400, resErrorBody);
   }
 };
 
