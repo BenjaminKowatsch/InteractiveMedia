@@ -4,13 +4,14 @@ var router = express.Router();
 var versionController = require('../controllers/version.controller');
 
 /**
- * @api {GET} /v1/version/ Get current version
+ * @api {GET} /v1/version/ Get version
  * @apiName GetVersion
  * @apiGroup version
  * @apiVersion  0.1.0
  *
- * @apiSuccess (200) {String} name Name of app
- * @apiSuccess (200) {String} version Current version
+ * @apiSuccess (SuccessCode) {200} Success Request successful
+ * @apiSuccess (Success) {String} version Current version
+ * @apiSuccess (Success) {String} name Name of the app
  *
  * @apiSuccessExample {json} Success-Response:
    {

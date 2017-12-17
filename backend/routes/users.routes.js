@@ -1,70 +1,89 @@
+// jscs:disable jsDoc
+
 var express = require('express');
 var router = express.Router();
 
 var usersController = require('../controllers/users.controller');
 var authenticationService = require('../services/authentication.service');
-//base route: host:8081/users
 
+/**
+ * @api {POST} /v1/users Register
+ * @apiName Register
+ * @apiGroup user
+ * @apiVersion 0.1.0
+ *
+ * @apiUse paramUsername
+ * @apiUse paramHashedPassword
+ *
+ * @apiUse paramExamplePassword
+ *
+ * @apiSuccess (SuccessCode) {201} Created Resource created
+ * @apiUse successBodySuccess
+ * @apiUse successBodyAuthtype
+ * @apiUse successBodyAuthtoken
+ *
+ * @apiUse successExampleAuthtypeToken
+ *
+ * @apiUse error400BadRequest
+ * @apiUse errorBodyCommonStructure
+ *
+ * @apiUse errorExampleCommon
+ */
 router.post('/', usersController.registerNewUser);
 
 /**
- *
- * @api {POST} /v1/login?type=:type Login
+ * @api {POST} /v1/users/login?type=:type Login
  * @apiName Login
  * @apiGroup user
- * @apiVersion  0.1.0
+ * @apiVersion 0.1.0
  *
- * @apiParam (type) {string} type Login type with type=(0: Password, 1:Google, 2: Facebook)
- * @apiParam (password) {string} username Username
- * @apiParam (password) {string} password Hash of a password
- * @apiParam (facebook) {string} accessToken Access token requested from by Facebook after successful login
- * @apiParam (google) {string} TODO TODO
+ * @apiParam (URL-Parameter) {string} type Login type with type=(0: Password, 1:Google, 2: Facebook)
+ * @apiParam (Parameter: type=password) {string} username Username
+ * @apiParam (Parameter: type=password) {string} password Hash of a password
+ * @apiParam (Parameter: type=facebook) {string} accessToken Access token requested from by Facebook after successful login
+ * @apiParam (Parameter: type=google) {string} TODO TODO
  *
- * @apiSuccess (Success) {string} success Request successful
- * @apiSuccess (Success) {string} payload.authtype Login type with type=(0: Password, 1:Google, 2: Facebook)
- * @apiSuccess (Success) {string} payload.accessToken Access token for further use
+ * @apiUse paramExamplePassword
+ * @apiUse paramExampleLoginFacebook
+ * @apiUse paramExampleLoginGoogle
  *
- * @apiError (Error) {string} success Request failed
- * @apiError (Error) {string} payload.dataPath Describe the error location
- * @apiError (Error) {string} payload.message Specify the error
- * @apiError (Error400) {String}  BadRequest Missing or malformed credentials
- * @apiError (Error400) {String}  BadRequest Missing or unknown type parameter
- * @apiError (Error401) {String}  Unauthorized Credentials are invalid
+ * @apiSuccess (SuccessCode) {200} Success Login Successful
+ * @apiUse successBodySuccess
+ * @apiUse successBodyAuthtype
+ * @apiUse successBodyAuthtoken
  *
- * @apiParamExample  {type} Password
-    {
-     "username" : "alex",
-     "password" : "XHDGETFHFJCHF"
-    }
- * @apiParamExample  {type} Facebook
-    {
-     "accessToken" : "DeUBZBpAr9KCBZB3knwe1eGvcur"
-    }
- * @apiParamExample  {type} Google
-    {
-     "TODO" : "TODO",
-     "TODO" : "TODO"
-    }
- * @apiSuccessExample {type} Success-Response
-    {
-        "success": true,
-        "payload": {
-            "authType": 0,
-            "authToken": "KDFBDICBIUDSBSDhdddhf784gG7F"
-        }
-    }
+ * @apiUse successExampleAuthtypeToken
  *
- * @apiErrorExample {json} Error example:
-    {
-        "success": false,
-        "payload": {
-            "dataPath": "login",
-            "message": "login failed"
-        }
-    }
+ * @apiUse error400BadRequest
+ * @apiUse error400MissingUnknownUrlParameterType
+ * @apiUse error401CredentialsInvalid
+ * @apiUse errorBodyCommonStructure
+ *
+ * @apiUse errorExampleCommon
  */
 router.post('/login', usersController.login);
 
+/**
+ * @api {POST} /v1/users/logout Logout
+ * @apiName Logout
+ * @apiGroup user
+ * @apiVersion 0.1.0
+ *
+ * @apiUse paramAccessToken
+ * @apiUse paramAuthtype
+ *
+ * @apiUse successBodySuccess
+ * @apiSuccess (SuccessCode) {200} Success Logout successful
+ *
+ * @apiUse errorBodyCommonStructure
+ * @apiUse error400BadRequest
+ * @apiUse error401AccessTokenInvalid
+ *
+ * @apiUse paramExampleAuthtoken
+ * @apiUse successExampleSuccess
+ *
+ * @apiUse errorExampleCommon
+ */
 router.post('/logout', authenticationService.isAuthenticated, usersController.logout);
 
 router.post('/sendData', authenticationService.isAuthenticated, usersController.dummyFunction);
