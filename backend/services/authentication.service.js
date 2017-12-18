@@ -4,14 +4,14 @@ var router = express.Router();
 var winston = require('winston');
 
 var user = require('../modules/user');
-var validateJsonService = require('./validateJson.service');
 var httpResonseService = require('./httpResonse.service');
 
-var jsonSchema = {
-  postData: require('../JSONSchema/postData.json')
+const ERROR = {
+  'INVALID_AUTHTYPE': 'invalid auth type'
 };
 
 module.exports.isAuthenticated = function(req, res, next) {
+
   let resErrorBody = {
     'success': false,
     'payload': {
@@ -20,48 +20,53 @@ module.exports.isAuthenticated = function(req, res, next) {
     }
   };
 
-  if ('authType' in req.body) {
-    const parsedAuthType = parseInt(req.body.authType);
-    if (!isNaN(parsedAuthType)) {
-      req.body.authType = parsedAuthType;
+  const authHeaderRaw = req.get('Authorization');
 
-      //TODO: Refactor
-      // validate data in request body
-      var validationResult = validateJsonService.validateAgainstSchema(req.body, jsonSchema.postData);
+  if (authHeaderRaw !== undefined) {
+    const authHeader = authHeaderRaw.split(' ');
+    if (authHeader.length === 2) {
+      const authType = parseInt(authHeader[0]);
+      const authToken = authHeader[1];
 
-      if (validationResult.valid === true) {
-        winston.debug('Request body is valid');
-
-        // request body is valid
-        verifyAccessToken(req.body.accessToken, req.body.authType)
-        .then((promiseData) => {
-          winston.debug('VerifyAccessToken result: ' + JSON.stringify(promiseData));
-          res.locals.userId = promiseData.userId;
-          next();
-        })
-        .catch((error) => {
-          // access token is invalid, unauthorized
-          winston.debug('Invalid access Token');
-          resErrorBody.payload.dataPath = 'token';
-          resErrorBody.payload.message = 'invalid access token';
-          httpResonseService.sendHttpResponse(res, 401, resErrorBody);
-        });
+      if (Number.isInteger(authType)) {
+        winston.debug('authType', authType);
+        winston.debug('authToken', authToken);
+        verifyAccessToken(authToken, authType).then((promiseData) => {
+            // verified user successfully
+            winston.debug('VerifyAccessToken result: ' + JSON.stringify(promiseData));
+            res.locals.userId = promiseData.userId;
+            res.locals.authType = authType;
+            res.locals.authToken = authToken;
+            next();
+          })
+          .catch((error) => {
+            // auth token or type invalid, unauthorized
+            if (error === ERROR.INVALID_AUTHTYPE) {
+              winston.debug('invalid auth type');
+              resErrorBody.payload.dataPath = 'authtype';
+              resErrorBody.payload.message = 'invalid auth type';
+            } else {
+              resErrorBody.payload.dataPath = 'authtoken';
+              resErrorBody.payload.message = 'invalid auth token';
+            }
+            httpResonseService.sendHttpResponse(res, 401, resErrorBody);
+          });
       } else {
-        // request body is invalid
-        winston.debug('invalid request body');
-        resErrorBody.payload.message = 'invalid request body';
+        // authType is not an integer
+        winston.debug('invalid format of authType provided in header Authorization');
+        resErrorBody.payload.message = 'invalid format of authType provided in header Authorization';
         httpResonseService.sendHttpResponse(res, 400, resErrorBody);
       }
     } else {
-      // failed to convert authType to int
-      winston.debug('invalid authType');
-      resErrorBody.payload.message = 'invalid authType';
+      // invalid number arguments in header Authorization
+      winston.debug('invalid number of arguments provided in header Authorization');
+      resErrorBody.payload.message = 'invalid number of arguments provided in header Authorization';
       httpResonseService.sendHttpResponse(res, 400, resErrorBody);
     }
   } else {
-    // authType is missing to request body
-    winston.debug('missing authType');
-    resErrorBody.payload.message = 'missing authType';
+    // no header Authorization provided
+    winston.debug('no header Authorization provided');
+    resErrorBody.payload.message = 'no header Authorization provided';
     httpResonseService.sendHttpResponse(res, 400, resErrorBody);
   }
 };
@@ -91,7 +96,7 @@ function verifyAccessToken(token, authType) {
       // Verify facebook access token
       return user.verifyFacebookAccessToken(token, true, false);
     default:
-      winston.error('Unknown authType');
-      return Promise.reject('Unknown authType');
+      winston.error(ERROR.INVALID_AUTHTYPE);
+      return Promise.reject(ERROR.INVALID_AUTHTYPE);
   }
 }

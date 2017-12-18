@@ -7,8 +7,12 @@ const databaseHelper = require('../data/databaseHelper');
 
 chai.use(require('chai-http'));
 
-var host = 'http://backend:8081';
-var baseUrl = '/v1/users';
+const HOST = 'http://backend:8081';
+
+const URL = {
+  BASE_USER: '/v1/users',
+  BASE_TEST: '/v1/test'
+};
 
 var https = require('https');
 var config = {
@@ -60,8 +64,8 @@ describe('User-Controller', () => {
 
     // POST - Login/Register new facebook user
     it('Login/Register as facebook user', function() {
-      return chai.request(host)
-            .post(baseUrl + '/login?type=2')
+      return chai.request(HOST)
+            .post(URL.BASE_USER + '/login?type=2')
             .send({'accessToken': facebookToken})
             .then(res => {
               expect(res).to.have.status(200);
@@ -76,11 +80,11 @@ describe('User-Controller', () => {
 
     // POST - Send user data as facebook user
     it('Send user data as facebook user', function() {
-      return chai.request(host)
-            .post(baseUrl + '/sendData')
-            .send({'accessToken': facebookToken, 'authType': 2, 'payload': {}})
+      return chai.request(HOST)
+            .get(URL.BASE_TEST + '/authentication/required')
+            .set('Authorization', '2 ' + facebookToken)
             .then(res => {
-              expect(res).to.have.status(201);
+              expect(res).to.have.status(200);
               expect(res).to.be.json;
               expect(res.body).to.be.an('object');
               expect(res.body.success).to.be.true;
@@ -90,9 +94,9 @@ describe('User-Controller', () => {
 
     // POST - Logout as default user
     it('Logout as facebook user', function() {
-      return chai.request(host)
-              .post(baseUrl + '/logout')
-              .send({'accessToken': facebookToken, 'authType': 2})
+      return chai.request(HOST)
+              .post(URL.BASE_USER + '/logout')
+              .set('Authorization', '2 ' + facebookToken)
               .then(res => {
                 expect(res).to.have.status(200);
                 expect(res).to.be.json;
@@ -104,9 +108,9 @@ describe('User-Controller', () => {
 
     // POST - Send data with expired token as facebook user
     it('should fail to send data with expired token as facebook user', function() {
-      return chai.request(host)
-            .post(baseUrl + '/sendData')
-            .send({'accessToken': facebookToken, 'authType': 2, 'payload': {}})
+      return chai.request(HOST)
+            .get(URL.BASE_TEST + '/authentication/required')
+            .set('Authorization', '2 ' + facebookToken)
             .then(res => {
               expect(res).to.have.status(401);
               expect(res).to.be.json;
@@ -117,8 +121,8 @@ describe('User-Controller', () => {
 
     // POST - Relogin facebook user
     it('Relogin as facebook user', function() {
-      return chai.request(host)
-            .post(baseUrl + '/login?type=2')
+      return chai.request(HOST)
+            .post(URL.BASE_USER + '/login?type=2')
             .send({'accessToken': facebookToken})
             .then(res => {
               expect(res).to.have.status(200);
@@ -130,8 +134,8 @@ describe('User-Controller', () => {
     });
 
     it('should fail to login with invalid token', function() {
-      return chai.request(host)
-            .post(baseUrl + '/login?type=2')
+      return chai.request(HOST)
+            .post(URL.BASE_USER + '/login?type=2')
             .send({'accessToken': 'XXXXX'})
             .then(res => {
               expect(res).to.have.status(401);
@@ -144,8 +148,8 @@ describe('User-Controller', () => {
     });
 
     it('should fail to login with empty token', function() {
-      return chai.request(host)
-            .post(baseUrl + '/login?type=2')
+      return chai.request(HOST)
+            .post(URL.BASE_USER + '/login?type=2')
             .send({'accessToken': ''})
             .then(res => {
               expect(res).to.have.status(400);
@@ -158,8 +162,8 @@ describe('User-Controller', () => {
     });
 
     it('should fail to login with empty body', function() {
-      return chai.request(host)
-            .post(baseUrl + '/login?type=2')
+      return chai.request(HOST)
+            .post(URL.BASE_USER + '/login?type=2')
             .send({})
             .then(res => {
               expect(res).to.have.status(400);
@@ -176,8 +180,8 @@ describe('User-Controller', () => {
     describe('Register', function() {
       before('Clean DB', databaseHelper.cbResetDB);
       it('should register new user', function() {
-        return chai.request(host)
-          .post(baseUrl + '/')
+        return chai.request(HOST)
+          .post(URL.BASE_USER + '/')
           .send({username: testData.users.valid[0].username,
             email: testData.users.valid[0].email,
             password: testData.users.valid[0].password})
@@ -193,8 +197,8 @@ describe('User-Controller', () => {
       });
 
       it('should fail to register existing user', function() {
-        return chai.request(host)
-            .post(baseUrl + '/')
+        return chai.request(HOST)
+            .post(URL.BASE_USER + '/')
             .send({username: testData.users.valid[0].username,
               email: testData.users.valid[0].email,
               password: testData.users.valid[0].password})
@@ -210,8 +214,8 @@ describe('User-Controller', () => {
       });
 
       it('should fail to register user with invalid username', function() {
-        return chai.request(host)
-            .post(baseUrl + '/')
+        return chai.request(HOST)
+            .post(URL.BASE_USER + '/')
             .send({username: testData.users.invalid.invalidUsername.username,
               email: testData.users.invalid.invalidUsername.email,
               password: testData.users.invalid.invalidUsername.password})
@@ -226,8 +230,8 @@ describe('User-Controller', () => {
       });
 
       it('should fail to register user with invalid password', function() {
-        return chai.request(host)
-            .post(baseUrl + '/')
+        return chai.request(HOST)
+            .post(URL.BASE_USER + '/')
             .send({username: testData.users.invalid.invalidPassword.username,
               email: testData.users.invalid.invalidPassword.email,
               password: testData.users.invalid.invalidPassword.password})
@@ -247,8 +251,8 @@ describe('User-Controller', () => {
       let defaultToken;
 
       before(function(done) {
-        chai.request(host)
-          .post(baseUrl + '/')
+        chai.request(HOST)
+          .post(URL.BASE_USER + '/')
           .send({username: testData.users.valid[1].username,
             email: testData.users.valid[1].email,
             password: testData.users.valid[1].password})
@@ -259,8 +263,8 @@ describe('User-Controller', () => {
       });
 
       it('should login as registered user', function() {
-        return chai.request(host)
-                .post(baseUrl + '/login?type=0')
+        return chai.request(HOST)
+                .post(URL.BASE_USER + '/login?type=0')
                 .send({username: testData.users.valid[1].username,
                   email: testData.users.valid[1].email,
                   password: testData.users.valid[1].password})
@@ -276,8 +280,8 @@ describe('User-Controller', () => {
       });
 
       it('should fail to login with invalid password', function() {
-        return chai.request(host)
-                .post(baseUrl + '/login?type=0')
+        return chai.request(HOST)
+                .post(URL.BASE_USER + '/login?type=0')
                 .send({username: testData.users.valid[1].username,
                   email: testData.users.valid[1].email,
                   password: 'XXXXX'})
@@ -293,8 +297,8 @@ describe('User-Controller', () => {
       });
 
       it('should fail to login with empty password', function() {
-        return chai.request(host)
-                .post(baseUrl + '/login?type=0')
+        return chai.request(HOST)
+                .post(URL.BASE_USER + '/login?type=0')
                 .send({username: testData.users.valid[1].username,
                   email: testData.users.valid[1].email,
                   password: ''})
@@ -309,8 +313,8 @@ describe('User-Controller', () => {
       });
 
       it('should fail to login with no password', function() {
-        return chai.request(host)
-                .post(baseUrl + '/login?type=0')
+        return chai.request(HOST)
+                .post(URL.BASE_USER + '/login?type=0')
                 .send({username: testData.users.valid[1].username,
                   email: testData.users.valid[1].email})
                 .then(res => {
@@ -325,8 +329,8 @@ describe('User-Controller', () => {
       });
 
       it('should fail to login with no username', function() {
-        return chai.request(host)
-                .post(baseUrl + '/login?type=0')
+        return chai.request(HOST)
+                .post(URL.BASE_USER + '/login?type=0')
                 .send({email: testData.users.valid[1].email,
                   password: testData.users.valid[2].password})
                 .then(res => {
@@ -341,8 +345,8 @@ describe('User-Controller', () => {
       });
 
       it('should fail to login with unknown username', function() {
-        return chai.request(host)
-                .post(baseUrl + '/login?type=0')
+        return chai.request(HOST)
+                .post(URL.BASE_USER + '/login?type=0')
                 .send({username: 'unknownUsername',
                   email: 'unknownEmail@example.de',
                   password: 'passwordX'})
@@ -358,8 +362,8 @@ describe('User-Controller', () => {
       });
 
       it('should fail to login with empty body', function() {
-        return chai.request(host)
-                .post(baseUrl + '/login?type=0')
+        return chai.request(HOST)
+                .post(URL.BASE_USER + '/login?type=0')
                 .send({})
                 .then(res => {
                   expect(res).to.have.status(400);
@@ -378,8 +382,8 @@ describe('User-Controller', () => {
       let defaultToken;
 
       before(function(done) {
-        chai.request(host)
-          .post(baseUrl + '/')
+        chai.request(HOST)
+          .post(URL.BASE_USER + '/')
           .send({username: testData.users.valid[4].username,
             email: testData.users.valid[4].email,
             password: testData.users.valid[4].password})
@@ -391,9 +395,9 @@ describe('User-Controller', () => {
 
       // POST - Logout as default user
       it('should logout', function() {
-        return chai.request(host)
-          .post(baseUrl + '/logout')
-          .send({'accessToken': defaultToken, 'authType': 0})
+        return chai.request(HOST)
+          .post(URL.BASE_USER + '/logout')
+          .set('Authorization', '0 ' + defaultToken)
           .then(res => {
             expect(res).to.have.status(200);
             expect(res).to.be.json;
@@ -405,9 +409,9 @@ describe('User-Controller', () => {
 
       // POST - Send data with expired token as default user
       it('should fail to send data with expired token as default user', function() {
-        return chai.request(host)
-              .post(baseUrl + '/sendData')
-              .send({'accessToken': defaultToken, 'authType': 0, 'payload': {}})
+        return chai.request(HOST)
+              .get(URL.BASE_TEST + '/authentication/required')
+              .set('Authorization', '0 ' + defaultToken)
               .then(res => {
                 expect(res).to.have.status(401);
                 expect(res).to.be.json;
@@ -418,8 +422,8 @@ describe('User-Controller', () => {
 
       // POST - Relogin as default user
       it('should re-login', function() {
-        return chai.request(host)
-                .post(baseUrl + '/login?type=0')
+        return chai.request(HOST)
+                .post(URL.BASE_USER + '/login?type=0')
                 .send({username: testData.users.valid[4].username,
                   email: testData.users.valid[4].email,
                   password: testData.users.valid[4].password})
@@ -437,8 +441,8 @@ describe('User-Controller', () => {
   describe('Invalid Auth-Type', function() {
     before('Clean DB', databaseHelper.cbResetDB);
     it('should fail with an invalid auth type', function() {
-      return chai.request(host)
-              .post(baseUrl + '/login?type=99')
+      return chai.request(HOST)
+              .post(URL.BASE_USER + '/login?type=99')
               .send({username: testData.users.valid[1].username,
                 email: testData.users.valid[1].email,
                 password: testData.users.valid[1].password})
@@ -454,8 +458,8 @@ describe('User-Controller', () => {
     });
 
     it('should fail with no auth type', function() {
-      return chai.request(host)
-              .post(baseUrl + '/login')
+      return chai.request(HOST)
+              .post(URL.BASE_USER + '/login')
               .send({username: testData.users.valid[1].username,
                 email: testData.users.valid[1].email,
                 password: testData.users.valid[1].password})

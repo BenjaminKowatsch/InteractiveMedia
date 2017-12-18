@@ -15,7 +15,7 @@ exports.createNewGroup = function(req, res) {
   winston.debug('Creating a new group');
   // validate data in request body
   validateJsonService.againstSchema(req.body.payload, jsonSchema.groupPayloadData).then(validationResult => {
-    return group.createNewGroup(req.body);
+    return group.createNewGroup(res.locals.authToken, req.body.payload);
   }).then(registerResult =>  {
     httpResonseService.sendHttpResponse(res, registerResult.statusCode, registerResult);
   }).catch(errorResult => {

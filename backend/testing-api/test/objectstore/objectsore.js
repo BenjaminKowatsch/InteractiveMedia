@@ -46,8 +46,7 @@ describe('Object-store', function() {
       return chai.request(HOST)
         .post(URL.BASE_OBJECTSTORE + '/upload')
         .attach('uploadField', imageData, 'image.png')
-        .field('accessToken', token)
-        .field('authType', 0)
+        .set('Authorization', '0 ' + token)
         .then(res => {
           expect(res).to.have.status(201);
           expect(res.body.success).to.be.true;
@@ -55,17 +54,16 @@ describe('Object-store', function() {
         });
     });
 
-    it('should fail upload a new image with invalid access token', function() {
+    it('should fail upload a new image with invalid auth token', function() {
       return chai.request(HOST)
         .post(URL.BASE_OBJECTSTORE + '/upload')
         .attach('uploadField', imageData, 'image.png')
-        .field('accessToken', 'XXX')
-        .field('authType', 0)
+        .set('Authorization', '0 ' + 'XXX')
         .then(res => {
           expect(res).to.have.status(401);
           expect(res.body.success).to.be.false;
-          expect(res.body.payload.dataPath).to.be.equal('token');
-          expect(res.body.payload.message).to.be.equal('invalid access token');
+          expect(res.body.payload.dataPath).to.be.equal('authtoken');
+          expect(res.body.payload.message).to.be.equal('invalid auth token');
         });
     });
 
@@ -94,8 +92,7 @@ describe('Object-store', function() {
         return chai.request(HOST)
           .post(URL.BASE_OBJECTSTORE + '/upload')
           .attach('uploadField', imageData, 'imageToDownload.png')
-          .field('accessToken', token)
-          .field('authType', 0)
+          .set('Authorization', '0 ' + token)
           .then(res => {
             imagePath = res.body.payload.path;
           });
