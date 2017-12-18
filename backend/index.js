@@ -12,6 +12,7 @@ var objectStoreRoutes = require('./routes/object.store.routes');
 var versionRoutes = require('./routes/version.routes');
 var groupRoutes = require('./routes/groups.routes');
 var statusRoutes = require('./routes/status.routes');
+var testRoutes = require('./routes/test.routes');
 
 var config = require('./modules/config');
 var user = require('./modules/user');
@@ -71,6 +72,7 @@ app.use('/v1/object-store', objectStoreRoutes);
 app.use('/v1/version', versionRoutes);
 app.use('/v1/groups', groupRoutes);
 app.use('/v1/status', statusRoutes);
+app.use('/v1/test', testRoutes);
 
 // error handling: unknown routes
 // this has to be last route to be added, otherwise it will not work
