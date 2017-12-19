@@ -64,14 +64,6 @@ var webpackConfig = merge(baseWebpackConfig, {
       // necessary to consistently work with multiple chunks via CommonsChunkPlugin
       chunksSortMode: 'dependency'
     }),
-    // Create second html file for redirecting to spotify
-    new HtmlWebpackPlugin({
-      filename: path.resolve(__dirname, '../dist/spotifyRedirect.html'),
-      template: 'spotifyRedirect.html',
-      favicon: path.join(__dirname, '../src/assets/favicon.png'),
-      // Set different chunk to prevent including js files from the main app
-      chunks: ['spotify']
-    }),
     // split vendor js into its own file
     new webpack.optimize.CommonsChunkPlugin({
       name: 'vendor',

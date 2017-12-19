@@ -41,8 +41,7 @@ module.exports = {
                         { search: '${FACEBOOK_API_VERSION}', replace: process.env.FACEBOOK_API_VERSION },
                         { search: '${ORIGIN_URL}', replace: process.env.ORIGIN_URL },
                         { search: '${CLIENT_ID}', replace: process.env.CLIENT_ID },
-                        { search: '${APP_ID}', replace: process.env.APP_ID },
-                        { search: '${SPOTIFY_CLIENT_ID}  ', replace: process.env.SPOTIFY_CLIENT_ID }
+                        { search: '${APP_ID}', replace: process.env.APP_ID }                  
                     ]
                 }
             },

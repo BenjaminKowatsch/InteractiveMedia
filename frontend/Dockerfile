@@ -16,7 +16,6 @@ FROM base-build AS build
 
 ENV CLIENT_ID "908170470873-8151s7cvldroebdl7mcpg2houdgljgfg.apps.googleusercontent.com"
 ENV APP_ID "1971379956470536"
-ENV SPOTIFY_CLIENT_ID "1e7dcb239e2a49c4a7176cd1e21f3ea7"
 ENV FACEBOOK_API_VERSION "v2.9"
 #ENV ORIGIN_URL "http://localhost:8088"
 ENV JWT_SIMPLE_SECRET "A3xFr93Yl2qTn5"
