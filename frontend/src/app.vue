@@ -71,13 +71,13 @@ export default {
         // Delete cookie for users who registered at Launometer
         Cookie.deleteCookie('accessToken');
         // Additionally sign out facebook and google users, if the AUTH_TYPE is set to facebook or google
-        if(1 === accessToken.authType){
+/*         if(1 === accessToken.authType){
           // Sign out from google and delete cookie for users who signed in with google
           var auth2 = gapi.auth2.getAuthInstance();
           auth2.signOut().then(function() {
             console.log('Signed out google user');
           });
-        }
+        } */
         // Post data to the backend to successfully logout the user
         axios.post(Config.webServiceURL+`/logout`, accessToken)
         .then(response => {
@@ -85,18 +85,6 @@ export default {
         })
         .catch(e => {
           console.log(JSON.stringify(e));
-        });
-        // Logout users who signed in with Facebook and reload the page afterwards
-        FB.getLoginStatus((response) => {
-          if ('connected' === response.status) {
-            FB.logout((response) => {
-              console.log("Logged out of app, but still logged into facebook");
-              // Due to a reload of the page the user will be automatically be logged in again
-              this.redirect("/",false, true, true);
-            });
-          }else{
-            this.redirect("/",false, true, true);
-          }
         });
       });
     }

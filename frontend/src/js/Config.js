@@ -5,6 +5,7 @@ var settings = {
     "googleParams": {
         "client_id": "${CLIENT_ID}"
     },
+    //Without the facebookParams the webpage doesnt load 
     "facebookParams": {
         "appId": "${APP_ID}",
         "version": "${FACEBOOK_API_VERSION}"
