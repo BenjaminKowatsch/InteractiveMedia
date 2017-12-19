@@ -171,9 +171,9 @@
             console.log(this.laune);
             // logs the mood to the console
 
-            this.$f7.mainView.router.loadPage('/emotion?mood=' +
-              this.laune);
-            // loads next view and hands over the mood variable
+           /*  this.$f7.mainView.router.loadPage('/emotion?mood=' +
+              this.laune); */
+            // loads next view and hands over the mood variable --> Example impl. for further implementations!
 
           } else {
             framework7.alert('Bitte trage etwas ein...');

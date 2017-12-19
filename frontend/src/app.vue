@@ -28,9 +28,9 @@
         <f7-list>
           <!-- TODO Neu eintragen machen-->
           <f7-list-item @click="reload()" title="Neu eintragen" link-view="#main-view" link-close-panel></f7-list-item>
-          <f7-list-item link="/statistics" title="Statisiken" link-view="#main-view" link-close-panel></f7-list-item>
-          <f7-list-item link="/timeline" title="Timeline" link-view="#main-view" link-close-panel></f7-list-item>
-          <f7-list-item link="/spotify" title="Spotify" link-view="#main-view" link-close-panel></f7-list-item>
+<!--  Just an Example for later implemenation:         
+<f7-list-item link="/statistics" title="Statisiken" link-view="#main-view" link-close-panel></f7-list-item> !-->
+
           <f7-block inner>
             <f7-link @click="logout" close-panel id="logoutButton">Logout</f7-link>
           </f7-block>
