@@ -36,12 +36,8 @@ module.exports = {
                 query: {
                     multiple: [
                         { search: '${JWT_SIMPLE_SECRET}', replace: process.env.JWT_SIMPLE_SECRET },
-                        //  { search: '${WEB_SERVICE_PROD_URL}', replace: process.env.WEB_SERVICE_PROD_URL },
                         { search: '${WEB_SERVICE_URL}', replace: process.env.WEB_SERVICE_URL },
-                        { search: '${FACEBOOK_API_VERSION}', replace: process.env.FACEBOOK_API_VERSION },
-                        { search: '${ORIGIN_URL}', replace: process.env.ORIGIN_URL },
-                        { search: '${CLIENT_ID}', replace: process.env.CLIENT_ID },
-                        { search: '${APP_ID}', replace: process.env.APP_ID }                  
+                        { search: '${ORIGIN_URL}', replace: process.env.ORIGIN_URL },             
                     ]
                 }
             },

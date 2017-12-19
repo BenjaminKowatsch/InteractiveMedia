@@ -45,23 +45,16 @@ Vue.use(VueCharts)
 
 
 var startApp = function(onLoadingFinished){
+  onLoadingFinished();
+}
 
   // Load Google API asynchronously
-  window.gapi.load('auth2', () => {
+/*   window.gapi.load('auth2', () => {
     // Init Google API with
-    const auth2 = window.gapi.auth2.init(Config.googleParams);
-    console.log("Google API initialized");
+/*     const auth2 = window.gapi.auth2.init(Config.googleParams);
+    console.log("Google API initialized"); */
 
-    FB.init({
-      appId: Config.facebookParams.appId,
-      cookie: true, // enable cookies to allow the server to access the session
-      xfbml: true, // parse social plugins on this page
-      version: Config.facebookParams.version // use graph api version
-    });
-    console.log("Facebook API initialized");
-    onLoadingFinished();
-  });
-};
+ /*  }); }; */
 
 var onLoadingFinished = function(){
 
