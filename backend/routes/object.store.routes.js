@@ -46,6 +46,6 @@ const objectStoreController = require('../controllers/object.store.controller');
 router.post('/upload', multer({storage: multer.memoryStorage()}).single('uploadField'),
     authenticationService.isAuthenticated, objectStoreController.upload);
 
-router.get('/download', objectStoreController.download);
+router.get('/download', authenticationService.isAuthenticated, objectStoreController.download);
 
 module.exports = router;

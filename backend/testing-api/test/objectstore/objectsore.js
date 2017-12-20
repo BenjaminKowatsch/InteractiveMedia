@@ -101,14 +101,28 @@ describe('Object-store', function() {
       it('should download an existing image', function() {
         return chai.request(HOST)
           .get(URL.BASE_OBJECTSTORE + '/download?filename=' + imagePath)
+          .set('Authorization', '0 ' + token)
           .then(res => {
             expect(res).to.have.status(200);
+          });
+      });
+
+      it('should fail to download an existing image with invalid auth token', function() {
+        return chai.request(HOST)
+          .get(URL.BASE_OBJECTSTORE + '/download?filename=' + imagePath)
+          .set('Authorization', '0 ' + 'XXX')
+          .then(res => {
+            expect(res).to.have.status(401);
+            expect(res.body.success).to.be.false;
+            expect(res.body.payload.dataPath).to.be.equal('authtoken');
+            expect(res.body.payload.message).to.be.equal('invalid auth token');
           });
       });
 
       it('should fail to download a missing image', function() {
         return chai.request(HOST)
           .get(URL.BASE_OBJECTSTORE + '/download?filename=missingimage.png')
+          .set('Authorization', '0 ' + token)
           .then(res => {
             expect(res).to.have.status(500);
             expect(res).to.be.json;
