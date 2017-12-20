@@ -24,6 +24,7 @@ module.exports.isAuthenticated = function(req, res, next) {
 
   if (authHeaderRaw !== undefined) {
     const authHeader = authHeaderRaw.split(' ');
+
     if (authHeader.length === 2) {
       const authType = parseInt(authHeader[0]);
       const authToken = authHeader[1];
@@ -43,10 +44,10 @@ module.exports.isAuthenticated = function(req, res, next) {
             // auth token or type invalid, unauthorized
             if (error === ERROR.INVALID_AUTHTYPE) {
               winston.debug('invalid auth type');
-              resErrorBody.payload.dataPath = 'authtype';
+              resErrorBody.payload.dataPath = 'authType';
               resErrorBody.payload.message = 'invalid auth type';
             } else {
-              resErrorBody.payload.dataPath = 'authtoken';
+              resErrorBody.payload.dataPath = 'authToken';
               resErrorBody.payload.message = 'invalid auth token';
             }
             httpResonseService.sendHttpResponse(res, 401, resErrorBody);
@@ -55,19 +56,19 @@ module.exports.isAuthenticated = function(req, res, next) {
         // authType is not an integer
         winston.debug('invalid format of authType provided in header Authorization');
         resErrorBody.payload.message = 'invalid format of authType provided in header Authorization';
-        httpResonseService.sendHttpResponse(res, 400, resErrorBody);
+        httpResonseService.sendHttpResponse(res, 401, resErrorBody);
       }
     } else {
       // invalid number arguments in header Authorization
       winston.debug('invalid number of arguments provided in header Authorization');
       resErrorBody.payload.message = 'invalid number of arguments provided in header Authorization';
-      httpResonseService.sendHttpResponse(res, 400, resErrorBody);
+      httpResonseService.sendHttpResponse(res, 401, resErrorBody);
     }
   } else {
     // no header Authorization provided
     winston.debug('no header Authorization provided');
     resErrorBody.payload.message = 'no header Authorization provided';
-    httpResonseService.sendHttpResponse(res, 400, resErrorBody);
+    httpResonseService.sendHttpResponse(res, 401, resErrorBody);
   }
 };
 
