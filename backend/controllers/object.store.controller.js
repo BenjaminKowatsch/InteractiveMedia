@@ -33,45 +33,78 @@ minioClient.bucketExists(config.minioBucketName, function(err) {
 });
 
 module.exports.upload = function(req, res) {
-  const filename = uuidService.generateUUID() + '.' + req.file.originalname;
-  winston.debug('storing file: ' + filename + ' at bucket: ' + config.minioBucketName);
-  minioClient.putObject(config.minioBucketName, filename, req.file.buffer, function(error, etag) {
-    if (error) {
-      const errorResponse = {
-        'success': false,
-        'payload': {
-          'dataPath': 'storeObject',
-          'message': 'store object failed'
-        }
-      };
-      httpResonseService.sendHttpResponse(res, 500, errorResponse);
-    } else {
-      successReponse = {
-        'success': true,
-        'payload': {
-          'path': filename
-        }
-      };
-      httpResonseService.sendHttpResponse(res, 201, successReponse);
+  let errorResponse = {
+    'success': false,
+    'payload': {
+      'dataPath': '',
+      'message': ''
     }
-  });
+  };
+
+  if ('file' in req) {
+    const filenameRaw = req.file.originalname;
+
+    if (filenameRaw !== null && filenameRaw !== undefined) {
+      const filename = uuidService.generateUUID() + '.' + filenameRaw;
+
+      winston.debug('storing file: ' + filename + ' at bucket: ' + config.minioBucketName);
+      minioClient.putObject(config.minioBucketName, filename, req.file.buffer, function(error, etag) {
+        if (error) {
+          winston.debug('internal minio error');
+          errorResponse.payload.dataPath = 'getObject';
+          errorResponse.payload.message = 'failed to get object';
+          httpResonseService.sendHttpResponse(res, 500, errorResponse);
+        } else {
+          const successReponse = {
+            'success': true,
+            'payload': {
+              'path': filename
+            }
+          };
+          httpResonseService.sendHttpResponse(res, 201, successReponse);
+        }
+      });
+    } else {
+      winston.debug('invalid or missing file');
+      errorResponse.payload.dataPath = 'invalidFile';
+      errorResponse.payload.message = 'invalid or missing file';
+      httpResonseService.sendHttpResponse(res, 400, errorResponse);
+    }
+  } else {
+    winston.debug('invalid or missing file');
+    errorResponse.payload.dataPath = 'invalidFile';
+    errorResponse.payload.message = 'invalid or missing file';
+    httpResonseService.sendHttpResponse(res, 400, errorResponse);
+  }
+
 };
 
 module.exports.download = function(req, res) {
-  winston.debug('download file: ' + req.query.filename + ' at bucket: ' + config.minioBucketName);
-
-  minioClient.getObject(config.minioBucketName, req.query.filename, function(error, stream) {
-    if (error) {
-      const errorResponse = {
-        'success': false,
-        'payload': {
-          'dataPath': 'getObject',
-          'message': 'failed to get object'
-        }
-      };
-      httpResonseService.sendHttpResponse(res, 500, errorResponse);
-    } else {
-      stream.pipe(res);
+  let errorResponse = {
+    'success': false,
+    'payload': {
+      'dataPath': '',
+      'message': ''
     }
-  });
+  };
+
+  if (req.query.filename !== null && req.query.filename !== undefined) {
+    winston.debug('download file: ' + req.query.filename + ' at bucket: ' + config.minioBucketName);
+
+    minioClient.getObject(config.minioBucketName, req.query.filename, function(error, stream) {
+      if (error) {
+        winston.debug('internal minio error');
+        errorResponse.payload.dataPath = 'getObject';
+        errorResponse.payload.message = 'failed to get object';
+        httpResonseService.sendHttpResponse(res, 500, errorResponse);
+      } else {
+        stream.pipe(res);
+      }
+    });
+  } else {
+    winston.debug('missing or invalid filename');
+    errorResponse.payload.dataPath = 'invalidFilename';
+    errorResponse.payload.message = 'missing or invalid filename';
+    httpResonseService.sendHttpResponse(res, 400, errorResponse);
+  }
 };
