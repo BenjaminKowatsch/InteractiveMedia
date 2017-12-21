@@ -54,7 +54,7 @@
  */
 /**
  * @apiDefine error400BadRequest
-    @apiError (ErrorCode) {400} BadRequest Missing or malformed request body
+    @apiError (ErrorCode) {400} BadRequest Missing or malformed request
  */
 /**
  * @apiDefine error401Unauthorized
