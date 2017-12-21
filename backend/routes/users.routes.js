@@ -69,8 +69,8 @@ router.post('/login', usersController.login);
  * @apiGroup user
  * @apiVersion 0.1.0
  *
- * @apiUse paramAccessToken
- * @apiUse paramAuthtype
+ * @apiUse headerAuthorization
+ * @apiUse headerExampleAuthorization
  *
  * @apiUse successBodySuccess
  * @apiSuccess (SuccessCode) {200} Success Logout successful
@@ -79,7 +79,6 @@ router.post('/login', usersController.login);
  * @apiUse error400BadRequest
  * @apiUse error401AccessTokenInvalid
  *
- * @apiUse paramExampleAuthtoken
  * @apiUse successExampleSuccess
  *
  * @apiUse errorExampleCommon

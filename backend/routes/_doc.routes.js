@@ -18,6 +18,17 @@
  */
 
 /**
+ * @apiDefine headerAuthorization
+ * @apiHeader (HTTP-Header) {Request} Authorization Provide authentication: type and authtoken separated with one space
+     type=(0: Password, 1:Google, 2: Facebook)
+ */
+
+/** @apiDefine headerExampleAuthorization
+ * @apiHeaderExample {string} Authorization:
+      Authorization: "0 FJF7HFkA38jF6FH9JF7"
+ */
+
+/**
  * @apiDefine successBodySuccess
     @apiSuccess (Success) {string} success Request successful
  */

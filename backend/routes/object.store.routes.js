@@ -13,14 +13,12 @@ const objectStoreController = require('../controllers/object.store.controller');
  * @apiGroup object-store
  * @apiVersion 0.1.0
  *
- * @apiParam (form-data) {string} accessToken Token to verify user
- * @apiParam (form-data) {int} authType Login type with authType=(0: Password, 1:Google, 2: Facebook)
- * @apiParam (form-data) {file} uploadField File to upload
+ * @apiParam (body) {file} uploadField File to upload
+ * @apiUse headerAuthorization
+ * @apiUse headerExampleAuthorization
  *
- * @apiParamExample {type} form-data
+ * @apiParamExample {type} body
     {
-        "accessToken" : "SDSHDHCS",
-        "authType" : 0,
         "uploadField": "<file>"
     }
  *
