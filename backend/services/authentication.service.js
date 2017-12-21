@@ -6,9 +6,7 @@ var winston = require('winston');
 var user = require('../modules/user');
 var httpResonseService = require('./httpResonse.service');
 
-const ERROR = {
-  'INVALID_AUTHTYPE': 'invalid auth type'
-};
+const ERROR = require('../config.error');
 
 module.exports.isAuthenticated = function(req, res, next) {
 
