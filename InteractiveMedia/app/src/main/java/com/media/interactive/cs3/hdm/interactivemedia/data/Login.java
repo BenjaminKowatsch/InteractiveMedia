@@ -1,15 +1,21 @@
 package com.media.interactive.cs3.hdm.interactivemedia.data;
 
+import android.app.Activity;
 import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Build;
+import android.support.annotation.NonNull;
 import android.support.annotation.RequiresApi;
 import android.util.Log;
 
+import com.android.volley.AuthFailureError;
 import com.android.volley.Request;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonObjectRequest;
 import com.facebook.AccessToken;
 import com.facebook.login.LoginManager;
 import com.google.android.gms.auth.api.Auth;
@@ -18,11 +24,16 @@ import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.auth.api.signin.GoogleSignInResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.OptionalPendingResult;
+import com.google.android.gms.common.api.ResolvingResultCallbacks;
+import com.google.android.gms.common.api.Status;
+import com.media.interactive.cs3.hdm.interactivemedia.CallbackListener;
 import com.media.interactive.cs3.hdm.interactivemedia.R;
 import com.media.interactive.cs3.hdm.interactivemedia.RestRequestQueue;
 import com.media.interactive.cs3.hdm.interactivemedia.contentprovider.DatabaseProvider;
 import com.media.interactive.cs3.hdm.interactivemedia.contentprovider.tables.LoginTable;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 
 import org.json.JSONException;
@@ -200,9 +211,9 @@ public class Login {
         return false;
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.N)
-    public CompletableFuture<Void> register(Context context) {
-        final CompletableFuture<Void> future = new CompletableFuture<>();
+    //@RequiresApi(api = Build.VERSION_CODES.N)
+    public void register(Context context, final CallbackListener<JSONObject,Exception> callbackListener) {
+        //final CompletableFuture<Void> future = new CompletableFuture<>();
 
         contentResolver = context.getContentResolver();
 
@@ -211,31 +222,33 @@ public class Login {
         final JSONObject data = new JSONObject();
         try {
             data.put("username", username);
+            data.put("email", email);
             data.put("password", hashedPassword);
         } catch (JSONException e) {
             e.printStackTrace();
         }
         Log.d(TAG, "data: " + data.toString());
 
-        RestRequestQueue.getInstance(context)
-            .send(url, Request.Method.POST, data)
-            .thenApply(this::loginResponseHandler)
-            .thenAccept(loginResult -> {
-                if (loginResult) {
-                    future.complete(null);
-                } else {
-                    future.completeExceptionally(new Throwable("Login Failed"));
-                }
-            })
-            .exceptionally(error -> {
-                throw new RuntimeException(error.getMessage(), error.getCause());
-            });
-        return future;
+        final JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(
+            Request.Method.POST, url, data, new Response.Listener<JSONObject>() {
+            @Override
+            public void onResponse(JSONObject response) {
+                loginResponseHandler(response);
+                callbackListener.onSuccess(response);
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                error.printStackTrace();
+                callbackListener.onFailure(error);
+            }
+        });
+        RestRequestQueue.getInstance(context).addToRequestQueue(jsonObjectRequest);
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.N)
-    public CompletableFuture<Void> login(Context context) {
-        final CompletableFuture<Void> future = new CompletableFuture<>();
+    //@RequiresApi(api = Build.VERSION_CODES.N)
+    public void login(Context context, CallbackListener<JSONObject,Exception> callbackListener) {
+        //final CompletableFuture<Void> future = new CompletableFuture<>();
 
         contentResolver = context.getContentResolver();
 
@@ -248,32 +261,32 @@ public class Login {
             checkForCachedCredentials(this);
 
             if (userType == null) {
-                future.completeExceptionally(new Throwable("No cached credentials available."));
-                return future;
+                callbackListener.onFailure(new Exception("No cached credentials available."));
+                return; //future;
             }
         }
         // Login with latest cached account type
 
         switch (userType.getValue()) {
             case 0: // UserType.DEFAULT
-                cachedDefaultLogin(future, context);
+                cachedDefaultLogin(context, callbackListener);
                 break;
             case 1: //UserType.GOOGLE
-                cachedGoogleLogin(future, context);
+                cachedGoogleLogin(context, callbackListener);
                 break;
             case 2: //UserType.FACEBOOK
-                cachedFacebookLogin(future, context);
+                cachedFacebookLogin( context, callbackListener);
                 break;
             default:
-                future.completeExceptionally(new Throwable("No cached credentials available."));
+                callbackListener.onFailure(new Exception("No cached credentials available."));
                 break;
         }
 
-        return future;
+        //return future;
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.N)
-    private void cachedGoogleLogin(CompletableFuture<Void> future, Context context) {
+    //@RequiresApi(api = Build.VERSION_CODES.N)
+    private void cachedGoogleLogin(Context context, final CallbackListener<JSONObject, Exception> callbackListener) {
         // Check if the accessToken is not set
         // If the accessToken is not set there is no need to check the cache
         if (accessToken == null) {
@@ -310,26 +323,25 @@ public class Login {
         }
         Log.d(TAG, "data: " + data.toString());
 
-        RestRequestQueue.getInstance(context)
-            .send(url, Request.Method.POST, data)
-            .thenApply(this::loginResponseHandler)
-            .thenAccept(loginResult -> {
-                if (loginResult) {
-                    future.complete(null);
-                } else {
-                    future.completeExceptionally(new Throwable("Google Login failed"));
-                }
-            })
-            .exceptionally(error -> {
-                Log.e("User: ", "Exceptionally Thread Id: "
-                    + android.os.Process.getThreadPriority(android.os.Process.myTid()));
-                future.completeExceptionally(error);
-                throw new RuntimeException(error.getMessage());
-            });
+        final JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(
+            Request.Method.POST, url, data, new Response.Listener<JSONObject>() {
+            @Override
+            public void onResponse(JSONObject response) {
+                loginResponseHandler(response);
+                callbackListener.onSuccess(response);
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                error.printStackTrace();
+                callbackListener.onFailure(error);
+            }
+        });
+        RestRequestQueue.getInstance(context).addToRequestQueue(jsonObjectRequest);
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.N)
-    private void cachedFacebookLogin(CompletableFuture<Void> future, Context context) {
+    //@RequiresApi(api = Build.VERSION_CODES.N)
+    private void cachedFacebookLogin(Context context, final CallbackListener<JSONObject, Exception> callbackListener) {
         // Check if the accessToken is not set
         // If the accessToken is not set there is no need to check the cache
         if (accessToken == null) {
@@ -352,26 +364,25 @@ public class Login {
         }
         Log.d(TAG, "data: " + data.toString());
 
-        RestRequestQueue.getInstance(context)
-            .send(url, Request.Method.POST, data)
-            .thenApply(this::loginResponseHandler)
-            .thenAccept(loginResult -> {
-                if (loginResult) {
-                    future.complete(null);
-                } else {
-                    future.completeExceptionally(new Throwable("Facebook Login failed"));
-                }
-            })
-            .exceptionally(error -> {
-                Log.e("User: ", "Exceptionally Thread Id: "
-                    + android.os.Process.getThreadPriority(android.os.Process.myTid()));
-                future.completeExceptionally(error);
-                throw new RuntimeException(error.getMessage());
-            });
+        final JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(
+            Request.Method.POST, url, data, new Response.Listener<JSONObject>() {
+            @Override
+            public void onResponse(JSONObject response) {
+                loginResponseHandler(response);
+                callbackListener.onSuccess(response);
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                error.printStackTrace();
+                callbackListener.onFailure(error);
+            }
+        });
+        RestRequestQueue.getInstance(context).addToRequestQueue(jsonObjectRequest);
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.N)
-    private void cachedDefaultLogin(CompletableFuture<Void> future, Context context) {
+    //@RequiresApi(api = Build.VERSION_CODES.N)
+    private void cachedDefaultLogin(Context context, final CallbackListener<JSONObject, Exception> callbackListener) {
 
         // Send data to Backend and validate data
 
@@ -386,23 +397,22 @@ public class Login {
         }
         Log.d(TAG, "data: " + data.toString());
 
-        RestRequestQueue.getInstance(context)
-            .send(url, Request.Method.POST, data)
-            .thenApply(this::loginResponseHandler)
-            .thenAccept(loginResult -> {
-                if (loginResult) {
-                    future.complete(null);
-                } else {
-                    future.completeExceptionally(new Throwable("Default Logout failed"));
-                }
-            })
-            .exceptionally(error -> {
+        final JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(
+            Request.Method.POST, url, data, new Response.Listener<JSONObject>() {
+            @Override
+            public void onResponse(JSONObject response) {
+                loginResponseHandler(response);
+                callbackListener.onSuccess(response);
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                error.printStackTrace();
+                callbackListener.onFailure(error);
+            }
+        });
+        RestRequestQueue.getInstance(context).addToRequestQueue(jsonObjectRequest);
 
-                Log.e("User: ", "Exceptionally Thread Id: "
-                    + android.os.Process.getThreadPriority(android.os.Process.myTid()));
-                future.completeExceptionally(error);
-                throw new RuntimeException(error.getMessage());
-            });
     }
 
     public String getAccessToken() {
@@ -424,32 +434,40 @@ public class Login {
             + '}';
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.N)
-    public CompletableFuture<Void> logout(Context context) {
-        final CompletableFuture<Void> future = new CompletableFuture<>();
+    //@RequiresApi(api = Build.VERSION_CODES.N)
+    public void logout(Activity activity, final CallbackListener<JSONObject, Exception> callbackListener) {
+        //final CompletableFuture<Void> future = new CompletableFuture<>();
 
         // Local Facebook logout
         LoginManager.getInstance().logOut();
         // Local Google logout
-        final String serverClientId = context.getString(R.string.server_client_id);
+        final String serverClientId = activity.getString(R.string.server_client_id);
         final GoogleSignInOptions signInOptions = new GoogleSignInOptions
             .Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
             .requestIdToken(serverClientId)
             .requestEmail()
             .build();
         final GoogleApiClient googleApiClient = new GoogleApiClient
-            .Builder(context)
+            .Builder(activity)
             .addApi(Auth.GOOGLE_SIGN_IN_API, signInOptions)
             .build();
         if (googleApiClient.isConnected()) {
             Auth.GoogleSignInApi
                 .signOut(googleApiClient)
-                .setResultCallback((status) -> {
-                    Log.i(TAG, "Google signed out.");
+                .setResultCallback(new ResolvingResultCallbacks<Status>(activity, 0) {
+                    @Override
+                    public void onSuccess(@NonNull Status status) {
+                        Log.i(TAG, "Google signed out.");
+                    }
+
+                    @Override
+                    public void onUnresolvableFailure(@NonNull Status status) {
+                        Log.e(TAG, "Google signed out failed.");
+                    }
                 });
         }
         // Logout at backend
-        final String url = context.getResources().getString(R.string.web_service_url).concat("/v1/users/logout");
+        final String url = activity.getResources().getString(R.string.web_service_url).concat("/v1/users/logout");
         Log.d(TAG, "url: " + url);
         final JSONObject data = new JSONObject();
         try {
@@ -460,22 +478,28 @@ public class Login {
         }
         Log.d(TAG, "data: " + data.toString());
 
-        RestRequestQueue.getInstance(context)
-            .send(url, Request.Method.POST, data)
-            .thenApply(this::logoutResponseHandler)
-            .thenAccept(loginResult -> {
-                if (loginResult) {
-                    future.complete(null);
-                } else {
-                    future.completeExceptionally(new Throwable("Default Login failed"));
-                }
-            })
-            .exceptionally(error -> {
-                future.completeExceptionally(error);
-                throw new RuntimeException(error.getMessage());
-            });
+        final JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(
+            Request.Method.POST, url, null, new Response.Listener<JSONObject>() {
+            @Override
+            public void onResponse(JSONObject response) {
+                logoutResponseHandler(response);
+                callbackListener.onSuccess(response);
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                error.printStackTrace();
+                callbackListener.onFailure(error);
+            }
+        }){
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                Map<String, String>  params = new HashMap<String, String>();
+                params.put("Authorization", userType.getValue()+" "+accessToken);
 
-
-        return future;
+                return params;
+            }
+        };
+        RestRequestQueue.getInstance(activity).addToRequestQueue(jsonObjectRequest);
     }
 }
