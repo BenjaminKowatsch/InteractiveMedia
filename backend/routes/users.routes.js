@@ -77,7 +77,7 @@ router.post('/login', usersController.login);
  *
  * @apiUse errorBodyCommonStructure
  * @apiUse error400BadRequest
- * @apiUse error401AccessTokenInvalid
+ * @apiUse error401Unauthorized
  *
  * @apiUse successExampleSuccess
  *

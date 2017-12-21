@@ -57,8 +57,8 @@
     @apiError (ErrorCode) {400} BadRequest Missing or malformed request body
  */
 /**
- * @apiDefine error401AccessTokenInvalid
-    @apiError (ErrorCode) {401} InvalidToken Access token is invalid
+ * @apiDefine error401Unauthorized
+    @apiError (ErrorCode) {401} Unauthorized Missing or invalid authentication information
  */
 /**
  * @apiDefine error401CredentialsInvalid
