@@ -24,7 +24,7 @@ const objectStoreController = require('../controllers/object.store.controller');
  *
  * @apiSuccess (SuccessCode) {201} Created Upload image successful
  * @apiUse successBodySuccess
- * @apiSuccess (Success) {string} payload.path Path of image for further use
+ * @apiSuccess (Success) {string} payload[path] Path of image for further use
  *
  * @apiSuccessExample Success-Response
     {

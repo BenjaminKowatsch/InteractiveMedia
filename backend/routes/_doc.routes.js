@@ -34,18 +34,18 @@
  */
 /**
  * @apiDefine successBodyAuthtype
-    @apiSuccess (Success) {string} payload.authtype Login type with type=(0: Password, 1:Google, 2: Facebook)
+    @apiSuccess (Success) {string} payload[authtype] Login type with type=(0: Password, 1:Google, 2: Facebook)
  */
 /**
  * @apiDefine successBodyAuthtoken
-    @apiSuccess (Success) {string} payload.accessToken Access token for further use
+    @apiSuccess (Success) {string} payload[accessToken] Access token for further use
  */
 
 /**
  * @apiDefine errorBodyCommonStructure
     @apiError (Error) {string} success Request failed
-    @apiError (Error) {string} payload.dataPath Describe the error location
-    @apiError (Error) {string} payload.message Specify the error
+    @apiError (Error) {string} payload[dataPath] Describe the error location
+    @apiError (Error) {string} payload[message] Specify the error
  */
 
 /**
