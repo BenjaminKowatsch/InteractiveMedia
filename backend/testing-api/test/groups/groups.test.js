@@ -49,7 +49,8 @@ describe('Groups-Controller', () => {
       it('should create a new group', () => {
         return chai.request(HOST)
         .post(URL.BASE_GROUP)
-        .send({'accessToken': tokens[0], 'authType': 0, payload: groupScenarios[0].create})
+        .set('Authorization', '0 ' + tokens[0])
+        .send({payload: groupScenarios[0].create})
         .then(function(res) {
           expect(res).to.have.status(201);
           expect(res).to.be.json;
@@ -70,7 +71,8 @@ describe('Groups-Controller', () => {
       it('should not create a new group due to referencing a not existing user', () => {
         chai.request(HOST)
         .post(URL.BASE_GROUP)
-        .send({'accessToken': tokens[0], 'authType': 0, payload: groupScenarios[0].createWrongUser})
+        .set('Authorization', '0 ' + tokens[0])
+        .send({payload: groupScenarios[0].createWrongUser})
         .then(res => {
           expect(res).to.have.status(400);
           expect(res).to.be.json;
@@ -85,7 +87,8 @@ describe('Groups-Controller', () => {
       it('should not create a new group due to duplicated users', () => {
         return chai.request(HOST)
         .post(URL.BASE_GROUP)
-        .send({'accessToken': tokens[0], 'authType': 0, payload: groupScenarios[0].createDuplicatedUser})
+        .set('Authorization', '0 ' + tokens[0])
+        .send({payload: groupScenarios[0].createDuplicatedUser})
         .then(res => {
           expect(res).to.have.status(400);
           expect(res).to.be.json;
@@ -100,7 +103,8 @@ describe('Groups-Controller', () => {
       it('should not create a new group due to group without creator user', () => {
         return chai.request(HOST)
         .post(URL.BASE_GROUP)
-        .send({'accessToken': tokens[0], 'authType': 0, payload: groupScenarios[0].createWithoutCreatorUser})
+        .set('Authorization', '0 ' + tokens[0])
+        .send({payload: groupScenarios[0].createWithoutCreatorUser})
         .then(res => {
           expect(res).to.have.status(400);
           expect(res).to.be.json;
@@ -115,7 +119,8 @@ describe('Groups-Controller', () => {
       it('should not create a new group due to create a group without users', () => {
         return chai.request(HOST)
         .post(URL.BASE_GROUP)
-        .send({'accessToken': tokens[0], 'authType': 0, payload: groupScenarios[0].createNullUsers})
+        .set('Authorization', '0 ' + tokens[0])
+        .send({payload: groupScenarios[0].createNullUsers})
         .then(res => {
           expect(res).to.have.status(400);
           expect(res).to.be.json;
@@ -130,7 +135,8 @@ describe('Groups-Controller', () => {
       it('should not create a new group due to invalide payload', () => {
         return chai.request(HOST)
         .post(URL.BASE_GROUP)
-        .send({'accessToken': tokens[0], 'authType': 0, payload: groupScenarios[0].createInvalidePayload})
+        .set('Authorization', '0 ' + tokens[0])
+        .send({payload: groupScenarios[0].createInvalidePayload})
         .then(res => {
           expect(res).to.have.status(400);
           expect(res).to.be.json;
@@ -145,29 +151,31 @@ describe('Groups-Controller', () => {
       it('should not create a new group due to wrong token', () => {
         return chai.request(HOST)
         .post(URL.BASE_GROUP)
-        .send({'accessToken': 'fooBar', 'authType': 0, payload: groupScenarios[0].create})
+        .set('Authorization', '0 ' + 'foobar')
+        .send({payload: groupScenarios[0].create})
         .then(res => {
           expect(res).to.have.status(401);
           expect(res).to.be.json;
           expect(res.body).to.be.an('object');
           expect(res.body.success).to.be.false;
           expect(res.body.payload).to.be.an('object');
-          expect(res.body.payload.dataPath).to.equal('token');
-          expect(res.body.payload.message).to.equal('Invalide access token');
+          expect(res.body.payload.dataPath).to.equal('authToken');
+          expect(res.body.payload.message).to.equal('invalid auth token');
         });
       });
 
       it('should not create a new group due to missing token', () => {
         return chai.request(HOST)
         .post(URL.BASE_GROUP)
+        .set('Authorization', '')
         .send({payload: groupScenarios[0].create})
         .then(res => {
-          expect(res).to.have.status(400);
+          expect(res).to.have.status(401);
           expect(res).to.be.json;
           expect(res.body.success).to.be.false;
           expect(res.body.payload).to.be.an('object');
           expect(res.body.payload.dataPath).to.equal('validation');
-          expect(res.body.payload.message).to.equal('Invalide body');
+          expect(res.body.payload.message).to.equal('invalid number of arguments provided in header Authorization');
         });
       });
     });

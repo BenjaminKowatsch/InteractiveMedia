@@ -16,16 +16,15 @@ const tokenService = require('../services/token.service');
  *                                  {JSONArray} 'users' consisting of userEmail Strings
  * @return {Promise}                 [description]
  */
-group.createNewGroup = function(requestBody) {
+group.createNewGroup = function(authToken, groupData) {
   return new Promise((resolve, reject) => {
     winston.debug('Hello from module createNewGroup');
     let responseData = {payload: {}};
-    let groupData = requestBody.payload;
     groupData.groupId = uuidService.generateUUID();
     groupData.createdAt = new Date();
     groupData.transactions = [];
     let errorToReturn = {isSelfProvided: true};
-    let creatorId = tokenService.decodeToken(requestBody.accessToken).userId;
+    let creatorId = tokenService.decodeToken(authToken).userId;
 
     // generate array of promises of db calls for find user by id
     let groupUserPromises = [];

@@ -86,6 +86,4 @@ router.post('/login', usersController.login);
  */
 router.post('/logout', authenticationService.isAuthenticated, usersController.logout);
 
-router.post('/sendData', authenticationService.isAuthenticated, usersController.dummyFunction);
-
 module.exports = router;

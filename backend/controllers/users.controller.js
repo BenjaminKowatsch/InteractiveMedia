@@ -38,16 +38,6 @@ exports.registerNewUser = function(req, res) {
   }
 };
 
-exports.dummyFunction = function(req, res) {
-  winston.debug('req.body', req.body);
-
-  winston.debug('userId: ', res.locals.userId);
-  winston.debug('authType: ', req.body.authType);
-
-  var resBody = {'success': true, 'payload': {}};
-  httpResonseService.sendHttpResponse(res, 201, resBody);
-};
-
 exports.login = function(req, res) {
   winston.debug('req.body', req.body);
   // get login type from uri parameter 'type'
@@ -159,9 +149,9 @@ exports.login = function(req, res) {
 exports.logout = function(req, res) {
   winston.debug('req.body', req.body);
   winston.debug('userId: ', res.locals.userId);
-  winston.debug('authType: ', req.body.authType);
+  winston.debug('authType: ', res.locals.authType);
 
-  user.logout(res.locals.userId, req.body.authType)
+  user.logout(res.locals.userId, res.locals.authType)
     .then(function() {
       var resBody = {'success': true, 'payload': {}};
       httpResonseService.sendHttpResponse(res, 200, resBody);

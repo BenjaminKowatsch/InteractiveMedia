@@ -53,6 +53,10 @@
  * @apiDefine error401CredentialsInvalid
     @apiError (ErrorCode) {401} InvalidCredentials Credentials are invalid
  */
+/**
+ * @apiDefine error500MinioInternalError
+    @apiError (ErrorCode) {500} MinioInternalError Minio internal error
+ */
 
 /**
  * @apiDefine paramExamplePassword
