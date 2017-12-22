@@ -26,6 +26,7 @@ services:
     build: ./backend 
     environment: 
       - ORIGIN=http://cloudproject.mi.hdm-stuttgart.de:8088
+      - LOGLEVEL=info
     image: localhost:5000/backend
     ports:
       - "8081:8081"

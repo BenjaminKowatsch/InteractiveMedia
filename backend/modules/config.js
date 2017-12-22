@@ -11,6 +11,7 @@ var settings = {
   'minioBucketName': process.env.MINIO_BUCKET_NAME,
   'minioObjectPrefix': process.env.MINIO_OBJECT_PREFIX,
   'minioEndpoint': process.env.MINIO_ENDPOINT,
-  'minioEndpointPort': Number(process.env.MINIO_ENDPOINT_PORT)
+  'minioEndpointPort': Number(process.env.MINIO_ENDPOINT_PORT),
+  'logLevel': process.env.LOGLEVEL || 'info'
 };
 module.exports = settings;
