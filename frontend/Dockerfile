@@ -28,7 +28,7 @@ RUN npm set progress=false
 RUN npm config set depth 0
 
 # install ALL node_modules, including 'devDependencies'
-RUN npm install --only=dev --no-bin-links
+RUN npm install --only=dev
 
 # add current folder
 COPY . .
