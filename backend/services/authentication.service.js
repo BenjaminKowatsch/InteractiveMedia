@@ -9,65 +9,60 @@ var httpResonseService = require('./httpResonse.service');
 const ERROR = require('../config.error');
 
 module.exports.isAuthenticated = function(req, res, next) {
-
-  let resErrorBody = {
-    'success': false,
-    'payload': {
-      'dataPath': 'validation',
-      'message': ''
+  let authType;
+  let authToken;
+  // begin promise-chain
+  Promise.resolve().then(() => {
+    const authHeaderRaw = req.get('Authorization');
+    if (authHeaderRaw === undefined) {
+      // no header Authorization provided
+      let msg = 'no header Authorization provided';
+      return Promise.reject({isSelfProvided: true, msg: msg});
     }
-  };
-
-  const authHeaderRaw = req.get('Authorization');
-
-  if (authHeaderRaw !== undefined) {
     const authHeader = authHeaderRaw.split(' ');
-
-    if (authHeader.length === 2) {
-      const authType = parseInt(authHeader[0]);
-      const authToken = authHeader[1];
-
-      if (Number.isInteger(authType)) {
-        winston.debug('authType', authType);
-        winston.debug('authToken', authToken);
-        verifyAccessToken(authToken, authType).then((promiseData) => {
-            // verified user successfully
-            winston.debug('VerifyAccessToken result: ' + JSON.stringify(promiseData));
-            res.locals.userId = promiseData.userId;
-            res.locals.authType = authType;
-            res.locals.authToken = authToken;
-            next();
-          })
-          .catch((error) => {
-            // auth token or type invalid, unauthorized
-            if (error === ERROR.INVALID_AUTHTYPE) {
-              winston.debug('invalid auth type');
-              resErrorBody.payload.dataPath = 'authType';
-              resErrorBody.payload.message = 'invalid auth type';
-            } else {
-              resErrorBody.payload.dataPath = 'authToken';
-              resErrorBody.payload.message = 'invalid auth token';
-            }
-            httpResonseService.sendHttpResponse(res, 401, resErrorBody);
-          });
-      } else {
-        // authType is not an integer
-        winston.debug('invalid format of authType provided in header Authorization');
-        resErrorBody.payload.message = 'invalid format of authType provided in header Authorization';
-        httpResonseService.sendHttpResponse(res, 401, resErrorBody);
-      }
-    } else {
+    if (authHeader.length !== 2) {
       // invalid number arguments in header Authorization
-      winston.debug('invalid number of arguments provided in header Authorization');
-      resErrorBody.payload.message = 'invalid number of arguments provided in header Authorization';
-      httpResonseService.sendHttpResponse(res, 401, resErrorBody);
+      let msg = 'invalid number of arguments provided in header Authorization';
+      return Promise.reject({isSelfProvided: true, msg: msg});
     }
-  } else {
-    // no header Authorization provided
-    winston.debug('no header Authorization provided');
-    resErrorBody.payload.message = 'no header Authorization provided';
+    authType = parseInt(authHeader[0]);
+    authToken = authHeader[1];
+    if (!Number.isInteger(authType)) {
+      // authType is not an integer
+      let msg = 'invalid format of authType provided in header Authorization';
+      return Promise.reject({isSelfProvided: true, msg: msg});
+    }
+    winston.debug('authType', authType);
+    winston.debug('authToken', authToken);
+    return verifyAccessToken(authToken, authType);
+  }).then(promiseData => {
+    // verified user successfully
+    res.locals.userId = promiseData.userId;
+    res.locals.authType = authType;
+    res.locals.authToken = authToken;
+    winston.debug('VerifyAccessToken result: ' + JSON.stringify(promiseData));
+    next();
+  }).catch((error) => {
+    let resErrorBody = {
+      success: false,
+      payload: {
+        dataPath: 'validation',
+        message: ''
+      }
+    };
+    if (error && error.isSelfProvided) {
+      resErrorBody.payload.message = error.msg;
+    } else if (error === ERROR.INVALID_AUTHTYPE) {
+      // auth token or type invalid, unauthorized
+      resErrorBody.payload.dataPath = 'authType';
+      resErrorBody.payload.message = 'invalid auth type';
+    } else {
+      resErrorBody.payload.dataPath = 'authToken';
+      resErrorBody.payload.message = 'invalid auth token';
+    }
+    winston.debug(resErrorBody.payload.message);
     httpResonseService.sendHttpResponse(res, 401, resErrorBody);
-  }
+  });
 };
 
 /**
