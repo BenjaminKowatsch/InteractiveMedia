@@ -6,16 +6,21 @@ const config = require('./config');
 const uuidService = require('../services/uuid.service');
 const database = require('../modules/database');
 const tokenService = require('../services/token.service');
+const ERROR = require('../config.error');
 
 /**
- * [description]
- *
- * @param  {JSONObject} groupData   group to be inserted into the database
- *                                  {String} 'name'
- *                                  {String} 'imageUrl'
- *                                  {JSONArray} 'users' consisting of userEmail Strings
- * @return {Promise}                 [description]
- */
+ * @param  {String} authToken auth token of user
+ * @param  {String} groupData.name name of new group
+ * @param  {String} groupData.imageUrl url of group image, can be null
+ * @param  {Array<String>} groupData.users array of user emails for group
+ * @return {Promise}
+ *    then: {Object}
+ *      {Boolean} success Flag to indicate the successful request
+ *      {Object} groupData Object which was inserted
+ *    catch: {Object}
+ *      {String} errorCode Kind of error which occured
+ *      {Object} responseData Object with error details
+ **/
 group.createNewGroup = function(authToken, groupData) {
   return new Promise((resolve, reject) => {
     winston.debug('Hello from module createNewGroup');
@@ -37,12 +42,14 @@ group.createNewGroup = function(authToken, groupData) {
       let groupUserIds = findOneValues.map(val => val ? val.userId : null);
       let groupUserEmails = findOneValues.map(val => val ? val.email : null);
       errorToReturn.dataPath = 'groupUsers';
+      errorToReturn.errorCode = ERROR.INVALIDE_CREATE_GROUP_VALUES;
 
       // checken if an id is null => unknonw user
       if (groupUserIds.includes(null)) {
         //filter returns true, if email of groupData.users is not in groupUserEmails
         let diffEmails = groupData.users.filter(i => groupUserEmails.indexOf(i) < 0).toString();
         errorToReturn.message = 'Unknown user: ' + diffEmails;
+        errorToReturn.errorCode = ERROR.UNKNOWN_USER;
         return Promise.reject(errorToReturn);
       //check if groupUsers contains groupCreator by creatorId
       } else if (!groupUserIds.includes(creatorId)) {
@@ -61,22 +68,22 @@ group.createNewGroup = function(authToken, groupData) {
       winston.debug('Creating a new group successful');
       responseData.payload = groupData;
       responseData.success = true;
-      responseData.statusCode = 201;
       resolve(responseData);
     }).catch(err => {
-      winston.error('Creating a new group failed ');
+      let errorCode;
+      winston.error('Creating a new group failed');
       winston.error(err);
-      responseData.payload.dataPath = 'group';
-      responseData.payload.message = err;
       responseData.success = false;
-      responseData.statusCode = 400;
-      // return custom values if it's an ErrorToReturn + values available
       if (err.isSelfProvided) {
-        responseData.payload.dataPath = err.dataPath || responseData.payload.dataPath;
-        responseData.payload.message = err.message || responseData.payload.message;
-        responseData.statusCode = err.statusCode || responseData.statusCode;
+        responseData.payload.dataPath = err.dataPath;
+        responseData.payload.message = err.message;
+        errorCode = err.errorCode;
+      } else {
+        responseData.payload.dataPath = 'group';
+        responseData.payload.message = 'unknown database error';
+        errorCode = ERROR.DB_ERROR;
       }
-      reject(responseData);
+      reject({errorCode: errorCode, responseData: responseData});
     });
   });
 };
