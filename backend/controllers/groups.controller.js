@@ -26,8 +26,8 @@ exports.createNewGroup = function(req, res) {
       case ERROR.UNKNOWN_USER:
         statusCode = 409;
         break;
-      case ERROR.INVALIDE_REQUEST_BODY:
-      case ERROR.INVALIDE_CREATE_GROUP_VALUES:
+      case ERROR.INVALID_REQUEST_BODY:
+      case ERROR.INVALID_CREATE_GROUP_VALUES:
         statusCode = 400;
         break;
       case ERROR.DB_ERROR:

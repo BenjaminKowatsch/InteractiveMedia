@@ -42,7 +42,7 @@ group.createNewGroup = function(authToken, groupData) {
       let groupUserIds = findOneValues.map(val => val ? val.userId : null);
       let groupUserEmails = findOneValues.map(val => val ? val.email : null);
       errorToReturn.dataPath = 'groupUsers';
-      errorToReturn.errorCode = ERROR.INVALIDE_CREATE_GROUP_VALUES;
+      errorToReturn.errorCode = ERROR.INVALID_CREATE_GROUP_VALUES;
 
       // checken if an id is null => unknonw user
       if (groupUserIds.includes(null)) {
