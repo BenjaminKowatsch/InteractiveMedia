@@ -11,29 +11,10 @@ const ERROR = require('../config.error');
 module.exports.isAuthenticated = function(req, res, next) {
   let authType;
   let authToken;
-  // begin promise-chain
-  Promise.resolve().then(() => {
-    const authHeaderRaw = req.get('Authorization');
-    if (authHeaderRaw === undefined) {
-      // no header Authorization provided
-      let msg = 'no header Authorization provided';
-      return Promise.reject({isSelfProvided: true, msg: msg});
-    }
-    const authHeader = authHeaderRaw.split(' ');
-    if (authHeader.length !== 2) {
-      // invalid number arguments in header Authorization
-      let msg = 'invalid number of arguments provided in header Authorization';
-      return Promise.reject({isSelfProvided: true, msg: msg});
-    }
-    authType = parseInt(authHeader[0]);
-    authToken = authHeader[1];
-    if (!Number.isInteger(authType)) {
-      // authType is not an integer
-      let msg = 'invalid format of authType provided in header Authorization';
-      return Promise.reject({isSelfProvided: true, msg: msg});
-    }
-    winston.debug('authType', authType);
-    winston.debug('authToken', authToken);
+  const authHeaderRaw = req.get('Authorization');
+  parseAuthHeader(authHeaderRaw).then(auth => {
+    authType = auth. authType;
+    authToken = auth.authToken;
     return verifyAccessToken(authToken, authType);
   }).then(promiseData => {
     // verified user successfully
@@ -93,4 +74,28 @@ function verifyAccessToken(token, authType) {
       winston.error(ERROR.INVALID_AUTHTYPE);
       return Promise.reject(ERROR.INVALID_AUTHTYPE);
   }
+}
+
+function parseAuthHeader(authHeaderRaw) {
+  if (authHeaderRaw === undefined) {
+    // no header Authorization provided
+    let msg = 'no header Authorization provided';
+    return Promise.reject({isSelfProvided: true, msg: msg});
+  }
+  const authHeader = authHeaderRaw.split(' ');
+  if (authHeader.length !== 2) {
+    // invalid number arguments in header Authorization
+    let msg = 'invalid number of arguments provided in header Authorization';
+    return Promise.reject({isSelfProvided: true, msg: msg});
+  }
+  authType = parseInt(authHeader[0]);
+  authToken = authHeader[1];
+  if (!Number.isInteger(authType)) {
+    // authType is not an integer
+    let msg = 'invalid format of authType provided in header Authorization';
+    return Promise.reject({isSelfProvided: true, msg: msg});
+  }
+  winston.debug('authType', authType);
+  winston.debug('authToken', authToken);
+  return Promise.resolve({authToken: authToken, authType: authType});
 }
