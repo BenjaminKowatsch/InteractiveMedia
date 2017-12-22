@@ -26,7 +26,7 @@ RUN npm set progress=false
 RUN npm config set depth 0
 
 # install only node packages required for production
-RUN npm install --only=production --no-bin-links
+RUN npm install --only=production
 
 #ARG ORIGIN
 
@@ -34,7 +34,7 @@ RUN npm install --only=production --no-bin-links
 RUN cp -R node_modules prod_node_modules
 
 # install ALL node_modules, including 'devDependencies'
-RUN npm install --no-bin-links
+RUN npm install
 
 #
 # ---- Unit tests and linters ----
