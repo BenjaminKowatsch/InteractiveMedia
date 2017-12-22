@@ -11,7 +11,7 @@ var statusController = require('../controllers/status.controller');
  *
  * @apiSuccess (SuccessCode) {200} Success Status is healthy
  * @apiUse successBodySuccess
- * @apiSuccess (Success) {String} payload.status Current status
+ * @apiSuccess (Success) {String} payload[status] Current status
  *
  * @apiSuccessExample {json} Success-Response:
    {
