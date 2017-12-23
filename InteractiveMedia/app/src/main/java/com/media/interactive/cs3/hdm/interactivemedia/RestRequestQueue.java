@@ -1,13 +1,12 @@
 package com.media.interactive.cs3.hdm.interactivemedia;
 
 import android.content.Context;
+import android.os.Build;
+import android.support.annotation.RequiresApi;
 import android.util.Log;
 
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
-import com.android.volley.Response;
-import com.android.volley.toolbox.JsonArrayRequest;
-import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
 
 import java.util.concurrent.CompletableFuture;
@@ -53,31 +52,5 @@ public class RestRequestQueue {
     public <T> void addToRequestQueue(Request<T> request) {
         getRequestQueue().add(request);
     }
-    /*
-    //@RequiresApi(api = Build.VERSION_CODES.N)
-    public CompletableFuture<JSONObject> send(String url, int requestMethod, JSONObject data) {
-        //final CompletableFuture<JSONObject> future = new CompletableFuture<>();
-
-        Log.d("RestQueue: ", " Thread Id: " + android.os.Process.getThreadPriority(android.os.Process.myTid()));
-
-        final JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(
-            requestMethod, url, data, future::complete, future::completeExceptionally);
-
-        addToRequestQueue(jsonObjectRequest);
-
-        //return future;
-    }
-
-    //@RequiresApi(api = Build.VERSION_CODES.N)
-    public void send(String url, int requestMethod, JSONArray data, Response.Listener<JSONArray> onComplete, Response.ErrorListener onCompleteExceptionally) {
-        //final CompletableFuture<JSONArray> future = new CompletableFuture<>();
-
-        final JsonArrayRequest jsonArrayRequest = new JsonArrayRequest(
-            requestMethod, url, data, onComplete, onCompleteExceptionally);
-
-        addToRequestQueue(jsonArrayRequest);
-
-        //return future;
-    }*/
 
 }

@@ -6,16 +6,14 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.net.Uri;
-import android.os.Build;
 import android.support.annotation.NonNull;
-import android.support.annotation.RequiresApi;
 import android.util.Log;
 
-import com.android.volley.AuthFailureError;
 import com.android.volley.Request;
 import com.android.volley.Response;
-import com.android.volley.VolleyError;
-import com.android.volley.toolbox.JsonObjectRequest;
+import com.android.volley.error.AuthFailureError;
+import com.android.volley.error.VolleyError;
+import com.android.volley.request.JsonObjectRequest;
 import com.facebook.AccessToken;
 import com.facebook.login.LoginManager;
 import com.google.android.gms.auth.api.Auth;
@@ -32,13 +30,11 @@ import com.media.interactive.cs3.hdm.interactivemedia.RestRequestQueue;
 import com.media.interactive.cs3.hdm.interactivemedia.contentprovider.DatabaseProvider;
 import com.media.interactive.cs3.hdm.interactivemedia.contentprovider.tables.LoginTable;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.concurrent.CompletableFuture;
-
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.HashMap;
+import java.util.Map;
 
 
 /**
@@ -54,6 +50,7 @@ public class Login {
     private String hashedPassword = null;
     private UserType userType = null;
     private String accessToken = null;
+    private String profilePicture = null;
     //private DatabaseHelper databaseHelper = null;
     private ContentResolver contentResolver = null;
 
@@ -212,7 +209,7 @@ public class Login {
     }
 
     //@RequiresApi(api = Build.VERSION_CODES.N)
-    public void register(Context context, final CallbackListener<JSONObject,Exception> callbackListener) {
+    public void register(Context context, final CallbackListener<JSONObject, Exception> callbackListener) {
         //final CompletableFuture<Void> future = new CompletableFuture<>();
 
         contentResolver = context.getContentResolver();
@@ -246,9 +243,8 @@ public class Login {
         RestRequestQueue.getInstance(context).addToRequestQueue(jsonObjectRequest);
     }
 
-    //@RequiresApi(api = Build.VERSION_CODES.N)
-    public void login(Context context, CallbackListener<JSONObject,Exception> callbackListener) {
-        //final CompletableFuture<Void> future = new CompletableFuture<>();
+
+    public void login(Context context, CallbackListener<JSONObject, Exception> callbackListener) {
 
         contentResolver = context.getContentResolver();
 
@@ -275,17 +271,15 @@ public class Login {
                 cachedGoogleLogin(context, callbackListener);
                 break;
             case 2: //UserType.FACEBOOK
-                cachedFacebookLogin( context, callbackListener);
+                cachedFacebookLogin(context, callbackListener);
                 break;
             default:
                 callbackListener.onFailure(new Exception("No cached credentials available."));
                 break;
         }
 
-        //return future;
     }
 
-    //@RequiresApi(api = Build.VERSION_CODES.N)
     private void cachedGoogleLogin(Context context, final CallbackListener<JSONObject, Exception> callbackListener) {
         // Check if the accessToken is not set
         // If the accessToken is not set there is no need to check the cache
@@ -340,7 +334,7 @@ public class Login {
         RestRequestQueue.getInstance(context).addToRequestQueue(jsonObjectRequest);
     }
 
-    //@RequiresApi(api = Build.VERSION_CODES.N)
+
     private void cachedFacebookLogin(Context context, final CallbackListener<JSONObject, Exception> callbackListener) {
         // Check if the accessToken is not set
         // If the accessToken is not set there is no need to check the cache
@@ -381,7 +375,7 @@ public class Login {
         RestRequestQueue.getInstance(context).addToRequestQueue(jsonObjectRequest);
     }
 
-    //@RequiresApi(api = Build.VERSION_CODES.N)
+
     private void cachedDefaultLogin(Context context, final CallbackListener<JSONObject, Exception> callbackListener) {
 
         // Send data to Backend and validate data
@@ -434,9 +428,9 @@ public class Login {
             + '}';
     }
 
-    //@RequiresApi(api = Build.VERSION_CODES.N)
+
     public void logout(Activity activity, final CallbackListener<JSONObject, Exception> callbackListener) {
-        //final CompletableFuture<Void> future = new CompletableFuture<>();
+
 
         // Local Facebook logout
         LoginManager.getInstance().logOut();
@@ -491,15 +485,23 @@ public class Login {
                 error.printStackTrace();
                 callbackListener.onFailure(error);
             }
-        }){
+        }) {
             @Override
             public Map<String, String> getHeaders() throws AuthFailureError {
-                Map<String, String>  params = new HashMap<String, String>();
-                params.put("Authorization", userType.getValue()+" "+accessToken);
+                final Map<String, String> params = new HashMap<String, String>();
+                params.put("Authorization", userType.getValue() + " " + accessToken);
 
                 return params;
             }
         };
         RestRequestQueue.getInstance(activity).addToRequestQueue(jsonObjectRequest);
+    }
+
+    public String getProfilePicture() {
+        return profilePicture;
+    }
+
+    public void setProfilePicture(String profilePicture) {
+        this.profilePicture = profilePicture;
     }
 }
