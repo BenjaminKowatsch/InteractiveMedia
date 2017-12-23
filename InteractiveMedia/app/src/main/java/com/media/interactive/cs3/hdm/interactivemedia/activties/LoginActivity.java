@@ -25,10 +25,13 @@ import com.google.android.gms.auth.api.signin.GoogleSignInResult;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.SignInButton;
 import com.google.android.gms.common.api.GoogleApiClient;
+import com.media.interactive.cs3.hdm.interactivemedia.CallbackListener;
 import com.media.interactive.cs3.hdm.interactivemedia.R;
 import com.media.interactive.cs3.hdm.interactivemedia.data.Hash;
 import com.media.interactive.cs3.hdm.interactivemedia.data.Login;
 import com.media.interactive.cs3.hdm.interactivemedia.data.UserType;
+
+import org.json.JSONObject;
 
 
 public class LoginActivity extends AppCompatActivity
@@ -65,9 +68,17 @@ public class LoginActivity extends AppCompatActivity
                 final Login login = Login.getInstance();
                 login.setAccessToken(loginResult.getAccessToken().getToken().toString());
                 login.setUserType(UserType.FACEBOOK);
-                login.login(LoginActivity.this)
-                    .thenAccept(LoginActivity.this::navigateToHome)
-                    .exceptionally(LoginActivity.this::loginFailedHandler);
+                login.login(LoginActivity.this, new CallbackListener<JSONObject, Exception>() {
+                    @Override
+                    public void onSuccess(JSONObject response) {
+                        navigateToHome();
+                    }
+
+                    @Override
+                    public void onFailure(Exception error) {
+                        loginFailedHandler(error);
+                    }
+                });
             }
 
             @Override
@@ -106,7 +117,7 @@ public class LoginActivity extends AppCompatActivity
             .build();
     }
 
-    private void navigateToHome(Void voidParam) {
+    private void navigateToHome() {
         final Intent toHome = new Intent(LoginActivity.this, HomeActivity.class);
         toHome.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
         startActivity(toHome);
@@ -121,7 +132,7 @@ public class LoginActivity extends AppCompatActivity
 
         Toast toast = Toast.makeText(context, text, duration);
         toast.show();
-        this.navigateToHome(nil);
+        this.navigateToHome();
         //Log.d(TAG,"Login failed");
         //throw new RuntimeException(error.getMessage());
         return nil;
@@ -145,9 +156,17 @@ public class LoginActivity extends AppCompatActivity
                 login.setUsername(loginUsername.getText().toString());
                 login.setHashedPassword(Hash.hashStringSha256(loginPassword.getText().toString()));
                 login.setUserType(UserType.DEFAULT);
-                login.login(LoginActivity.this)
-                    .thenAccept(LoginActivity.this::navigateToHome)
-                    .exceptionally(LoginActivity.this::loginFailedHandler);
+                login.login(LoginActivity.this, new CallbackListener<JSONObject, Exception>() {
+                    @Override
+                    public void onSuccess(JSONObject response) {
+                        navigateToHome();
+                    }
+
+                    @Override
+                    public void onFailure(Exception error) {
+                        loginFailedHandler(error);
+                    }
+                });
                 break;
             default:
                 Log.e(TAG, "OnClick error occurred");
@@ -176,9 +195,17 @@ public class LoginActivity extends AppCompatActivity
             final Login login = Login.getInstance();
             login.setAccessToken(account.getIdToken());
             login.setUserType(UserType.GOOGLE);
-            login.login(LoginActivity.this)
-                .thenAccept(LoginActivity.this::navigateToHome)
-                .exceptionally(LoginActivity.this::loginFailedHandler);
+            login.login(LoginActivity.this, new CallbackListener<JSONObject, Exception>() {
+                @Override
+                public void onSuccess(JSONObject response) {
+                    navigateToHome();
+                }
+
+                @Override
+                public void onFailure(Exception error) {
+                    loginFailedHandler(error);
+                }
+            });
             /*
             if (account.getPhotoUrl() != null) {
                 final String googleImgUrl = account.getPhotoUrl().toString();
@@ -191,7 +218,7 @@ public class LoginActivity extends AppCompatActivity
     }
 
 
-    @RequiresApi(api = Build.VERSION_CODES.N)
+    //@RequiresApi(api = Build.VERSION_CODES.N)
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);

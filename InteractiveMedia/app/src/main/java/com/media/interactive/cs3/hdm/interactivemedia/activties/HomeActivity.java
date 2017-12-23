@@ -20,11 +20,14 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Toast;
 
+import com.media.interactive.cs3.hdm.interactivemedia.CallbackListener;
 import com.media.interactive.cs3.hdm.interactivemedia.R;
 import com.media.interactive.cs3.hdm.interactivemedia.data.Login;
 import com.media.interactive.cs3.hdm.interactivemedia.fragments.GroupFragment;
 import com.media.interactive.cs3.hdm.interactivemedia.fragments.IMyFragment;
 import com.media.interactive.cs3.hdm.interactivemedia.fragments.TransactionFragment;
+
+import org.json.JSONObject;
 
 public class HomeActivity extends AppCompatActivity
     implements NavigationView.OnNavigationItemSelectedListener,
@@ -103,20 +106,23 @@ public class HomeActivity extends AppCompatActivity
                 fragment = new TransactionFragment();
                 break;
             case R.id.nav_logout:
-                Login.getInstance().logout(this)
-                    .thenAccept((voidParam) -> {
+                Login.getInstance().logout(this, new CallbackListener<JSONObject, Exception>() {
+                    @Override
+                    public void onSuccess(JSONObject response) {
                         Log.d(TAG, "Successfully logged out.");
                         Toast.makeText(HomeActivity.this, "Sucessfully logged out.", Toast.LENGTH_SHORT).show();
                         final Intent toLogin = new Intent(HomeActivity.this, LoginActivity.class);
                         toLogin.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
                         startActivity(toLogin);
                         finish();
-                    })
-                    .exceptionally(error -> {
+                    }
+
+                    @Override
+                    public void onFailure(Exception error) {
                         Log.d(TAG, "Failed during logout.");
                         Toast.makeText(HomeActivity.this, "Logout failed", Toast.LENGTH_SHORT).show();
-                        throw new RuntimeException(error.getMessage());
-                    });
+                    }
+                });
 
 
                 break;

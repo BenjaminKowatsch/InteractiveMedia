@@ -11,10 +11,13 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.media.interactive.cs3.hdm.interactivemedia.CallbackListener;
 import com.media.interactive.cs3.hdm.interactivemedia.R;
 import com.media.interactive.cs3.hdm.interactivemedia.data.Hash;
 import com.media.interactive.cs3.hdm.interactivemedia.data.Login;
 import com.media.interactive.cs3.hdm.interactivemedia.data.UserType;
+
+import org.json.JSONObject;
 
 public class RegisterActivity extends AppCompatActivity
     implements View.OnClickListener {
@@ -48,8 +51,9 @@ public class RegisterActivity extends AppCompatActivity
                 login.setUserType(UserType.DEFAULT);
                 login.setEmail(registerEmail.getText().toString());
                 login.setHashedPassword(Hash.hashStringSha256(registerPassword.getText().toString()));
-                login.register(RegisterActivity.this)
-                    .thenAccept((voidParam) -> {
+                login.register(RegisterActivity.this, new CallbackListener<JSONObject, Exception>() {
+                    @Override
+                    public void onSuccess(JSONObject param) {
                         Toast.makeText(getApplicationContext(),
                             "Success fully logged in",
                             Toast.LENGTH_SHORT).show();
@@ -57,11 +61,13 @@ public class RegisterActivity extends AppCompatActivity
                         toHome.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
                         startActivity(toHome);
                         finish();
-                    })
-                    .exceptionally((error) -> {
+                    }
+
+                    @Override
+                    public void onFailure(Exception error) {
                         Log.e(TAG, "error: " + error.getMessage());
-                        throw new RuntimeException(error.getMessage());
-                    });
+                    }
+                });
 
                 break;
             default:

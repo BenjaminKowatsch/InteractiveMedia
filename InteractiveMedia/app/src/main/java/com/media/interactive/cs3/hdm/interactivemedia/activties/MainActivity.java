@@ -9,11 +9,14 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.media.interactive.cs3.hdm.interactivemedia.CallbackListener;
 import com.media.interactive.cs3.hdm.interactivemedia.R;
 import com.media.interactive.cs3.hdm.interactivemedia.contentprovider.DatabaseHelper;
 import com.media.interactive.cs3.hdm.interactivemedia.contentprovider.DummyDataAdder;
 import com.media.interactive.cs3.hdm.interactivemedia.data.Hash;
 import com.media.interactive.cs3.hdm.interactivemedia.data.Login;
+
+import org.json.JSONObject;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -55,8 +58,9 @@ public class MainActivity extends AppCompatActivity {
 
     @RequiresApi(api = Build.VERSION_CODES.N)
     private void launchNextActivity() {
-        Login.getInstance().login(MainActivity.this)
-            .thenAccept(Void -> {
+        Login.getInstance().login(MainActivity.this, new CallbackListener<JSONObject, Exception>() {
+            @Override
+            public void onSuccess(JSONObject param) {
                 if (sharedPreferences.getBoolean(hasRun, false)) {
                     // This is not the first run
                     Log.d(TAG, "Launching Home Activity");
@@ -64,10 +68,13 @@ public class MainActivity extends AppCompatActivity {
                     intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
                     startActivity(intent);
                 } else {
-                    throw new RuntimeException("Not first run");
+                    Log.d(TAG, "Not first run");
                 }
-            })
-            .exceptionally(error -> {
+                finish();
+            }
+
+            @Override
+            public void onFailure(Exception error) {
                 Log.d(TAG, "Login failed due to " + error.getMessage());
                 Toast.makeText(getApplicationContext(), "Login failed", Toast.LENGTH_SHORT).show();
                 // Do first run stuff
@@ -78,10 +85,9 @@ public class MainActivity extends AppCompatActivity {
                 sharedPreferences.edit()
                     .putBoolean(hasRun, true)
                     .commit();
-                throw new RuntimeException(error.getMessage());
-            }).thenAccept((result) -> {
                 finish();
-            });
+            }
+        });
     }
 
 
