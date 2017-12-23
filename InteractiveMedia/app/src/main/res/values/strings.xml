@@ -15,9 +15,12 @@
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
 
-    <string name="web_service_url">http://10.0.0.107:8081</string>
+    <!-- Local WLAN Device Setup -->
+    <!--<string name="web_service_url">http://10.0.0.107:8081</string>-->
+    <!-- Production Setup -->
     <!--<string name="web_service_url">http://cloudproject.mi.hdm-stuttgart.de:8081</string>-->
-    <!--<string name="web_service_url">http://10.0.2.2:8081</string>-->
+    <!-- Emulator Setup -->
+    <string name="web_service_url">http://10.0.2.2:8081</string>
     <string name="pick_image_source">Image Source</string>
 
 </resources>
