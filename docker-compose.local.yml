@@ -28,6 +28,7 @@ services:
     build: ./backend 
     environment: 
       - ORIGIN=http://localhost:8088
+      - LOGLEVEL=debug
     image: localhost:5000/backend
     ports:
       - "8081:8081"

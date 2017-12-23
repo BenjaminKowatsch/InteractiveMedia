@@ -26,7 +26,7 @@ RUN npm set progress=false
 RUN npm config set depth 0
 
 # install only node packages required for production
-RUN npm install --only=production --no-bin-links
+RUN npm install --only=production
 
 #ARG ORIGIN
 

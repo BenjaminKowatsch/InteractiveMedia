@@ -24,7 +24,8 @@ var MONGO_DB_CONNECTION_ERROR_CODE = 10;
  * Configure logger
  * ===========================
  */
-winston.level = 'info';
+winston.level = config.logLevel;
+winston.info('logLevel', winston.level);
 
 /**
  * Initialize express instance
