@@ -7,5 +7,5 @@ module.exports = {
     NO_AUTH_HEADER: 'no http request header Authorization provided',
     INVALID_AUTH_HEADER: 'invalid http request header Authorization provided',
     INVALID_AUTH_TOKEN: 'invalid auth token',
-    UNKNOWN_OR_EXPIRED_USER: 'unknown user or expired token'
+    UNKNOWN_USER_OR_EXPIRED_TOKEN: 'unknown user or expired token'
   };

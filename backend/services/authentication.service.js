@@ -38,7 +38,7 @@ module.exports.isAuthenticated = function(req, res, next) {
       case ERROR.INVALID_AUTH_TOKEN:
         statusCode = 401;
         break;
-      case ERROR.UNKNOWN_OR_EXPIRED_USER:
+      case ERROR.UNKNOWN_USER_OR_EXPIRED_TOKEN:
         statusCode = 401;
         break;
       case ERROR.DB_ERROR:

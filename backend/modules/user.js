@@ -76,7 +76,7 @@ exports.verifyGoogleAccessToken = function(token, verifyDatabase) {
               responseData.success = false;
               responseData.payload.dataPath = 'user';
               responseData.payload.message = 'unknown user or expired token';
-              errorCode = ERROR.UNKNOWN_OR_EXPIRED_USER;
+              errorCode = ERROR.UNKNOWN_USER_OR_EXPIRED_TOKEN;
               winston.error('errorCode', errorCode);
               reject({errorCode: errorCode, responseData: responseData});
             } else {
@@ -145,7 +145,7 @@ exports.verifyPasswordAccessToken = function(token) {
           responseData.success = false;
           responseData.payload.dataPath = 'user';
           responseData.payload.message = 'unknown user or expired token';
-          errorCode = ERROR.UNKNOWN_OR_EXPIRED_USER;
+          errorCode = ERROR.UNKNOWN_USER_OR_EXPIRED_TOKEN;
           winston.error('errorCode', errorCode);
           reject({errorCode: errorCode, responseData: responseData});
         } else {
@@ -220,7 +220,7 @@ function verifyFacbookTokenAtDatabase(data, verifyDatabase) {
           responseData.success = false;
           responseData.payload.dataPath = 'user';
           responseData.payload.message = 'unknown user or expired token';
-          errorCode = ERROR.UNKNOWN_OR_EXPIRED_USER;
+          errorCode = ERROR.UNKNOWN_USER_OR_EXPIRED_TOKEN;
           winston.error('errorCode', errorCode);
           reject({errorCode: errorCode, responseData: responseData});
         } else {
