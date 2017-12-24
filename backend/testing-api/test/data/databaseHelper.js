@@ -84,6 +84,6 @@ module.exports.cbResetDB = function(done) {
   promiseResetDB().then(() => {
       done();
     }).catch((error) => {
-      winston.err('DB Error: ' + error);
+      winston.error('DB Error: ' + error);
     });
 };
