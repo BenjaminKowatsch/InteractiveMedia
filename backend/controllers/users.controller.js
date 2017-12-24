@@ -81,8 +81,8 @@ exports.login = function(req, res) {
           .then(function(tokenValidationResult) {
               winston.debug('GoogleAccessToken: is valid');
               return user.googleOrFacebookLogin(tokenValidationResult.payload.userId,
-                              tokenValidationResult.payload.expiryDate, user.AUTH_TYPE.GOOGLE, req.body.accessToken,
-                              tokenValidationResult.payload.email);
+                tokenValidationResult.payload.expiryDate, user.AUTH_TYPE.GOOGLE, req.body.accessToken,
+                tokenValidationResult.payload.email);
             })
           .then(function(loginResult) {
               // mongo update was successful
@@ -112,8 +112,8 @@ exports.login = function(req, res) {
               winston.debug('FacebookAccessToken: is valid');
               winston.debug('tokenValidationResult', JSON.stringify(tokenValidationResult));
               return user.googleOrFacebookLogin(tokenValidationResult.payload.userId,
-                              tokenValidationResult.payload.expiryDate, user.AUTH_TYPE.FACEBOOK, req.body.accessToken,
-                              tokenValidationResult.payload.email);
+                tokenValidationResult.payload.expiryDate, user.AUTH_TYPE.FACEBOOK, req.body.accessToken,
+                tokenValidationResult.payload.email);
             })
           .then(function(loginResult) {
               // mongo update was successful

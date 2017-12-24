@@ -24,20 +24,13 @@ module.exports.isAuthenticated = function(req, res, next) {
     winston.debug('VerifyAccessToken result: ' + JSON.stringify(promiseData));
     next();
   }).catch((errorResult) => {
+    winston.error('errorCode', errorCode);
     let statusCode = 418;
     switch (errorResult.errorCode) {
       case ERROR.NO_AUTH_HEADER:
-        statusCode = 401;
-        break;
       case ERROR.INVALID_AUTH_HEADER:
-        statusCode = 401;
-        break;
       case ERROR.INVALID_AUTHTYPE:
-        statusCode = 401;
-        break;
       case ERROR.INVALID_AUTH_TOKEN:
-        statusCode = 401;
-        break;
       case ERROR.UNKNOWN_USER_OR_EXPIRED_TOKEN:
         statusCode = 401;
         break;
@@ -92,7 +85,6 @@ function parseAuthHeader(authHeaderRaw) {
     responseData.payload.dataPath = 'authentication';
     responseData.payload.message = 'no http request header Authorization provided';
     let errorCode = ERROR.NO_AUTH_HEADER;
-    winston.error('errorCode', errorCode);
     return Promise.reject({errorCode: errorCode, responseData: responseData});
   }
   const authHeader = authHeaderRaw.split(' ');
@@ -102,7 +94,6 @@ function parseAuthHeader(authHeaderRaw) {
     responseData.payload.dataPath = 'authentication';
     responseData.payload.message = 'invalid number of arguments provided in http request header Authorization';
     let errorCode = ERROR.INVALID_AUTH_HEADER;
-    winston.error('errorCode', errorCode);
     return Promise.reject({errorCode: errorCode, responseData: responseData});
   }
   const authType = parseInt(authHeader[0]);
@@ -113,7 +104,6 @@ function parseAuthHeader(authHeaderRaw) {
     responseData.payload.dataPath = 'authentication';
     responseData.payload.message = 'invalid authType provided in http request header Authorization';
     let errorCode = ERROR.INVALID_AUTHTYPE;
-    winston.error('errorCode', errorCode);
     return Promise.reject({errorCode: errorCode, responseData: responseData});
   }
   winston.debug('authType', authType);
