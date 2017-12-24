@@ -24,7 +24,7 @@ module.exports.isAuthenticated = function(req, res, next) {
     winston.debug('VerifyAccessToken result: ' + JSON.stringify(promiseData));
     next();
   }).catch((errorResult) => {
-    winston.error('errorCode', errorCode);
+    winston.error('errorCode', errorResult.errorCode);
     let statusCode = 418;
     switch (errorResult.errorCode) {
       case ERROR.NO_AUTH_HEADER:
