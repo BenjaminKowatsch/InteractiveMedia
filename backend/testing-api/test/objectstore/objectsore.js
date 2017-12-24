@@ -62,8 +62,8 @@ describe('Object-store', function() {
         .then(res => {
           expect(res).to.have.status(401);
           expect(res.body.success).to.be.false;
-          expect(res.body.payload.dataPath).to.be.equal('authToken');
-          expect(res.body.payload.message).to.be.equal('invalid auth token');
+          expect(res.body.payload.dataPath).to.be.equal('authentication');
+          expect(res.body.payload.message).to.be.equal('invalid authToken');
         });
     });
 
@@ -125,8 +125,8 @@ describe('Object-store', function() {
           .then(res => {
             expect(res).to.have.status(401);
             expect(res.body.success).to.be.false;
-            expect(res.body.payload.dataPath).to.be.equal('authToken');
-            expect(res.body.payload.message).to.be.equal('invalid auth token');
+            expect(res.body.payload.dataPath).to.be.equal('authentication');
+            expect(res.body.payload.message).to.be.equal('invalid authToken');
           });
       });
 

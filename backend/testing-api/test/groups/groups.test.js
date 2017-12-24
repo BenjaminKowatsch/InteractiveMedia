@@ -159,8 +159,8 @@ describe('Groups-Controller', () => {
           expect(res.body).to.be.an('object');
           expect(res.body.success).to.be.false;
           expect(res.body.payload).to.be.an('object');
-          expect(res.body.payload.dataPath).to.equal('authToken');
-          expect(res.body.payload.message).to.equal('invalid auth token');
+          expect(res.body.payload.dataPath).to.equal('authentication');
+          expect(res.body.payload.message).to.equal('invalid authToken');
         });
       });
 
@@ -174,8 +174,9 @@ describe('Groups-Controller', () => {
           expect(res).to.be.json;
           expect(res.body.success).to.be.false;
           expect(res.body.payload).to.be.an('object');
-          expect(res.body.payload.dataPath).to.equal('validation');
-          expect(res.body.payload.message).to.equal('invalid number of arguments provided in header Authorization');
+          expect(res.body.payload.dataPath).to.equal('authentication');
+          expect(res.body.payload.message).to.
+            equal('invalid number of arguments provided in http request header Authorization');
         });
       });
     });
