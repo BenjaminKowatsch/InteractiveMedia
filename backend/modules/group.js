@@ -21,7 +21,7 @@ const ERROR = require('../config.error');
  *      {String} errorCode Kind of error which occured
  *      {Object} responseData Object with error details
  **/
-group.createNewGroup = function(authToken, groupData) {
+group.createNewGroup = function(creatorId, groupData) {
   return new Promise((resolve, reject) => {
     winston.debug('Hello from module createNewGroup');
     let responseData = {payload: {}};
@@ -29,7 +29,6 @@ group.createNewGroup = function(authToken, groupData) {
     groupData.createdAt = new Date();
     groupData.transactions = [];
     let errorToReturn = {isSelfProvided: true};
-    let creatorId = tokenService.decodeToken(authToken).userId;
 
     // generate array of promises of db calls for find user by id
     let groupUserPromises = [];
