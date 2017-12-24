@@ -6,70 +6,40 @@ var winston = require('winston');
 var user = require('../modules/user');
 var httpResonseService = require('./httpResonse.service');
 
-const ERROR = {
-  'INVALID_AUTHTYPE': 'invalid auth type'
-};
+const ERROR = require('../config.error');
 
 module.exports.isAuthenticated = function(req, res, next) {
-
-  let resErrorBody = {
-    'success': false,
-    'payload': {
-      'dataPath': 'validation',
-      'message': ''
-    }
-  };
-
+  let authType;
+  let authToken;
   const authHeaderRaw = req.get('Authorization');
-
-  if (authHeaderRaw !== undefined) {
-    const authHeader = authHeaderRaw.split(' ');
-
-    if (authHeader.length === 2) {
-      const authType = parseInt(authHeader[0]);
-      const authToken = authHeader[1];
-
-      if (Number.isInteger(authType)) {
-        winston.debug('authType', authType);
-        winston.debug('authToken', authToken);
-        verifyAccessToken(authToken, authType).then((promiseData) => {
-            // verified user successfully
-            winston.debug('VerifyAccessToken result: ' + JSON.stringify(promiseData));
-            res.locals.userId = promiseData.userId;
-            res.locals.authType = authType;
-            res.locals.authToken = authToken;
-            next();
-          })
-          .catch((error) => {
-            // auth token or type invalid, unauthorized
-            if (error === ERROR.INVALID_AUTHTYPE) {
-              winston.debug('invalid auth type');
-              resErrorBody.payload.dataPath = 'authType';
-              resErrorBody.payload.message = 'invalid auth type';
-            } else {
-              resErrorBody.payload.dataPath = 'authToken';
-              resErrorBody.payload.message = 'invalid auth token';
-            }
-            httpResonseService.sendHttpResponse(res, 401, resErrorBody);
-          });
-      } else {
-        // authType is not an integer
-        winston.debug('invalid format of authType provided in header Authorization');
-        resErrorBody.payload.message = 'invalid format of authType provided in header Authorization';
-        httpResonseService.sendHttpResponse(res, 401, resErrorBody);
-      }
-    } else {
-      // invalid number arguments in header Authorization
-      winston.debug('invalid number of arguments provided in header Authorization');
-      resErrorBody.payload.message = 'invalid number of arguments provided in header Authorization';
-      httpResonseService.sendHttpResponse(res, 401, resErrorBody);
+  parseAuthHeader(authHeaderRaw).then(auth => {
+    authType = auth.payload.authType;
+    authToken = auth.payload.authToken;
+    return verifyAccessToken(authToken, authType);
+  }).then(promiseData => {
+    // verified user successfully
+    res.locals.userId = promiseData.payload.userId;
+    res.locals.authType = authType;
+    res.locals.authToken = authToken;
+    winston.debug('VerifyAccessToken result: ' + JSON.stringify(promiseData));
+    next();
+  }).catch((errorResult) => {
+    winston.error('errorCode', errorResult.errorCode);
+    let statusCode = 418;
+    switch (errorResult.errorCode) {
+      case ERROR.NO_AUTH_HEADER:
+      case ERROR.INVALID_AUTH_HEADER:
+      case ERROR.INVALID_AUTHTYPE:
+      case ERROR.INVALID_AUTH_TOKEN:
+      case ERROR.UNKNOWN_USER_OR_EXPIRED_TOKEN:
+        statusCode = 401;
+        break;
+      case ERROR.DB_ERROR:
+        statusCode = 500;
+        break;
     }
-  } else {
-    // no header Authorization provided
-    winston.debug('no header Authorization provided');
-    resErrorBody.payload.message = 'no header Authorization provided';
-    httpResonseService.sendHttpResponse(res, 401, resErrorBody);
-  }
+    httpResonseService.sendHttpResponse(res, statusCode, errorResult.responseData);
+  });
 };
 
 /**
@@ -97,7 +67,50 @@ function verifyAccessToken(token, authType) {
       // Verify facebook access token
       return user.verifyFacebookAccessToken(token, true, false);
     default:
-      winston.error(ERROR.INVALID_AUTHTYPE);
-      return Promise.reject(ERROR.INVALID_AUTHTYPE);
+      let responseData = {payload: {}};
+      responseData.success = false;
+      responseData.payload.dataPath = 'authentication';
+      responseData.payload.message = 'invalid authType provided in http request header Authorization';
+      let errorCode = ERROR.INVALID_AUTHTYPE;
+      winston.error('errorCode', errorCode);
+      return Promise.reject({errorCode: errorCode, responseData: responseData});
   }
+}
+
+function parseAuthHeader(authHeaderRaw) {
+  let responseData = {payload: {}};
+  if (authHeaderRaw === undefined) {
+    // no header Authorization provided
+    responseData.success = false;
+    responseData.payload.dataPath = 'authentication';
+    responseData.payload.message = 'no http request header Authorization provided';
+    let errorCode = ERROR.NO_AUTH_HEADER;
+    return Promise.reject({errorCode: errorCode, responseData: responseData});
+  }
+  const authHeader = authHeaderRaw.split(' ');
+  if (authHeader.length !== 2) {
+    // invalid number arguments in header Authorization
+    responseData.success = false;
+    responseData.payload.dataPath = 'authentication';
+    responseData.payload.message = 'invalid number of arguments provided in http request header Authorization';
+    let errorCode = ERROR.INVALID_AUTH_HEADER;
+    return Promise.reject({errorCode: errorCode, responseData: responseData});
+  }
+  const authType = parseInt(authHeader[0]);
+  const authToken = authHeader[1];
+  if (!Number.isInteger(authType)) {
+    // authType is not an integer
+    responseData.success = false;
+    responseData.payload.dataPath = 'authentication';
+    responseData.payload.message = 'invalid authType provided in http request header Authorization';
+    let errorCode = ERROR.INVALID_AUTHTYPE;
+    return Promise.reject({errorCode: errorCode, responseData: responseData});
+  }
+  winston.debug('authType', authType);
+  winston.debug('authToken', authToken);
+  responseData.success = true;
+  responseData.payload.authType = authType;
+  responseData.payload.authToken = authToken;
+  winston.debug('parseAuthHeader: before Promise.resolve');
+  return Promise.resolve(responseData);
 }

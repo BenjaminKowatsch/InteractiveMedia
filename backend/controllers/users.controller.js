@@ -80,9 +80,9 @@ exports.login = function(req, res) {
         user.verifyGoogleAccessToken(req.body.accessToken, false)
           .then(function(tokenValidationResult) {
               winston.debug('GoogleAccessToken: is valid');
-              return user.googleOrFacebookLogin(tokenValidationResult.userId,
-                              tokenValidationResult.expiryDate, user.AUTH_TYPE.GOOGLE, req.body.accessToken,
-                              tokenValidationResult.email);
+              return user.googleOrFacebookLogin(tokenValidationResult.payload.userId,
+                tokenValidationResult.payload.expiryDate, user.AUTH_TYPE.GOOGLE, req.body.accessToken,
+                tokenValidationResult.payload.email);
             })
           .then(function(loginResult) {
               // mongo update was successful
@@ -110,9 +110,10 @@ exports.login = function(req, res) {
         user.verifyFacebookAccessToken(req.body.accessToken, false, true)
           .then(function(tokenValidationResult) {
               winston.debug('FacebookAccessToken: is valid');
-              return user.googleOrFacebookLogin(tokenValidationResult.userId,
-                              tokenValidationResult.expiryDate, user.AUTH_TYPE.FACEBOOK, req.body.accessToken,
-                              tokenValidationResult.email);
+              winston.debug('tokenValidationResult', JSON.stringify(tokenValidationResult));
+              return user.googleOrFacebookLogin(tokenValidationResult.payload.userId,
+                tokenValidationResult.payload.expiryDate, user.AUTH_TYPE.FACEBOOK, req.body.accessToken,
+                tokenValidationResult.payload.email);
             })
           .then(function(loginResult) {
               // mongo update was successful
@@ -121,8 +122,8 @@ exports.login = function(req, res) {
             })
           .catch(function(loginErrorResult) {
               // mongo update failed
-              winston.info('loginErrorResult', loginErrorResult);
-              resBody = {'success': false, 'payload': loginErrorResult};
+              winston.info('loginErrorResult', JSON.stringify(loginErrorResult));
+              resBody = {'success': false, 'payload': loginErrorResult.responseData.payload};
               httpResonseService.sendHttpResponse(res, 401, resBody);
             });
       } else {

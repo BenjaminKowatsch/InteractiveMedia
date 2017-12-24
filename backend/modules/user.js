@@ -8,6 +8,7 @@ const config = require('./config');
 const uuidService = require('../services/uuid.service');
 const tokenService = require('../services/token.service');
 const database = require('../modules/database');
+const ERROR = require('../config.error');
 
 const MONGO_ERRCODE = {
   'DUPLICATEKEY': 11000
@@ -41,6 +42,7 @@ const googleAuthClient = new googleAuth.OAuth2(config.googleOAuthClientID, '', '
  */
 exports.verifyGoogleAccessToken = function(token, verifyDatabase) {
   return new Promise((resolve, reject) => {
+    let responseData = {payload: {}};
     // verify google access token
     googleAuthClient.verifyIdToken(token, config.googleOAuthClientID,
     function(error, login) {
@@ -64,31 +66,45 @@ exports.verifyGoogleAccessToken = function(token, verifyDatabase) {
           var options = {fields: {userId: 1, authType: 1, email: 1, expiryDate: 1}};
           database.collections.users.findOne(query, options, function(error, result) {
             if (error === null && result !== null) {
-              var promiseData = {
-                'expiryDate': result.expiryDate,
-                'email': result.email,
-                'userId': result.userId
-              };
-              winston.debug('returning:', promiseData);
-              resolve(promiseData);
+              responseData.success = true;
+              responseData.payload.expiryDate = result.expiryDate;
+              responseData.payload.userId = result.userId;
+              responseData.payload.email = result.email;
+              resolve(responseData);
+            } else if (error === null && result === null) {
+              let errorCode;
+              responseData.success = false;
+              responseData.payload.dataPath = 'user';
+              responseData.payload.message = 'unknown user or expired token';
+              errorCode = ERROR.UNKNOWN_USER_OR_EXPIRED_TOKEN;
+              winston.error('errorCode', errorCode);
+              reject({errorCode: errorCode, responseData: responseData});
             } else {
-              // Invalid expiryDate or internal database error
-              winston.error('Error MONGO_DB_INTERNAL_ERROR');
-              reject(error);
+              // Unknown internal database error
+              let errorCode;
+              responseData.success = false;
+              responseData.payload.dataPath = 'user';
+              responseData.payload.message = 'unknown database error';
+              errorCode = ERROR.DB_ERROR;
+              winston.error('errorCode', errorCode);
+              reject({errorCode: errorCode, responseData: responseData});
             }
           });
         } else {
-          var promiseData = {
-            'expiryDate': expiryDate,
-            'email': email,
-            'userId': userId
-          };
-          winston.debug('returning: ', promiseData);
-          resolve(promiseData);
+          responseData.success = true;
+          responseData.payload.expiryDate = result.expiryDate;
+          responseData.payload.userId = result.userId;
+          responseData.payload.email = result.email;
+          resolve(responseData);
         }
       } else {
-        winston.debug('token declared invalid by google library: ', error);
-        reject(error);
+        // Google claims invalid token
+        responseData.success = false;
+        responseData.payload.dataPath = 'authentication';
+        responseData.payload.message = 'invalid auth token';
+        let errorCode = ERROR.INVALID_AUTH_TOKEN;
+        winston.error('errorCode', errorCode);
+        reject({errorCode: errorCode, responseData: responseData});
       }
     });
   });
@@ -107,27 +123,43 @@ exports.verifyGoogleAccessToken = function(token, verifyDatabase) {
  */
 exports.verifyPasswordAccessToken = function(token) {
   return new Promise((resolve, reject) => {
-    var payload = tokenService.decodeToken(token);
-    var query = {
-      userId: payload.userId,
-      authType: AUTH_TYPE.PASSWORD,
-      expiryDate: {
-        '$gt': new Date()
-      }
-    };
-    var options = {fields: {userId: 1, expiryDate: 1}};
-    database.collections.users.findOne(query, options, function(error, result) {
-      if (error === null && result !== null) {
-        var promiseData = {
-          //  userCollection: userCollection,
-          expiryDate: result.expiryDate,
-          userId: result.userId
-        };
-        resolve(promiseData);
-      } else {
-        winston.error('Error MONGO_DB_INTERNAL_ERROR');
-        reject(error);
-      }
+    let responseData = {payload: {}};
+    tokenService.decodeToken(token).then(promiseData => {
+      var query = {
+        userId: promiseData.payload.userId,
+        authType: AUTH_TYPE.PASSWORD,
+        expiryDate: {
+          '$gt': new Date()
+        }
+      };
+      winston.debug('verifyPasswordAccessToken: query', JSON.stringify(query));
+      var options = {fields: {userId: 1, expiryDate: 1}};
+      database.collections.users.findOne(query, options, function(error, result) {
+        if (error === null && result !== null) {
+          responseData.success = true;
+          responseData.payload.expiryDate = result.expiryDate;
+          responseData.payload.userId = result.userId;
+          resolve(responseData);
+        } else if (error === null && result === null) {
+          let errorCode;
+          responseData.success = false;
+          responseData.payload.dataPath = 'user';
+          responseData.payload.message = 'unknown user or expired token';
+          errorCode = ERROR.UNKNOWN_USER_OR_EXPIRED_TOKEN;
+          winston.error('errorCode', errorCode);
+          reject({errorCode: errorCode, responseData: responseData});
+        } else {
+          let errorCode;
+          responseData.success = false;
+          responseData.payload.dataPath = 'user';
+          responseData.payload.message = 'unknown database error';
+          errorCode = ERROR.DB_ERROR;
+          winston.error('errorCode', errorCode);
+          reject({errorCode: errorCode, responseData: responseData});
+        }
+      });
+    }).catch((errorResult) => {
+      reject(errorResult);
     });
   });
 };
@@ -161,6 +193,7 @@ function httpsGetRequest(options) {
 }
 
 function verifyFacbookTokenAtDatabase(data, verifyDatabase) {
+  let responseData = {payload: {}};
   return new Promise((resolve, reject) => {
     const expiryDate = new Date(data.data.expires_at * 1000);
     const userId = data.data.user_id;
@@ -178,33 +211,46 @@ function verifyFacbookTokenAtDatabase(data, verifyDatabase) {
       const options = {fields: {userId: 1, expiryDate: 1}};
       database.collections.users.findOne(query, options, function(error, result) {
         if (error === null && result !== null) {
-          const promiseData = {
-            expiryDate: result.expiryDate,
-            userId: result.userId
-          };
-          winston.debug('returning:', promiseData);
-          resolve(promiseData);
+          responseData.success = true;
+          responseData.payload.expiryDate = result.expiryDate;
+          responseData.payload.userId = result.userId;
+          resolve(responseData);
+        } else if (error === null && result === null) {
+          let errorCode;
+          responseData.success = false;
+          responseData.payload.dataPath = 'user';
+          responseData.payload.message = 'unknown user or expired token';
+          errorCode = ERROR.UNKNOWN_USER_OR_EXPIRED_TOKEN;
+          winston.error('errorCode', errorCode);
+          reject({errorCode: errorCode, responseData: responseData});
         } else {
-          // Invalid expiryDate or internal database error
-          winston.error('Error MONGO_DB_INTERNAL_ERROR: ', error);
-          reject(error);
+          // Unknown internal database error
+          let errorCode;
+          responseData.success = false;
+          responseData.payload.dataPath = 'user';
+          responseData.payload.message = 'unknown database error';
+          errorCode = ERROR.DB_ERROR;
+          winston.error('errorCode', errorCode);
+          reject({errorCode: errorCode, responseData: responseData});
         }
       });
     } else {
-      const promiseData = {
-        expiryDate: expiryDate,
-        userId: userId
-      };
       winston.debug('returning: ', promiseData);
       if (verifyEmail === true) {
         verifyFacbookEmail(token).then((emailResult) => {
-          promiseData.email = emailResult.email;
-          resolve(promiseData);
+          responseData.success = true;
+          responseData.payload.expiryDate = result.expiryDate;
+          responseData.payload.userId = result.userId;
+          responseData.payload.email = emailResult.email;
+          resolve(responseData);
         }).catch((err) => {
           reject(err);
         });
       } else {
-        resolve(promiseData);
+        responseData.success = true;
+        responseData.payload.expiryDate = expiryDate;
+        responseData.payload.userId = userId;
+        resolve(responseData);
       }
     }
   });
@@ -222,6 +268,7 @@ function verifyFacbookTokenAtDatabase(data, verifyDatabase) {
  *                                                 {String} message String containing the error message or facebook error
  */
 exports.verifyFacebookAccessToken = function(token, verifyDatabase, verifyEmail) {
+  let responseData = {payload: {}};
   var options = {
     host: 'graph.facebook.com',
     path: ('/v2.9/debug_token?access_token=' +
@@ -234,23 +281,24 @@ exports.verifyFacebookAccessToken = function(token, verifyDatabase, verifyEmail)
       // check if Facebook verified the provided token
       if (data.data.error) {
         // Facebook claimed invalid access token
-        const errorResponse = {
-          'dataPath': 'login',
-          'message': 'login failed'
-        };
-        return Promise.reject(errorResponse);
+        responseData.success = false;
+        responseData.payload.dataPath = 'authentication';
+        responseData.payload.message = 'invalid auth token';
+        let errorCode = ERROR.INVALID_AUTH_TOKEN;
+        winston.error('errorCode', errorCode);
+        return Promise.reject({errorCode: errorCode, responseData: responseData});
       }
 
       const expiryDate = new Date(data.data.expires_at * 1000);
       const userId = data.data.user_id;
-      const promiseData = {
-        expiryDate: expiryDate,
-        userId: userId
-      };
       if (verifyDatabase === true) {
         return verifyFacbookTokenAtDatabase(data, verifyDatabase);
       } else {
-        return promiseData;
+        responseData.success = true;
+        responseData.payload.expiryDate = expiryDate;
+        responseData.payload.userId = userId;
+        winston.debug('in verifyFacbookTokenAtDatabase verifyDatabase === false', JSON.stringify(responseData));
+        return responseData;
       }
     })
     .then((result) => {
@@ -263,7 +311,7 @@ exports.verifyFacebookAccessToken = function(token, verifyDatabase, verifyEmail)
         return httpsGetRequest(emailOptions)
             .then((emailResult) => {
               winston.debug('resolving email promise: ' + JSON.stringify(emailResult));
-              result.email = emailResult.email;
+              result.payload.email = emailResult.email;
               return result;
             });
       } else {

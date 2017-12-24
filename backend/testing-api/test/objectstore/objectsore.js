@@ -62,11 +62,22 @@ describe('Object-store', function() {
         .then(res => {
           expect(res).to.have.status(401);
           expect(res.body.success).to.be.false;
-          expect(res.body.payload.dataPath).to.be.equal('authToken');
-          expect(res.body.payload.message).to.be.equal('invalid auth token');
+          expect(res.body.payload.dataPath).to.be.equal('authentication');
+          expect(res.body.payload.message).to.be.equal('invalid authToken');
         });
     });
 
+    it('should fail upload a new image with with missing uploadField', function() {
+      return chai.request(HOST)
+        .post(URL.BASE_OBJECTSTORE + '/upload')
+        .set('Authorization', '0 ' + token)
+        .then(res => {
+          expect(res).to.have.status(400);
+          expect(res.body.success).to.be.false;
+          expect(res.body.payload.dataPath).to.be.equal('invalidFile');
+          expect(res.body.payload.message).to.be.equal('invalid or missing file');
+        });
+    });
   });
 
   describe('Download image', function() {
@@ -114,8 +125,8 @@ describe('Object-store', function() {
           .then(res => {
             expect(res).to.have.status(401);
             expect(res.body.success).to.be.false;
-            expect(res.body.payload.dataPath).to.be.equal('authToken');
-            expect(res.body.payload.message).to.be.equal('invalid auth token');
+            expect(res.body.payload.dataPath).to.be.equal('authentication');
+            expect(res.body.payload.message).to.be.equal('invalid authToken');
           });
       });
 
@@ -131,6 +142,21 @@ describe('Object-store', function() {
             expect(res.body.payload).to.be.an('object');
             expect(res.body.payload.dataPath).to.equal('getObject');
             expect(res.body.payload.message).to.equal('failed to get object');
+          });
+      });
+
+      it('should fail to download with missing filename url parameter', function() {
+        return chai.request(HOST)
+          .get(URL.BASE_OBJECTSTORE + '/download')
+          .set('Authorization', '0 ' + token)
+          .then(res => {
+            expect(res).to.have.status(400);
+            expect(res).to.be.json;
+            expect(res.body).to.be.an('object');
+            expect(res.body.success).to.be.false;
+            expect(res.body.payload).to.be.an('object');
+            expect(res.body.payload.dataPath).to.equal('invalidFilename');
+            expect(res.body.payload.message).to.equal('missing or invalid filename');
           });
       });
     });

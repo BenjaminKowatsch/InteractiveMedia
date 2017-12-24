@@ -18,23 +18,34 @@
  */
 
 /**
+ * @apiDefine headerAuthorization
+ * @apiHeader (HTTP-Header) {Request} Authorization Provide authentication: type and authtoken separated with one space
+     type=(0: Password, 1:Google, 2: Facebook)
+ */
+
+/** @apiDefine headerExampleAuthorization
+ * @apiHeaderExample {string} Authorization:
+      Authorization: "0 FJF7HFkA38jF6FH9JF7"
+ */
+
+/**
  * @apiDefine successBodySuccess
     @apiSuccess (Success) {string} success Request successful
  */
 /**
  * @apiDefine successBodyAuthtype
-    @apiSuccess (Success) {string} payload.authtype Login type with type=(0: Password, 1:Google, 2: Facebook)
+    @apiSuccess (Success) {string} payload[authtype] Login type with type=(0: Password, 1:Google, 2: Facebook)
  */
 /**
  * @apiDefine successBodyAuthtoken
-    @apiSuccess (Success) {string} payload.accessToken Access token for further use
+    @apiSuccess (Success) {string} payload[accessToken] Access token for further use
  */
 
 /**
  * @apiDefine errorBodyCommonStructure
     @apiError (Error) {string} success Request failed
-    @apiError (Error) {string} payload.dataPath Describe the error location
-    @apiError (Error) {string} payload.message Specify the error
+    @apiError (Error) {string} payload[dataPath] Describe the error location
+    @apiError (Error) {string} payload[message] Specify the error
  */
 
 /**
@@ -43,11 +54,11 @@
  */
 /**
  * @apiDefine error400BadRequest
-    @apiError (ErrorCode) {400} BadRequest Missing or malformed request body
+    @apiError (ErrorCode) {400} BadRequest Missing or malformed request
  */
 /**
- * @apiDefine error401AccessTokenInvalid
-    @apiError (ErrorCode) {401} InvalidToken Access token is invalid
+ * @apiDefine error401Unauthorized
+    @apiError (ErrorCode) {401} Unauthorized Missing or invalid authentication information
  */
 /**
  * @apiDefine error401CredentialsInvalid

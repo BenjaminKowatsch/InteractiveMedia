@@ -76,12 +76,12 @@ describe('Autentication', function() {
             expect(res.body).to.be.an('object');
             expect(res.body.success).to.be.false;
             expect(res.body.payload).to.be.an('object');
-            expect(res.body.payload.dataPath).to.be.equal('validation');
-            expect(res.body.payload.message).to.be.equal('no header Authorization provided');
+            expect(res.body.payload.dataPath).to.be.equal('authentication');
+            expect(res.body.payload.message).to.be.equal('no http request header Authorization provided');
           });
     });
 
-    it('should fail to get restricted resource with no token authorization header', function() {
+    it('should fail to get restricted resource with no token in authorization header', function() {
       return chai.request(HOST)
           .get(URL.TEST_AUTHENTICATION + '/required')
           .set('Authorization', '0')
@@ -91,9 +91,9 @@ describe('Autentication', function() {
             expect(res.body).to.be.an('object');
             expect(res.body.success).to.be.false;
             expect(res.body.payload).to.be.an('object');
-            expect(res.body.payload.dataPath).to.be.equal('validation');
+            expect(res.body.payload.dataPath).to.be.equal('authentication');
             expect(res.body.payload.message).to.be.
-              equal('invalid number of arguments provided in header Authorization');
+              equal('invalid number of arguments provided in http request header Authorization');
           });
     });
 
@@ -107,9 +107,9 @@ describe('Autentication', function() {
             expect(res.body).to.be.an('object');
             expect(res.body.success).to.be.false;
             expect(res.body.payload).to.be.an('object');
-            expect(res.body.payload.dataPath).to.be.equal('validation');
+            expect(res.body.payload.dataPath).to.be.equal('authentication');
             expect(res.body.payload.message).to.be.
-              equal('invalid number of arguments provided in header Authorization');
+              equal('invalid number of arguments provided in http request header Authorization');
           });
     });
 
@@ -123,9 +123,9 @@ describe('Autentication', function() {
             expect(res.body).to.be.an('object');
             expect(res.body.success).to.be.false;
             expect(res.body.payload).to.be.an('object');
-            expect(res.body.payload.dataPath).to.be.equal('validation');
+            expect(res.body.payload.dataPath).to.be.equal('authentication');
             expect(res.body.payload.message).to.be.
-              equal('invalid number of arguments provided in header Authorization');
+              equal('invalid number of arguments provided in http request header Authorization');
           });
     });
 
@@ -139,9 +139,9 @@ describe('Autentication', function() {
             expect(res.body).to.be.an('object');
             expect(res.body.success).to.be.false;
             expect(res.body.payload).to.be.an('object');
-            expect(res.body.payload.dataPath).to.be.equal('validation');
+            expect(res.body.payload.dataPath).to.be.equal('authentication');
             expect(res.body.payload.message).to.be.
-              equal('invalid format of authType provided in header Authorization');
+              equal('invalid authType provided in http request header Authorization');
           });
     });
 
@@ -155,8 +155,9 @@ describe('Autentication', function() {
             expect(res.body).to.be.an('object');
             expect(res.body.success).to.be.false;
             expect(res.body.payload).to.be.an('object');
-            expect(res.body.payload.dataPath).to.be.equal('authType');
-            expect(res.body.payload.message).to.be.equal('invalid auth type');
+            expect(res.body.payload.dataPath).to.be.equal('authentication');
+            expect(res.body.payload.message).to.be.
+              equal('invalid authType provided in http request header Authorization');
           });
     });
 
@@ -170,8 +171,8 @@ describe('Autentication', function() {
             expect(res.body).to.be.an('object');
             expect(res.body.success).to.be.false;
             expect(res.body.payload).to.be.an('object');
-            expect(res.body.payload.dataPath).to.be.equal('authToken');
-            expect(res.body.payload.message).to.be.equal('invalid auth token');
+            expect(res.body.payload.dataPath).to.be.equal('authentication');
+            expect(res.body.payload.message).to.be.equal('invalid authToken');
           });
     });
 

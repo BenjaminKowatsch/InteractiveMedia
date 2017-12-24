@@ -1,5 +1,6 @@
 var tv4 = require('tv4');
 var winston = require('winston');
+const ERROR = require('../config.error');
 
 /**
  * Function to validate the request data with a JSON schema.
@@ -54,14 +55,10 @@ exports.againstSchema = function(inputData, jsonSchema) {
   // Validate the received json data from the request with the predefined json schema
   return new Promise((resolve,reject) => {
     var validationResult = tv4.validate(inputData, jsonSchema);
-    var returnValue = {
-      isValidationResult: true
-    };
     if (validationResult === true) {
       // validation was successful
       winston.debug('Success: json is valid');
-      returnValue.valid = true;
-      resolve(returnValue);
+      resolve();
     } else {
       // validation failed
       var refinedErrorObj = {
@@ -69,13 +66,13 @@ exports.againstSchema = function(inputData, jsonSchema) {
         message: tv4.error.message
       };
       winston.debug('Error: validation failed', refinedErrorObj);
-      returnValue.success = false;
-      returnValue.statusCode = 400;
-      returnValue.payload = {
-        'dataPath': 'validation',
-        'message': 'Invalide body'
+      let responseData = {};
+      responseData.success = false;
+      responseData.payload = {
+        dataPath: 'validation',
+        message: 'Invalide body'
       };
-      reject(returnValue);
+      reject({errorCode: ERROR.INVALID_REQUEST_BODY, responseData: responseData});
     }
   });
 };

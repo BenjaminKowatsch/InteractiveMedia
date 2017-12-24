@@ -2,6 +2,7 @@ const winston = require('winston');
 
 const group = require('../modules/group');
 const database = require('../modules/database');
+const ERROR = require('../config.error');
 
 const validateJsonService = require('../services/validateJson.service');
 const httpResonseService = require('../services/httpResonse.service');
@@ -14,13 +15,26 @@ const jsonSchema = {
 exports.createNewGroup = function(req, res) {
   winston.debug('Creating a new group');
   // validate data in request body
-  validateJsonService.againstSchema(req.body.payload, jsonSchema.groupPayloadData).then(validationResult => {
-    return group.createNewGroup(res.locals.authToken, req.body.payload);
+  validateJsonService.againstSchema(req.body.payload, jsonSchema.groupPayloadData).then(() => {
+    return group.createNewGroup(res.locals.userId, req.body.payload);
   }).then(registerResult =>  {
-    httpResonseService.sendHttpResponse(res, registerResult.statusCode, registerResult);
+    httpResonseService.sendHttpResponse(res, 201, registerResult);
   }).catch(errorResult => {
     winston.debug(errorResult);
-    httpResonseService.sendHttpResponse(res, errorResult.statusCode, errorResult);
+    let statusCode = 418;
+    switch (errorResult.errorCode) {
+      case ERROR.UNKNOWN_USER:
+        statusCode = 409;
+        break;
+      case ERROR.INVALID_REQUEST_BODY:
+      case ERROR.INVALID_CREATE_GROUP_VALUES:
+        statusCode = 400;
+        break;
+      case ERROR.DB_ERROR:
+        statusCode = 500;
+        break;
+    }
+    httpResonseService.sendHttpResponse(res, statusCode, errorResult.responseData);
   });
 };
 

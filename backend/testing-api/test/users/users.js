@@ -142,8 +142,8 @@ describe('User-Controller', () => {
               expect(res).to.be.json;
               expect(res.body).to.be.an('object');
               expect(res.body.success).to.be.false;
-              expect(res.body.payload.dataPath).to.equal('login');
-              expect(res.body.payload.message).to.equal('login failed');
+              expect(res.body.payload.dataPath).to.equal('authentication');
+              expect(res.body.payload.message).to.equal('invalid auth token');
             });
     });
 
@@ -417,6 +417,8 @@ describe('User-Controller', () => {
                 expect(res).to.be.json;
                 expect(res.body).to.be.an('object');
                 expect(res.body.success).to.be.false;
+                expect(res.body.payload.dataPath).to.equal('user');
+                expect(res.body.payload.message).to.equal('unknown user or expired token');
               });
       });
 
