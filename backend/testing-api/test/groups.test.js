@@ -69,12 +69,12 @@ describe('Groups-Controller', () => {
 
     describe('with error', () => {
       it('should not create a new group due to referencing a not existing user', () => {
-        chai.request(HOST)
+        return chai.request(HOST)
         .post(URL.BASE_GROUP)
         .set('Authorization', '0 ' + tokens[0])
         .send(groupScenarios[0].createWrongUser)
         .then(res => {
-          expect(res).to.have.status(400);
+          expect(res).to.have.status(409);
           expect(res).to.be.json;
           expect(res.body).to.be.an('object');
           expect(res.body.success).to.be.false;
