@@ -64,6 +64,18 @@ group.createNewGroup = function(creatorId, groupData) {
         return database.collections.groups.insertOne(groupData);
       }
     }).then(result => {
+      let userUpdatePromises = [];
+      let update = {
+        '$push': {
+          'groupIds': groupData.groupId
+        }
+      };
+      for (let i = 0; i < groupData.users.length; i++) {
+        userUpdatePromises.push(database.collections.users.findOne());
+        database.collections.users.updateOne({userId: groupData.users[i]}, update);
+      }
+      return Promise.all(userUpdatePromises);
+    }).then(result => {
       winston.debug('Creating a new group successful');
       responseData.payload = groupData;
       responseData.success = true;
