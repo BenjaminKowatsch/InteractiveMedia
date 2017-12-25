@@ -12,9 +12,6 @@ const authenticationService = require('../services/authentication.service');
 router.get('/', authenticationService.isAuthenticated,
     authorizationService.isAuthorizedAdmin, groupsController.getAll);
 
-router.get('/:groupid', authenticationService.isAuthenticated,
-    authorizationService.isGroupMember, groupsController.getById);
-
 /**
  * @api {POST} /v1/groups/ Create
  * @apiName Create
@@ -42,8 +39,30 @@ router.get('/:groupid', authenticationService.isAuthenticated,
  *
  * @apiUse errorExampleCommon
  */
-
 router.post('/', authenticationService.isAuthenticated,
     groupsController.createNewGroup);
+
+/**
+ * @api {GET} /v1/groups/ Get
+ * @apiName Get
+ * @apiGroup group
+ * @apiVersion 0.1.0
+
+ * @apiUse headerExampleAuthorization
+ *
+ * @apiSuccess (SuccessCode) {200} ReturnsGroup
+ * @apiUse successExampleGroup
+
+ * @apiUse error400UnknownId
+ * @apiUse error401Unauthorized
+ * @apiUse error403Forbidden
+ * @apiUse error418UncaughtError
+ * @apiUse error500DatabaseError
+ * @apiUse errorBodyCommonStructure
+ *
+ * @apiUse errorExampleCommon
+ */
+router.get('/:groupid', authenticationService.isAuthenticated,
+    authorizationService.isGroupMember, groupsController.getGroupById);
 
 module.exports = router;

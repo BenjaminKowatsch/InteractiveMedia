@@ -43,7 +43,7 @@ exports.getAll = function(req, res) {
   httpResponseService.send(res, 404, 'Not implemented');
 };
 
-exports.getById = function(req, res) {
+exports.getGroupById = function(req, res) {
   const groupId = req.params.groupid;
   winston.debug('Getting group with id ' + groupId);
   httpResponseService.send(res, 404, 'Not implemented');

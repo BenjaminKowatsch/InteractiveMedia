@@ -57,6 +57,10 @@
     @apiError (ErrorCode) {400} BadRequest Missing or malformed request
  */
 /**
+ * @apiDefine error400UnknownId
+    @apiError (ErrorCode) {400} UnknownId Id for the requested resource is unknown
+ */
+/**
  * @apiDefine error400InvalidBody
     @apiError (ErrorCode) {400} InvalidBody Validation error for request body
  */
@@ -68,6 +72,12 @@
  * @apiDefine error401CredentialsInvalid
     @apiError (ErrorCode) {401} InvalidCredentials Credentials are invalid
  */
+
+/**
+ * @apiDefine error403Forbidden
+    @apiError (ErrorCode) {403} Forbidden The authenticated user is not permitted to perform the requested operation
+ */
+
 /**
  * @apiDefine error418UncaughtError
     @apiError (ErrorCode) {418} UncaughtError Uncaught error
@@ -162,7 +172,7 @@
             "name" : "test_group_1",
             "imageUrl" : null,
             "users" : ["f2bed6b9-6a5a-4363-a9fa-e1f10579c0c1","2368218d-b5ec-4d4d-bc3c-6c249776ee11"]
-            "transactions" : [],
+            "transactions" : ["all transaction-objects, length=0 if group was just created"],
             "groupId" : "6367e722-e857-4d0f-bf78-278a92260418",
             "createdAt" : "2017-12-25T10:56:13.234Z"
     }
