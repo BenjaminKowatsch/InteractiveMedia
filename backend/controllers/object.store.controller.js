@@ -3,6 +3,7 @@ var config = require('../modules/config');
 var Minio = require('minio');
 const httpResponseService = require('../services/httpResponse.service');
 const uuidService = require('../services/uuid.service');
+const ERROR = require('../config.error');
 
 var minioClient = new Minio.Client({
   endPoint: config.minioEndpoint,
@@ -32,51 +33,77 @@ minioClient.bucketExists(config.minioBucketName, function(err) {
   }
 });
 
-module.exports.upload = function(req, res) {
-  let errorResponse = {
-    'success': false,
-    'payload': {
-      'dataPath': '',
-      'message': ''
-    }
-  };
+function minioPutObject(bucketName, objectName, stream) {
+  return new Promise((resolve, reject) => {
+    winston.debug('storing file: ' + objectName + ' at bucket: ' + bucketName);
+    let responseData = {payload: {}};
 
-  if ('file' in req) {
+    minioClient.putObject(bucketName, objectName, stream).then(arg => {
+      responseData.success = true;
+      resolve(responseData);
+    }).catch((err, etag) => {
+      responseData.success = false;
+      responseData.payload.dataPath = 'objectstore';
+      responseData.payload.message = 'failed to store file';
+      let errorCode = ERROR.MINIO_ERROR;
+      reject({errorCode: errorCode, responseData: responseData});
+    });
+  });
+}
+
+function parseRequestUploadFile(req) {
+  let responseData = {payload: {}};
+  return new Promise((resolve, reject) => {
+    if (!('file' in req)) {
+      responseData.success = false;
+      responseData.payload.dataPath = 'objectstore';
+      responseData.payload.message = 'invalid or missing file';
+      let errorCode = ERROR.INVALID_OR_MISSING_FILE_IN_REQUEST;
+      reject({errorCode: errorCode, responseData: responseData});
+    }
     const filenameRaw = req.file.originalname;
+    winston.debug('filenameRaw', filenameRaw);
 
-    if (filenameRaw !== null && filenameRaw !== undefined) {
-      const filename = uuidService.generateUUID() + '.' + filenameRaw;
-
-      winston.debug('storing file: ' + filename + ' at bucket: ' + config.minioBucketName);
-      minioClient.putObject(config.minioBucketName, filename, req.file.buffer, function(error, etag) {
-        if (error) {
-          winston.debug('internal minio error');
-          errorResponse.payload.dataPath = 'getObject';
-          errorResponse.payload.message = 'failed to get object';
-          httpResponseService.send(res, 500, errorResponse);
-        } else {
-          const successReponse = {
-            'success': true,
-            'payload': {
-              'path': filename
-            }
-          };
-          httpResponseService.send(res, 201, successReponse);
-        }
-      });
-    } else {
-      winston.debug('invalid or missing file');
-      errorResponse.payload.dataPath = 'invalidFile';
-      errorResponse.payload.message = 'invalid or missing file';
-      httpResponseService.send(res, 400, errorResponse);
+    if (filenameRaw == null || filenameRaw == undefined) {
+      responseData.success = false;
+      responseData.payload.dataPath = 'objectstore';
+      responseData.payload.message = 'invalid or missing file';
+      let errorCode = ERROR.INVALID_OR_MISSING_FILE_IN_REQUEST;
+      reject({errorCode: errorCode, responseData: responseData});
     }
-  } else {
-    winston.debug('invalid or missing file');
-    errorResponse.payload.dataPath = 'invalidFile';
-    errorResponse.payload.message = 'invalid or missing file';
-    httpResponseService.send(res, 400, errorResponse);
-  }
 
+    const filename = uuidService.generateUUID() + '.' + filenameRaw;
+    winston.debug('filename', filename);
+    responseData.success = true;
+    responseData.payload.filename = filename;
+    responseData.payload.filenameRaw = filenameRaw;
+    resolve(responseData);
+  });
+}
+
+module.exports.upload = function(req, res) {
+  let responseData = {payload: {}};
+  let filename;
+  parseRequestUploadFile(req).then(fileMeta => {
+    filename = fileMeta.payload.filename;
+    return minioPutObject(config.minioBucketName, filename, req.file.buffer);
+  }).then(promiseData => {
+      responseData.success = true;
+      responseData.payload.path = filename;
+      httpResponseService.send(res, 201, responseData);
+    }).catch(errorResult => {
+      winston.error('errorCode', errorResult.errorCode);
+      let statusCode = 418;
+      switch (errorResult.errorCode) {
+        case ERROR.INVALID_OR_MISSING_FILE_IN_REQUEST:
+          statusCode = 400;
+          break;
+        case ERROR.MINIO_ERROR:
+          statusCode = 500;
+          break;
+      }
+      httpResponseService.send(res, statusCode, errorResult.responseData);
+    });
 };
 
 module.exports.download = function(req, res) {
