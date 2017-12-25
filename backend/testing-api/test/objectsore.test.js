@@ -3,7 +3,7 @@
 const chai = require('chai');
 const fs = require('fs');
 const expect = require('chai').expect;
-const databaseHelper = require('../data/databaseHelper');
+const databaseHelper = require('./data/databaseHelper');
 
 chai.use(require('chai-http'));
 
@@ -14,7 +14,7 @@ const URL = {
   REGISTER_USER: '/v1/users/',
   BASE_OBJECTSTORE: '/v1/object-store'
 };
-const userData = require('../data/user.data');
+const userData = require('./data/user.data');
 
 var registerUser = index => chai.request(HOST).post(URL.REGISTER_USER).send({
   username: userData.users.valid[index].username,
