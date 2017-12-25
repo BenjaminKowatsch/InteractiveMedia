@@ -1,55 +1,9 @@
 var winston = require('winston');
 var config = require('../modules/config');
-var Minio = require('minio');
 const httpResponseService = require('../services/httpResponse.service');
 const uuidService = require('../services/uuid.service');
+const objectStore = require('../modules/objectstore.module');
 const ERROR = require('../config.error');
-
-var minioClient = new Minio.Client({
-  endPoint: config.minioEndpoint,
-  port: config.minioEndpointPort,
-  secure: false,
-  accessKey: config.minioAccessKey,
-  secretKey: config.minioSecretKey
-});
-
-winston.debug('minioclient: ' + (undefined === minioClient));
-
-minioClient.bucketExists(config.minioBucketName, function(err) {
-  if (err) {
-    if (err.code === 'NoSuchBucket') {
-      winston.debug('Minio bucket ' + config.minioBucketName + ' will be created.');
-      minioClient.makeBucket(config.minioBucketName, 'us-east-1', function(err) {
-        if (err) {
-          return winston.error(err);
-        }
-        winston.debug('Bucket created successfully in "us-east-1".');
-      });
-    } else {
-      winston.debug('An error occured');
-    }
-  } else {
-    winston.debug('Minio bucket ' + config.minioBucketName + ' already exists.');
-  }
-});
-
-function minioPutObject(bucketName, objectName, stream) {
-  return new Promise((resolve, reject) => {
-    winston.debug('storing file: ' + objectName + ' at bucket: ' + bucketName);
-    let responseData = {payload: {}};
-
-    minioClient.putObject(bucketName, objectName, stream).then(arg => {
-      responseData.success = true;
-      resolve(responseData);
-    }).catch((err, etag) => {
-      responseData.success = false;
-      responseData.payload.dataPath = 'objectstore';
-      responseData.payload.message = 'failed to store file';
-      let errorCode = ERROR.MINIO_ERROR;
-      reject({errorCode: errorCode, responseData: responseData});
-    });
-  });
-}
 
 function parseRequestUploadFile(req) {
   let responseData = {payload: {}};
@@ -86,7 +40,7 @@ module.exports.upload = function(req, res) {
   let filename;
   parseRequestUploadFile(req).then(fileMeta => {
     filename = fileMeta.payload.filename;
-    return minioPutObject(config.minioBucketName, filename, req.file.buffer);
+    return objectStore.putObject(config.minioBucketName, filename, req.file.buffer);
   }).then(promiseData => {
       responseData.success = true;
       responseData.payload.path = filename;
@@ -122,31 +76,12 @@ function parseRequestDownloadFile(req) {
   return Promise.resolve(responseData);
 }
 
-function minioGetObject(bucketName, objectName) {
-  return new Promise((resolve, reject) => {
-    winston.debug('loading file: ' + objectName + ' at bucket: ' + bucketName);
-    let responseData = {payload: {}};
-
-    minioClient.getObject(bucketName, objectName).then(stream => {
-      responseData.success = true;
-      responseData.payload.stream = stream;
-      resolve(responseData);
-    }).catch((err, etag) => {
-      responseData.success = false;
-      responseData.payload.dataPath = 'objectstore';
-      responseData.payload.message = 'failed to load file';
-      let errorCode = ERROR.MINIO_ERROR;
-      reject({errorCode: errorCode, responseData: responseData});
-    });
-  });
-}
-
 module.exports.download = function(req, res) {
   let responseData = {payload: {}};
   let filename;
   parseRequestDownloadFile(req).then(fileMeta => {
     filename = fileMeta.payload.filename;
-    return minioGetObject(config.minioBucketName, filename);
+    return objectStore.getObject(config.minioBucketName, filename);
   }).then(promiseData => {
       promiseData.payload.stream.pipe(res);
     }).catch(errorResult => {
