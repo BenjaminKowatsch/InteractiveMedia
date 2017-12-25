@@ -7,7 +7,6 @@ export default [
       path: '/overview/',
       component: require('./pages/overview.vue')
   },
-
   {
       path: '/register/',
       component: require('./pages/register.vue')

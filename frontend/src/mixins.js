@@ -12,7 +12,7 @@ export default {
       if (accessToken !== '') {
         onValid(accessToken)
       } else {
-        this.$f7.alert('Sie sind nicht eingeloggt, bitte loggen Sie sich ein', 'Launometer', () => {
+        this.$f7.alert('Sie sind nicht eingeloggt, bitte loggen Sie sich ein', 'Debts² Admin Panel', () => {
           this.redirect('/', false, true, true)
         })
       }
@@ -25,7 +25,7 @@ export default {
      */
     loginUser: function (payload) {
       // sets a cookie to a logged in user
-      var jsonCookie = {'accessToken': payload.accessToken, 'authType': payload.authType}
+      var jsonCookie = {'accessToken': payload.accessToken, '/* authT */ype': payload.authType}
       Cookie.createJSONCookie('accessToken', jsonCookie) // creates the cookie
       this.redirect('/overview', true, false, false)
     },

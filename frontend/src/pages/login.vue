@@ -84,7 +84,7 @@
           }, error =>{
             console.log("Wrong");
             // logs to the console when login data didn't match to any database entry
-            this.$f7.alert('Username oder Passwort falsch', 'Launometer');
+            this.$f7.alert('Username oder Passwort falsch', 'Debts² Admin Panel');
           });
         },
         /**
@@ -116,7 +116,7 @@
             .then(this.loginResponseHandler)
             .catch(this.defaultErrorHandler); */
           } else {
-            this.$f7.alert('Username oder Passwort darf nicht leer sein', 'Launometer');
+            this.$f7.alert('Username oder Passwort darf nicht leer sein', 'Debts² Admin Panel');
           }
         },
         reset: function() {
