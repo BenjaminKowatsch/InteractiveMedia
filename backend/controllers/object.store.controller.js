@@ -106,32 +106,60 @@ module.exports.upload = function(req, res) {
     });
 };
 
-module.exports.download = function(req, res) {
-  let errorResponse = {
-    'success': false,
-    'payload': {
-      'dataPath': '',
-      'message': ''
-    }
-  };
-
-  if (req.query.filename !== null && req.query.filename !== undefined) {
-    winston.debug('download file: ' + req.query.filename + ' at bucket: ' + config.minioBucketName);
-
-    minioClient.getObject(config.minioBucketName, req.query.filename, function(error, stream) {
-      if (error) {
-        winston.debug('internal minio error');
-        errorResponse.payload.dataPath = 'getObject';
-        errorResponse.payload.message = 'failed to get object';
-        httpResponseService.send(res, 500, errorResponse);
-      } else {
-        stream.pipe(res);
-      }
-    });
-  } else {
-    winston.debug('missing or invalid filename');
-    errorResponse.payload.dataPath = 'invalidFilename';
-    errorResponse.payload.message = 'missing or invalid filename';
-    httpResponseService.send(res, 400, errorResponse);
+function parseRequestDownloadFile(req) {
+  let responseData = {payload: {}};
+  if (req.query.filename == null || req.query.filename == undefined) {
+    responseData.success = false;
+    responseData.payload.dataPath = 'objectstore';
+    responseData.payload.message = 'invalid or missing filename in request';
+    let errorCode = ERROR.INVALID_OR_MISSING_FILENAME_IN_REQUEST;
+    return Promise.reject({errorCode: errorCode, responseData: responseData});
   }
+  const filename = req.query.filename;
+  winston.debug('filename', filename);
+  responseData.success = true;
+  responseData.payload.filename = filename;
+  return Promise.resolve(responseData);
+}
+
+function minioGetObject(bucketName, objectName) {
+  return new Promise((resolve, reject) => {
+    winston.debug('loading file: ' + objectName + ' at bucket: ' + bucketName);
+    let responseData = {payload: {}};
+
+    minioClient.getObject(bucketName, objectName).then(stream => {
+      responseData.success = true;
+      responseData.payload.stream = stream;
+      resolve(responseData);
+    }).catch((err, etag) => {
+      responseData.success = false;
+      responseData.payload.dataPath = 'objectstore';
+      responseData.payload.message = 'failed to load file';
+      let errorCode = ERROR.MINIO_ERROR;
+      reject({errorCode: errorCode, responseData: responseData});
+    });
+  });
+}
+
+module.exports.download = function(req, res) {
+  let responseData = {payload: {}};
+  let filename;
+  parseRequestDownloadFile(req).then(fileMeta => {
+    filename = fileMeta.payload.filename;
+    return minioGetObject(config.minioBucketName, filename);
+  }).then(promiseData => {
+      promiseData.payload.stream.pipe(res);
+    }).catch(errorResult => {
+      winston.error('errorCode', errorResult.errorCode);
+      let statusCode = 418;
+      switch (errorResult.errorCode) {
+        case ERROR.INVALID_OR_MISSING_FILENAME_IN_REQUEST:
+          statusCode = 400;
+          break;
+        case ERROR.MINIO_ERROR:
+          statusCode = 500;
+          break;
+      }
+      httpResponseService.send(res, statusCode, errorResult.responseData);
+    });
 };
