@@ -57,6 +57,10 @@
     @apiError (ErrorCode) {400} BadRequest Missing or malformed request
  */
 /**
+ * @apiDefine error400InvalidBody
+    @apiError (ErrorCode) {400} InvalidBody Validation error for request body
+ */
+/**
  * @apiDefine error401Unauthorized
     @apiError (ErrorCode) {401} Unauthorized Missing or invalid authentication information
  */
@@ -65,8 +69,18 @@
     @apiError (ErrorCode) {401} InvalidCredentials Credentials are invalid
  */
 /**
+ * @apiDefine error418UncaughtError
+    @apiError (ErrorCode) {418} UncaughtError Uncaught error
+ */
+
+/**
  * @apiDefine error500MinioInternalError
     @apiError (ErrorCode) {500} MinioInternalError Minio internal error
+ */
+
+/**
+ * @apiDefine error500DatabaseError
+    @apiError (ErrorCode) {500} DatabaseError Database internal error
  */
 
 /**
@@ -129,4 +143,49 @@
             "message": "logout failed"
         }
     }
+    @apiErrorExample {type} Error-Response
+    {
+        "success": false,
+        "payload": {
+            "dataPath": "groupUsers",
+            "message": "Unknown user: wrong_mail@mail.com"
+        }
+    }
+ */
+
+/**
+ * @apiDefine successExampleGroup
+    @apiSuccessExample {type} Success-Response
+    {
+        "success": true,
+        "payload": {
+            "name" : "test_group_1",
+            "imageUrl" : null,
+            "users" : ["f2bed6b9-6a5a-4363-a9fa-e1f10579c0c1","2368218d-b5ec-4d4d-bc3c-6c249776ee11"]
+            "transactions" : [],
+            "groupId" : "6367e722-e857-4d0f-bf78-278a92260418",
+            "createdAt" : "2017-12-25T10:56:13.234Z"
+    }
+ */
+/**
+ * @apiDefine paramExampleCreateGroup
+    @apiParamExample {type} CreateGroup
+    {
+        name: 'TheFooBars',
+        imageUrl: null,
+        users: ['user_1@example.de', 'user_2@example.de', 'user_3@example.de']
+    }
+ */
+
+/**
+ * @apiDefine error409UnknownUser
+    @apiError (ErrorCode) {409} UnknownUser Unknown user: {{wrong_mail@mail.com}}
+ */
+/**
+ * @apiDefine error400DuplicatedUsers
+    @apiError (ErrorCode) {400} DuplicatedUsers Duplicated groupUsers
+ */
+/**
+ * @apiDefine error400MissingGroupCreator
+    @apiError (ErrorCode) {400} MissingGroupCreator GroupCreator must be part of groupUsers
  */
