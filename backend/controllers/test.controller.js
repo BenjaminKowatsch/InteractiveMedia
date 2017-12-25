@@ -1,10 +1,10 @@
 const winston = require('winston');
-const httpResonseService = require('../services/httpResonse.service');
+const httpResponseService = require('../services/httpResponse.service');
 
 module.exports.getAuthenticationNotRequired = function(req, res) {
-  httpResonseService.sendHttpResponse(res, 200, {'success': true, 'payload': {'hello': 'open world'}});
+  httpResponseService.send(res, 200, {'success': true, 'payload': {'hello': 'open world'}});
 };
 
 module.exports.getAuthenticationRequired = function(req, res) {
-  httpResonseService.sendHttpResponse(res, 200, {'success': true, 'payload': {'hello': 'authenticated world'}});
+  httpResponseService.send(res, 200, {'success': true, 'payload': {'hello': 'authenticated world'}});
 };

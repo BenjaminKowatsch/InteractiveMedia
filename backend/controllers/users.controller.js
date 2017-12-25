@@ -1,9 +1,9 @@
 var winston = require('winston');
 
-var user = require('../modules/user');
+var user = require('../modules/user.module');
 
 const validateJsonService = require('../services/validateJson.service');
-var httpResonseService = require('../services/httpResonse.service');
+const httpResponseService = require('../services/httpResponse.service');
 
 var jsonSchema = {
   userData: require('../JSONSchema/userData.json'),
@@ -24,17 +24,17 @@ exports.registerNewUser = function(req, res) {
       .then(function(registerResult) {
         // mongo update was successful
         var resBody = {'success': true, 'payload': registerResult.payload};
-        httpResonseService.sendHttpResponse(res, 201, resBody);
+        httpResponseService.send(res, 201, resBody);
       })
       .catch(function(registerResult) {
         // mongo update failed
         var resBody = {'success': false, 'payload': registerResult.payload};
-        httpResonseService.sendHttpResponse(res, 400, resBody);
+        httpResponseService.send(res, 400, resBody);
       });
   } else {
     // request body is invalid
     var resBody = {'success': false, 'payload': validationResult.error};
-    httpResonseService.sendHttpResponse(res, 400, resBody);
+    httpResponseService.send(res, 400, resBody);
   }
 };
 
@@ -57,17 +57,17 @@ exports.login = function(req, res) {
          .then(function(loginResult) {
           // mongo update was successful
           resBody = {'success': true, 'payload': loginResult};
-          httpResonseService.sendHttpResponse(res, 200, resBody);
+          httpResponseService.send(res, 200, resBody);
         })
          .catch(function(loginErrorResult) {
           // mongo update failed
           resBody = {'success': false, 'payload': loginErrorResult};
-          httpResonseService.sendHttpResponse(res, 401, resBody);
+          httpResponseService.send(res, 401, resBody);
         });
       } else {
         // request body is invalid
         resBody = {'success': false, 'payload': validationResult.error};
-        httpResonseService.sendHttpResponse(res, 400, resBody);
+        httpResponseService.send(res, 400, resBody);
       }
       break;
     }
@@ -87,17 +87,17 @@ exports.login = function(req, res) {
           .then(function(loginResult) {
               // mongo update was successful
               resBody = {'success': true, 'payload': loginResult};
-              httpResonseService.sendHttpResponse(res, 200, resBody);
+              httpResponseService.send(res, 200, resBody);
             })
           .catch(function(loginErrorResult) {
               // mongo update failed
               resBody = {'success': false, 'payload': loginErrorResult};
-              httpResonseService.sendHttpResponse(res, 401, resBody);
+              httpResponseService.send(res, 401, resBody);
             });
       } else {
         // request body is invalid
         resBody = {'success': false, 'payload': validationResult.error};
-        httpResonseService.sendHttpResponse(res, 400, resBody);
+        httpResponseService.send(res, 400, resBody);
       }
       break;
     }
@@ -118,18 +118,18 @@ exports.login = function(req, res) {
           .then(function(loginResult) {
               // mongo update was successful
               resBody = {'success': true, 'payload': loginResult};
-              httpResonseService.sendHttpResponse(res, 200, resBody);
+              httpResponseService.send(res, 200, resBody);
             })
           .catch(function(loginErrorResult) {
               // mongo update failed
               winston.info('loginErrorResult', JSON.stringify(loginErrorResult));
               resBody = {'success': false, 'payload': loginErrorResult.responseData.payload};
-              httpResonseService.sendHttpResponse(res, 401, resBody);
+              httpResponseService.send(res, 401, resBody);
             });
       } else {
         // request body is invalid
         resBody = {'success': false, 'payload': validationResult.error};
-        httpResonseService.sendHttpResponse(res, 400, resBody);
+        httpResponseService.send(res, 400, resBody);
       }
       break;
     }
@@ -141,7 +141,7 @@ exports.login = function(req, res) {
           'dataPath': 'authType',
           'message': 'invalid auth type'
         }};
-      httpResonseService.sendHttpResponse(res, 400, resBody);
+      httpResponseService.send(res, 400, resBody);
       break;
     }
   }
@@ -155,10 +155,10 @@ exports.logout = function(req, res) {
   user.logout(res.locals.userId, res.locals.authType)
     .then(function() {
       var resBody = {'success': true, 'payload': {}};
-      httpResonseService.sendHttpResponse(res, 200, resBody);
+      httpResponseService.send(res, 200, resBody);
     })
     .catch(function() {
       var resBody = {'success': true, 'payload': {}};
-      httpResonseService.sendHttpResponse(res, 400, resBody);
+      httpResponseService.send(res, 400, resBody);
     });
 };

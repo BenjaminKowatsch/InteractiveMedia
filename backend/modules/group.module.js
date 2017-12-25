@@ -4,7 +4,7 @@ const group = module.exports = {};
 const winston = require('winston');
 const config = require('./config');
 const uuidService = require('../services/uuid.service');
-const database = require('../modules/database');
+const database = require('../modules/database.module');
 const tokenService = require('../services/token.service');
 const ERROR = require('../config.error');
 

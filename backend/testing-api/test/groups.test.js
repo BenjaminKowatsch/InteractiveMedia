@@ -3,7 +3,7 @@
 const chai = require('chai');
 const expect = require('chai').expect;
 const winston = require('winston');
-const databaseHelper = require('../data/databaseHelper');
+const databaseHelper = require('./data/databaseHelper');
 
 chai.use(require('chai-http'));
 
@@ -14,8 +14,8 @@ const URL = {
   REGISTER_USER: '/v1/users/',
 };
 
-const userData = require('../data/user.data');
-const groupScenarios = require('./../data/groupScenarios');
+const userData = require('./data/user.data');
+const groupScenarios = require('./data/groupScenarios');
 
 // ************* Helper ***********//
 

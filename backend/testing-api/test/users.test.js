@@ -3,7 +3,7 @@
 var chai = require('chai');
 var fs = require('fs');
 var expect = require('chai').expect;
-const databaseHelper = require('../data/databaseHelper');
+const databaseHelper = require('./data/databaseHelper');
 
 chai.use(require('chai-http'));
 
@@ -20,7 +20,7 @@ var config = {
   'facebookAppId': process.env.FACEBOOK_APP_ID
 };
 
-const testData = require('../data/user.data');
+const testData = require('./data/user.data');
 
 function getFacebookTestAccessToken() {
   return new Promise((resolve, reject) => {
