@@ -1,7 +1,7 @@
 var winston = require('winston');
 var config = require('../modules/config');
 var Minio = require('minio');
-const httpResonseService = require('../services/httpResonse.service');
+const httpResponseService = require('../services/httpResponse.service');
 const uuidService = require('../services/uuid.service');
 
 var minioClient = new Minio.Client({
@@ -53,7 +53,7 @@ module.exports.upload = function(req, res) {
           winston.debug('internal minio error');
           errorResponse.payload.dataPath = 'getObject';
           errorResponse.payload.message = 'failed to get object';
-          httpResonseService.sendHttpResponse(res, 500, errorResponse);
+          httpResponseService.send(res, 500, errorResponse);
         } else {
           const successReponse = {
             'success': true,
@@ -61,20 +61,20 @@ module.exports.upload = function(req, res) {
               'path': filename
             }
           };
-          httpResonseService.sendHttpResponse(res, 201, successReponse);
+          httpResponseService.send(res, 201, successReponse);
         }
       });
     } else {
       winston.debug('invalid or missing file');
       errorResponse.payload.dataPath = 'invalidFile';
       errorResponse.payload.message = 'invalid or missing file';
-      httpResonseService.sendHttpResponse(res, 400, errorResponse);
+      httpResponseService.send(res, 400, errorResponse);
     }
   } else {
     winston.debug('invalid or missing file');
     errorResponse.payload.dataPath = 'invalidFile';
     errorResponse.payload.message = 'invalid or missing file';
-    httpResonseService.sendHttpResponse(res, 400, errorResponse);
+    httpResponseService.send(res, 400, errorResponse);
   }
 
 };
@@ -96,7 +96,7 @@ module.exports.download = function(req, res) {
         winston.debug('internal minio error');
         errorResponse.payload.dataPath = 'getObject';
         errorResponse.payload.message = 'failed to get object';
-        httpResonseService.sendHttpResponse(res, 500, errorResponse);
+        httpResponseService.send(res, 500, errorResponse);
       } else {
         stream.pipe(res);
       }
@@ -105,6 +105,6 @@ module.exports.download = function(req, res) {
     winston.debug('missing or invalid filename');
     errorResponse.payload.dataPath = 'invalidFilename';
     errorResponse.payload.message = 'missing or invalid filename';
-    httpResonseService.sendHttpResponse(res, 400, errorResponse);
+    httpResponseService.send(res, 400, errorResponse);
   }
 };

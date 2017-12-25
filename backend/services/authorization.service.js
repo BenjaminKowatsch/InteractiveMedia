@@ -3,7 +3,7 @@ const express = require('express');
 const database = require('../modules/database');
 const group = require('../modules/group');
 const winston = require('winston');
-const httpResonseService = require('./httpResonse.service');
+const httpResponseService = require('./httpResponse.service');
 
 exports.isAuthorizedAdmin = function(req, res, next) {
   winston.debug('Authorizing request as admin');
@@ -16,12 +16,12 @@ exports.isAuthorizedAdmin = function(req, res, next) {
           winston.error('Non-admin user attempted to access /groups: ' +
               userId);
           const resBody = {'success': false, 'payload': error.message};
-          httpResonseService.sendHttpResponse(res, 403, resBody);
+          httpResponseService.send(res, 403, resBody);
         });
   } else {
     let error = 'Authorization failed due to missing authentication';
     let resBody = {'success': false, 'payload': error};
-    httpResonseService.sendHttpResponse(res, 500, resBody);
+    httpResponseService.send(res, 500, resBody);
   }
 };
 
@@ -38,7 +38,7 @@ exports.isGroupMember = function(req, res, next) {
         winston.error('User ' + userId + ' could not be authorized for group ' +
             groupId);
         let resBody = {'success': false, 'payload': error.message};
-        httpResonseService.sendHttpResponse(res, 403, resBody);
+        httpResponseService.send(res, 403, resBody);
       });
     } else {
       next();
@@ -46,7 +46,7 @@ exports.isGroupMember = function(req, res, next) {
   } else {
     let error = 'Authorization failed due to missing authentication';
     let resBody = {'success': false, 'payload': error};
-    httpResonseService.sendHttpResponse(res, 500, resBody);
+    httpResponseService.send(res, 500, resBody);
   }
 };
 

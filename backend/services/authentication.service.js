@@ -4,7 +4,7 @@ var router = express.Router();
 var winston = require('winston');
 
 var user = require('../modules/user');
-var httpResonseService = require('./httpResonse.service');
+var httpResponseService = require('./httpResponse.service');
 
 const ERROR = require('../config.error');
 
@@ -38,7 +38,7 @@ module.exports.isAuthenticated = function(req, res, next) {
         statusCode = 500;
         break;
     }
-    httpResonseService.sendHttpResponse(res, statusCode, errorResult.responseData);
+    httpResponseService.send(res, statusCode, errorResult.responseData);
   });
 };
 

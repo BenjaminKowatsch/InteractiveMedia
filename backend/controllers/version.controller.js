@@ -1,7 +1,7 @@
 var appVersionService = require('../services/appVersion.service');
-const httpResonseService = require('../services/httpResonse.service');
+const httpResponseService = require('../services/httpResponse.service');
 
 exports.getVersion = function(req, res) {
   currentAppVersion = appVersionService.getAppVersion();
-  httpResonseService.sendHttpResponse(res, 200, currentAppVersion);
+  httpResponseService.send(res, 200, currentAppVersion);
 };
