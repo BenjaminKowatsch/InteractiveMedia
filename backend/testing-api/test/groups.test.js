@@ -50,7 +50,7 @@ describe('Groups-Controller', () => {
         return chai.request(HOST)
         .post(URL.BASE_GROUP)
         .set('Authorization', '0 ' + tokens[0])
-        .send({payload: groupScenarios[0].create})
+        .send(groupScenarios[0].create)
         .then(function(res) {
           expect(res).to.have.status(201);
           expect(res).to.be.json;
@@ -72,7 +72,7 @@ describe('Groups-Controller', () => {
         chai.request(HOST)
         .post(URL.BASE_GROUP)
         .set('Authorization', '0 ' + tokens[0])
-        .send({payload: groupScenarios[0].createWrongUser})
+        .send(groupScenarios[0].createWrongUser)
         .then(res => {
           expect(res).to.have.status(400);
           expect(res).to.be.json;
@@ -88,7 +88,7 @@ describe('Groups-Controller', () => {
         return chai.request(HOST)
         .post(URL.BASE_GROUP)
         .set('Authorization', '0 ' + tokens[0])
-        .send({payload: groupScenarios[0].createDuplicatedUser})
+        .send(groupScenarios[0].createDuplicatedUser)
         .then(res => {
           expect(res).to.have.status(400);
           expect(res).to.be.json;
@@ -104,7 +104,7 @@ describe('Groups-Controller', () => {
         return chai.request(HOST)
         .post(URL.BASE_GROUP)
         .set('Authorization', '0 ' + tokens[0])
-        .send({payload: groupScenarios[0].createWithoutCreatorUser})
+        .send(groupScenarios[0].createWithoutCreatorUser)
         .then(res => {
           expect(res).to.have.status(400);
           expect(res).to.be.json;
@@ -120,7 +120,7 @@ describe('Groups-Controller', () => {
         return chai.request(HOST)
         .post(URL.BASE_GROUP)
         .set('Authorization', '0 ' + tokens[0])
-        .send({payload: groupScenarios[0].createNullUsers})
+        .send(groupScenarios[0].createNullUsers)
         .then(res => {
           expect(res).to.have.status(400);
           expect(res).to.be.json;
@@ -136,7 +136,7 @@ describe('Groups-Controller', () => {
         return chai.request(HOST)
         .post(URL.BASE_GROUP)
         .set('Authorization', '0 ' + tokens[0])
-        .send({payload: groupScenarios[0].createInvalidePayload})
+        .send(groupScenarios[0].createInvalidePayload)
         .then(res => {
           expect(res).to.have.status(400);
           expect(res).to.be.json;
@@ -152,7 +152,7 @@ describe('Groups-Controller', () => {
         return chai.request(HOST)
         .post(URL.BASE_GROUP)
         .set('Authorization', '0 ' + 'foobar')
-        .send({payload: groupScenarios[0].create})
+        .send(groupScenarios[0].create)
         .then(res => {
           expect(res).to.have.status(401);
           expect(res).to.be.json;
@@ -168,7 +168,7 @@ describe('Groups-Controller', () => {
         return chai.request(HOST)
         .post(URL.BASE_GROUP)
         .set('Authorization', '')
-        .send({payload: groupScenarios[0].create})
+        .send(groupScenarios[0].create)
         .then(res => {
           expect(res).to.have.status(401);
           expect(res).to.be.json;
