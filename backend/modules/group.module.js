@@ -71,8 +71,7 @@ group.createNewGroup = function(creatorId, groupData) {
         }
       };
       for (let i = 0; i < groupData.users.length; i++) {
-        userUpdatePromises.push(database.collections.users.findOne());
-        database.collections.users.updateOne({userId: groupData.users[i]}, update);
+        userUpdatePromises.push(database.collections.users.updateOne({userId: groupData.users[i]}, update));
       }
       return Promise.all(userUpdatePromises);
     }).then(result => {
