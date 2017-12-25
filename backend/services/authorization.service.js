@@ -1,7 +1,7 @@
 const express = require('express');
 
-const database = require('../modules/database');
-const group = require('../modules/group');
+const database = require('../modules/database.module');
+const group = require('../modules/group.module');
 const winston = require('winston');
 const httpResponseService = require('./httpResponse.service');
 

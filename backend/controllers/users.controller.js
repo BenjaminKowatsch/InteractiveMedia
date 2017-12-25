@@ -1,6 +1,6 @@
 var winston = require('winston');
 
-var user = require('../modules/user');
+var user = require('../modules/user.module');
 
 const validateJsonService = require('../services/validateJson.service');
 const httpResponseService = require('../services/httpResponse.service');

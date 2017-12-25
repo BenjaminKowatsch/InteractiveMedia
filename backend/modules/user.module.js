@@ -7,7 +7,7 @@ const GoogleAuth = require('google-auth-library');
 const config = require('./config');
 const uuidService = require('../services/uuid.service');
 const tokenService = require('../services/token.service');
-const database = require('../modules/database');
+const database = require('../modules/database.module');
 const ERROR = require('../config.error');
 
 const MONGO_ERRCODE = {

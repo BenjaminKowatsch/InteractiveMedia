@@ -3,7 +3,7 @@ var router = express.Router();
 
 var winston = require('winston');
 
-var user = require('../modules/user');
+var user = require('../modules/user.module');
 var httpResponseService = require('./httpResponse.service');
 
 const ERROR = require('../config.error');

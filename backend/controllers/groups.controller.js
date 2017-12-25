@@ -1,7 +1,7 @@
 const winston = require('winston');
 
-const group = require('../modules/group');
-const database = require('../modules/database');
+const group = require('../modules/group.module');
+const database = require('../modules/database.module');
 const ERROR = require('../config.error');
 
 const validateJsonService = require('../services/validateJson.service');

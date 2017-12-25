@@ -15,8 +15,8 @@ var statusRoutes = require('./routes/status.routes');
 var testRoutes = require('./routes/test.routes');
 
 var config = require('./modules/config');
-var user = require('./modules/user');
-var database = require('./modules/database');
+var user = require('./modules/user.module');
+var database = require('./modules/database.module');
 
 var MONGO_DB_CONNECTION_ERROR_CODE = 10;
 
