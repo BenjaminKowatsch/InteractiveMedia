@@ -17,6 +17,7 @@ var testRoutes = require('./routes/test.routes');
 var config = require('./modules/config');
 var user = require('./modules/user.module');
 var database = require('./modules/database.module');
+var objectstore = require('./modules/objectstore.module');
 
 var MONGO_DB_CONNECTION_ERROR_CODE = 10;
 
@@ -113,9 +114,11 @@ function startServer() {
  * ===================
  */
 database.tryConnect(config.mongodbURL, function() {
-
-  startServer();
-
+  objectstore.makeBucket(config.minioBucketName).then(promiseData => {
+    startServer();
+  }).catch(errorResult => {
+    winston.error('Object store error at startup', JSON.stringify(errorResult));
+  });
 }, function() {
   winston.error('Not connected to database after maxRetries reached.');
 });

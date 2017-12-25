@@ -11,24 +11,39 @@ const minioClient = new Minio.Client({
   secretKey: config.minioSecretKey
 });
 
-minioClient.bucketExists(config.minioBucketName, function(err) {
-  winston.debug('in bucketExists');
-  if (err) {
-    if (err.code === 'NoSuchBucket') {
-      winston.debug('Minio bucket ' + config.minioBucketName + ' will be created.');
-      minioClient.makeBucket(config.minioBucketName, 'us-east-1', function(err) {
-        if (err) {
-          return winston.error(err);
-        }
-        winston.debug('Bucket created successfully in "us-east-1".');
-      });
-    } else {
-      winston.debug('An error occured');
-    }
-  } else {
-    winston.debug('Minio bucket ' + config.minioBucketName + ' already exists.');
-  }
-});
+module.exports.makeBucket = function(bucketName) {
+  return new Promise((resolve, reject) => {
+    let responseData = {payload: {}};
+
+    minioClient.bucketExists(bucketName).then(() => {
+      winston.debug('bucket exists', bucketName);
+      responseData.success = true;
+      resolve(responseData);
+    }).catch((err) => {
+      if (err.code === ERROR.MINIO_NO_SUCH_BUCKET) {
+        winston.debug('bucket does not exist', bucketName);
+        minioClient.makeBucket(bucketName, 'us-east-1').then(() => {
+          winston.debug('bucket created', bucketName);
+          responseData.success = true;
+          resolve(responseData);
+        }).catch((err) => {
+          winston.debug('error while creating bucket:', JSON.stringify(err));
+          responseData.success = false;
+          responseData.payload.dataPath = 'objectstore';
+          responseData.payload.message = 'unknown minio error';
+          let errorCode = ERROR.MINIO_ERROR;
+          reject({errorCode: errorCode, responseData: responseData});
+        });
+      } else {
+        responseData.success = false;
+        responseData.payload.dataPath = 'objectstore';
+        responseData.payload.message = 'unknown minio error';
+        let errorCode = ERROR.MINIO_ERROR;
+        reject({errorCode: errorCode, responseData: responseData});
+      }
+    });
+  });
+};
 
 module.exports.putObject = function(bucketName, objectName, stream) {
     return new Promise((resolve, reject) => {
