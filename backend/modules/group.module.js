@@ -28,6 +28,7 @@ module.exports.createNewGroup = function(creatorId, groupData) {
     groupData.createdAt = new Date();
     groupData.transactions = [];
     let errorToReturn = {isSelfProvided: true};
+    let groupUserObjects;
 
     // generate array of promises of db calls for find user by id
     let groupUserPromises = [];
@@ -39,7 +40,7 @@ module.exports.createNewGroup = function(creatorId, groupData) {
       // return all groupUserIds if object is not null
       let groupUserIds = findOneValues.map(val => val ? val.userId : null);
       let groupUserEmails = findOneValues.map(val => val ? val.email : null);
-      let groupUserObjects = findOneValues.map(val => val ? {userId: val.userId, username: val.username} : null);
+      groupUserObjects = findOneValues.map(val => val ? {userId: val.userId, username: val.username} : null);
       errorToReturn.dataPath = 'groupUsers';
       errorToReturn.errorCode = ERROR.INVALID_CREATE_GROUP_VALUES;
 
@@ -60,7 +61,7 @@ module.exports.createNewGroup = function(creatorId, groupData) {
         return Promise.reject(errorToReturn);
       // no error -> replace emails with ids and insert into db
       } else {
-        groupData.users = groupUserObjects;
+        groupData.users = groupUserIds;
         return database.collections.groups.insertOne(groupData);
       }
     }).then(result => {
@@ -76,13 +77,14 @@ module.exports.createNewGroup = function(creatorId, groupData) {
       return Promise.all(userUpdatePromises);
     }).then(result => {
       winston.debug('Creating a new group successful');
+      groupData.users = groupUserObjects; //returns also the username
       responseData.payload = groupData;
       responseData.success = true;
       resolve(responseData);
     }).catch(err => {
       let errorCode;
-      winston.error('Creating a new group failed');
-      winston.error(err);
+      winston.debug('Creating a new group failed');
+      winston.debug(err);
       responseData.success = false;
       if (err.isSelfProvided) {
         responseData.payload.dataPath = err.dataPath;
@@ -174,7 +176,7 @@ module.exports.verifyGroupContainsUser = function(userId, groupId) {
         errorToReturn.errorCode = ERROR.UNKNOWN_GROUP;
         return Promise.reject(errorToReturn);
       } else if (groupResult.users.indexOf(userId) < 0) {
-        errorToReturn.dataPath = 'authentication';
+        errorToReturn.dataPath = 'authorization';
         errorToReturn.message = 'user is not but has to be a member of the group';
         errorToReturn.errorCode = ERROR.USER_NOT_IN_GROUP;
         return Promise.reject(errorToReturn);
@@ -183,7 +185,7 @@ module.exports.verifyGroupContainsUser = function(userId, groupId) {
       }
     }).catch(err => {
       winston.debug(err);
-      let responseData = {payload: {dataPath: 'authentication'}, success: false};
+      let responseData = {payload: {dataPath: 'authorization'}, success: false};
       let errorCode;
       if (err.isSelfProvided) {
         responseData.payload.dataPath = err.dataPath;
