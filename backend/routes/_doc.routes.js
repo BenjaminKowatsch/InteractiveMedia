@@ -178,7 +178,7 @@
                 "userId": "2368218d-b5ec-4d4d-bc3c-6c249776ee11"
                 "username": "user_2_name",
             }]
-            "transactions" : [ ... ], // all transaction-objects, length=0 if group was just created 
+            "transactions" : [ ... ], // all transaction-objects, length=0 if group was just created
             "groupId" : "6367e722-e857-4d0f-bf78-278a92260418",
             "createdAt" : "2017-12-25T10:56:13.234Z"
     }
