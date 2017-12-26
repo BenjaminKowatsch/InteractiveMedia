@@ -67,14 +67,14 @@ describe('Object-store', function() {
         });
     });
 
-    it('should fail upload a new image with with missing uploadField', function() {
+    it('should fail upload a new image with missing uploadField', function() {
       return chai.request(HOST)
         .post(URL.BASE_OBJECTSTORE + '/upload')
         .set('Authorization', '0 ' + token)
         .then(res => {
           expect(res).to.have.status(400);
           expect(res.body.success).to.be.false;
-          expect(res.body.payload.dataPath).to.be.equal('invalidFile');
+          expect(res.body.payload.dataPath).to.be.equal('objectstore');
           expect(res.body.payload.message).to.be.equal('invalid or missing file');
         });
     });
@@ -140,8 +140,8 @@ describe('Object-store', function() {
             expect(res.body).to.be.an('object');
             expect(res.body.success).to.be.false;
             expect(res.body.payload).to.be.an('object');
-            expect(res.body.payload.dataPath).to.equal('getObject');
-            expect(res.body.payload.message).to.equal('failed to get object');
+            expect(res.body.payload.dataPath).to.equal('objectstore');
+            expect(res.body.payload.message).to.equal('failed to load file');
           });
       });
 
@@ -155,8 +155,8 @@ describe('Object-store', function() {
             expect(res.body).to.be.an('object');
             expect(res.body.success).to.be.false;
             expect(res.body.payload).to.be.an('object');
-            expect(res.body.payload.dataPath).to.equal('invalidFilename');
-            expect(res.body.payload.message).to.equal('missing or invalid filename');
+            expect(res.body.payload.dataPath).to.equal('objectstore');
+            expect(res.body.payload.message).to.equal('invalid or missing filename in request');
           });
       });
     });
