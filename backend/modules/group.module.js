@@ -119,6 +119,46 @@ group.verifyGroupContainsUser = function(userId, groupId) {
         winston.error('Error MONGO_DB_INTERNAL_ERROR: ', error);
         reject(error);
       }
+module.exports.verifyGroupContainsUser = function(userId, groupId) {
+  return new Promise((resolve, reject) => {
+    let errorToReturn = {isSelfProvided: true};
+    Promise.resolve().then(()=> {
+      if (!groupId) {
+        errorToReturn.message = 'missing groupId in URL';
+        errorToReturn.errorCode = ERROR.MISSING_ID_IN_URL;
+        return Promise.reject(errorToReturn);
+      } else {
+        let query = {groupId: groupId};
+        let options = {fields: {objectId: true, users: true}};
+        return database.collections.groups.findOne(query, options);
+      }
+    }).then(groupResult => {
+      if (!groupResult) {
+        errorToReturn.dataPath = 'group';
+        errorToReturn.message = 'group not found';
+        errorToReturn.errorCode = ERROR.UNKNOWN_GROUP;
+        return Promise.reject(errorToReturn);
+      } else if (groupResult.users.indexOf(userId) < 0) {
+        errorToReturn.dataPath = 'authentication';
+        errorToReturn.message = 'user is not but has to be a member of the group';
+        errorToReturn.errorCode = ERROR.USER_NOT_IN_GROUP;
+        return Promise.reject(errorToReturn);
+      } else {
+        resolve(groupResult);
+      }
+    }).catch(err => {
+      winston.debug(err);
+      let responseData = {payload: {dataPath: 'authentication'}, success: false};
+      let errorCode;
+      if (err.isSelfProvided) {
+        responseData.payload.dataPath = err.dataPath;
+        responseData.payload.message = err.message;
+        errorCode = err.errorCode;
+      } else {
+        responseData.payload.message = 'unknown database error';
+        errorCode = ERROR.DB_ERROR;
+      }
+      reject({errorCode: errorCode, responseData: responseData});
     });
   });
 };
