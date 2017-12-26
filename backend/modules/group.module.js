@@ -1,5 +1,4 @@
 'use strict';
-const group = module.exports = {};
 
 const winston = require('winston');
 const config = require('./config');
@@ -21,7 +20,7 @@ const ERROR = require('../config.error');
  *      {String} errorCode Kind of error which occured
  *      {Object} responseData Object with error details
  **/
-group.createNewGroup = function(creatorId, groupData) {
+module.exports.createNewGroup = function(creatorId, groupData) {
   return new Promise((resolve, reject) => {
     winston.debug('Hello from module createNewGroup');
     let responseData = {payload: {}};
