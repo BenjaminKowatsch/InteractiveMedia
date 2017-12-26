@@ -42,22 +42,22 @@ module.exports.upload = function(req, res) {
     filename = fileMeta.payload.filename;
     return objectStore.putObject(config.minioBucketName, filename, req.file.buffer);
   }).then(promiseData => {
-      responseData.success = true;
-      responseData.payload.path = filename;
-      httpResponseService.send(res, 201, responseData);
-    }).catch(errorResult => {
-      winston.error('errorCode', errorResult.errorCode);
-      let statusCode = 418;
-      switch (errorResult.errorCode) {
-        case ERROR.INVALID_OR_MISSING_FILE_IN_REQUEST:
-          statusCode = 400;
-          break;
-        case ERROR.MINIO_ERROR:
-          statusCode = 500;
-          break;
-      }
-      httpResponseService.send(res, statusCode, errorResult.responseData);
-    });
+    responseData.success = true;
+    responseData.payload.path = filename;
+    httpResponseService.send(res, 201, responseData);
+  }).catch(errorResult => {
+    winston.error('errorCode', errorResult.errorCode);
+    let statusCode = 418;
+    switch (errorResult.errorCode) {
+      case ERROR.INVALID_OR_MISSING_FILE_IN_REQUEST:
+        statusCode = 400;
+        break;
+      case ERROR.MINIO_ERROR:
+        statusCode = 500;
+        break;
+    }
+    httpResponseService.send(res, statusCode, errorResult.responseData);
+  });
 };
 
 function parseRequestDownloadFile(req) {
@@ -83,18 +83,18 @@ module.exports.download = function(req, res) {
     filename = fileMeta.payload.filename;
     return objectStore.getObject(config.minioBucketName, filename);
   }).then(promiseData => {
-      promiseData.payload.stream.pipe(res);
-    }).catch(errorResult => {
-      winston.error('errorCode', errorResult.errorCode);
-      let statusCode = 418;
-      switch (errorResult.errorCode) {
-        case ERROR.INVALID_OR_MISSING_FILENAME_IN_REQUEST:
-          statusCode = 400;
-          break;
-        case ERROR.MINIO_ERROR:
-          statusCode = 500;
-          break;
-      }
-      httpResponseService.send(res, statusCode, errorResult.responseData);
-    });
+    promiseData.payload.stream.pipe(res);
+  }).catch(errorResult => {
+    winston.error('errorCode', errorResult.errorCode);
+    let statusCode = 418;
+    switch (errorResult.errorCode) {
+      case ERROR.INVALID_OR_MISSING_FILENAME_IN_REQUEST:
+        statusCode = 400;
+        break;
+      case ERROR.MINIO_ERROR:
+        statusCode = 500;
+        break;
+    }
+    httpResponseService.send(res, statusCode, errorResult.responseData);
+  });
 };
