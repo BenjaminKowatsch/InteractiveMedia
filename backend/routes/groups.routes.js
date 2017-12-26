@@ -53,16 +53,17 @@ router.post('/', authenticationService.isAuthenticated,
  * @apiSuccess (SuccessCode) {200} ReturnsGroup
  * @apiUse successExampleGroup
 
- * @apiUse error400UnknownId
+ * @apiUse error400MissingUnknownUrlParameter
  * @apiUse error401Unauthorized
  * @apiUse error403Forbidden
+ * @apiUse error404UnknownId
  * @apiUse error418UncaughtError
  * @apiUse error500DatabaseError
+ * @apiUse error500UnknownUser
  * @apiUse errorBodyCommonStructure
  *
  * @apiUse errorExampleCommon
  */
-router.get('/:groupid', authenticationService.isAuthenticated,
+router.get('/:groupId', authenticationService.isAuthenticated,
     authorizationService.isGroupMember, groupsController.getGroupById);
-
 module.exports = router;

@@ -53,12 +53,16 @@
     @apiError (ErrorCode) {400} MissingType Missing or unknown type parameter in url
  */
 /**
+ * @apiDefine error400MissingUnknownUrlParameter
+    @apiError (ErrorCode) {400} MissingType Missing or unknown parameter in url
+ */
+/**
  * @apiDefine error400BadRequest
     @apiError (ErrorCode) {400} BadRequest Missing or malformed request
  */
 /**
- * @apiDefine error400UnknownId
-    @apiError (ErrorCode) {400} UnknownId Id for the requested resource is unknown
+ * @apiDefine error404UnknownId
+    @apiError (ErrorCode) {404} UnknownId Id for the requested resource is unknown
  */
 /**
  * @apiDefine error400InvalidBody
@@ -205,3 +209,8 @@
  * @apiDefine error400MissingGroupCreator
     @apiError (ErrorCode) {400} MissingGroupCreator GroupCreator must be part of groupUsers
  */
+/**
+ * @apiDefine error500UnknownUser
+    @apiError (ErrorCode) {500} UnknownUser Requestd group references a non-existing user (by Id)
+ */
+
