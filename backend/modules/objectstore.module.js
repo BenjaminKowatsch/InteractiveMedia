@@ -22,25 +22,21 @@ module.exports.makeBucket = function(bucketName) {
     }).catch((err) => {
       if (err.code === ERROR.MINIO_NO_SUCH_BUCKET) {
         winston.debug('bucket does not exist', bucketName);
-        minioClient.makeBucket(bucketName, 'us-east-1').then(() => {
-          winston.debug('bucket created', bucketName);
-          responseData.success = true;
-          resolve(responseData);
-        }).catch((err) => {
-          winston.debug('error while creating bucket:', JSON.stringify(err));
-          responseData.success = false;
-          responseData.payload.dataPath = 'objectstore';
-          responseData.payload.message = 'unknown minio error';
-          let errorCode = ERROR.MINIO_ERROR;
-          reject({errorCode: errorCode, responseData: responseData});
-        });
+        return minioClient.makeBucket(bucketName, 'us-east-1');
       } else {
-        responseData.success = false;
-        responseData.payload.dataPath = 'objectstore';
-        responseData.payload.message = 'unknown minio error';
-        let errorCode = ERROR.MINIO_ERROR;
-        reject({errorCode: errorCode, responseData: responseData});
+        return Promise.reject(err);
       }
+    }).then(() => {
+      winston.debug('bucket created', bucketName);
+      responseData.success = true;
+      resolve(responseData);
+    }).catch((err) => {
+      winston.debug('error while creating bucket:', JSON.stringify(err));
+      responseData.success = false;
+      responseData.payload.dataPath = 'objectstore';
+      responseData.payload.message = 'unknown minio error';
+      let errorCode = ERROR.MINIO_ERROR;
+      reject({errorCode: errorCode, responseData: responseData});
     });
   });
 };
