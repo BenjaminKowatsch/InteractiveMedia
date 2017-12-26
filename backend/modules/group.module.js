@@ -40,6 +40,7 @@ group.createNewGroup = function(creatorId, groupData) {
       // return all groupUserIds if object is not null
       let groupUserIds = findOneValues.map(val => val ? val.userId : null);
       let groupUserEmails = findOneValues.map(val => val ? val.email : null);
+      let groupUserObjects = findOneValues.map(val => val ? {userId: val.userId, username: val.username} : null);
       errorToReturn.dataPath = 'groupUsers';
       errorToReturn.errorCode = ERROR.INVALID_CREATE_GROUP_VALUES;
 
@@ -60,7 +61,7 @@ group.createNewGroup = function(creatorId, groupData) {
         return Promise.reject(errorToReturn);
       // no error -> replace emails with ids and insert into db
       } else {
-        groupData.users = groupUserIds;
+        groupData.users = groupUserObjects;
         return database.collections.groups.insertOne(groupData);
       }
     }).then(result => {
