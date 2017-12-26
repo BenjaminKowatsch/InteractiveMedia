@@ -18,9 +18,9 @@ router.get('/', authenticationService.isAuthenticated,
  * @apiGroup group
  * @apiVersion 0.1.0
  *
- * @apiParam (URL-Parameter) {string} name Name of the group
- * @apiParam (URL-Parameter) {string} imageUrl URL to the group image (required but can be null)
- * @apiParam (URL-Parameter) {Array[String]} users Email addresses of the group members, including creator's email
+ * @apiParam (Parameter) {string} name Name of the group
+ * @apiParam (Parameter) {string} imageUrl URL to the group image (required but can be null)
+ * @apiParam (Parameter) {Array[String]} users Email addresses of the group members, including creator's email
  *
  * @apiUse paramExampleCreateGroup
  * @apiUse headerExampleAuthorization
