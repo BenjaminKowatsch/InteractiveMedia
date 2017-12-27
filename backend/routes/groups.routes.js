@@ -23,11 +23,14 @@ router.get('/', authenticationService.isAuthenticated,
  * @apiParam (Parameter) {Array[String]} users Email addresses of the group members, including creator's email
  *
  * @apiUse paramExampleCreateGroup
+ *
+ * @apiUse headerAuthorization
  * @apiUse headerExampleAuthorization
  *
  * @apiSuccess (SuccessCode) {201} Success Group Created
  * @apiUse successExampleGroup
 
+ * @apiUse error400MissingUnknownUrlParameterType
  * @apiUse error400InvalidBody
  * @apiUse error400DuplicatedUsers
  * @apiUse error400MissingGroupCreator
@@ -50,11 +53,13 @@ router.post('/', authenticationService.isAuthenticated,
  *
  * @apiParam (URL-Parameter) {string} groupId Id of the requested group
  *
+ * @apiUse headerAuthorization
  * @apiUse headerExampleAuthorization
  *
  * @apiSuccess (SuccessCode) {200} ReturnsGroup
  * @apiUse successExampleGroup
-
+ *
+ * @apiUse error400MissingUnknownUrlParameterType
  * @apiUse error400MissingUnknownUrlParameter
  * @apiUse error401Unauthorized
  * @apiUse error403Forbidden

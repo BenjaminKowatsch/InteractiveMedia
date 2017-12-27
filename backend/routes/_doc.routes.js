@@ -177,10 +177,10 @@
             "imageUrl" : null,
             "users" : [{
                 "userId": "f2bed6b9-6a5a-4363-a9fa-e1f10579c0c1",
-                "username": "user_1_name",
+                "username": "user_1_name"
             },{
-                "userId": "2368218d-b5ec-4d4d-bc3c-6c249776ee11"
-                "username": "user_2_name",
+                "userId": "2368218d-b5ec-4d4d-bc3c-6c249776ee11",
+                "username": "user_2_name"
             }]
             "transactions" : [ ... ], // all transaction-objects, length=0 if group was just created
             "groupId" : "6367e722-e857-4d0f-bf78-278a92260418",
@@ -211,7 +211,7 @@
  */
 /**
  * @apiDefine error500UnknownUser
-    @apiError (ErrorCode) {500} UnknownUser Requestd group references a non-existing user (by Id)
+    @apiError (ErrorCode) {500} UnknownUser Requestd group or user references a non-existing userId
  */
 
 /**
@@ -220,11 +220,26 @@
     {
         "success": true,
         "payload": {
-            "username" : "my_user_name"
-            "" : "blabalb"
+            "username": "my_user_name",
+            "email": "my_user_mail@example.com",
+            "userId": "6367e722-e857-4d0f-bf78-278a92260418",
+            "groupIds": ["f2bed6b9-6a5a-4363-a9fa-e1f10579c0c1","2368218d-b5ec-4d4d-bc3c-6c249776ee11"]
+        }
     }
  */
 /**
  * @apiDefine successBodyUsername
     @apiSuccess (Success) {string} payload[username] Username of requesting user
+ */
+/**
+ * @apiDefine successBodyEmail
+    @apiSuccess (Success) {string} payload[email] Email of requesting user
+ */
+/**
+ * @apiDefine successBodyUserId
+    @apiSuccess (Success) {string} payload[userId] Id of requesting user
+ */
+/**
+ * @apiDefine successBodyGroupIds
+    @apiSuccess (Success) {Array[string]} payload[groupIds] Ids of requesting user's groups
  */
