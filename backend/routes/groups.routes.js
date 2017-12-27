@@ -30,7 +30,6 @@ router.get('/', authenticationService.isAuthenticated,
  * @apiSuccess (SuccessCode) {201} Success Group Created
  * @apiUse successExampleGroup
 
- * @apiUse error400MissingUnknownUrlParameterType
  * @apiUse error400InvalidBody
  * @apiUse error400DuplicatedUsers
  * @apiUse error400MissingGroupCreator
@@ -59,7 +58,6 @@ router.post('/', authenticationService.isAuthenticated,
  * @apiSuccess (SuccessCode) {200} ReturnsGroup
  * @apiUse successExampleGroup
  *
- * @apiUse error400MissingUnknownUrlParameterType
  * @apiUse error400MissingUnknownUrlParameter
  * @apiUse error401Unauthorized
  * @apiUse error403Forbidden

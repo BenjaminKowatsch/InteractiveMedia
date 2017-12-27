@@ -99,11 +99,10 @@ router.post('/logout', authenticationService.isAuthenticated, usersController.lo
  * @apiUse successBodyEmail
  * @apiUse successBodyUserId
  * @apiUse successBodyGroupIds
- * @apiSuccess (SuccessCode) {200} Success Logout successful
+ * @apiSuccess (SuccessCode) {200} Success Get User
  *
  * @apiUse successExampleUser
  *
- * @apiUse error400MissingUnknownUrlParameterType
  * @apiUse error401Unauthorized
  * @apiUse error418UncaughtError
  * @apiUse error500DatabaseError
