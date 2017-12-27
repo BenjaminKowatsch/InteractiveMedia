@@ -509,3 +509,64 @@ exports.register = function(username, password, email) {
     });
   });
 };
+
+module.exports.getUserData = function(userId) {
+  winston.debug('Hello from module getUserData');
+  return new Promise((resolve, reject) => {
+    let responseData = {payload: {}};
+    checkIfUserIdIsGiven(userId)
+    .then(() => findUserById(userId))
+    .then(checkIfUserResultIsNotNull)
+    .then(userResult => {
+      delete userResult._id;
+      responseData.success = true;
+      responseData.payload = userResult;
+      resolve(responseData);
+    }).catch(err => {
+      winston.debug(err);
+      responseData.success = false;
+      responseData.payload.dataPath = 'group';
+      let errorCode;
+      if (err.isSelfProvided) {
+        responseData.payload.message = err.message;
+        errorCode = err.errorCode;
+      } else {
+        responseData.payload.message = 'unknown database error';
+        errorCode = ERROR.DB_ERROR;
+      }
+      reject({errorCode: errorCode, responseData: responseData});
+    });
+  });
+};
+
+function checkIfUserIdIsGiven(userId) {
+  return new Promise((resolve, reject) => {
+    if (!userId) {
+      let errorToReturn = {isSelfProvided: true};
+      errorToReturn.message = 'missing userId';
+      errorToReturn.errorCode = ERROR.UNKNOWN_USER;
+      reject(errorToReturn);
+    } else {
+      resolve();
+    }
+  });
+}
+
+function findUserById(userId) {
+  let query = {userId: userId};
+  let options = {fields: {username: true, groupIds: true, email: true, userId: true}};
+  return database.collections.users.findOne(query, options);
+}
+
+function checkIfUserResultIsNotNull(userResult) {
+  return new Promise((resolve, reject) => {
+    if (!userResult) {
+      let errorToReturn = {isSelfProvided: true};
+      errorToReturn.message = 'user not found';
+      errorToReturn.errorCode = ERROR.UNKNOWN_USER;
+      reject(errorToReturn);
+    } else {
+      resolve(userResult);
+    }
+  });
+}

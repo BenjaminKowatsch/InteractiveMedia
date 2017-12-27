@@ -109,4 +109,6 @@ router.post('/logout', authenticationService.isAuthenticated, usersController.lo
  *
  * @apiUse errorExampleCommon
  */
+router.get('/user', authenticationService.isAuthenticated, usersController.getUserData);
+
 module.exports = router;
