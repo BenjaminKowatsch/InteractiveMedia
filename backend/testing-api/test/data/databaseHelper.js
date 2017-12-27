@@ -50,8 +50,8 @@ function waitForAndSetMutex() {
 function promiseResetDB() {
   return new Promise((resolve,reject) => {
     let db;
-    waitOrOrderForDB()
-    .then(waitForAndSetMutex)
+    waitForAndSetMutex()
+    .then(waitOrOrderForDB)
     .then(() => {
       db = database.db;
       winston.debug('Database connection established');
