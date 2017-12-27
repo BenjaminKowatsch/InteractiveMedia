@@ -30,7 +30,7 @@ module.exports.createNewGroup = function(creatorId, groupData) {
     let groupUserObjects;
 
     findUsersByField('email', groupData.users)
-    .then(findUsersResult => checkForInvalideCreateGroupValues(findUsersResult, groupData.users, creatorId))
+    .then(findUsersResult => checkForInvalidCreateGroupValues(findUsersResult, groupData.users, creatorId))
     .then(groupUser => {
       groupData.users = groupUser.ids;
       groupUserObjects = groupUser.objects;
@@ -120,7 +120,7 @@ module.exports.verifyGroupContainsUser = function(userId, groupId) {
   });
 };
 
-function checkForInvalideCreateGroupValues(findUsersResult, requestedUserEmails, creatorId) {
+function checkForInvalidCreateGroupValues(findUsersResult, requestedUserEmails, creatorId) {
   let errorToReturn = {isSelfProvided: true};
   errorToReturn.dataPath = 'groupUsers';
   errorToReturn.errorCode = ERROR.INVALID_CREATE_GROUP_VALUES;
