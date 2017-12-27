@@ -214,3 +214,17 @@
     @apiError (ErrorCode) {500} UnknownUser Requestd group references a non-existing user (by Id)
  */
 
+/**
+ * @apiDefine successExampleUser
+    @apiSuccessExample {type} Success-Response
+    {
+        "success": true,
+        "payload": {
+            "username" : "my_user_name"
+            "" : "blabalb"
+    }
+ */
+/**
+ * @apiDefine successBodyUsername
+    @apiSuccess (Success) {string} payload[username] Username of requesting user
+ */

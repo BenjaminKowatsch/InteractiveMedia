@@ -85,4 +85,28 @@ router.post('/login', usersController.login);
  */
 router.post('/logout', authenticationService.isAuthenticated, usersController.logout);
 
+/**
+ * @api {GET} /v1/users/user User
+ * @apiName User
+ * @apiGroup user
+ * @apiVersion 0.1.0
+ *
+ * @apiUse headerAuthorization
+ * @apiUse headerExampleAuthorization
+ *
+ * @apiUse successBodySuccess
+ * @apiUse successBodyUsername
+ * @apiSuccess (SuccessCode) {200} Success Logout successful
+ *
+ * @apiUse successExampleUser
+ *
+ * @apiUse error400MissingUnknownUrlParameterType
+ * @apiUse error401Unauthorized
+ * @apiUse error418UncaughtError
+ * @apiUse error500DatabaseError
+ * @apiUse error500UnknownUser
+ * @apiUse errorBodyCommonStructure
+ *
+ * @apiUse errorExampleCommon
+ */
 module.exports = router;
