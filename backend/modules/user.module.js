@@ -92,9 +92,9 @@ exports.verifyGoogleAccessToken = function(token, verifyDatabase) {
           });
         } else {
           responseData.success = true;
-          responseData.payload.expiryDate = result.expiryDate;
-          responseData.payload.userId = result.userId;
-          responseData.payload.email = result.email;
+          responseData.payload.expiryDate = expiryDate;
+          responseData.payload.userId = userId;
+          responseData.payload.email = email;
           resolve(responseData);
         }
       } else {
