@@ -30,7 +30,7 @@
 
 /**
  * @apiDefine successBodySuccess
-    @apiSuccess (Success) {string} success Request successful
+    @apiSuccess (Success) {boolean} success Request successful
  */
 /**
  * @apiDefine successBodyAuthtype
@@ -243,3 +243,40 @@
  * @apiDefine successBodyGroupIds
     @apiSuccess (Success) {Array[string]} payload[groupIds] Ids of requesting user's groups
  */
+/**
+ * @apiDefine paramExampleCreateTransaction
+    @apiParamExample {type} Create Transaction
+    {
+        "amount": 1234.13,
+        "infoName": "A very expensive Beer",
+        "infoLocation": {
+            "latitude": 48.947,
+            "longitude": 9.131
+        },
+        "infoCreatedAt": "2017-04-23T18:25:43.511Z",
+        "infoImageUrl": "a97c6b8e08f9d7a.image.jpg",
+        "paidBy": "6367e722-e857-4d0f-bf78-278a92260418",
+        "split": "even"
+    }
+*/
+/**
+ * @apiDefine successExampleTransaction
+    @apiSuccessExample {type} Success-Response
+    {
+        "success": true,
+        "payload": {
+            "publishedAt" : "2017-04-23T19:34:23.321Z",
+            "amount": 1234.13,
+            "infoName": "A very expensive Beer",
+            "infoLocation": {
+                "latitude": 48.947,
+                "longitude": 9.131
+            },
+            "infoCreatedAt": "2017-04-23T18:25:43.511Z",
+            "infoImageUrl":"a97c6b8e08f9d7a.image.jpg",
+            "paidBy": "6367e722-e857-4d0f-bf78-278a92260418",
+            "split": "even"
+        }
+    }
+ */
+
