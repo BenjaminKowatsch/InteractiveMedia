@@ -29,6 +29,7 @@ describe('Groups-Controller', () => {
   describe('Create new Group', () => {
     before('register User 0 and 1', done => {
       tokens = {};
+      groupId = {};
       databaseHelper.promiseResetDB().then(()=> {
         return registerUser(0);
       }).then(res => {
@@ -65,6 +66,25 @@ describe('Groups-Controller', () => {
           expect(res.body.payload.transactions).to.be.empty;
           expect(res.body.payload.groupId).to.be.an('string').and.not.to.be.empty;
           expect(res.body.payload.createdAt).to.be.an('string').and.not.to.be.empty;
+          groupId = res.body.payload.groupId;
+        });
+      });
+
+      it('should get the groupId with userDate request of user_0', function() {
+        return chai.request(HOST)
+        .get(URL.BASE_USER  + '/user')
+        .set('Authorization', '0 ' + tokens[0])
+        .then(res => {
+          expect(res).to.have.status(200);
+          expect(res).to.be.json;
+          expect(res.body).to.be.an('object');
+          expect(res.body.success).to.be.true;
+          expect(res.body.payload).to.be.an('object');
+          expect(res.body.payload.username).to.equal(userData.users.valid[0].username);
+          expect(res.body.payload.email).to.equal(userData.users.valid[0].email);
+          expect(res.body.payload.groupIds).to.have.lengthOf(1);
+          expect(res.body.payload.groupIds).to.include(groupId);
+          expect(res.body.payload.userId).to.have.lengthOf(36).and.to.be.a('string');
         });
       });
     });
