@@ -53,8 +53,20 @@
     @apiError (ErrorCode) {400} MissingType Missing or unknown type parameter in url
  */
 /**
+ * @apiDefine error400MissingUnknownUrlParameter
+    @apiError (ErrorCode) {400} MissingType Missing or unknown parameter in url
+ */
+/**
  * @apiDefine error400BadRequest
     @apiError (ErrorCode) {400} BadRequest Missing or malformed request
+ */
+/**
+ * @apiDefine error404UnknownId
+    @apiError (ErrorCode) {404} UnknownId Id for the requested resource is unknown
+ */
+/**
+ * @apiDefine error400InvalidBody
+    @apiError (ErrorCode) {400} InvalidBody Validation error for request body
  */
 /**
  * @apiDefine error401Unauthorized
@@ -64,9 +76,25 @@
  * @apiDefine error401CredentialsInvalid
     @apiError (ErrorCode) {401} InvalidCredentials Credentials are invalid
  */
+
+/**
+ * @apiDefine error403Forbidden
+    @apiError (ErrorCode) {403} Forbidden The authenticated user is not permitted to perform the requested operation
+ */
+
+/**
+ * @apiDefine error418UncaughtError
+    @apiError (ErrorCode) {418} UncaughtError Uncaught error
+ */
+
 /**
  * @apiDefine error500MinioInternalError
     @apiError (ErrorCode) {500} MinioInternalError Minio internal error
+ */
+
+/**
+ * @apiDefine error500DatabaseError
+    @apiError (ErrorCode) {500} DatabaseError Database internal error
  */
 
 /**
@@ -129,4 +157,60 @@
             "message": "logout failed"
         }
     }
+    @apiErrorExample {type} Error-Response
+    {
+        "success": false,
+        "payload": {
+            "dataPath": "groupUsers",
+            "message": "Unknown user: wrong_mail@mail.com"
+        }
+    }
  */
+
+/**
+ * @apiDefine successExampleGroup
+    @apiSuccessExample {type} Success-Response
+    {
+        "success": true,
+        "payload": {
+            "name" : "test_group_1",
+            "imageUrl" : null,
+            "users" : [{
+                "userId": "f2bed6b9-6a5a-4363-a9fa-e1f10579c0c1",
+                "username": "user_1_name",
+            },{
+                "userId": "2368218d-b5ec-4d4d-bc3c-6c249776ee11"
+                "username": "user_2_name",
+            }]
+            "transactions" : [ ... ], // all transaction-objects, length=0 if group was just created
+            "groupId" : "6367e722-e857-4d0f-bf78-278a92260418",
+            "createdAt" : "2017-12-25T10:56:13.234Z"
+    }
+ */
+/**
+ * @apiDefine paramExampleCreateGroup
+    @apiParamExample {type} CreateGroup
+    {
+        name: 'TheFooBars',
+        imageUrl: null,
+        users: ['user_1@example.de', 'user_2@example.de', 'user_3@example.de']
+    }
+ */
+
+/**
+ * @apiDefine error409UnknownUser
+    @apiError (ErrorCode) {409} UnknownUser Unknown user: {{wrong_mail@mail.com}}
+ */
+/**
+ * @apiDefine error400DuplicatedUsers
+    @apiError (ErrorCode) {400} DuplicatedUsers Duplicated groupUsers
+ */
+/**
+ * @apiDefine error400MissingGroupCreator
+    @apiError (ErrorCode) {400} MissingGroupCreator GroupCreator must be part of groupUsers
+ */
+/**
+ * @apiDefine error500UnknownUser
+    @apiError (ErrorCode) {500} UnknownUser Requestd group references a non-existing user (by Id)
+ */
+

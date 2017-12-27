@@ -1,8 +1,8 @@
 module.exports = {
     INVALID_AUTHTYPE: 'invalid auth type',
     UNKNOWN_USER: 'unknown user',
-    INVALID_CREATE_GROUP_VALUES: 'invalide create group values',
-    INVALID_REQUEST_BODY: 'invalide request body',
+    INVALID_CREATE_GROUP_VALUES: 'invalid create group values',
+    INVALID_REQUEST_BODY: 'invalid request body',
     DB_ERROR: 'database error',
     NO_AUTH_HEADER: 'no http request header Authorization provided',
     INVALID_AUTH_HEADER: 'invalid http request header Authorization provided',
@@ -11,5 +11,9 @@ module.exports = {
     MINIO_ERROR: 'minio error',
     INVALID_OR_MISSING_FILE_IN_REQUEST: 'invalid or missing file in request',
     INVALID_OR_MISSING_FILENAME_IN_REQUEST: 'invalid or missing filename in request',
-    MINIO_NO_SUCH_BUCKET: 'NoSuchBucket'
+    MINIO_NO_SUCH_BUCKET: 'NoSuchBucket',
+    MISSING_ID_IN_URL: 'missing ID in URL',
+    USER_NOT_IN_GROUP: 'user is not a member of the group',
+    UNKNOWN_GROUP: 'unknown group',
+    NOT_AUTHENTICATED: 'user is not authenticated',
   };

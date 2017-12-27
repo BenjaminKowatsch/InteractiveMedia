@@ -1,5 +1,4 @@
 'use strict';
-const group = module.exports = {};
 
 const winston = require('winston');
 const config = require('./config');
@@ -21,7 +20,7 @@ const ERROR = require('../config.error');
  *      {String} errorCode Kind of error which occured
  *      {Object} responseData Object with error details
  **/
-group.createNewGroup = function(creatorId, groupData) {
+module.exports.createNewGroup = function(creatorId, groupData) {
   return new Promise((resolve, reject) => {
     winston.debug('Hello from module createNewGroup');
     let responseData = {payload: {}};
@@ -29,6 +28,7 @@ group.createNewGroup = function(creatorId, groupData) {
     groupData.createdAt = new Date();
     groupData.transactions = [];
     let errorToReturn = {isSelfProvided: true};
+    let groupUserObjects;
 
     // generate array of promises of db calls for find user by id
     let groupUserPromises = [];
@@ -40,6 +40,7 @@ group.createNewGroup = function(creatorId, groupData) {
       // return all groupUserIds if object is not null
       let groupUserIds = findOneValues.map(val => val ? val.userId : null);
       let groupUserEmails = findOneValues.map(val => val ? val.email : null);
+      groupUserObjects = findOneValues.map(val => val ? {userId: val.userId, username: val.username} : null);
       errorToReturn.dataPath = 'groupUsers';
       errorToReturn.errorCode = ERROR.INVALID_CREATE_GROUP_VALUES;
 
@@ -64,14 +65,26 @@ group.createNewGroup = function(creatorId, groupData) {
         return database.collections.groups.insertOne(groupData);
       }
     }).then(result => {
+      let userUpdatePromises = [];
+      let update = {
+        '$push': {
+          'groupIds': groupData.groupId
+        }
+      };
+      for (let i = 0; i < groupData.users.length; i++) {
+        userUpdatePromises.push(database.collections.users.updateOne({userId: groupData.users[i]}, update));
+      }
+      return Promise.all(userUpdatePromises);
+    }).then(result => {
       winston.debug('Creating a new group successful');
+      groupData.users = groupUserObjects; //returns also the username
       responseData.payload = groupData;
       responseData.success = true;
       resolve(responseData);
     }).catch(err => {
       let errorCode;
-      winston.error('Creating a new group failed');
-      winston.error(err);
+      winston.debug('Creating a new group failed');
+      winston.debug(err);
       responseData.success = false;
       if (err.isSelfProvided) {
         responseData.payload.dataPath = err.dataPath;
@@ -87,26 +100,102 @@ group.createNewGroup = function(creatorId, groupData) {
   });
 };
 
-// by maxi, not refactored yet
-group.verifyGroupContainsUser = function(userId, groupId) {
+module.exports.getGroupById = function(groupId) {
+  winston.debug('Hello from module getGroupById');
   return new Promise((resolve, reject) => {
-    let query = {objectId: groupId};
-    let options = {fields: {objectId: true, users: true}};
-    database.collections.groups.findOne(query, options, function(error, result) {
-      if (error === null && result !== null) {
-        let promiseData = {
-          groupId: result.objectId,
-          users: result.users,
-        };
-        if (result.users.indexOf(userId) > 0) {
-          resolve(promiseData);
-        } else {
-          reject(promiseData);
-        }
+    let responseData = {payload: {}};
+    let errorToReturn = {isSelfProvided: true};
+    Promise.resolve().then(() => {
+      if (!groupId) {
+        errorToReturn.message = 'missing groupId in URL';
+        errorToReturn.errorCode = ERROR.MISSING_ID_IN_URL;
+        return Promise.reject(errorToReturn);
       } else {
-        winston.error('Error MONGO_DB_INTERNAL_ERROR: ', error);
-        reject(error);
+        let query = {groupId: groupId};
+        let options = {fields: {_id: false}};
+        return database.collections.groups.findOne(query, options);
       }
+    }).then(groupResult => {
+      if (!groupResult) {
+        errorToReturn.message = 'group not found';
+        errorToReturn.errorCode = ERROR.UNKNOWN_GROUP;
+        return Promise.reject(errorToReturn);
+      } else {
+        responseData.payload = groupResult;
+        let groupUserPromises = [];
+        for (let i = 0; i < groupResult.users.length; i++) {
+          groupUserPromises.push(database.collections.users.findOne({userId: groupResult.users[i]}));
+        }
+        return Promise.all(groupUserPromises);
+      }
+    }).then(userResults => {
+      if (userResults.includes(null)) {
+        errorToReturn.message = 'Unknown user in group';
+        errorToReturn.errorCode = ERROR.UNKNOWN_USER;
+        return Promise.reject(errorToReturn);
+      } else {
+        let groupUserObjects = userResults.map(val => ({userId: val.userId, username: val.username}));
+        responseData.payload.users = groupUserObjects;
+        responseData.success = true;
+        resolve(responseData);
+      }
+    }).catch(err => {
+      winston.debug(err);
+      responseData.success = false;
+      responseData.payload.dataPath = 'group';
+      let errorCode;
+      if (err.isSelfProvided) {
+        responseData.payload.message = err.message;
+        errorCode = err.errorCode;
+      } else {
+        responseData.payload.message = 'unknown database error';
+        errorCode = ERROR.DB_ERROR;
+      }
+      reject({errorCode: errorCode, responseData: responseData});
+    });
+  });
+};
+
+module.exports.verifyGroupContainsUser = function(userId, groupId) {
+  return new Promise((resolve, reject) => {
+    let errorToReturn = {isSelfProvided: true};
+    Promise.resolve().then(()=> {
+      if (!groupId) {
+        errorToReturn.message = 'missing groupId in URL';
+        errorToReturn.errorCode = ERROR.MISSING_ID_IN_URL;
+        return Promise.reject(errorToReturn);
+      } else {
+        let query = {groupId: groupId};
+        let options = {fields: {objectId: true, users: true}};
+        return database.collections.groups.findOne(query, options);
+      }
+    }).then(groupResult => {
+      if (!groupResult) {
+        errorToReturn.dataPath = 'group';
+        errorToReturn.message = 'group not found';
+        errorToReturn.errorCode = ERROR.UNKNOWN_GROUP;
+        return Promise.reject(errorToReturn);
+      } else if (groupResult.users.indexOf(userId) < 0) {
+        errorToReturn.dataPath = 'authorization';
+        errorToReturn.message = 'user is not but has to be a member of the group';
+        errorToReturn.errorCode = ERROR.USER_NOT_IN_GROUP;
+        return Promise.reject(errorToReturn);
+      } else {
+        resolve(groupResult);
+      }
+    }).catch(err => {
+      winston.debug(err);
+      let responseData = {payload: {dataPath: 'authorization'}, success: false};
+      let errorCode;
+      if (err.isSelfProvided) {
+        responseData.payload.dataPath = err.dataPath;
+        responseData.payload.message = err.message;
+        errorCode = err.errorCode;
+      } else {
+        responseData.payload.message = 'unknown database error';
+        errorCode = ERROR.DB_ERROR;
+      }
+      reject({errorCode: errorCode, responseData: responseData});
     });
   });
 };
