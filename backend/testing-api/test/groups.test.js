@@ -213,7 +213,6 @@ describe('Groups-Controller', () => {
 
     describe('with success', () => {
       it('should get the group by user 0', () => {
-        console.log(groupId);
         return chai.request(HOST)
         .get(URL.BASE_GROUP + groupId)
         .set('Authorization', '0 ' + tokens[0])
@@ -235,7 +234,6 @@ describe('Groups-Controller', () => {
       });
 
       it('should get the group by user 1', () => {
-        console.log(groupId);
         return chai.request(HOST)
         .get(URL.BASE_GROUP + groupId)
         .set('Authorization', '0 ' + tokens[1])
