@@ -43,11 +43,13 @@ router.post('/', authenticationService.isAuthenticated,
     groupsController.createNewGroup);
 
 /**
- * @api {GET} /v1/groups/ Get
+ * @api {GET} /v1/groups/:groupId Get
  * @apiName Get
  * @apiGroup group
  * @apiVersion 0.1.0
-
+ *
+ * @apiParam (URL-Parameter) {string} groupId Id of the requested group
+ *
  * @apiUse headerExampleAuthorization
  *
  * @apiSuccess (SuccessCode) {200} ReturnsGroup
