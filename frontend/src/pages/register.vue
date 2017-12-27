@@ -11,7 +11,7 @@
              <f7-navbar>
              <!-- navigation -->
                 <f7-nav-left back-link="Back" sliding></f7-nav-left>
-                <f7-nav-center sliding>Launometer</f7-nav-center>
+                <f7-nav-center sliding>Debts² Admin Panel</f7-nav-center>
                  <!-- label with app name -->
             </f7-navbar>
             <!-- Page Content -->

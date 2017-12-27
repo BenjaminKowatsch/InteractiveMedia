@@ -10,7 +10,6 @@
     "chart.js": "^2.5.0",
     "framework7": "^1.5.4",
     "framework7-vue": "^0.8.5",
-    "spotify-web-api-js": "0.22.0",
     "vue": "^2.3.3",
     "vue-chartjs": "^2.6.3",
     "vue-touch": "^2.0.0-beta.4",

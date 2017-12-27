@@ -10,7 +10,7 @@
   <f7-page toolbar-fixed>
   <!-- navigation -->
     <f7-navbar>
-      <f7-nav-center sliding>Wie ist deine Stimmung heute?</f7-nav-center>
+      <f7-nav-center sliding>Dashboard</f7-nav-center>
       <!-- label which asks for the actual feeling -->
     </f7-navbar>
 
@@ -19,12 +19,12 @@
       <!-- popup which apears if one doesn't enter anything -->
     </f7-popup>
 
-    <v-touch class="outerMoodslider" v-on:panstart="start($event)" v-on:panmove="move($event)" v-on:panend="end($event)" v-bind:pan-options="{ direction: 'vertical' }">
+<!--     <v-touch class="outerMoodslider" v-on:panstart="start($event)" v-on:panmove="move($event)" v-on:panend="end($event)" v-bind:pan-options="{ direction: 'vertical' }">
       <moodslider></moodslider>
-    </v-touch>
+    </v-touch> -->
     <!-- area for import of the moodslider component -->
     <f7-list form>
-      <f7-button id="launeButton" v-on:click="navigate()">...</f7-button>
+      <f7-button id="launeButton" v-on:click="navigate()">.Just a dummy button.</f7-button>
       <!-- Emotion button -->
     </f7-list>
   </f7-page>
@@ -36,32 +36,32 @@
   * START JScript Elements for establishing the view according to the template elements
   * imports Moodslider (to be found in component folder), Axios
   */
-  import Moodslider from '@/components/moodslider'
-  import Axios from 'axios'
+/*   import Moodslider from '@/components/moodslider'
+ */  import Axios from 'axios'
 
 
   export default {
     name: 'overview',
     components: {
-      Moodslider
-      //adds the moodslider as component
+/*       Moodslider
+ */      //adds the moodslider as component
     },
 
     data() {
       return {
-        moodbarHeight: 0,
+/*         moodbarHeight: 0,
         topOffset: 0,
         progressbar: {},
-        laune: 0,
+        laune: 0, */
         // sets the variables and defines them
       }
     },
     mounted: function() {
       // loads the moodslider as moodbar and gets template elements by their classes
-      var moodbar = document.getElementsByClassName('outerMoodslider')[0];
+ /*      var moodbar = document.getElementsByClassName('outerMoodslider')[0];
       this.moodbarHeight = moodbar.clientHeight;
       this.topOffset = moodbar.getBoundingClientRect().top;
-      this.progressbar = document.getElementsByClassName('inner')[0];
+      this.progressbar = document.getElementsByClassName('inner')[0]; */
     },
     methods: {
 
@@ -73,8 +73,8 @@
 
       start: function(event) {
 
-        this.progressbar.setAttribute("style", "height:" +
-          this.getProgressBarHeightInPercent(event.center.y) + "%;");
+ /*        this.progressbar.setAttribute("style", "height:" +
+          this.getProgressBarHeightInPercent(event.center.y) + "%;"); */
         // raises the height when starting to slide the moodbar via percentage
       },
 
@@ -84,8 +84,8 @@
        * @param  event  event   The event
        */
       move: function(event) {
-        this.progressbar.setAttribute("style", "height:" +
-          this.getProgressBarHeightInPercent(event.center.y) + "%;");
+/*         this.progressbar.setAttribute("style", "height:" +
+          this.getProgressBarHeightInPercent(event.center.y) + "%;"); */
         // raises the height while sliding the moodbar via percentage
       },
 
@@ -95,9 +95,9 @@
        * @param      {<type>}  event   The event
        */
       end: function(event) {
-        this.progressbar.setAttribute("style", "height:" +
+       /*  this.progressbar.setAttribute("style", "height:" +
         this.getProgressBarHeightInPercent(event.center.y) + "%;");
-        this.laune = this.getProgressBarHeightInPercent(event.center.y);
+        this.laune = this.getProgressBarHeightInPercent(event.center.y); */
         /* 
         *  raises the height until stopping to slide the moodbar 
         *  via percentage and gets the actual level as variable
@@ -112,7 +112,7 @@
        * percentage
        * @return     {number}  The progress bar height in percent.
        */
-      getProgressBarHeightInPercent: function(yCoordinate) {
+    /*   getProgressBarHeightInPercent: function(yCoordinate) {
         var absoluteCoordinate = yCoordinate - this.topOffset;
         var percentage = 100 * (1 - (absoluteCoordinate / this.moodbarHeight));
         // computes the percentage via moodbar height
@@ -120,23 +120,23 @@
         // sets the percentage of the height as label of the button
         return percentage;
       },
-
+ */
       /**
        * Sets the button label for each mood according to height.
        *
        * @param      {number}  percentage  The percentage
        */
 
-      setButtonLabel: function(percentage) {
+    /*   setButtonLabel: function(percentage) { */
         // sets the label of the mood button
-        var moods = ['Miserabel', 'Schlecht', 'Heiter bis wolkig', 'Gut', 'Überragend'];
-        var button = document.getElementById('launeButton');
+      /*   var moods = ['Miserabel', 'Schlecht', 'Heiter bis wolkig', 'Gut', 'Überragend'];
+        var button = document.getElementById('launeButton'); */
         /* 
         *  sets an array of possible moods and sets the template element 
         *  emotion button as button variable
         */
 
-        if (percentage >= 0 && percentage <= 20) {
+  /*       if (percentage >= 0 && percentage <= 20) {
           button.innerHTML = moods[0];
         } else if (percentage >= 20 && percentage <= 40) {
           button.innerHTML = moods[1];
@@ -146,12 +146,12 @@
           button.innerHTML = moods[3];
         } else if (percentage >= 80 && percentage <= 100) {
           button.innerHTML = moods[4];
-        }
+        } */
         /*
         *  selects a mood out of the array according to the percentage 
         *  of the chosen emotion level
         */
-      },
+     /*  }, */
 
       /**
        * Checks if a mood has been selected
@@ -159,7 +159,7 @@
        *
        * @return the correct view String.
        */
-      navigate: function() {
+      /* navigate: function() {
 
         var framework7 = new Framework7();
         var button = document.getElementById('launeButton');
@@ -168,20 +168,20 @@
           var buttonText = button.innerHTML;
           if (buttonText !== '...') {
 
-            console.log(this.laune);
+            console.log(this.laune); */
             // logs the mood to the console
 
-            this.$f7.mainView.router.loadPage('/emotion?mood=' +
-              this.laune);
-            // loads next view and hands over the mood variable
+           /*  this.$f7.mainView.router.loadPage('/emotion?mood=' +
+              this.laune); */
+            // loads next view and hands over the mood variable --> Example impl. for further implementations!
 
-          } else {
-            framework7.alert('Bitte trage etwas ein...');
+          /* } else {
+            framework7.alert('Bitte trage etwas ein...'); */
             // sends an alert to the user when nothing is chosen on the slider
-          }
-        }
-
-      }
+        /*   }
+        } */
+/* 
+      } */
 
     }
   }
