@@ -1,3 +1,5 @@
+'use strict';
+
 const MongoClient = require('mongodb').MongoClient;
 const winston = require('winston');
 
@@ -16,11 +18,42 @@ function createIndexCallback(err, indexname) {
   }
 }
 
+function waitOrOrderForDB() {
+  return new Promise((resolve,reject) => {
+    if (database.db) {
+      resolve();
+    } else {
+      MongoClient.connect('mongodb://mongo/debtsquared', mongoConnectConfig).then(db => {
+        console.log('DB connection established');
+        database.db = db;
+        resolve();
+      }).catch(err => {
+        winston.error('Database connection failed with error: ' + err);
+        database.collections.users = undefined;
+        database.collections.groups = undefined;
+        database.db = undefined;
+        reject();
+      });
+    }
+  });
+}
+
+let mutex = Promise.resolve();
+let mutexResolver;
+function waitForAndSetMutex() {
+  return mutex.then(() => {
+    mutex = new Promise((resolve)=> (mutexResolver = resolve));
+    return true;
+  });
+}
+
 function promiseResetDB() {
   return new Promise((resolve,reject) => {
-    var db;
-    MongoClient.connect('mongodb://mongo/debtsquared', mongoConnectConfig).then(_db => {
-      db = _db;
+    let db;
+    waitOrOrderForDB()
+    .then(waitForAndSetMutex)
+    .then(() => {
+      db = database.db;
       winston.debug('Database connection established');
       return db.dropCollection('users');
     }).then(result => {
@@ -66,15 +99,8 @@ function promiseResetDB() {
       }, createIndexCallback);
 
       winston.info('Database successfully cleaned');
-      db.close();
+      mutexResolver();
       resolve();
-    }).catch(err => {
-      winston.error('Database connection failed with error: ' + err);
-      database.collections.users = undefined;
-      database.collections.groups = undefined;
-      database.db = undefined;
-      db.close();
-      reject();
     });
   });
 }
