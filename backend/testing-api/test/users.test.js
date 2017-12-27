@@ -262,21 +262,6 @@ describe('User-Controller', () => {
         });
       });
 
-      it('should fail to do a request with valid token and wrong authType', function() {
-        return chai.request(HOST)
-        .get(URL.BASE_USER  + '/user')
-        .set('Authorization', '1 ' + defaultToken)
-        .then(res => {
-          expect(res).to.have.status(401);
-          expect(res).to.be.json;
-          expect(res.body).to.be.an('object');
-          expect(res.body.success).to.be.false;
-          expect(res.body.payload).to.be.an('object');
-          expect(res.body.payload.dataPath).to.equal('authentication');
-          expect(res.body.payload.message).to.equal('invalid auth token');
-        });
-      }).timeout(10000);
-
       it('should login as registered user', function() {
         return chai.request(HOST)
         .post(URL.BASE_USER + '/login?type=0')
