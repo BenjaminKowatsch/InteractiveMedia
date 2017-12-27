@@ -29,7 +29,7 @@ module.exports = [
       imageUrl: null,
       users: []
     },
-    createInvalidePayload: {
+    createInvalidPayload: {
       imageUrl: null,
       users: ['wrong_user_0_email@bar.foo', userData.users.valid[1].email]
     },

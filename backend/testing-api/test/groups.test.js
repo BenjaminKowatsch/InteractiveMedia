@@ -134,11 +134,11 @@ describe('Groups-Controller', () => {
         });
       });
 
-      it('should not create a new group due to invalide payload', () => {
+      it('should not create a new group due to invalid payload', () => {
         return chai.request(HOST)
         .post(URL.BASE_GROUP)
         .set('Authorization', '0 ' + tokens[0])
-        .send(groupScenarios[0].createInvalidePayload)
+        .send(groupScenarios[0].createInvalidPayload)
         .then(res => {
           expect(res).to.have.status(400);
           expect(res).to.be.json;
@@ -146,7 +146,7 @@ describe('Groups-Controller', () => {
           expect(res.body.success).to.be.false;
           expect(res.body.payload).to.be.an('object');
           expect(res.body.payload.dataPath).to.equal('validation');
-          expect(res.body.payload.message).to.equal('Invalide body');
+          expect(res.body.payload.message).to.equal('Invalid body');
         });
       });
 
