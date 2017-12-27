@@ -86,8 +86,8 @@ router.post('/login', usersController.login);
 router.post('/logout', authenticationService.isAuthenticated, usersController.logout);
 
 /**
- * @api {GET} /v1/users/user User
- * @apiName User
+ * @api {GET} /v1/users/user Get User
+ * @apiName getUser
  * @apiGroup user
  * @apiVersion 0.1.0
  *
