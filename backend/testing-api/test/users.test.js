@@ -491,4 +491,86 @@ describe('User-Controller', () => {
       });
     });
   });
+
+  describe('Get User', function() {
+    before('Clean DB and register User 0 and 1', done => {
+      tokens = {};
+      databaseHelper.promiseResetDB().then(()=> {
+        return chai.request(HOST).post(URL.BASE_USER  + '/').send(testData.users.valid[0]);
+      }).then(res => {
+        tokens[0] = res.body.payload.accessToken;
+        return chai.request(HOST).post(URL.BASE_USER  + '/').send(testData.users.valid[1]);
+      }).then(res => {
+        tokens[1] = res.body.payload.accessToken;
+        done();
+      }).catch((error) => {
+        console.log('Register User Error: ' + error);
+      });
+    });
+
+    it('should get the user-data of user_0', function() {
+      return chai.request(HOST)
+      .get(URL.BASE_USER  + '/user')
+      .set('Authorization', '0 ' + tokens[0])
+      .then(res => {
+        expect(res).to.have.status(200);
+        expect(res).to.be.json;
+        expect(res.body).to.be.an('object');
+        expect(res.body.success).to.be.true;
+        expect(res.body.payload).to.be.an('object');
+        expect(res.body.payload.username).to.equal(testData.users.valid[0].username);
+        expect(res.body.payload.email).to.equal(testData.users.valid[0].email);
+        expect(res.body.payload._id).to.be.undefined;
+        expect(res.body.payload.groupIds).to.be.undefined;
+        expect(res.body.payload.userId).to.have.lengthOf(36).and.to.be.a('string');
+      });
+    });
+
+    it('should get the user-data of user_1', function() {
+      return chai.request(HOST)
+      .get(URL.BASE_USER  + '/user')
+      .set('Authorization', '0 ' + tokens[1])
+      .then(res => {
+        expect(res).to.have.status(200);
+        expect(res).to.be.json;
+        expect(res.body).to.be.an('object');
+        expect(res.body.success).to.be.true;
+        expect(res.body.payload).to.be.an('object');
+        expect(res.body.payload.username).to.equal(testData.users.valid[1].username);
+        expect(res.body.payload.email).to.equal(testData.users.valid[1].email);
+        expect(res.body.payload._id).to.be.undefined;
+        expect(res.body.payload.groupIds).to.be.undefined;
+        expect(res.body.payload.userId).to.have.lengthOf(36).and.to.be.a('string');
+      });
+    });
+
+    it('should not get the user-data of user_0 due to wrong token', function() {
+      return chai.request(HOST)
+      .get(URL.BASE_USER  + '/user')
+      .set('Authorization', '0 this_is_a_wrong_token')
+      .then(res => {
+        expect(res).to.have.status(401);
+        expect(res).to.be.json;
+        expect(res.body).to.be.an('object');
+        expect(res.body.success).to.be.false;
+        expect(res.body.payload).to.be.an('object');
+        expect(res.body.payload.dataPath).to.equal('authentication');
+        expect(res.body.payload.message).to.equal('invalid authToken');
+      });
+    });
+
+    it('should not get the user-data of user_0 due to missing auth header', function() {
+      return chai.request(HOST)
+      .get(URL.BASE_USER  + '/user')
+      .then(res => {
+        expect(res).to.have.status(401);
+        expect(res).to.be.json;
+        expect(res.body).to.be.an('object');
+        expect(res.body.success).to.be.false;
+        expect(res.body.payload).to.be.an('object');
+        expect(res.body.payload.dataPath).to.equal('authentication');
+        expect(res.body.payload.message).to.equal('no http request header Authorization provided');
+      });
+    });
+  });
 });
