@@ -9,14 +9,18 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.google.firebase.iid.FirebaseInstanceId;
 import com.media.interactive.cs3.hdm.interactivemedia.CallbackListener;
 import com.media.interactive.cs3.hdm.interactivemedia.R;
 import com.media.interactive.cs3.hdm.interactivemedia.contentprovider.DatabaseHelper;
 import com.media.interactive.cs3.hdm.interactivemedia.contentprovider.DummyDataAdder;
 import com.media.interactive.cs3.hdm.interactivemedia.data.Hash;
 import com.media.interactive.cs3.hdm.interactivemedia.data.Login;
+import com.media.interactive.cs3.hdm.interactivemedia.notification.DeleteInstanceIDService;
 
 import org.json.JSONObject;
+
+import java.io.IOException;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -26,12 +30,15 @@ public class MainActivity extends AppCompatActivity {
     private SharedPreferences sharedPreferences;
     private DatabaseHelper databaseHelper;
 
-    @RequiresApi(api = Build.VERSION_CODES.N)
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         databaseHelper = new DatabaseHelper(this);
 
+        final Intent deleteTokenIntent = new Intent(this, DeleteInstanceIDService.class);
+        startService(deleteTokenIntent);
 
         //databaseHelper.deleteAllUsers();
         databaseHelper.resetDatabase();
