@@ -70,7 +70,7 @@ exports.againstSchema = function(inputData, jsonSchema) {
       responseData.success = false;
       responseData.payload = {
         dataPath: 'validation',
-        message: 'Invalide body'
+        message: 'Invalid body'
       };
       reject({errorCode: ERROR.INVALID_REQUEST_BODY, responseData: responseData});
     }
