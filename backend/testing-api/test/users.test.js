@@ -65,114 +65,114 @@ describe('User-Controller', () => {
     // POST - Login/Register new facebook user
     it('Login/Register as facebook user', function() {
       return chai.request(HOST)
-            .post(URL.BASE_USER + '/login?type=2')
-            .send({'accessToken': facebookToken})
-            .then(res => {
-              expect(res).to.have.status(200);
-              expect(res).to.be.json;
-              expect(res.body).to.be.an('object');
-              expect(res.body.success).to.be.true;
-              expect(res.body.payload).to.be.an('object');
-              expect(res.body.payload.authType).to.be.equal(2);
-              expect(res.body.payload.accessToken).to.have.lengthOf.above(1);
-            });
+      .post(URL.BASE_USER + '/login?type=2')
+      .send({'accessToken': facebookToken})
+      .then(res => {
+        expect(res).to.have.status(200);
+        expect(res).to.be.json;
+        expect(res.body).to.be.an('object');
+        expect(res.body.success).to.be.true;
+        expect(res.body.payload).to.be.an('object');
+        expect(res.body.payload.authType).to.be.equal(2);
+        expect(res.body.payload.accessToken).to.have.lengthOf.above(1);
+      });
     });
 
     // POST - Send user data as facebook user
     it('Send user data as facebook user', function() {
       return chai.request(HOST)
-            .get(URL.BASE_TEST + '/authentication/required')
-            .set('Authorization', '2 ' + facebookToken)
-            .then(res => {
-              expect(res).to.have.status(200);
-              expect(res).to.be.json;
-              expect(res.body).to.be.an('object');
-              expect(res.body.success).to.be.true;
-              expect(res.body.payload).to.be.an('object');
-            });
+      .get(URL.BASE_TEST + '/authentication/required')
+      .set('Authorization', '2 ' + facebookToken)
+      .then(res => {
+        expect(res).to.have.status(200);
+        expect(res).to.be.json;
+        expect(res.body).to.be.an('object');
+        expect(res.body.success).to.be.true;
+        expect(res.body.payload).to.be.an('object');
+      });
     });
 
     // POST - Logout as default user
     it('Logout as facebook user', function() {
       return chai.request(HOST)
-              .post(URL.BASE_USER + '/logout')
-              .set('Authorization', '2 ' + facebookToken)
-              .then(res => {
-                expect(res).to.have.status(200);
-                expect(res).to.be.json;
-                expect(res.body).to.be.an('object');
-                expect(res.body.success).to.be.true;
-                expect(res.body.payload).to.be.an('object');
-              });
+      .post(URL.BASE_USER + '/logout')
+      .set('Authorization', '2 ' + facebookToken)
+      .then(res => {
+        expect(res).to.have.status(200);
+        expect(res).to.be.json;
+        expect(res.body).to.be.an('object');
+        expect(res.body.success).to.be.true;
+        expect(res.body.payload).to.be.an('object');
+      });
     });
 
     // POST - Send data with expired token as facebook user
     it('should fail to send data with expired token as facebook user', function() {
       return chai.request(HOST)
-            .get(URL.BASE_TEST + '/authentication/required')
-            .set('Authorization', '2 ' + facebookToken)
-            .then(res => {
-              expect(res).to.have.status(401);
-              expect(res).to.be.json;
-              expect(res.body).to.be.an('object');
-              expect(res.body.success).to.be.false;
-            });
+      .get(URL.BASE_TEST + '/authentication/required')
+      .set('Authorization', '2 ' + facebookToken)
+      .then(res => {
+        expect(res).to.have.status(401);
+        expect(res).to.be.json;
+        expect(res.body).to.be.an('object');
+        expect(res.body.success).to.be.false;
+      });
     });
 
     // POST - Relogin facebook user
     it('Relogin as facebook user', function() {
       return chai.request(HOST)
-            .post(URL.BASE_USER + '/login?type=2')
-            .send({'accessToken': facebookToken})
-            .then(res => {
-              expect(res).to.have.status(200);
-              expect(res).to.be.json;
-              expect(res.body).to.be.an('object');
-              expect(res.body.success).to.be.true;
-              expect(res.body.payload).to.be.an('object');
-            });
+      .post(URL.BASE_USER + '/login?type=2')
+      .send({'accessToken': facebookToken})
+      .then(res => {
+        expect(res).to.have.status(200);
+        expect(res).to.be.json;
+        expect(res.body).to.be.an('object');
+        expect(res.body.success).to.be.true;
+        expect(res.body.payload).to.be.an('object');
+      });
     });
 
     it('should fail to login with invalid token', function() {
       return chai.request(HOST)
-            .post(URL.BASE_USER + '/login?type=2')
-            .send({'accessToken': 'XXXXX'})
-            .then(res => {
-              expect(res).to.have.status(401);
-              expect(res).to.be.json;
-              expect(res.body).to.be.an('object');
-              expect(res.body.success).to.be.false;
-              expect(res.body.payload.dataPath).to.equal('authentication');
-              expect(res.body.payload.message).to.equal('invalid auth token');
-            });
+      .post(URL.BASE_USER + '/login?type=2')
+      .send({'accessToken': 'XXXXX'})
+      .then(res => {
+        expect(res).to.have.status(401);
+        expect(res).to.be.json;
+        expect(res.body).to.be.an('object');
+        expect(res.body.success).to.be.false;
+        expect(res.body.payload.dataPath).to.equal('authentication');
+        expect(res.body.payload.message).to.equal('invalid auth token');
+      });
     });
 
     it('should fail to login with empty token', function() {
       return chai.request(HOST)
-            .post(URL.BASE_USER + '/login?type=2')
-            .send({'accessToken': ''})
-            .then(res => {
-              expect(res).to.have.status(400);
-              expect(res).to.be.json;
-              expect(res.body).to.be.an('object');
-              expect(res.body.success).to.be.false;
-              expect(res.body.payload).to.be.an('object');
-              expect(res.body.payload.dataPath).to.equal('accessToken');
-            });
+      .post(URL.BASE_USER + '/login?type=2')
+      .send({'accessToken': ''})
+      .then(res => {
+        expect(res).to.have.status(400);
+        expect(res).to.be.json;
+        expect(res.body).to.be.an('object');
+        expect(res.body.success).to.be.false;
+        expect(res.body.payload).to.be.an('object');
+        expect(res.body.payload.dataPath).to.equal('accessToken');
+      });
     });
 
     it('should fail to login with empty body', function() {
       return chai.request(HOST)
-            .post(URL.BASE_USER + '/login?type=2')
-            .send({})
-            .then(res => {
-              expect(res).to.have.status(400);
-              expect(res).to.be.json;
-              expect(res.body).to.be.an('object');
-              expect(res.body.success).to.be.false;
-              expect(res.body.payload).to.be.an('object');
-              expect(res.body.payload.message).to.be.equal('empty input');
-            });
+      .post(URL.BASE_USER + '/login?type=2')
+      .send({})
+      .then(res => {
+        expect(res).to.have.status(400);
+        expect(res).to.be.json;
+        expect(res.body).to.be.an('object');
+        expect(res.body.success).to.be.false;
+        expect(res.body.payload).to.be.an('object');
+        expect(res.body.payload.message).to.be.equal('empty input');
+      });
     });
   });
 
@@ -181,68 +181,68 @@ describe('User-Controller', () => {
       before('Clean DB', databaseHelper.cbResetDB);
       it('should register new user', function() {
         return chai.request(HOST)
-          .post(URL.BASE_USER + '/')
-          .send({username: testData.users.valid[0].username,
-            email: testData.users.valid[0].email,
-            password: testData.users.valid[0].password})
-          .then(function(res) {
-            expect(res).to.have.status(201);
-            expect(res).to.be.json;
-            expect(res.body).to.be.an('object');
-            expect(res.body.success).to.be.true;
-            expect(res.body.payload).to.be.an('object');
-            expect(res.body.payload.accessToken.length).to.equal(200);
-            expect(res.body.payload.authType).to.equal(0);
-          });
+        .post(URL.BASE_USER + '/')
+        .send({username: testData.users.valid[0].username,
+          email: testData.users.valid[0].email,
+          password: testData.users.valid[0].password})
+        .then(function(res) {
+          expect(res).to.have.status(201);
+          expect(res).to.be.json;
+          expect(res.body).to.be.an('object');
+          expect(res.body.success).to.be.true;
+          expect(res.body.payload).to.be.an('object');
+          expect(res.body.payload.accessToken.length).to.equal(200);
+          expect(res.body.payload.authType).to.equal(0);
+        });
       });
 
       it('should fail to register existing user', function() {
         return chai.request(HOST)
-            .post(URL.BASE_USER + '/')
-            .send({username: testData.users.valid[0].username,
-              email: testData.users.valid[0].email,
-              password: testData.users.valid[0].password})
-            .then(function(res) {
-              expect(res).to.have.status(400);
-              expect(res).to.be.json;
-              expect(res.body).to.be.an('object');
-              expect(res.body.success).to.be.false;
-              expect(res.body.payload).to.be.an('object');
-              expect(res.body.payload.dataPath).to.equal('username');
-              expect(res.body.payload.message).to.equal('Username already exists');
-            });
+        .post(URL.BASE_USER + '/')
+        .send({username: testData.users.valid[0].username,
+          email: testData.users.valid[0].email,
+          password: testData.users.valid[0].password})
+        .then(function(res) {
+          expect(res).to.have.status(400);
+          expect(res).to.be.json;
+          expect(res.body).to.be.an('object');
+          expect(res.body.success).to.be.false;
+          expect(res.body.payload).to.be.an('object');
+          expect(res.body.payload.dataPath).to.equal('username');
+          expect(res.body.payload.message).to.equal('Username already exists');
+        });
       });
 
       it('should fail to register user with invalid username', function() {
         return chai.request(HOST)
-            .post(URL.BASE_USER + '/')
-            .send({username: testData.users.invalid.invalidUsername.username,
-              email: testData.users.invalid.invalidUsername.email,
-              password: testData.users.invalid.invalidUsername.password})
-            .then(function(res) {
-              expect(res).to.have.status(400);
-              expect(res).to.be.json;
-              expect(res.body).to.be.an('object');
-              expect(res.body.success).to.be.false;
-              expect(res.body.payload).to.be.an('object');
-              expect(res.body.payload.dataPath).to.equal('username');
-            });
+        .post(URL.BASE_USER + '/')
+        .send({username: testData.users.invalid.invalidUsername.username,
+          email: testData.users.invalid.invalidUsername.email,
+          password: testData.users.invalid.invalidUsername.password})
+        .then(function(res) {
+          expect(res).to.have.status(400);
+          expect(res).to.be.json;
+          expect(res.body).to.be.an('object');
+          expect(res.body.success).to.be.false;
+          expect(res.body.payload).to.be.an('object');
+          expect(res.body.payload.dataPath).to.equal('username');
+        });
       });
 
       it('should fail to register user with invalid password', function() {
         return chai.request(HOST)
-            .post(URL.BASE_USER + '/')
-            .send({username: testData.users.invalid.invalidPassword.username,
-              email: testData.users.invalid.invalidPassword.email,
-              password: testData.users.invalid.invalidPassword.password})
-            .then(function(res) {
-              expect(res).to.have.status(400);
-              expect(res).to.be.json;
-              expect(res.body).to.be.an('object');
-              expect(res.body.success).to.be.false;
-              expect(res.body.payload).to.be.an('object');
-              expect(res.body.payload.dataPath).to.equal('password');
-            });
+        .post(URL.BASE_USER + '/')
+        .send({username: testData.users.invalid.invalidPassword.username,
+          email: testData.users.invalid.invalidPassword.email,
+          password: testData.users.invalid.invalidPassword.password})
+        .then(function(res) {
+          expect(res).to.have.status(400);
+          expect(res).to.be.json;
+          expect(res.body).to.be.an('object');
+          expect(res.body.success).to.be.false;
+          expect(res.body.payload).to.be.an('object');
+          expect(res.body.payload.dataPath).to.equal('password');
+        });
       });
     });
 
@@ -252,127 +252,127 @@ describe('User-Controller', () => {
 
       before(function(done) {
         chai.request(HOST)
-          .post(URL.BASE_USER + '/')
-          .send({username: testData.users.valid[1].username,
-            email: testData.users.valid[1].email,
-            password: testData.users.valid[1].password})
-          .then((res) => {
-            defaultToken = res.body.payload.accessToken;
-            done();
-          });
+        .post(URL.BASE_USER + '/')
+        .send({username: testData.users.valid[1].username,
+          email: testData.users.valid[1].email,
+          password: testData.users.valid[1].password})
+        .then((res) => {
+          defaultToken = res.body.payload.accessToken;
+          done();
+        });
       });
 
       it('should login as registered user', function() {
         return chai.request(HOST)
-                .post(URL.BASE_USER + '/login?type=0')
-                .send({username: testData.users.valid[1].username,
-                  email: testData.users.valid[1].email,
-                  password: testData.users.valid[1].password})
-                .then(res => {
-                  expect(res).to.have.status(200);
-                  expect(res).to.be.json;
-                  expect(res.body).to.be.an('object');
-                  expect(res.body.success).to.be.true;
-                  expect(res.body.payload).to.be.an('object');
-                  expect(res.body.payload.authType).to.equal(0);
-                  expect(res.body.payload.accessToken).to.have.lengthOf(84);
-                });
+        .post(URL.BASE_USER + '/login?type=0')
+        .send({username: testData.users.valid[1].username,
+          email: testData.users.valid[1].email,
+          password: testData.users.valid[1].password})
+        .then(res => {
+          expect(res).to.have.status(200);
+          expect(res).to.be.json;
+          expect(res.body).to.be.an('object');
+          expect(res.body.success).to.be.true;
+          expect(res.body.payload).to.be.an('object');
+          expect(res.body.payload.authType).to.equal(0);
+          expect(res.body.payload.accessToken).to.have.lengthOf(84);
+        });
       });
 
       it('should fail to login with invalid password', function() {
         return chai.request(HOST)
-                .post(URL.BASE_USER + '/login?type=0')
-                .send({username: testData.users.valid[1].username,
-                  email: testData.users.valid[1].email,
-                  password: 'XXXXX'})
-                .then(res => {
-                  expect(res).to.have.status(401);
-                  expect(res).to.be.json;
-                  expect(res.body).to.be.an('object');
-                  expect(res.body.success).to.be.false;
-                  expect(res.body.payload).to.be.an('object');
-                  expect(res.body.payload.dataPath).to.equal('login');
-                  expect(res.body.payload.message).to.equal('login failed');
-                });
+        .post(URL.BASE_USER + '/login?type=0')
+        .send({username: testData.users.valid[1].username,
+          email: testData.users.valid[1].email,
+          password: 'XXXXX'})
+        .then(res => {
+          expect(res).to.have.status(401);
+          expect(res).to.be.json;
+          expect(res.body).to.be.an('object');
+          expect(res.body.success).to.be.false;
+          expect(res.body.payload).to.be.an('object');
+          expect(res.body.payload.dataPath).to.equal('login');
+          expect(res.body.payload.message).to.equal('login failed');
+        });
       });
 
       it('should fail to login with empty password', function() {
         return chai.request(HOST)
-                .post(URL.BASE_USER + '/login?type=0')
-                .send({username: testData.users.valid[1].username,
-                  email: testData.users.valid[1].email,
-                  password: ''})
-                .then(res => {
-                  expect(res).to.have.status(400);
-                  expect(res).to.be.json;
-                  expect(res.body).to.be.an('object');
-                  expect(res.body.success).to.be.false;
-                  expect(res.body.payload).to.be.an('object');
-                  expect(res.body.payload.dataPath).to.equal('password');
-                });
+        .post(URL.BASE_USER + '/login?type=0')
+        .send({username: testData.users.valid[1].username,
+          email: testData.users.valid[1].email,
+          password: ''})
+        .then(res => {
+          expect(res).to.have.status(400);
+          expect(res).to.be.json;
+          expect(res.body).to.be.an('object');
+          expect(res.body.success).to.be.false;
+          expect(res.body.payload).to.be.an('object');
+          expect(res.body.payload.dataPath).to.equal('password');
+        });
       });
 
       it('should fail to login with no password', function() {
         return chai.request(HOST)
-                .post(URL.BASE_USER + '/login?type=0')
-                .send({username: testData.users.valid[1].username,
-                  email: testData.users.valid[1].email})
-                .then(res => {
-                  expect(res).to.have.status(401);
-                  expect(res).to.be.json;
-                  expect(res.body).to.be.an('object');
-                  expect(res.body.success).to.be.false;
-                  expect(res.body.payload).to.be.an('object');
-                  expect(res.body.payload.dataPath).to.equal('login');
-                  expect(res.body.payload.message).to.equal('login failed');
-                });
+        .post(URL.BASE_USER + '/login?type=0')
+        .send({username: testData.users.valid[1].username,
+          email: testData.users.valid[1].email})
+        .then(res => {
+          expect(res).to.have.status(401);
+          expect(res).to.be.json;
+          expect(res.body).to.be.an('object');
+          expect(res.body.success).to.be.false;
+          expect(res.body.payload).to.be.an('object');
+          expect(res.body.payload.dataPath).to.equal('login');
+          expect(res.body.payload.message).to.equal('login failed');
+        });
       });
 
       it('should fail to login with no username', function() {
         return chai.request(HOST)
-                .post(URL.BASE_USER + '/login?type=0')
-                .send({email: testData.users.valid[1].email,
-                  password: testData.users.valid[2].password})
-                .then(res => {
-                  expect(res).to.have.status(401);
-                  expect(res).to.be.json;
-                  expect(res.body).to.be.an('object');
-                  expect(res.body.success).to.be.false;
-                  expect(res.body.payload).to.be.an('object');
-                  expect(res.body.payload.dataPath).to.equal('login');
-                  expect(res.body.payload.message).to.equal('login failed');
-                });
+        .post(URL.BASE_USER + '/login?type=0')
+        .send({email: testData.users.valid[1].email,
+          password: testData.users.valid[2].password})
+        .then(res => {
+          expect(res).to.have.status(401);
+          expect(res).to.be.json;
+          expect(res.body).to.be.an('object');
+          expect(res.body.success).to.be.false;
+          expect(res.body.payload).to.be.an('object');
+          expect(res.body.payload.dataPath).to.equal('login');
+          expect(res.body.payload.message).to.equal('login failed');
+        });
       });
 
       it('should fail to login with unknown username', function() {
         return chai.request(HOST)
-                .post(URL.BASE_USER + '/login?type=0')
-                .send({username: 'unknownUsername',
-                  email: 'unknownEmail@example.de',
-                  password: 'passwordX'})
-                .then(res => {
-                  expect(res).to.have.status(401);
-                  expect(res).to.be.json;
-                  expect(res.body).to.be.an('object');
-                  expect(res.body.success).to.be.false;
-                  expect(res.body.payload).to.be.an('object');
-                  expect(res.body.payload.dataPath).to.equal('login');
-                  expect(res.body.payload.message).to.equal('login failed');
-                });
+        .post(URL.BASE_USER + '/login?type=0')
+        .send({username: 'unknownUsername',
+          email: 'unknownEmail@example.de',
+          password: 'passwordX'})
+        .then(res => {
+          expect(res).to.have.status(401);
+          expect(res).to.be.json;
+          expect(res.body).to.be.an('object');
+          expect(res.body.success).to.be.false;
+          expect(res.body.payload).to.be.an('object');
+          expect(res.body.payload.dataPath).to.equal('login');
+          expect(res.body.payload.message).to.equal('login failed');
+        });
       });
 
       it('should fail to login with empty body', function() {
         return chai.request(HOST)
-                .post(URL.BASE_USER + '/login?type=0')
-                .send({})
-                .then(res => {
-                  expect(res).to.have.status(400);
-                  expect(res).to.be.json;
-                  expect(res.body).to.be.an('object');
-                  expect(res.body.success).to.be.false;
-                  expect(res.body.payload).to.be.an('object');
-                  expect(res.body.payload.message).to.be.equal('empty input');
-                });
+        .post(URL.BASE_USER + '/login?type=0')
+        .send({})
+        .then(res => {
+          expect(res).to.have.status(400);
+          expect(res).to.be.json;
+          expect(res.body).to.be.an('object');
+          expect(res.body.success).to.be.false;
+          expect(res.body.payload).to.be.an('object');
+          expect(res.body.payload.message).to.be.equal('empty input');
+        });
       });
 
     });
@@ -383,59 +383,59 @@ describe('User-Controller', () => {
 
       before(function(done) {
         chai.request(HOST)
-          .post(URL.BASE_USER + '/')
-          .send({username: testData.users.valid[4].username,
-            email: testData.users.valid[4].email,
-            password: testData.users.valid[4].password})
-          .then((res) => {
-            defaultToken = res.body.payload.accessToken;
-            done();
-          });
+        .post(URL.BASE_USER + '/')
+        .send({username: testData.users.valid[4].username,
+          email: testData.users.valid[4].email,
+          password: testData.users.valid[4].password})
+        .then((res) => {
+          defaultToken = res.body.payload.accessToken;
+          done();
+        });
       });
 
       // POST - Logout as default user
       it('should logout', function() {
         return chai.request(HOST)
-          .post(URL.BASE_USER + '/logout')
-          .set('Authorization', '0 ' + defaultToken)
-          .then(res => {
-            expect(res).to.have.status(200);
-            expect(res).to.be.json;
-            expect(res.body).to.be.an('object');
-            expect(res.body.success).to.be.true;
-            expect(res.body.payload).to.be.an('object');
-          });
+        .post(URL.BASE_USER + '/logout')
+        .set('Authorization', '0 ' + defaultToken)
+        .then(res => {
+          expect(res).to.have.status(200);
+          expect(res).to.be.json;
+          expect(res.body).to.be.an('object');
+          expect(res.body.success).to.be.true;
+          expect(res.body.payload).to.be.an('object');
+        });
       });
 
       // POST - Send data with expired token as default user
       it('should fail to send data with expired token as default user', function() {
         return chai.request(HOST)
-              .get(URL.BASE_TEST + '/authentication/required')
-              .set('Authorization', '0 ' + defaultToken)
-              .then(res => {
-                expect(res).to.have.status(401);
-                expect(res).to.be.json;
-                expect(res.body).to.be.an('object');
-                expect(res.body.success).to.be.false;
-                expect(res.body.payload.dataPath).to.equal('user');
-                expect(res.body.payload.message).to.equal('unknown user or expired token');
-              });
+        .get(URL.BASE_TEST + '/authentication/required')
+        .set('Authorization', '0 ' + defaultToken)
+        .then(res => {
+          expect(res).to.have.status(401);
+          expect(res).to.be.json;
+          expect(res.body).to.be.an('object');
+          expect(res.body.success).to.be.false;
+          expect(res.body.payload.dataPath).to.equal('user');
+          expect(res.body.payload.message).to.equal('unknown user or expired token');
+        });
       });
 
       // POST - Relogin as default user
       it('should re-login', function() {
         return chai.request(HOST)
-                .post(URL.BASE_USER + '/login?type=0')
-                .send({username: testData.users.valid[4].username,
-                  email: testData.users.valid[4].email,
-                  password: testData.users.valid[4].password})
-                .then(res => {
-                  expect(res).to.have.status(200);
-                  expect(res).to.be.json;
-                  expect(res.body).to.be.an('object');
-                  expect(res.body.success).to.be.true;
-                  expect(res.body.payload).to.be.an('object');
-                });
+        .post(URL.BASE_USER + '/login?type=0')
+        .send({username: testData.users.valid[4].username,
+          email: testData.users.valid[4].email,
+          password: testData.users.valid[4].password})
+        .then(res => {
+          expect(res).to.have.status(200);
+          expect(res).to.be.json;
+          expect(res.body).to.be.an('object');
+          expect(res.body.success).to.be.true;
+          expect(res.body.payload).to.be.an('object');
+        });
       });
     });
   });
@@ -444,36 +444,118 @@ describe('User-Controller', () => {
     before('Clean DB', databaseHelper.cbResetDB);
     it('should fail with an invalid auth type', function() {
       return chai.request(HOST)
-              .post(URL.BASE_USER + '/login?type=99')
-              .send({username: testData.users.valid[1].username,
-                email: testData.users.valid[1].email,
-                password: testData.users.valid[1].password})
-              .then(res => {
-                expect(res).to.have.status(400);
-                expect(res).to.be.json;
-                expect(res.body).to.be.an('object');
-                expect(res.body.success).to.be.false;
-                expect(res.body.payload).to.be.an('object');
-                expect(res.body.payload.dataPath).to.equal('authType');
-                expect(res.body.payload.message).to.equal('invalid auth type');
-              });
+      .post(URL.BASE_USER + '/login?type=99')
+      .send({username: testData.users.valid[1].username,
+        email: testData.users.valid[1].email,
+        password: testData.users.valid[1].password})
+      .then(res => {
+        expect(res).to.have.status(400);
+        expect(res).to.be.json;
+        expect(res.body).to.be.an('object');
+        expect(res.body.success).to.be.false;
+        expect(res.body.payload).to.be.an('object');
+        expect(res.body.payload.dataPath).to.equal('authType');
+        expect(res.body.payload.message).to.equal('invalid auth type');
+      });
     });
 
     it('should fail with no auth type', function() {
       return chai.request(HOST)
-              .post(URL.BASE_USER + '/login')
-              .send({username: testData.users.valid[1].username,
-                email: testData.users.valid[1].email,
-                password: testData.users.valid[1].password})
-              .then(res => {
-                expect(res).to.have.status(400);
-                expect(res).to.be.json;
-                expect(res.body).to.be.an('object');
-                expect(res.body.success).to.be.false;
-                expect(res.body.payload).to.be.an('object');
-                expect(res.body.payload.dataPath).to.equal('authType');
-                expect(res.body.payload.message).to.equal('invalid auth type');
-              });
+      .post(URL.BASE_USER + '/login')
+      .send({username: testData.users.valid[1].username,
+        email: testData.users.valid[1].email,
+        password: testData.users.valid[1].password})
+      .then(res => {
+        expect(res).to.have.status(400);
+        expect(res).to.be.json;
+        expect(res.body).to.be.an('object');
+        expect(res.body.success).to.be.false;
+        expect(res.body.payload).to.be.an('object');
+        expect(res.body.payload.dataPath).to.equal('authType');
+        expect(res.body.payload.message).to.equal('invalid auth type');
+      });
+    });
+  });
+
+  describe('Get User', function() {
+    before('Clean DB and register User 0 and 1', done => {
+      tokens = {};
+      databaseHelper.promiseResetDB().then(()=> {
+        return chai.request(HOST).post(URL.BASE_USER  + '/').send(testData.users.valid[0]);
+      }).then(res => {
+        tokens[0] = res.body.payload.accessToken;
+        return chai.request(HOST).post(URL.BASE_USER  + '/').send(testData.users.valid[1]);
+      }).then(res => {
+        tokens[1] = res.body.payload.accessToken;
+        done();
+      }).catch((error) => {
+        console.log('Register User Error: ' + error);
+      });
+    });
+
+    it('should get the user-data of user_0', function() {
+      return chai.request(HOST)
+      .get(URL.BASE_USER  + '/user')
+      .set('Authorization', '0 ' + tokens[0])
+      .then(res => {
+        expect(res).to.have.status(200);
+        expect(res).to.be.json;
+        expect(res.body).to.be.an('object');
+        expect(res.body.success).to.be.true;
+        expect(res.body.payload).to.be.an('object');
+        expect(res.body.payload.username).to.equal(testData.users.valid[0].username);
+        expect(res.body.payload.email).to.equal(testData.users.valid[0].email);
+        expect(res.body.payload._id).to.be.undefined;
+        expect(res.body.payload.groupIds).to.be.undefined;
+        expect(res.body.payload.userId).to.have.lengthOf(36).and.to.be.a('string');
+      });
+    });
+
+    it('should get the user-data of user_1', function() {
+      return chai.request(HOST)
+      .get(URL.BASE_USER  + '/user')
+      .set('Authorization', '0 ' + tokens[1])
+      .then(res => {
+        expect(res).to.have.status(200);
+        expect(res).to.be.json;
+        expect(res.body).to.be.an('object');
+        expect(res.body.success).to.be.true;
+        expect(res.body.payload).to.be.an('object');
+        expect(res.body.payload.username).to.equal(testData.users.valid[1].username);
+        expect(res.body.payload.email).to.equal(testData.users.valid[1].email);
+        expect(res.body.payload._id).to.be.undefined;
+        expect(res.body.payload.groupIds).to.be.undefined;
+        expect(res.body.payload.userId).to.have.lengthOf(36).and.to.be.a('string');
+      });
+    });
+
+    it('should not get the user-data of user_0 due to wrong token', function() {
+      return chai.request(HOST)
+      .get(URL.BASE_USER  + '/user')
+      .set('Authorization', '0 this_is_a_wrong_token')
+      .then(res => {
+        expect(res).to.have.status(401);
+        expect(res).to.be.json;
+        expect(res.body).to.be.an('object');
+        expect(res.body.success).to.be.false;
+        expect(res.body.payload).to.be.an('object');
+        expect(res.body.payload.dataPath).to.equal('authentication');
+        expect(res.body.payload.message).to.equal('invalid authToken');
+      });
+    });
+
+    it('should not get the user-data of user_0 due to missing auth header', function() {
+      return chai.request(HOST)
+      .get(URL.BASE_USER  + '/user')
+      .then(res => {
+        expect(res).to.have.status(401);
+        expect(res).to.be.json;
+        expect(res.body).to.be.an('object');
+        expect(res.body.success).to.be.false;
+        expect(res.body.payload).to.be.an('object');
+        expect(res.body.payload.dataPath).to.equal('authentication');
+        expect(res.body.payload.message).to.equal('no http request header Authorization provided');
+      });
     });
   });
 });

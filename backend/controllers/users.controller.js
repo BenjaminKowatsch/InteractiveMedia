@@ -162,3 +162,20 @@ exports.logout = function(req, res) {
       httpResponseService.send(res, 400, resBody);
     });
 };
+
+exports.getUserData = function(req, res) {
+  winston.debug('Hello from getUserData');
+  user.getUserData(res.locals.userId).then(userResult => {
+    httpResponseService.send(res, 200, userResult);
+  }).catch(errorResult => {
+    winston.debug(errorResult);
+    let statusCode = 418;
+    switch (errorResult.errorCode) {
+      case ERROR.UNKNOWN_USER:
+      case ERROR.DB_ERROR:
+        statusCode = 500;
+        break;
+    }
+    httpResponseService.send(res, statusCode, errorResult.responseData);
+  });
+};

@@ -85,4 +85,32 @@ router.post('/login', usersController.login);
  */
 router.post('/logout', authenticationService.isAuthenticated, usersController.logout);
 
+/**
+ * @api {GET} /v1/users/user Get User
+ * @apiName getUser
+ * @apiGroup user
+ * @apiVersion 0.1.0
+ *
+ * @apiUse headerAuthorization
+ * @apiUse headerExampleAuthorization
+ *
+ * @apiUse successBodySuccess
+ * @apiUse successBodyUsername
+ * @apiUse successBodyEmail
+ * @apiUse successBodyUserId
+ * @apiUse successBodyGroupIds
+ * @apiSuccess (SuccessCode) {200} Success Get User
+ *
+ * @apiUse successExampleUser
+ *
+ * @apiUse error401Unauthorized
+ * @apiUse error418UncaughtError
+ * @apiUse error500DatabaseError
+ * @apiUse error500UnknownUser
+ * @apiUse errorBodyCommonStructure
+ *
+ * @apiUse errorExampleCommon
+ */
+router.get('/user', authenticationService.isAuthenticated, usersController.getUserData);
+
 module.exports = router;

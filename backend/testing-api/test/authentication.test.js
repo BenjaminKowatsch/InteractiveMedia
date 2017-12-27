@@ -176,5 +176,20 @@ describe('Autentication', function() {
           });
     });
 
+    it(' to get restricted resource with valid auth token and wrong authType in authorization header', function() {
+      return chai.request(HOST)
+      .get(URL.TEST_AUTHENTICATION + '/required')
+      .set('Authorization', '1 ' + token)
+      .then(res => {
+        expect(res).to.have.status(401);
+        expect(res).to.be.json;
+        expect(res.body).to.be.an('object');
+        expect(res.body.success).to.be.false;
+        expect(res.body.payload).to.be.an('object');
+        expect(res.body.payload.dataPath).to.equal('authentication');
+        expect(res.body.payload.message).to.equal('invalid auth token');
+      });
+    }).timeout(10000);
+
   });
 });
