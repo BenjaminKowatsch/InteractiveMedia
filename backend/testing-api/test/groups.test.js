@@ -19,11 +19,8 @@ const groupScenarios = require('./data/groupScenarios');
 
 // ************* Helper ***********//
 
-var registerUser = index => chai.request(HOST).post(URL.BASE_USER  + '/').send({
-  username: userData.users.valid[index].username,
-  email: userData.users.valid[index].email,
-  password: userData.users.valid[index].password
-});
+let registerUser = index => chai.request(HOST).post(URL.BASE_USER  + '/').send(userData.users.valid[index]);
+let getUserData = token => chai.request(HOST).get(URL.BASE_USER  + '/user').set('Authorization', '0 ' + token);
 
 describe('Groups-Controller', () => {
   describe('Create new Group', () => {
@@ -304,6 +301,70 @@ describe('Groups-Controller', () => {
           expect(res.body.payload.dataPath).to.equal('group');
           expect(res.body.payload.message).to.equal('group not found');
         });
+      });
+    });
+  });
+});
+
+describe.skip('Create and get transactions', function() {
+  let groupId;
+  let users = groupScenarios[1].users;
+  let transactions = groupScenarios[1].transactions;
+
+  before('register user 0, 1, 2, create group, prepare testData', function(done) {
+    this.timeout(10000);
+    databaseHelper.promiseResetDB().then(()=> {
+      return registerUser(0);
+    }).then(res => {
+      users[0].token = res.body.payload.accessToken;
+      return getUserData(users[0].token);
+    }).then(res => {
+      users[0].token = res.body.payload.userId;
+      return registerUser(1);
+    }).then(res => {
+      users[1].token = res.body.payload.accessToken;
+      return getUserData(users[1].token);
+    }).then(res => {
+      users[1].token = res.body.payload.userId;
+      return registerUser(2);
+    }).then(res => {
+      users[2].token = res.body.payload.accessToken;
+      return getUserData(users[2].token);
+    }).then(res => {
+      users[2].token = res.body.payload.userId;
+      return chai.request(HOST)
+        .post(URL.BASE_GROUP  + '/')
+        .set('Authorization', '0 ' + users[0].token)
+        .send(groupScenarios[1].create);
+    }).then(res => {
+      groupId = res.body.payload.groupId;
+      groupScenarios[1].setUserIdsInTransactions();
+      done();
+    }).catch((error) => {
+      console.log('Register User or Group Error: ' + error);
+    });
+  });
+
+  describe('with success', () => {
+    it('should add transaction 0 by user_0', () => {
+      let transaction = transactions[0];
+      return chai.request(HOST)
+      .post(URL.BASE_GROUP  + '/' + groupId + '/transactions')
+      .set('Authorization', '0 ' + users[0].token)
+      .send(transaction)
+      .then(function(res) {
+        expect(res).to.have.status(201);
+        expect(res).to.be.json;
+        expect(res.body).to.be.an('object');
+        expect(res.body.success).to.be.true;
+        expect(res.body.payload).to.be.an('object');
+        expect(res.body.payload.amount).to.equal(transaction.amount);
+        expect(res.body.payload.infoName).to.equal(transaction.infoName);
+        expect(res.body.payload.infoLocation).to.deep.equal(transaction.infoLocation);
+        expect(res.body.payload.infoCreatedAt).to.equal(transaction.infoCreatedAt);
+        expect(res.body.payload.infoImageUrl).to.equal(transaction.infoImageUrl);
+        expect(res.body.payload.paidBy).to.equal(transaction.paidBy);
+        expect(res.body.payload.publishedAt).to.be.a('string').with.lengthOf(24);
       });
     });
   });
