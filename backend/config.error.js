@@ -18,4 +18,5 @@ module.exports = {
     USER_NOT_IN_GROUP: 'user is not a member of the group',
     UNKNOWN_GROUP: 'unknown group',
     NOT_AUTHENTICATED: 'user is not authenticated',
+    DUPLICATED_USER: 'duplicated user'
   };

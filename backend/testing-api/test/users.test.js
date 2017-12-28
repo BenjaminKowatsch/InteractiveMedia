@@ -210,8 +210,8 @@ describe('User-Controller', () => {
           expect(res.body).to.be.an('object');
           expect(res.body.success).to.be.false;
           expect(res.body.payload).to.be.an('object');
-          expect(res.body.payload.dataPath).to.equal('username');
-          expect(res.body.payload.message).to.equal('Username already exists');
+          expect(res.body.payload.dataPath).to.equal('register');
+          expect(res.body.payload.message).to.equal('username already exists');
         });
       });
 

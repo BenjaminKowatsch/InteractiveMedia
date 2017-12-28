@@ -29,6 +29,8 @@ services:
     environment: 
       - ORIGIN=http://localhost:8088
       - LOGLEVEL=debug
+      - ADMIN_USERNAME=admin
+      - ADMIN_PASSWORD=inter@kt!veMedien
     image: localhost:5000/backend
     ports:
       - "8081:8081"

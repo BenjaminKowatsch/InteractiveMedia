@@ -14,6 +14,9 @@ var settings = {
   'minioObjectPrefix': process.env.MINIO_OBJECT_PREFIX,
   'minioEndpoint': process.env.MINIO_ENDPOINT,
   'minioEndpointPort': Number(process.env.MINIO_ENDPOINT_PORT),
-  'logLevel': process.env.LOGLEVEL || 'info'
+  'logLevel': process.env.LOGLEVEL || 'info',
+  'adminUsername': process.env.ADMIN_USERNAME || 'admin',
+  'adminPassword': process.env.ADMIN_PASSWORD || 'inter@kt!veMedien',
+  'adminEmail': process.env.ADMIN_EMAIL || 'admin@example.com',
 };
 module.exports = settings;

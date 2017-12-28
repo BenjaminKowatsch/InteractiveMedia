@@ -21,6 +21,9 @@ var user = require('./modules/user.module');
 var database = require('./modules/database.module');
 var objectstore = require('./modules/objectstore.module');
 
+const ERROR = require('./config.error');
+const ROLES = require('./config.roles');
+
 var MONGO_DB_CONNECTION_ERROR_CODE = 10;
 
 /**
@@ -117,9 +120,25 @@ function startServer() {
  */
 database.tryConnect(config.mongodbURL, function() {
   objectstore.makeBucket(config.minioBucketName).then(promiseData => {
+    return user.register(config.adminUsername, config.adminPassword, config.adminEmail, ROLES.ADMIN);
+  }).then(registerResult => {
+    winston.info('register admin successful');
     startServer();
   }).catch(errorResult => {
-    winston.error('Object store error at startup', JSON.stringify(errorResult));
+    winston.error(JSON.stringify(errorResult));
+    switch (errorResult.errorCode) {
+      case ERROR.DUPLICATED_USER:
+        // admin already exists, start server anyway
+        startServer();
+        break;
+      case ERROR.DB_ERROR:
+      case ERROR.MINIO_ERROR:
+        let statusCode = 500;
+        process.exit(1);
+        break;
+      default:
+        process.exit(1);
+    }
   });
 }, function() {
   winston.error('Not connected to database after maxRetries reached.');
