@@ -5,6 +5,7 @@
 const chai = require('chai');
 const expect = require('chai').expect;
 const winston = require('winston');
+const databaseHelper = require('./data/databaseHelper');
 
 chai.use(require('chai-http'));
 
@@ -13,7 +14,8 @@ const HOST = 'http://backend:8081';
 const URL = {
   BASE_USER: '/v1/users',
   TEST_AUTHENTICATION: '/v1/test/authentication',
-  TEST_AUTHORIZATION: '/v1/test/authorization'
+  TEST_AUTHORIZATION: '/v1/test/authorization',
+  BASE_ADMIN: '/v1/admin'
 };
 
 const userData = require('./data/user.data');
@@ -39,16 +41,16 @@ describe('Authorization', () => {
         console.log('Register User Error: ' + error);
       });
     });
-    before('login as admin', done => {
-      chai.request(HOST)
-          .post(URL.BASE_USER + '/login?type=0')
-          .send({username: adminData.username, password: adminData.password})
-          .then(res => {
-            adminToken = res.body.payload.accessToken;
-            done();
-          })
-          .catch((err) => {console.error('Error login as admin');});
+
+    before('add admin', done => {
+      databaseHelper.promiseResetDB().then(() => {
+        return chai.request(HOST).post(URL.BASE_ADMIN + '/add');
+      }).then(res => {
+          adminToken = res.body.payload.accessToken;
+          done();
+        }).catch((err) => {console.error('Error add admin');});
     });
+
     it('should be accessible with no authorization', () => {
         return chai.request(HOST)
             .get(URL.TEST_AUTHORIZATION + '/none')
@@ -92,15 +94,13 @@ describe('Authorization', () => {
   describe('required to be Admin', () => {
     let adminToken;
     let userToken;
-    before('login as admin', done => {
-      chai.request(HOST)
-          .post(URL.BASE_USER + '/login?type=0')
-          .send({username: adminData.username, password: adminData.password})
-          .then(res => {
-            adminToken = res.body.payload.accessToken;
-            done();
-          })
-          .catch((err) => {console.error('Error login as admin');});
+    before('add admin', done => {
+      databaseHelper.promiseResetDB().then(() => {
+        return chai.request(HOST).post(URL.BASE_ADMIN + '/add');
+      }).then(res => {
+          adminToken = res.body.payload.accessToken;
+          done();
+        }).catch((err) => {console.error('Error add admin');});
     });
     before('register User 1', done => {
       registerUser(1).then(res => {

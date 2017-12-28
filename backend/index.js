@@ -15,6 +15,7 @@ var versionRoutes = require('./routes/version.routes');
 var groupRoutes = require('./routes/groups.routes');
 var statusRoutes = require('./routes/status.routes');
 var testRoutes = require('./routes/test.routes');
+var adminRoutes = require('./routes/admin.routes');
 
 var config = require('./modules/config');
 var user = require('./modules/user.module');
@@ -80,6 +81,7 @@ app.use('/v1/version', versionRoutes);
 app.use('/v1/groups', groupRoutes);
 app.use('/v1/status', statusRoutes);
 app.use('/v1/test', testRoutes);
+app.use('/v1/admin', adminRoutes);
 
 // error handling: unknown routes
 // this has to be last route to be added, otherwise it will not work
