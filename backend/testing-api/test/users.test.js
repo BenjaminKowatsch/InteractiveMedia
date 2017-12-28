@@ -277,7 +277,7 @@ describe('User-Controller', () => {
           expect(res.body.success).to.be.true;
           expect(res.body.payload).to.be.an('object');
           expect(res.body.payload.authType).to.equal(0);
-          expect(res.body.payload.accessToken).to.have.lengthOf(84);
+          expect(res.body.payload.accessToken).to.have.lengthOf(200);
         });
       });
 
