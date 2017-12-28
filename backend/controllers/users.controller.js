@@ -3,6 +3,7 @@
 var winston = require('winston');
 
 var user = require('../modules/user.module');
+const ROLES = require('../config.roles');
 const ERROR = require('../config.error');
 
 const validateJsonService = require('../services/validateJson.service');
@@ -23,15 +24,15 @@ exports.registerNewUser = function(req, res) {
     // request body is valid
 
     // store user in mongo
-    user.register(req.body.username, req.body.password, req.body.email)
+    user.register(req.body.username, req.body.password, req.body.email, ROLES.USER)
       .then(function(registerResult) {
         // mongo update was successful
         var resBody = {'success': true, 'payload': registerResult.payload};
         httpResponseService.send(res, 201, resBody);
       })
-      .catch(function(registerResult) {
+      .catch(function(errorResult) {
         // mongo update failed
-        var resBody = {'success': false, 'payload': registerResult.payload};
+        var resBody = {'success': false, 'payload': errorResult.responseData.payload};
         httpResponseService.send(res, 400, resBody);
       });
   } else {
