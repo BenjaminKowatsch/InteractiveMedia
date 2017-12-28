@@ -28,6 +28,7 @@
             android:inputType="textShortMessage" />
 
         <TextView
+            android:id="@+id/tv_add_transaction_split"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
@@ -59,13 +60,21 @@
         </RelativeLayout>
 
 
+        <EditText
+            android:id="@+id/et_add_transaction_amount"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:ems="10"
+            android:hint="Amount"
+            android:inputType="numberDecimal" />
 
         <DatePicker
+            android:id="@+id/dp_add_transaction_date"
             android:layout_width="match_parent"
             android:layout_height="wrap_content" />
 
         <TimePicker
-            android:id="@+id/timePicker"
+            android:id="@+id/tp_add_transaction_time"
             android:layout_width="match_parent"
             android:layout_height="wrap_content" />
 
