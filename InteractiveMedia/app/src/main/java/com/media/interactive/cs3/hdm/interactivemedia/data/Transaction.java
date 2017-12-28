@@ -12,7 +12,6 @@ import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
 import java.util.Date;
 
-@RequiresApi(api = Build.VERSION_CODES.O)
 public class Transaction {
     private final String name;
     private final String split;
