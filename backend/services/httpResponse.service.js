@@ -1,3 +1,5 @@
+'use strict';
+
 var winston = require('winston');
 
 exports.send = function(res, statusCode, body) {

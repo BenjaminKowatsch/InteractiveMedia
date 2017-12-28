@@ -1,3 +1,5 @@
+'use strict';
+
 const userData = require('./user.data.json');
 
 module.exports = [

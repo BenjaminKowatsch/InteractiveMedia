@@ -1,3 +1,5 @@
+'use strict';
+
 // Define configuration options in separate node module
 var settings = {
   'port': process.env.PORT,

@@ -1,4 +1,6 @@
-/* jshint expr: true */
+'use strict';
+
+/*jshint expr: true, node:true, mocha:true*/
 
 const chai = require('chai');
 const fs = require('fs');

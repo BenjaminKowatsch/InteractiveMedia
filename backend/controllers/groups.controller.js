@@ -1,3 +1,5 @@
+'use strict';
+
 const winston = require('winston');
 
 const group = require('../modules/group.module');

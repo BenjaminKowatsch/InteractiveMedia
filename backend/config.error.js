@@ -1,3 +1,5 @@
+'use strict';
+
 module.exports = {
     INVALID_AUTHTYPE: 'invalid auth type',
     UNKNOWN_USER: 'unknown user',

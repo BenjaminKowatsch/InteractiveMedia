@@ -1,3 +1,5 @@
+'use strict';
+
 var tv4 = require('tv4');
 var winston = require('winston');
 const ERROR = require('../config.error');
