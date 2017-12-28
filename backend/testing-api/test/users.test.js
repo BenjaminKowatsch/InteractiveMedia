@@ -1,4 +1,6 @@
-/* jshint expr: true */
+'use strict';
+
+/*jshint expr: true, node:true, mocha:true*/
 
 var chai = require('chai');
 var fs = require('fs');
@@ -478,8 +480,8 @@ describe('User-Controller', () => {
   });
 
   describe('Get User', function() {
+    let tokens = {};
     before('Clean DB and register User 0 and 1', done => {
-      tokens = {};
       databaseHelper.promiseResetDB().then(()=> {
         return chai.request(HOST).post(URL.BASE_USER  + '/').send(testData.users.valid[0]);
       }).then(res => {

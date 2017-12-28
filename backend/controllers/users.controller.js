@@ -1,6 +1,9 @@
+'use strict';
+
 var winston = require('winston');
 
 var user = require('../modules/user.module');
+const ERROR = require('../config.error');
 
 const validateJsonService = require('../services/validateJson.service');
 const httpResponseService = require('../services/httpResponse.service');

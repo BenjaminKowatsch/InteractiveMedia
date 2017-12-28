@@ -1,3 +1,5 @@
+'use strict';
+
 // jscs:disable jsDoc
 
 /**

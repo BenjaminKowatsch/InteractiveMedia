@@ -1,4 +1,6 @@
-/*jshint expr: true*/
+'use strict';
+
+/*jshint expr: true, node:true, mocha:true*/
 
 var chai = require('chai');
 var assert = chai.assert;
