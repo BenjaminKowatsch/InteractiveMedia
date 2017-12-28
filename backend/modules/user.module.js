@@ -1,3 +1,5 @@
+'use strict';
+
 const winston = require('winston');
 const jwt = require('jwt-simple');
 const https = require('https');
@@ -235,23 +237,10 @@ function verifyFacbookTokenAtDatabase(data, verifyDatabase) {
         }
       });
     } else {
-      winston.debug('returning: ', promiseData);
-      if (verifyEmail === true) {
-        verifyFacbookEmail(token).then((emailResult) => {
-          responseData.success = true;
-          responseData.payload.expiryDate = result.expiryDate;
-          responseData.payload.userId = result.userId;
-          responseData.payload.email = emailResult.email;
-          resolve(responseData);
-        }).catch((err) => {
-          reject(err);
-        });
-      } else {
-        responseData.success = true;
-        responseData.payload.expiryDate = expiryDate;
-        responseData.payload.userId = userId;
-        resolve(responseData);
-      }
+      responseData.success = true;
+      responseData.payload.expiryDate = expiryDate;
+      responseData.payload.userId = userId;
+      resolve(responseData);
     }
   });
 }

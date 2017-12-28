@@ -1,3 +1,5 @@
+'use strict';
+
 var database = module.exports = {};
 
 const winston = require('winston');

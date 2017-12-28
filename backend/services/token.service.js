@@ -1,3 +1,5 @@
+'use strict';
+
 const jwt = require('jwt-simple');
 const winston = require('winston');
 

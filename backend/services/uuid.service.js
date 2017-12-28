@@ -1,3 +1,5 @@
+'use strict';
+
 /**
  * Generates a new Universal Unique Identifier
  *
