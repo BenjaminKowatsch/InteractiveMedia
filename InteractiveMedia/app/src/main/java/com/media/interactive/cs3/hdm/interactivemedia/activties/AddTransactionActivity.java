@@ -1,9 +1,13 @@
 package com.media.interactive.cs3.hdm.interactivemedia.activties;
 
+import android.app.DatePickerDialog;
+import android.app.TimePickerDialog;
 import android.content.ContentValues;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.text.InputType;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.DatePicker;
@@ -15,13 +19,24 @@ import com.media.interactive.cs3.hdm.interactivemedia.R;
 import com.media.interactive.cs3.hdm.interactivemedia.contentprovider.DatabaseProvider;
 import com.media.interactive.cs3.hdm.interactivemedia.data.Transaction;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
 
 public class AddTransactionActivity extends AppCompatActivity {
+    private final SimpleDateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyy");
+    private final SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm");
+    private final SimpleDateFormat dateTimeFormat = new SimpleDateFormat(dateFormat.toPattern() + timeFormat.toPattern());
+    private EditText dateEditText;
+    private EditText timeEditText;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_transaction);
+        dateEditText = findViewById(R.id.et_add_transaction_date);
+        timeEditText = findViewById(R.id.et_add_transaction_time);
 
         Button addTransactionButton = findViewById(R.id.bn_add_transaction);
         addTransactionButton.setOnClickListener(new View.OnClickListener() {
@@ -37,6 +52,7 @@ public class AddTransactionActivity extends AppCompatActivity {
                 finish();
             }
         });
+        setupDatePicker();
     }
 
     private void createAndSaveTransaction(View view) {
@@ -48,10 +64,8 @@ public class AddTransactionActivity extends AppCompatActivity {
     private Transaction buildFromCurrentView() {
         final EditText name = findViewById(R.id.et_add_transaction_purpose);
         final TextView split = findViewById(R.id.tv_add_transaction_split);
-        final DatePicker date = findViewById(R.id.dp_add_transaction_date);
-        final TimePicker time = findViewById(R.id.tp_add_transaction_time);
         final EditText amount = findViewById(R.id.et_add_transaction_amount);
-        return buildTransaction(name, split, date, time, amount);
+        return buildTransaction(name, split, dateEditText, timeEditText, amount);
     }
 
     private void saveToLocalDatabase(Transaction transaction) {
@@ -60,17 +74,78 @@ public class AddTransactionActivity extends AppCompatActivity {
     }
 
     private Transaction buildTransaction(EditText nameText, TextView splitText,
-                                         DatePicker datePicker, TimePicker timePicker, EditText amountText) {
+                                         EditText dateText, EditText timeText, EditText amountText) {
         final String purpose = nameText.getText().toString();
         final String split = splitText.getText().toString();
-        final Date dateTime = toLocalDateTime(datePicker, timePicker);
         final double amount = Double.parseDouble(amountText.getText().toString());
+        final Date dateTime = parseDateTime(dateText, timeText);
         return new Transaction(purpose, split, dateTime, amount);
     }
 
-    private Date toLocalDateTime(DatePicker datePicker, TimePicker timePicker) {
-        return new Date(datePicker.getYear(), datePicker.getMonth(), datePicker.getDayOfMonth(),
-                timePicker.getHour(), timePicker.getMinute());
+    private Date parseDateTime(EditText dateText, EditText timeText) {
+        final String dateTimeText = dateText.getText().toString() + timeText.getText().toString();
+        try {
+            return dateTimeFormat.parse(dateTimeText);
+        } catch (ParseException e) {
+            Log.e(this.getClass().getName(), "Could not parse dateTime from text " + dateTimeText
+                    + " using default of now instead.");
+            Log.d(this.getClass().getName(), e.getMessage());
+            return new Date(System.currentTimeMillis());
+        }
+    }
+
+    private void setupDatePicker() {
+        Calendar calendar = Calendar.getInstance();
+
+        // implement the date picker dialog
+        final DatePickerDialog datePicker = new DatePickerDialog(this, new DatePickerDialog.OnDateSetListener() {
+            @Override
+            public void onDateSet(DatePicker datePicker, int year, int month, int day) {
+                setDateText(year, month, day, dateEditText);
+            }
+        }, calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar
+                .DAY_OF_MONTH));
+
+        final TimePickerDialog timePicker = new TimePickerDialog(this, new TimePickerDialog.OnTimeSetListener() {
+            @Override
+            public void onTimeSet(TimePicker timePicker, int hourOfDay, int minute) {
+                setTimeText(hourOfDay, minute, timeEditText);
+            }
+        }, calendar.get(Calendar.HOUR_OF_DAY), calendar.get(Calendar.MINUTE), true);
+
+        // prevent showing keyboard
+        dateEditText.setInputType(InputType.TYPE_NULL);
+        timeEditText.setInputType(InputType.TYPE_NULL);
+
+        dateEditText.setText(dateFormat.format(new Date(System.currentTimeMillis())));
+        timeEditText.setText(timeFormat.format(new Date(System.currentTimeMillis())));
+
+        // register from edit text listener
+        dateEditText.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                datePicker.show();
+            }
+        });
+
+        timeEditText.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                timePicker.show();
+            }
+        });
+    }
+
+    private void setTimeText(int hourOfDay, int minute, EditText timeEditText) {
+        Calendar date = Calendar.getInstance();
+        date.set(0, 0, 0, hourOfDay, minute);
+        timeEditText.setText(timeFormat.format(date.getTime()));
+    }
+
+    private void setDateText(int year, int month, int day, EditText dateEditText) {
+        Calendar date = Calendar.getInstance();
+        date.set(year, month, day);
+        dateEditText.setText(dateFormat.format(date.getTime()));
     }
 
 }
