@@ -389,8 +389,8 @@ exports.passwordLogin = function(username, password) {
       if (err === null && result.value !== null && result.ok === 1) {
         // Successfully logged in and created new expiry date
         const toEncode = {
-          'userId': result.userId,
-          'expiryDate': result.expiryDate
+          'userId': result.value.userId,
+          'expiryDate': result.value.expiryDate
         };
         responseData = {
           'accessToken': tokenService.generateAccessToken(toEncode),
