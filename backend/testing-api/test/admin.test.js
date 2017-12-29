@@ -41,7 +41,7 @@ describe('Admin', () => {
     it('should login as admin', function() {
       return chai.request(HOST)
       .post(URL.BASE_USER + '/login?type=0')
-      .send({username: adminData.username, email: adminData.email, password: adminData.password})
+      .send({username: adminData.username, password: adminData.password})
       .then(res => {
         expect(res).to.have.status(200);
         expect(res).to.be.json;
@@ -61,7 +61,7 @@ describe('Admin', () => {
         return chai.request(HOST).post(URL.BASE_ADMIN + '/add');
       }).then(res => {
         return chai.request(HOST).post(URL.BASE_USER + '/login?type=0')
-          .send({username: adminData.username, email: adminData.email, password: adminData.password});
+          .send({username: adminData.username, password: adminData.password});
       }).then(res => {
           adminToken = res.body.payload.accessToken;
           done();
