@@ -31,6 +31,7 @@ services:
       - LOGLEVEL=debug
       - ADMIN_USERNAME=admin
       - ADMIN_PASSWORD=inter@kt!veMedien
+      - ADMIN_EMAIL=admin@example.com
     image: localhost:5000/backend
     ports:
       - "8081:8081"

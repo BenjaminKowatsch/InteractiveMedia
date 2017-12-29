@@ -28,7 +28,8 @@ services:
       - ORIGIN=http://cloudproject.mi.hdm-stuttgart.de:8088
       - LOGLEVEL=info
       - ADMIN_USERNAME=admin
-      - ADMIN_PASSWORD=inter@kt!veMedien      
+      - ADMIN_PASSWORD=inter@kt!veMedien
+      - ADMIN_EMAIL=admin@example.com      
     image: localhost:5000/backend
     ports:
       - "8081:8081"
