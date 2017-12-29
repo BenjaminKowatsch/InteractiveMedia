@@ -130,7 +130,6 @@ describe('Authorization', () => {
           .get(URL.TEST_AUTHORIZATION + '/admin')
           .set('Authorization', '0 ' + userToken)
           .then(res => {
-            console.log(res.body);
             expect(res).to.have.status(403);
             expect(res).to.be.json;
             expect(res.body).to.be.an('object');
