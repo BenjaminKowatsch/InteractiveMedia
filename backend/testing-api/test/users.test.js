@@ -510,6 +510,7 @@ describe('User-Controller', () => {
         expect(res.body.payload._id).to.be.undefined;
         expect(res.body.payload.groupIds).to.be.undefined;
         expect(res.body.payload.userId).to.have.lengthOf(36).and.to.be.a('string');
+        expect(res.body.payload.role).to.equal('user');
       });
     });
 
@@ -528,6 +529,7 @@ describe('User-Controller', () => {
         expect(res.body.payload._id).to.be.undefined;
         expect(res.body.payload.groupIds).to.be.undefined;
         expect(res.body.payload.userId).to.have.lengthOf(36).and.to.be.a('string');
+        expect(res.body.payload.role).to.equal('user');
       });
     });
 
