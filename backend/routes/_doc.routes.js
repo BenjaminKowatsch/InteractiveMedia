@@ -249,3 +249,8 @@
  * @apiDefine successBodyGroupIds
     @apiSuccess (Success) {Array[string]} payload[groupIds] Ids of requesting user's groups
  */
+
+/**
+ * @apiDefine admin Administrator
+ *  role:'admin'
+ */

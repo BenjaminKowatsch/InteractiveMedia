@@ -77,6 +77,7 @@ router.get('/authorization/none', testController.getAuthorizationNotRequired);
  * @apiName authorizationAdminRequired
  * @apiGroup test
  * @apiVersion 0.1.0
+ * @apiPermission admin
  *
  * @apiUse headerAuthorization
  * @apiUse headerExampleAuthorization
