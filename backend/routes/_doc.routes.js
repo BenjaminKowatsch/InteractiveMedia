@@ -229,6 +229,7 @@
             "username": "my_user_name",
             "email": "my_user_mail@example.com",
             "userId": "6367e722-e857-4d0f-bf78-278a92260418",
+            "role": "user",
             "groupIds": ["f2bed6b9-6a5a-4363-a9fa-e1f10579c0c1","2368218d-b5ec-4d4d-bc3c-6c249776ee11"]
         }
     }
@@ -244,6 +245,10 @@
 /**
  * @apiDefine successBodyUserId
     @apiSuccess (Success) {string} payload[userId] Id of requesting user
+ */
+/**
+ * @apiDefine successBodyRole
+    @apiSuccess (Success) {string} payload[role] Role of requesting user. Supported roles: user, admin
  */
 /**
  * @apiDefine successBodyGroupIds
