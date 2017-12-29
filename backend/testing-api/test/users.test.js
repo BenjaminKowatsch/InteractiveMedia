@@ -55,7 +55,6 @@ describe('User-Controller', () => {
     before(function(done) {
       getFacebookTestAccessToken()
         .then((token) => {
-          console.log('Facbook Login got access token: ' + token);
           facebookToken = token;
           done();
         }).catch((error) => {
