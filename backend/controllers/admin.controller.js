@@ -33,10 +33,10 @@ module.exports.addAdmin = function(req, res) {
   };
 
 module.exports.getAllGroups = function(req, res) {
-  let responseData = {payload: {}};
   group.getAllGroups().then(groupResult => {
+      let responseData = {payload: {}};
       responseData.success = true;
-      responseData.payload.groups = groupResult.payload.groups;
+      responseData.payload = groupResult.payload.groups;
       httpResponseService.send(res, 200, responseData);
     }).catch(errorResult => {
       winston.error(errorResult.errorCode);
