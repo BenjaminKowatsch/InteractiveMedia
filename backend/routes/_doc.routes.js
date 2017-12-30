@@ -60,7 +60,7 @@
  */
 /**
  * @apiDefine error400MissingUnknownUrlParameter
-    @apiError (ErrorCode) {400} MissingType Missing or unknown parameter in url
+    @apiError (ErrorCode) {400} MissingUrlParameter Missing or unknown parameter in url
  */
 /**
  * @apiDefine error400BadRequest
