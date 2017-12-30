@@ -231,6 +231,23 @@
     }
  */
 /**
+ * @apiDefine successExampleAdminGetAllGroups
+    @apiSuccessExample {type} Success-Response
+    {
+        "success": true,
+        "payload": {
+            "groups": [
+                "name" : "test_group_1",
+                "imageUrl" : null,
+                "groupId" : "6367e722-e857-4d0f-bf78-278a92260418",
+                "createdAt" : "2017-12-25T10:56:13.234Z",
+                "countUsers" : 3,
+                "countTransactions" : 35
+            ]
+        }
+    }
+ */
+/**
  * @apiDefine successBodyUsername
     @apiSuccess (Success) {string} payload[username] Username of requesting user
  */
@@ -249,6 +266,34 @@
 /**
  * @apiDefine successBodyGroupIds
     @apiSuccess (Success) {Array[string]} payload[groupIds] Ids of requesting user's groups
+ */
+/**
+ * @apiDefine successBodyGroups
+    @apiSuccess (Success) {Array[group]} payload[groups] List of all groups
+ */
+/**
+ * @apiDefine successBodyGroupName
+    @apiSuccess (Success) {string} group[name] Name of group
+ */
+/**
+ * @apiDefine successBodyGroupImageUrl
+    @apiSuccess (Success) {string} group[imageUrl] ImageUrl of group
+ */
+/**
+ * @apiDefine successBodyGroupId
+    @apiSuccess (Success) {string} group[groupId] Id of group
+ */
+/**
+ * @apiDefine successBodyGroupCreatedAt
+    @apiSuccess (Success) {string} group[createdAt] Date when group was created
+ */
+/**
+ * @apiDefine successBodyGroupCountTransactions
+    @apiSuccess (Success) {int} group[countTransactions] Number of transaction in group
+ */
+/**
+ * @apiDefine successBodyGroupCountUsers
+    @apiSuccess (Success) {int} group[countUsers] Number of users in group
  */
 
 /**

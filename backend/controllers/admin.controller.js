@@ -3,6 +3,7 @@
 const winston = require('winston');
 const config = require('../modules/config');
 const user = require('../modules/user.module');
+const group = require('../modules/group.module');
 const httpResponseService = require('../services/httpResponse.service');
 const ERROR = require('../config.error');
 const ROLES = require('../config.roles');
@@ -30,3 +31,21 @@ module.exports.addAdmin = function(req, res) {
         httpResponseService.send(res, statusCode, errorResult.responseData);
       });
   };
+
+module.exports.getAllGroups = function(req, res) {
+  let responseData = {payload: {}};
+  group.getAllGroups().then(groupResult => {
+      responseData.success = true;
+      responseData.payload.groups = groupResult.payload.groups;
+      httpResponseService.send(res, 200, responseData);
+    }).catch(errorResult => {
+      winston.error(errorResult.errorCode);
+      let statusCode = 418;
+      switch (errorResult.errorCode) {
+        case ERROR.DB_ERROR:
+          statusCode = 500;
+          break;
+      }
+      httpResponseService.send(res, statusCode, errorResult.responseData);
+    });
+};
