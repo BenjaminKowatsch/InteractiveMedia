@@ -18,6 +18,10 @@
  * @apiDefine paramAuthtype
     @apiParam (Parameter) {int} authType Login type with authType=(0: Password, 1:Google, 2: Facebook)
  */
+/**
+ * @apiDefine paramUrlGroupId
+    @apiParam (URL-Parameter) {string} groupId Id of the requested group
+ */
 
 /**
  * @apiDefine headerAuthorization
@@ -268,32 +272,44 @@
     @apiSuccess (Success) {Array[string]} payload[groupIds] Ids of requesting user's groups
  */
 /**
- * @apiDefine successBodyGroups
-    @apiSuccess (Success) {Array[group]} payload[groups] List of all groups
- */
-/**
  * @apiDefine successBodyGroupName
-    @apiSuccess (Success) {string} group[name] Name of group
+    @apiSuccess (Success) {string} payload[name] Name of group
  */
 /**
  * @apiDefine successBodyGroupImageUrl
-    @apiSuccess (Success) {string} group[imageUrl] ImageUrl of group
+    @apiSuccess (Success) {string} payload[imageUrl] ImageUrl of group
  */
 /**
  * @apiDefine successBodyGroupId
-    @apiSuccess (Success) {string} group[groupId] Id of group
+    @apiSuccess (Success) {string} payload[groupId] Id of group
  */
 /**
  * @apiDefine successBodyGroupCreatedAt
-    @apiSuccess (Success) {string} group[createdAt] Date when group was created
+    @apiSuccess (Success) {string} payload[createdAt] Date when group was created
  */
 /**
  * @apiDefine successBodyGroupCountTransactions
-    @apiSuccess (Success) {int} group[countTransactions] Number of transaction in group
+    @apiSuccess (Success) {int} payload[countTransactions] Number of transaction in group
  */
 /**
  * @apiDefine successBodyGroupCountUsers
-    @apiSuccess (Success) {int} group[countUsers] Number of users in group
+    @apiSuccess (Success) {int} payload[countUsers] Number of users in group
+ */
+/**
+ * @apiDefine successBodyGroupTransactions
+    @apiSuccess (Success) {Array[transaction]} payload[transactions] List of transactions in group
+ */
+/**
+ * @apiDefine successBodyGroupUsers
+    @apiSuccess (Success) {Array[user]} payload[users] List of users in group
+ */
+/**
+ * @apiDefine successBodyGroupUsersUserId
+    @apiSuccess (Success) {string} users[userId] Id of user
+ */
+/**
+ * @apiDefine successBodyGroupUsersName
+    @apiSuccess (Success) {string} users[username] Name of user
  */
 
 /**
