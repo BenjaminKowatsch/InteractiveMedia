@@ -21,7 +21,6 @@ router.post('/add', adminController.addAdmin);
  * @apiUse headerAuthorization
  * @apiUse headerExampleAuthorization
  *
- * @apiUse successBodyGroups
  * @apiUse successBodyGroupName
  * @apiUse successBodyGroupImageUrl
  * @apiUse successBodyGroupId
