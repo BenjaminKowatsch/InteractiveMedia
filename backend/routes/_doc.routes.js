@@ -257,6 +257,26 @@
     }
  */
 /**
+ * @apiDefine successExampleAdminGetAllUsers
+    @apiSuccessExample {type} Success-Response
+    {
+        "success": true,
+        "payload": [{
+            "username" : "Harry Potter",
+            "email" : "harry.potter@hogwarts.edu",
+            "userId" : "d9gh1hs7-e8lk-495f-br48-2f4ds92260418",
+            "role" : "2017-12-25T10:56:13.234Z",
+            "countGroupIds" : 3,
+        },{
+            "name" : "Ron Weasly",
+            "imageUrl" : "ron.weasly@hogwarts.edu",
+            "groupId" : "4js8fg66-f4g8-ay98-ql04-f212343jf5ui",
+            "createdAt" : "2017-12-20T13:22:02.515Z",
+            "countGroupIds" : 5,
+        }]
+    }
+ */
+/**
  * @apiDefine successBodyUserUsername
     @apiSuccess (Success) {string} payload[username] Name of user
  */
@@ -275,6 +295,10 @@
 /**
  * @apiDefine successBodyUserGroupIds
     @apiSuccess (Success) {Array[string]} payload[groupIds] Ids of groups the user belongs to
+ */
+/**
+ * @apiDefine successBodyUserCountGroupIds
+    @apiSuccess (Success) {int} payload[countGroupIds] Number of groups the user belongs to
  */
 /**
  * @apiDefine successBodyGroupName
