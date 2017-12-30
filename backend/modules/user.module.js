@@ -587,3 +587,39 @@ module.exports.verifyRole = function(userId, role) {
     });
   });
 };
+
+module.exports.getAllUsers = function() {
+  winston.debug('getAllUsers');
+  return new Promise((resolve, reject) => {
+    let responseData = {payload: {}};
+    const aggregation = {
+      $project: {
+        _id: 0,
+        username: 1,
+        email: 1,
+        userId: 1,
+        role: 1,
+        countGroupIds: {'$size': {'$ifNull': ['$groupIds', []]}}
+      }
+    };
+    database.collections.users.aggregate([aggregation]).toArray()
+    .then(result => {
+      responseData.payload.users = result;
+      responseData.success = true;
+      resolve(responseData);
+    }).catch(err => {
+      winston.debug(err);
+      responseData.success = false;
+      responseData.payload.dataPath = 'user';
+      let errorCode;
+      if (err.isSelfProvided) {
+        responseData.payload.message = err.message;
+        errorCode = err.errorCode;
+      } else {
+        responseData.payload.message = 'unknown database error';
+        errorCode = ERROR.DB_ERROR;
+      }
+      reject({errorCode: errorCode, responseData: responseData});
+    });
+  });
+};

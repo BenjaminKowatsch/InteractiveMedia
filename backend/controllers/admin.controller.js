@@ -75,3 +75,21 @@ module.exports.getGroupById = function(req, res) {
     httpResponseService.send(res, statusCode, errorResult.responseData);
   });
 };
+
+module.exports.getAllUsers = function(req, res) {
+  user.getAllUsers().then(userResult => {
+      let responseData = {payload: {}};
+      responseData.success = true;
+      responseData.payload = userResult.payload.users;
+      httpResponseService.send(res, 200, responseData);
+    }).catch(errorResult => {
+      winston.error(errorResult.errorCode);
+      let statusCode = 418;
+      switch (errorResult.errorCode) {
+        case ERROR.DB_ERROR:
+          statusCode = 500;
+          break;
+      }
+      httpResponseService.send(res, statusCode, errorResult.responseData);
+    });
+};

@@ -244,4 +244,82 @@ describe('Admin', () => {
       });
     });
   });
+
+  describe('Users', () => {
+    describe.only('get all users', () => {
+      let adminToken;
+      let tokens = {};
+      let groupId;
+      before('add admin', done => {
+        databaseHelper.promiseResetDB().then(() => {
+          return chai.request(HOST).post(URL.BASE_ADMIN + '/add');
+        }).then(res => {
+          adminToken = res.body.payload.accessToken;
+          done();
+        }).catch((err) => {console.error('Error add admin');});
+      });
+
+      before('register users, create group', done => {
+        registerUser(0).then(res => {
+          tokens[0] = res.body.payload.accessToken;
+          return registerUser(1);
+        }).then(res => {
+          tokens[1] = res.body.payload.accessToken;
+          return chai.request(HOST)
+            .post(URL.BASE_GROUP  + '/')
+            .set('Authorization', '0 ' + tokens[0])
+            .send(groupScenarios[1].createGroup0);
+        }).then(res => {
+          groupId = res.body.payload.groupId;
+          done();
+        }).catch((error) => {
+          console.log('Register User Error: ' + error);
+        });
+      });
+
+      it('should get all users', () => {
+        return chai.request(HOST)
+        .get(URL.BASE_ADMIN + '/users')
+        .set('Authorization', '0 ' + adminToken)
+        .then(res => {
+          expect(res).to.have.status(200);
+          expect(res).to.be.json;
+          expect(res.body).to.be.an('object');
+          expect(res.body.success).to.be.true;
+          expect(res.body.payload).to.be.an('array');
+          expect(res.body.payload).to.have.lengthOf(3);
+          expect(res.body.payload[0].username).to.equal(adminData.username);
+          expect(res.body.payload[0].email).to.equal(adminData.email);
+          expect(res.body.payload[0].userId).to.have.lengthOf(36).and.to.be.a('string');
+          expect(res.body.payload[0].role).to.equal('admin');
+          expect(res.body.payload[0].countGroupIds).to.equal(0);
+          expect(res.body.payload[1].username).to.equal(userData.users.valid[0].username);
+          expect(res.body.payload[1].email).to.equal(userData.users.valid[0].email);
+          expect(res.body.payload[1].userId).to.have.lengthOf(36).and.to.be.a('string');
+          expect(res.body.payload[1].role).to.equal('user');
+          expect(res.body.payload[1].countGroupIds).to.equal(1);
+          expect(res.body.payload[2].username).to.equal(userData.users.valid[1].username);
+          expect(res.body.payload[2].email).to.equal(userData.users.valid[1].email);
+          expect(res.body.payload[2].userId).to.have.lengthOf(36).and.to.be.a('string');
+          expect(res.body.payload[2].role).to.equal('user');
+          expect(res.body.payload[2].countGroupIds).to.equal(1);
+        });
+      });
+
+      it('should fail to get all users with normal user', () => {
+        return chai.request(HOST)
+            .get(URL.BASE_ADMIN + '/users')
+            .set('Authorization', '0 ' + tokens[0])
+            .then(res => {
+              expect(res).to.have.status(403);
+              expect(res).to.be.json;
+              expect(res.body).to.be.an('object');
+              expect(res.body.success).to.be.false;
+              expect(res.body.payload).to.be.an('object');
+              expect(res.body.payload.dataPath).to.be.equal('authorization');
+              expect(res.body.payload.message).to.be.equal('user is not authorized');
+            });
+      });
+    });
+  });
 });

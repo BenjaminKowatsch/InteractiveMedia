@@ -80,4 +80,35 @@ router.get('/groups', authenticationService.isAuthenticated, authorizationServic
 router.get('/groups/:groupId', authenticationService.isAuthenticated, authorizationService.isAuthorizedAdmin,
     adminController.getGroupById);
 
+/**
+ * @api {GET} /v1/admin/users/ Get users
+ * @apiName GetUsers
+ * @apiGroup admin
+ * @apiVersion 0.1.0
+ * @apiPermission admin
+ *
+ * @apiUse headerAuthorization
+ * @apiUse headerExampleAuthorization
+ *
+ * @apiUse successBodySuccess
+ * @apiUse successBodyUserUsername
+ * @apiUse successBodyUserEmail
+ * @apiUse successBodyUserUserId
+ * @apiUse successBodyUserRole
+ * @apiUse successBodyUserCountGroupIds
+ *
+ * @apiSuccess (SuccessCode) {200} Success AllUsers
+ * @apiUse successExampleAdminGetAllUsers
+ *
+ * @apiUse error401Unauthorized
+ * @apiUse error403Forbidden
+ * @apiUse error418UncaughtError
+ * @apiUse error500DatabaseError
+ * @apiUse errorBodyCommonStructure
+ *
+ * @apiUse errorExampleCommon
+ */
+router.get('/users', authenticationService.isAuthenticated, authorizationService.isAuthorizedAdmin,
+    adminController.getAllUsers);
+
 module.exports = router;
