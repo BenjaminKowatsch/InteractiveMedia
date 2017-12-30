@@ -17,7 +17,7 @@ module.exports.addAdmin = function(req, res) {
         httpResponseService.send(res, 201, responseData);
       }).catch(errorResult => {
         winston.error(JSON.stringify(errorResult));
-        let statusCode;
+        let statusCode = 418;
         switch (errorResult.errorCode) {
           case ERROR.DUPLICATED_USER:
             // admin already exists
