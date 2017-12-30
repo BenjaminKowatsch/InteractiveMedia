@@ -239,16 +239,21 @@
     @apiSuccessExample {type} Success-Response
     {
         "success": true,
-        "payload": {
-            "groups": [
-                "name" : "test_group_1",
-                "imageUrl" : null,
-                "groupId" : "6367e722-e857-4d0f-bf78-278a92260418",
-                "createdAt" : "2017-12-25T10:56:13.234Z",
-                "countUsers" : 3,
-                "countTransactions" : 35
-            ]
-        }
+        "payload": [{
+            "name" : "test_group_1",
+            "imageUrl" : null,
+            "groupId" : "6367e722-e857-4d0f-bf78-278a92260418",
+            "createdAt" : "2017-12-25T10:56:13.234Z",
+            "countUsers" : 3,
+            "countTransactions" : 35
+        },{
+            "name" : "test_group_2",
+            "imageUrl" : null,
+            "groupId" : "d8gk54a9-f4g8-d2g6-h783-f2ajg83jf5ui",
+            "createdAt" : "2017-12-30T18:55:02.678Z",
+            "countUsers" : 5,
+            "countTransactions" : 11
+        }]
     }
  */
 /**
