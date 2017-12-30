@@ -557,34 +557,33 @@ function checkIfUserResultIsNotNull(userResult) {
     }
   });
 }
-function findUserByQuery(query) {
-  return database.collections.users.findOne(query);
-}
 
 module.exports.verifyRole = function(userId, role) {
   return new Promise((resolve, reject) => {
     let responseData = {payload: {}};
-    checkIfUserIdIsGiven(userId)
-      .then(() => findUserByQuery({userId: userId, role: role}))
-      .then(checkIfUserResultIsNotNull)
-      .then(userResult => {
-        delete userResult._id;
-        responseData.success = true;
-        responseData.payload = userResult;
-        resolve(responseData);
-      }).catch(err => {
-        winston.debug(err);
-        responseData.success = false;
-        responseData.payload.dataPath = 'authorization';
-        let errorCode;
-        if (err.isSelfProvided) {
-          responseData.payload.message = err.message;
-          errorCode = err.errorCode;
-        } else {
-          responseData.payload.message = 'unknown database error';
-          errorCode = ERROR.DB_ERROR;
-        }
-        reject({errorCode: errorCode, responseData: responseData});
-      });
+    checkIfUserIdIsGiven(userId).then(() => {
+        const query = {userId: userId, role: role};
+        return database.collections.users.findOne(query);
+      })
+    .then(checkIfUserResultIsNotNull)
+    .then(userResult => {
+      responseData.success = true;
+      responseData.payload.userId = userResult.userId;
+      responseData.payload.role = userResult.role;
+      resolve(responseData);
+    }).catch(err => {
+      winston.debug(err);
+      responseData.success = false;
+      responseData.payload.dataPath = 'authorization';
+      let errorCode;
+      if (err.isSelfProvided) {
+        responseData.payload.message = err.message;
+        errorCode = err.errorCode;
+      } else {
+        responseData.payload.message = 'unknown database error';
+        errorCode = ERROR.DB_ERROR;
+      }
+      reject({errorCode: errorCode, responseData: responseData});
+    });
   });
 };
