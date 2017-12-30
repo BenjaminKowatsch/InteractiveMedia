@@ -21,6 +21,7 @@ router.post('/add', adminController.addAdmin);
  * @apiUse headerAuthorization
  * @apiUse headerExampleAuthorization
  *
+ * @apiUse successBodySuccess
  * @apiUse successBodyGroupName
  * @apiUse successBodyGroupImageUrl
  * @apiUse successBodyGroupId
@@ -54,6 +55,7 @@ router.get('/groups', authenticationService.isAuthenticated, authorizationServic
  * @apiUse headerAuthorization
  * @apiUse headerExampleAuthorization
  *
+ * @apiUse successBodySuccess
  * @apiUse successBodyGroupName
  * @apiUse successBodyGroupImageUrl
  * @apiUse successBodyGroupId
