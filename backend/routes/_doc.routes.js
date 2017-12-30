@@ -257,24 +257,24 @@
     }
  */
 /**
- * @apiDefine successBodyUsername
-    @apiSuccess (Success) {string} payload[username] Username of requesting user
+ * @apiDefine successBodyUserUsername
+    @apiSuccess (Success) {string} payload[username] Name of user
  */
 /**
- * @apiDefine successBodyEmail
-    @apiSuccess (Success) {string} payload[email] Email of requesting user
+ * @apiDefine successBodyUserEmail
+    @apiSuccess (Success) {string} payload[email] Email of user
  */
 /**
- * @apiDefine successBodyUserId
-    @apiSuccess (Success) {string} payload[userId] Id of requesting user
+ * @apiDefine successBodyUserUserId
+    @apiSuccess (Success) {string} payload[userId] Id of user
  */
 /**
- * @apiDefine successBodyRole
-    @apiSuccess (Success) {string} payload[role] Role of requesting user. Supported roles: user, admin
+ * @apiDefine successBodyUserRole
+    @apiSuccess (Success) {string} payload[role] Role of user. Supported roles: user, admin
  */
 /**
- * @apiDefine successBodyGroupIds
-    @apiSuccess (Success) {Array[string]} payload[groupIds] Ids of requesting user's groups
+ * @apiDefine successBodyUserGroupIds
+    @apiSuccess (Success) {Array[string]} payload[groupIds] Ids of groups the user belongs to
  */
 /**
  * @apiDefine successBodyGroupName
