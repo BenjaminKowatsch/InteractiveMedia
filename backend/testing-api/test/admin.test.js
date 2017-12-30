@@ -172,5 +172,76 @@ describe('Admin', () => {
             });
       });
     });
+
+    describe('get group', () => {
+      let adminToken;
+      let tokens = {};
+      let groupId;
+      before('add admin', done => {
+        databaseHelper.promiseResetDB().then(() => {
+          return chai.request(HOST).post(URL.BASE_ADMIN + '/add');
+        }).then(res => {
+          adminToken = res.body.payload.accessToken;
+          done();
+        }).catch((err) => {console.error('Error add admin');});
+      });
+
+      before('register users, create group', done => {
+        registerUser(0).then(res => {
+          tokens[0] = res.body.payload.accessToken;
+          return registerUser(1);
+        }).then(res => {
+          tokens[1] = res.body.payload.accessToken;
+          return registerUser(2);
+        }).then(res => {
+          tokens[2] = res.body.payload.accessToken;
+          return chai.request(HOST)
+            .post(URL.BASE_GROUP  + '/')
+            .set('Authorization', '0 ' + tokens[0])
+            .send(groupScenarios[1].createGroup0);
+        }).then(res => {
+          groupId = res.body.payload.groupId;
+          done();
+        }).catch((error) => {
+          console.log('Register User Error: ' + error);
+        });
+      });
+
+      it('should get group by id', () => {
+        return chai.request(HOST)
+        .get(URL.BASE_ADMIN + '/groups/' + groupId)
+        .set('Authorization', '0 ' + adminToken)
+        .then(res => {
+          expect(res).to.have.status(200);
+          expect(res).to.be.json;
+          expect(res.body).to.be.an('object');
+          expect(res.body.success).to.be.true;
+          expect(res.body.payload).to.be.an('object');
+          expect(res.body.payload.name).to.equal(groupScenarios[1].createGroup0.name);
+          expect(res.body.payload.imageUrl).to.equal(groupScenarios[1].createGroup0.imageUrl);
+          expect(res.body.payload.users).to.have.lengthOf(groupScenarios[1].createGroup0.users.length);
+          expect(res.body.payload.users.map(val => val.username))
+          .to.have.members([userData.users.valid[0].username, userData.users.valid[1].username]);
+          expect(res.body.payload.transactions).to.be.empty;
+          expect(res.body.payload.groupId).to.equal(groupId);
+          expect(res.body.payload.createdAt).to.be.an('string').and.not.to.be.empty;
+        });
+      });
+
+      it('should fail to get group by id with normal user', () => {
+        return chai.request(HOST)
+            .get(URL.BASE_ADMIN + '/groups/' + groupId)
+            .set('Authorization', '0 ' + tokens[0])
+            .then(res => {
+              expect(res).to.have.status(403);
+              expect(res).to.be.json;
+              expect(res.body).to.be.an('object');
+              expect(res.body.success).to.be.false;
+              expect(res.body.payload).to.be.an('object');
+              expect(res.body.payload.dataPath).to.be.equal('authorization');
+              expect(res.body.payload.message).to.be.equal('user is not authorized');
+            });
+      });
+    });
   });
 });
