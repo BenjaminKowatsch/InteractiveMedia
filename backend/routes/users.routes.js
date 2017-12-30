@@ -92,6 +92,7 @@ router.post('/logout', authenticationService.isAuthenticated, usersController.lo
  * @apiName getUser
  * @apiGroup user
  * @apiVersion 0.1.0
+ * @apiDescription Get information about the user identified by the provided auth token.
  *
  * @apiUse headerAuthorization
  * @apiUse headerExampleAuthorization
