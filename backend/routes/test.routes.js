@@ -92,7 +92,7 @@ router.get('/authorization/none', testController.getAuthorizationNotRequired);
     }
  *
  * @apiUse error401Unauthorized
- * @apiUse error403Unauthorized
+ * @apiUse error403Forbidden
  * @apiUse error418UncaughtError
  * @apiUse error500DatabaseError
  * @apiUse errorBodyCommonStructure
