@@ -13,24 +13,27 @@
     </f7-navbar>
     <f7-list form>
 
-      <li v-for="group in groups">
-       <p>{{group.name}}</p>
-<!--         <p>{{group.users}}</p>      
- -->        </li>
+      <h2>Groups overview</h2> 
+      <div v-if="groupCount > 0">
+        <li v-for="group in groups">
+          <p><b>Group name:</b> {{group.name}}, <b>Group id:</b> {{group.groupId}}</p>
+          <p><b>User count:</b> {{group.countUsers}}, <b>Transaction count:</b> {{group.countTransactions}}</p>
+        </li>
+      </div>
+      <div v-else>
+        <h2>NO GROUPS FOUND</h2>
+      </div>
+
       <div id="groupcount">
-<!--         <h2>{{groupCount}}</h2>
- -->      </div>
+         <h3>Number of groups: {{groupCount}}</h3>
+      </div>
 
+      <div v-if="version">
+        <p>Debts² admin panel version informations: 
+          {{version.name}}  {{version.version}}
+        </p>
+      </div>
 
-  <div v-if="groups.length = 0">
-    <h1>NO GROUPS FOUND</h1>
-  </div>
-
-  <div v-if="version">
-    <p>Aktuelle Versionshinweise: 
-     {{version.name}}  {{version.version}}
-    </p>
-  </div>
        </f7-list form>  
     <f7-list>
       <f7-list-button title="CreateDummyGroup" v-on:click="createDummyGroup()"></f7-list-button>
@@ -42,16 +45,19 @@
 </template>
 
 <script>
- /*
+/*
   * START JScript Elements for establishing the view according to the template elements
   * imports Moodslider (to be found in component folder), Axios
   */
 /*   import Moodslider from '@/components/moodslider'
- */  import Axios from 'axios'
-import Cookie from "../js/Cookie.js";
+ */
 
-  export default {
-    name: 'overview',
+import axios from "axios";
+import Cookie from "../js/Cookie.js";
+import Config from "../js/Config.js";
+
+export default {
+  name: "overview",
 
   data() {
     return {
@@ -61,10 +67,10 @@ import Cookie from "../js/Cookie.js";
       authToken: "",
       groupId: "",
       groupCount: ""
-      }
-    },
+    };
+  },
+
   mounted: function() {
-    //groupCount = ""
     var groupCountLoaded = false;
     console.log(groupCountLoaded);
     this.authToken = Cookie.getJSONCookie("accessToken").accessToken;
@@ -74,69 +80,7 @@ import Cookie from "../js/Cookie.js";
     this.getGroups();
     this.groupId = "9a7fb2f3-8b39-4849-ac81-48c1835220d0";
     this.getGroupById(this.groupId);
-
-
- 
-
- */
-    //Gets groupnames. To access all groups, admin access required. For testing specific groupid is used
-    //Seltsames: object enthält bei response.data zwei Objecte, da success: true als eingenes object gehandelt wird (bzw nur true)
-    //Mögliches unsauberes mocking für gesamtanzahl anzeige: Resultat/2 ...
-   /*  axios
-      .get(
-        Config.webServiceURL +
-          "/v1/groups/a43f1597-b23d-4c8e-96d3-e707d8e00d51",
-        {
-          headers: { Authorization: `0 ${this.authToken}` }
-        },
-        { responseType: "stream" }
-      )
-      .then(response => {
-        // JSON responses are automatically parsed.
-        this.groups = response.data;
-
-        console.log("Groups: " + response.statusText);
-        console.log("Headers: " + response.headers);
-        console.log("Config: " + response.config);
-        console.log("Data: " + response.data);
-        console.log("Typ: " + typeof response.data);
-        console.log("Objectlength: " + Object.keys(this.groups).length);
-        console.log("Groups in array: " + this.groups);
-        console.log("Groups in Array JSON: " + JSON.stringify(this.groups));
-        console.log(
-          "Array with JSONStringy: " + JSON.stringify(this.groups.length)
-        );
-        console.log("Groupsarray size: " + this.groups.size);
-        console.log("Groupsarray length: " + this.groups.length); */
-        /* var filteredGroups = groups.filter(function(el) {
-          return el.success != true;
-        }); */
-/*         console.log(
-          "Groupsarray after filtering: " + JSON.stringify(this.filteredGroups)
-        );
-        console.log(
-          "Groupsarray count after filtering: " +
-            Object.keys(this.filteredGroups).length
-        ); */
-  /*     })
-      .catch(e => {
-        this.errors.push(e);
-        console.log("Errors in Groups: " + e);
-      }); */
-
-    //groupCount = this.countProperties(this.groups);
-
-    axios
-      .get(Config.webServiceURL + "/v1/version")
-      .then(response => {
-        // JSON responses are automatically parsed.
-        this.version = response.data;
-        console.log("Version: " + response.statusText);
-      })
-      .catch(e => {
-        this.errors.push(e);
-        console.log("Errors in Version: " + e);
-      });
+    this.getVersionInfos();
   },
 
   methods: {
@@ -146,9 +90,9 @@ import Cookie from "../js/Cookie.js";
         .post(
           Config.webServiceURL + "/v1/groups",
           {
-            name: "Testgroup1",
+            name: "Testgroup3",
             imageUrl: null,
-            users: ["asdfg@web.de", "alexa@web.de"]
+            users: ["alex1@alex.de", "admin@example.com", "benny1@alex.de"]
           },
           {
             headers: { Authorization: `0 ${this.authToken}` }
@@ -163,44 +107,65 @@ import Cookie from "../js/Cookie.js";
     },
 
     authorizeAdmin: function() {
-
-      axios.get(Config.webServiceURL + "/v1/test/authorization/admin", {
-        headers: { Authorization: "0 " + this.authToken }
-      }).then(function (response) {
-        console.log("Authorization as admin: " + response.data.payload.hello);
-      }).catch(function (e) {
-        this.errors.push(e);
-        console.log("Errors in admin authorization: " + e);
-      });
+      axios
+        .get(Config.webServiceURL + "/v1/test/authorization/admin", {
+          headers: { Authorization: "0 " + this.authToken }
+        })
+        .then(function(response) {
+          console.log("Authorization as admin: " + response.data.payload.hello);
+        })
+        .catch(e => {
+          this.errors.push(e);
+          console.log("Errors in admin authorization: " + e);
+        });
     },
-getGroups: function getGroups() {
 
-      axios.get(Config.webServiceURL + "/v1/admin/groups", {
-        headers: { Authorization: "0 " + this.authToken }
-      }).then(function (response) {
-        this.checkResponse(response, function (payload) {
-          this.groups = payload;
+    getGroups: function() {
+      axios
+        .get(Config.webServiceURL + "/v1/admin/groups", {
+          headers: { Authorization: "0 " + this.authToken }
+        })
+        .then(response => {
+          this.groups = response.data.payload;
           this.groupCount = this.countProperties(this.groups);
           this.groupCountLoaded = true;
           console.log("Anzahl Gruppen: " + this.groupCount);
           console.log("Existing Groups: " + JSON.stringify(this.groups));
+        })
+        .catch(e => {
+          this.errors.push(e);
+          console.log("Errors in GET admin/groups: " + error);
         });
-      }).catch(function (e) {
-        this.errors.push(e);
-        console.log("Errors in GET admin/groups: " + e);
-      });
     },
 
     getGroupById: function getGroupById(id) {
+      axios
+        .get(Config.webServiceURL + "/v1/admin/groups/" + id, {
+          headers: { Authorization: "0 " + this.authToken }
+        })
+        .then(function(response) {
+          console.log(
+            "Desired Group: " + JSON.stringify(response.data.payload)
+          );
+        })
+        .catch(e => {
+          this.errors.push(e);
+          console.log("Errors in GET admin/groups/:groupID: " + e);
+        });
+    },
 
-      axios.get(Config.webServiceURL + "/v1/admin/groups/" + id, {
-        headers: { Authorization: "0 " + this.authToken }
-      }).then(function (response) {
-        console.log("Desired Group: " + JSON.stringify(response.data.payload));
-      }).catch(function (e) {
-        this.errors.push(e);
-        console.log("Errors in GET admin/groups/:groupID: " + e);
-      });
+    getVersionInfos: function() {
+      axios
+        .get(Config.webServiceURL + "/v1/version")
+        .then(response => {
+          // JSON responses are automatically parsed.
+          this.version = response.data;
+          console.log("Version: " + response.statusText);
+        })
+        .catch(e => {
+          this.errors.push(e);
+          console.log("Errors in Version: " + e);
+        });
     },
 
     checkResponse: function checkResponse(response, onValid, failure) {
@@ -211,9 +176,9 @@ getGroups: function getGroups() {
         failure(response.data);
       }
     },
+
     countProperties: function(obj) {
       var count = 0;
-
       for (var property in obj) {
         if (Object.prototype.hasOwnProperty.call(obj, property)) {
           count++;
@@ -221,22 +186,6 @@ getGroups: function getGroups() {
       }
       return count;
     }
-    /* saveToken: function(response){
-      console.log("Entered TokenFunction")
-      
-      this.authToken = response.data.payload.accessToken
-      console.log("AuthToken: " + this.authToken)
-      this.getAccessToken()
-      console.log("THis was the getAccessToken call from Login.vue")
-
-    },
-
-      accessToken: function(){
-        console.log("Entered getterMethod")
-        this.tokenStr = this.login.getAccessToken()
-        console.log("Saved accessToken from login: " + tokenStr)
-
-      }, */
   }
 };
 </script>
