@@ -120,6 +120,46 @@ module.exports.verifyGroupContainsUser = function(userId, groupId) {
   });
 };
 
+module.exports.getAllGroups = function() {
+  winston.debug('getAllGroups');
+  return new Promise((resolve, reject) => {
+    let responseData = {payload: {}};
+    const aggregation = {
+      $project: {
+        _id: 0,
+        imageUrl: 1,
+        groupId: 1,
+        createdAt: 1,
+        name: 1,
+        countUsers: {$size: '$users'},
+        countTransactions: {$size: '$transactions'}
+      }
+    };
+    aggregateGroups(aggregation).then(result => {
+      responseData.payload.groups = result;
+      responseData.success = true;
+      resolve(responseData);
+    }).catch(err => {
+      winston.debug(err);
+      responseData.success = false;
+      responseData.payload.dataPath = 'group';
+      let errorCode;
+      if (err.isSelfProvided) {
+        responseData.payload.message = err.message;
+        errorCode = err.errorCode;
+      } else {
+        responseData.payload.message = 'unknown database error';
+        errorCode = ERROR.DB_ERROR;
+      }
+      reject({errorCode: errorCode, responseData: responseData});
+    });
+  });
+};
+
+function aggregateGroups(query) {
+  return database.collections.groups.aggregate([query]).toArray();
+}
+
 function checkForInvalidCreateGroupValues(findUsersResult, requestedUserEmails, creatorId) {
   let errorToReturn = {isSelfProvided: true};
   errorToReturn.dataPath = 'groupUsers';
