@@ -49,3 +49,29 @@ module.exports.getAllGroups = function(req, res) {
       httpResponseService.send(res, statusCode, errorResult.responseData);
     });
 };
+
+module.exports.getGroupById = function(req, res) {
+  const groupId = req.params.groupId;
+  group.getGroupById(groupId).then(groupResult =>  {
+    let responseData = {payload: {}};
+    responseData.success = true;
+    responseData.payload = groupResult.payload;
+    httpResponseService.send(res, 200, groupResult);
+  }).catch(errorResult => {
+    winston.debug(errorResult);
+    let statusCode = 418;
+    switch (errorResult.errorCode) {
+      case ERROR.MISSING_ID_IN_URL:
+        statusCode = 400;
+        break;
+      case ERROR.UNKNOWN_GROUP:
+        statusCode = 404;
+        break;
+      case ERROR.UNKNOWN_USER:
+      case ERROR.DB_ERROR:
+        statusCode = 500;
+        break;
+    }
+    httpResponseService.send(res, statusCode, errorResult.responseData);
+  });
+};
