@@ -212,10 +212,6 @@
     @apiError (ErrorCode) {400} MissingGroupCreator GroupCreator must be part of groupUsers
  */
 /**
- * @apiDefine error403Unauthorized
-    @apiError (ErrorCode) {403} Unauthorized User does not have the necessary permission
- */
-/**
  * @apiDefine error500UnknownUser
     @apiError (ErrorCode) {500} UnknownUser Requestd group or user references a non-existing userId
  */
