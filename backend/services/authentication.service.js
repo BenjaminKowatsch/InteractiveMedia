@@ -9,6 +9,7 @@ var user = require('../modules/user.module');
 var httpResponseService = require('./httpResponse.service');
 
 const ERROR = require('../config.error');
+const AUTH_TYPE = require('../config.authType');
 
 module.exports.isAuthenticated = function(req, res, next) {
   let authType;
@@ -48,7 +49,7 @@ module.exports.isAuthenticated = function(req, res, next) {
  * Function to verify each type of access token (google, facebook or password)
  *
  * @param  {String} token    AccessToken to be verified
- * @param  {user.AUTH_TYPE} authType Authentication type specifing whether the user belongs to google, facebook or password authentication
+ * @param  {AUTH_TYPE} authType Authentication type specifing whether the user belongs to google, facebook or password authentication
  * @return {Promise}          then: {JSONObject} promiseData JSON object containing the following properties:
  *                                                 {Date} expiryDate Date to indicate the expiration of the accessToken
  *                                                 {String} userId String to uniquely identify the user
@@ -56,15 +57,15 @@ module.exports.isAuthenticated = function(req, res, next) {
  */
 function verifyAccessToken(token, authType) {
   switch (authType) {
-    case user.AUTH_TYPE.PASSWORD:
+    case AUTH_TYPE.PASSWORD:
       winston.debug('Verifing Password access token');
       // Verify password access token
       return user.verifyPasswordAccessToken(token);
-    case user.AUTH_TYPE.GOOGLE:
+    case AUTH_TYPE.GOOGLE:
       winston.debug('Verifing Google access token');
       // Verify google access token
       return user.verifyGoogleAccessToken(token, true);
-    case user.AUTH_TYPE.FACEBOOK:
+    case AUTH_TYPE.FACEBOOK:
       winston.debug('Verifing Facebook access token');
       // Verify facebook access token
       return user.verifyFacebookAccessToken(token, true, false);

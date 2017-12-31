@@ -5,6 +5,7 @@ var winston = require('winston');
 var user = require('../modules/user.module');
 const ROLES = require('../config.roles');
 const ERROR = require('../config.error');
+const AUTH_TYPE = require('../config.authType');
 
 const validateJsonService = require('../services/validateJson.service');
 const httpResponseService = require('../services/httpResponse.service');
@@ -50,7 +51,7 @@ exports.login = function(req, res) {
   winston.debug('loginType: ', loginType);
   // validate request body depending on login type
   switch (Number(loginType)) {
-    case user.AUTH_TYPE.PASSWORD: {
+    case AUTH_TYPE.PASSWORD: {
       winston.debug('loginType: Password');
       // validate data in request body
       let validationResult = validateJsonService.validateAgainstSchema(req.body, jsonSchema.userData);
@@ -75,7 +76,7 @@ exports.login = function(req, res) {
       }
       break;
     }
-    case user.AUTH_TYPE.GOOGLE: {
+    case AUTH_TYPE.GOOGLE: {
       winston.debug('loginType: GOOGLE');
       // validate data in request body
       let validationResult = validateJsonService.validateAgainstSchema(req.body, jsonSchema.googleFacebookLogin);
@@ -85,7 +86,7 @@ exports.login = function(req, res) {
           .then(function(tokenValidationResult) {
               winston.debug('GoogleAccessToken: is valid');
               return user.googleOrFacebookLogin(tokenValidationResult.payload.userId,
-                tokenValidationResult.payload.expiryDate, user.AUTH_TYPE.GOOGLE, req.body.accessToken,
+                tokenValidationResult.payload.expiryDate, AUTH_TYPE.GOOGLE, req.body.accessToken,
                 tokenValidationResult.payload.email);
             })
           .then(function(loginResult) {
@@ -105,7 +106,7 @@ exports.login = function(req, res) {
       }
       break;
     }
-    case user.AUTH_TYPE.FACEBOOK: {
+    case AUTH_TYPE.FACEBOOK: {
       winston.debug('loginType: FACEBOOK');
       // validate data in request body
       let validationResult = validateJsonService.validateAgainstSchema(req.body, jsonSchema.googleFacebookLogin);
@@ -116,7 +117,7 @@ exports.login = function(req, res) {
               winston.debug('FacebookAccessToken: is valid');
               winston.debug('tokenValidationResult', JSON.stringify(tokenValidationResult));
               return user.googleOrFacebookLogin(tokenValidationResult.payload.userId,
-                tokenValidationResult.payload.expiryDate, user.AUTH_TYPE.FACEBOOK, req.body.accessToken,
+                tokenValidationResult.payload.expiryDate, AUTH_TYPE.FACEBOOK, req.body.accessToken,
                 tokenValidationResult.payload.email);
             })
           .then(function(loginResult) {
