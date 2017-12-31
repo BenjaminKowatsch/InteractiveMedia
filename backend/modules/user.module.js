@@ -512,7 +512,7 @@ module.exports.getUserData = function(userId) {
     }).catch(err => {
       winston.debug(err);
       responseData.success = false;
-      responseData.payload.dataPath = 'group';
+      responseData.payload.dataPath = 'user';
       let errorCode;
       if (err.isSelfProvided) {
         responseData.payload.message = err.message;
