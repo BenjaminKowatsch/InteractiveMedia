@@ -12,17 +12,11 @@ const tokenService = require('../services/token.service');
 const database = require('../modules/database.module');
 const ERROR = require('../config.error');
 const ROLES = require('../config.roles');
+const AUTH_TYPE = require('../config.authType');
 
 const MONGO_ERRCODE = {
   'DUPLICATEKEY': 11000
 };
-
-const AUTH_TYPE = {
-  'PASSWORD': 0,
-  'GOOGLE': 1,
-  'FACEBOOK': 2
-};
-exports.AUTH_TYPE = AUTH_TYPE;
 
 // 60 minutes in ms
 const validTimeOfTokenInMs = 3600000;
@@ -315,7 +309,7 @@ exports.verifyFacebookAccessToken = function(token, verifyDatabase, verifyEmail)
  *
  * @param {String} userId String to uniquely identify the user, to find the user at the database
  * @param {Date} expiryDate Date to indicate the expiration of the accessToken, will be stored into the database
- * @param  {user.AUTH_TYPE} authType An enumeration value, which specifies the current type of authentication,
+ * @param  {AUTH_TYPE} authType An enumeration value, which specifies the current type of authentication,
  *                                   to be stored into the responseData, so the client will received it and store it into a cookie
  * @param  {String} accessToken    AccessToken to be stored into the responseData, so the client will received it and store it into a cookie
  * @return {Promise}                then:  {JSONObject} object containing access token and auth type
