@@ -242,6 +242,21 @@ describe('Admin', () => {
               expect(res.body.payload.message).to.be.equal('user is not authorized');
             });
       });
+
+      it('should fail to get group by id with unknown groupId', () => {
+        return chai.request(HOST)
+            .get(URL.BASE_ADMIN + '/groups/' + 'XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX')
+            .set('Authorization', '0 ' + adminToken)
+            .then(res => {
+              expect(res).to.have.status(404);
+              expect(res).to.be.json;
+              expect(res.body).to.be.an('object');
+              expect(res.body.success).to.be.false;
+              expect(res.body.payload).to.be.an('object');
+              expect(res.body.payload.dataPath).to.be.equal('group');
+              expect(res.body.payload.message).to.be.equal('group not found');
+            });
+      });
     });
   });
 
@@ -397,6 +412,21 @@ describe('Admin', () => {
               expect(res.body.payload).to.be.an('object');
               expect(res.body.payload.dataPath).to.be.equal('authorization');
               expect(res.body.payload.message).to.be.equal('user is not authorized');
+            });
+      });
+
+      it('should fail to get user by id with unknown userId', () => {
+        return chai.request(HOST)
+            .get(URL.BASE_ADMIN + '/users/' + 'XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX')
+            .set('Authorization', '0 ' + adminToken)
+            .then(res => {
+              expect(res).to.have.status(404);
+              expect(res).to.be.json;
+              expect(res.body).to.be.an('object');
+              expect(res.body.success).to.be.false;
+              expect(res.body.payload).to.be.an('object');
+              expect(res.body.payload.dataPath).to.be.equal('user');
+              expect(res.body.payload.message).to.be.equal('user not found');
             });
       });
     });
