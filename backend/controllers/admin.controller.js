@@ -93,3 +93,25 @@ module.exports.getAllUsers = function(req, res) {
       httpResponseService.send(res, statusCode, errorResult.responseData);
     });
 };
+
+module.exports.getUserById = function(req, res) {
+  const userId = req.params.userId;
+  user.getUserData(userId).then(userResult =>  {
+    let responseData = {payload: {}};
+    responseData.success = true;
+    responseData.payload = userResult.payload;
+    httpResponseService.send(res, 200, userResult);
+  }).catch(errorResult => {
+    winston.error(errorResult.errorCode);
+    let statusCode = 418;
+    switch (errorResult.errorCode) {
+      case ERROR.UNKNOWN_USER:
+        statusCode = 404;
+        break;
+      case ERROR.DB_ERROR:
+        statusCode = 500;
+        break;
+    }
+    httpResponseService.send(res, statusCode, errorResult.responseData);
+  });
+};
