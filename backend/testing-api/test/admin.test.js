@@ -246,7 +246,7 @@ describe('Admin', () => {
   });
 
   describe('Users', () => {
-    describe.only('get all users', () => {
+    describe('get all users', () => {
       let adminToken;
       let tokens = {};
       let groupId;
@@ -309,6 +309,85 @@ describe('Admin', () => {
       it('should fail to get all users with normal user', () => {
         return chai.request(HOST)
             .get(URL.BASE_ADMIN + '/users')
+            .set('Authorization', '0 ' + tokens[0])
+            .then(res => {
+              expect(res).to.have.status(403);
+              expect(res).to.be.json;
+              expect(res.body).to.be.an('object');
+              expect(res.body.success).to.be.false;
+              expect(res.body.payload).to.be.an('object');
+              expect(res.body.payload.dataPath).to.be.equal('authorization');
+              expect(res.body.payload.message).to.be.equal('user is not authorized');
+            });
+      });
+    });
+
+    describe('get user', () => {
+      let adminToken;
+      let tokens = {};
+      let userIds = {};
+      let groupId;
+      before('add admin', done => {
+        databaseHelper.promiseResetDB().then(() => {
+          return chai.request(HOST).post(URL.BASE_ADMIN + '/add');
+        }).then(res => {
+          adminToken = res.body.payload.accessToken;
+          done();
+        }).catch((err) => {console.error('Error add admin');});
+      });
+
+      before('register users, create group', done => {
+        registerUser(0).then(res => {
+          tokens[0] = res.body.payload.accessToken;
+          return registerUser(1);
+        }).then(res => {
+          tokens[1] = res.body.payload.accessToken;
+          return registerUser(2);
+        }).then(res => {
+          tokens[2] = res.body.payload.accessToken;
+          return chai.request(HOST)
+            .post(URL.BASE_GROUP  + '/')
+            .set('Authorization', '0 ' + tokens[0])
+            .send(groupScenarios[1].createGroup0);
+        }).then(res => {
+          groupId = res.body.payload.groupId;
+          done();
+        }).catch((error) => {console.log('Register User Error: ' + error);});
+      });
+
+      before('get userId of user_0', done => {
+        chai.request(HOST)
+        .get(URL.BASE_USER  + '/user')
+        .set('Authorization', '0 ' + tokens[0])
+        .then(res => {
+          userIds[0] = res.body.payload.userId;
+          done();
+        }).catch(error => {console.error('Unable to get userId of user_0');});
+      });
+
+      it('should get user by id', () => {
+        return chai.request(HOST)
+        .get(URL.BASE_ADMIN + '/users/' + userIds[0])
+        .set('Authorization', '0 ' + adminToken)
+        .then(res => {
+          expect(res).to.have.status(200);
+          expect(res).to.be.json;
+          expect(res.body).to.be.an('object');
+          expect(res.body.success).to.be.true;
+          expect(res.body.payload).to.be.an('object');
+          expect(res.body.payload.username).to.equal(userData.users.valid[0].username);
+          expect(res.body.payload.email).to.equal(userData.users.valid[0].email);
+          expect(res.body.payload._id).to.be.undefined;
+          expect(res.body.payload.groupIds).to.be.an('array');
+          expect(res.body.payload.groupIds[0]).to.equal(groupId);
+          expect(res.body.payload.userId).to.equal(userIds[0]);
+          expect(res.body.payload.role).to.equal('user');
+        });
+      });
+
+      it('should fail to get user by id with normal user', () => {
+        return chai.request(HOST)
+            .get(URL.BASE_ADMIN + '/users/' + userIds[0])
             .set('Authorization', '0 ' + tokens[0])
             .then(res => {
               expect(res).to.have.status(403);

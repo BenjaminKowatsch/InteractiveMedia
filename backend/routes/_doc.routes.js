@@ -22,6 +22,10 @@
  * @apiDefine paramUrlGroupId
     @apiParam (URL-Parameter) {string} groupId Id of the requested group
  */
+/**
+ * @apiDefine paramUrlUserId
+    @apiParam (URL-Parameter) {string} userId Id of the requested user
+ */
 
 /**
  * @apiDefine headerAuthorization
