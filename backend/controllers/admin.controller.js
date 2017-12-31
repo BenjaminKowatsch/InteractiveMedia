@@ -58,7 +58,7 @@ module.exports.getGroupById = function(req, res) {
     responseData.payload = groupResult.payload;
     httpResponseService.send(res, 200, groupResult);
   }).catch(errorResult => {
-    winston.debug(errorResult);
+    winston.error(errorResult.errorCode);
     let statusCode = 418;
     switch (errorResult.errorCode) {
       case ERROR.MISSING_ID_IN_URL:
