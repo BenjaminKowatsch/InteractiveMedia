@@ -35,5 +35,17 @@ module.exports = [
       imageUrl: null,
       users: ['wrong_user_0_email@bar.foo', userData.users.valid[1].email]
     },
+  },
+  {
+    createGroup0: {
+      name: 'test_gruppe_0',
+      imageUrl: null,
+      users: [userData.users.valid[0].email, userData.users.valid[1].email]
+    },
+    createGroup1: {
+      name: 'test_gruppe_1',
+      imageUrl: null,
+      users: [userData.users.valid[0].email]
+    },
   }
 ];

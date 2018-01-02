@@ -20,6 +20,9 @@ services:
     environment:
       - ORIGIN=http://localhost:8088
       - LOGLEVEL=error
+      - ADMIN_USERNAME=admin
+      - ADMIN_PASSWORD=inter@kt!veMedien
+      - ADMIN_EMAIL=admin@example.com
     image: localhost:5000/backend
     depends_on:
       mongo:
@@ -34,6 +37,10 @@ services:
 
   backend-testing:
     build: ./backend/testing-api
+    environment:
+      - ADMIN_USERNAME=admin
+      - ADMIN_PASSWORD=inter@kt!veMedien
+      - ADMIN_EMAIL=admin@example.com
     depends_on:
       backend:
         condition: service_healthy

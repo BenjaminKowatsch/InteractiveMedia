@@ -55,7 +55,6 @@ describe('User-Controller', () => {
     before(function(done) {
       getFacebookTestAccessToken()
         .then((token) => {
-          console.log('Facbook Login got access token: ' + token);
           facebookToken = token;
           done();
         }).catch((error) => {
@@ -210,8 +209,8 @@ describe('User-Controller', () => {
           expect(res.body).to.be.an('object');
           expect(res.body.success).to.be.false;
           expect(res.body.payload).to.be.an('object');
-          expect(res.body.payload.dataPath).to.equal('username');
-          expect(res.body.payload.message).to.equal('Username already exists');
+          expect(res.body.payload.dataPath).to.equal('register');
+          expect(res.body.payload.message).to.equal('username already exists');
         });
       });
 
@@ -510,6 +509,7 @@ describe('User-Controller', () => {
         expect(res.body.payload._id).to.be.undefined;
         expect(res.body.payload.groupIds).to.be.undefined;
         expect(res.body.payload.userId).to.have.lengthOf(36).and.to.be.a('string');
+        expect(res.body.payload.role).to.equal('user');
       });
     });
 
@@ -528,6 +528,7 @@ describe('User-Controller', () => {
         expect(res.body.payload._id).to.be.undefined;
         expect(res.body.payload.groupIds).to.be.undefined;
         expect(res.body.payload.userId).to.have.lengthOf(36).and.to.be.a('string');
+        expect(res.body.payload.role).to.equal('user');
       });
     });
 

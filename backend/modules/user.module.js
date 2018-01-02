@@ -11,17 +11,12 @@ const uuidService = require('../services/uuid.service');
 const tokenService = require('../services/token.service');
 const database = require('../modules/database.module');
 const ERROR = require('../config.error');
+const ROLES = require('../config.roles');
+const AUTH_TYPE = require('../config.authType');
 
 const MONGO_ERRCODE = {
   'DUPLICATEKEY': 11000
 };
-
-const AUTH_TYPE = {
-  'PASSWORD': 0,
-  'GOOGLE': 1,
-  'FACEBOOK': 2
-};
-exports.AUTH_TYPE = AUTH_TYPE;
 
 // 60 minutes in ms
 const validTimeOfTokenInMs = 3600000;
@@ -314,7 +309,7 @@ exports.verifyFacebookAccessToken = function(token, verifyDatabase, verifyEmail)
  *
  * @param {String} userId String to uniquely identify the user, to find the user at the database
  * @param {Date} expiryDate Date to indicate the expiration of the accessToken, will be stored into the database
- * @param  {user.AUTH_TYPE} authType An enumeration value, which specifies the current type of authentication,
+ * @param  {AUTH_TYPE} authType An enumeration value, which specifies the current type of authentication,
  *                                   to be stored into the responseData, so the client will received it and store it into a cookie
  * @param  {String} accessToken    AccessToken to be stored into the responseData, so the client will received it and store it into a cookie
  * @return {Promise}                then:  {JSONObject} object containing access token and auth type
@@ -332,7 +327,8 @@ exports.googleOrFacebookLogin = function(userId, expiryDate, authType, accessTok
       'userId': userId,
       'email': email,
       'authType': authType,
-      'expiryDate': expiryDate
+      'expiryDate': expiryDate,
+      'role': ROLES.USER
     }, {
       upsert: true
     },
@@ -447,42 +443,28 @@ exports.logout = function(userId, authType) {
   });
 };
 
-/**
- * Function to register a new user at the database
- *
- * @param  {String} username       The name of the new user
- * @param  {String} password       The password of the new user
- * @return {Promise}                then: {JSONObject} promiseData Is a modified version of the responseData object
- *                                                 {Boolean} success  Flag to indicate the successful request
- *                                                 {JSONObject} payload
- *                                  catch: {JSONObject} error Is a modified version of the responseData object
- *                                                {Boolean} success  Flag to indicate the unsuccessful request
- *                                                {JSONObject} payload
- */
-exports.register = function(username, password, email) {
+exports.register = function(username, password, email, role) {
   return new Promise((resolve, reject) => {
     const userToRegister = {
       'expiryDate': tokenService.getNewExpiryDate(validTimeOfTokenInMs),
       'password': password,
       'username': username,
       'email': email,
+      'role': role,
       'userId': uuidService.generateUUID(),
       'authType': AUTH_TYPE.PASSWORD
     };
 
     database.collections.users.insertOne(userToRegister, function(err, result) {
-      let responseData = {
-        'success': false,
-        'payload': {}
-      };
+      let responseData = {payload: {}};
       if (err != null && err.code === MONGO_ERRCODE.DUPLICATEKEY) {
         // error: duplicated key
-        responseData.payload.dataPath = 'username';
-        responseData.payload.message = 'Username already exists';
         responseData.success = false;
-        winston.error('Registration failed. Duplicated key');
-        reject(responseData);
-      } else {
+        responseData.payload.dataPath = 'register';
+        responseData.payload.message = 'username already exists';
+        let errorCode = ERROR.DUPLICATED_USER;
+        reject({errorCode: errorCode, responseData: responseData});
+      } else if (err == null && result) {
         // update successful
         const toEncode = {
           'userId': userToRegister.userId,
@@ -492,8 +474,18 @@ exports.register = function(username, password, email) {
           'accessToken': tokenService.generateAccessToken(toEncode),
           'authType': AUTH_TYPE.PASSWORD
         };
-        winston.debug('Registration successful');
+        winston.debug('Registration successful', responseData.payload.accessToken);
         resolve(responseData);
+      } else {
+        // Unknown internal database error
+        winston.debug('err', JSON.stringify(err));
+        let errorCode;
+        responseData.success = false;
+        responseData.payload.dataPath = 'user';
+        responseData.payload.message = 'unknown database error';
+        errorCode = ERROR.DB_ERROR;
+        winston.error('errorCode', errorCode);
+        reject({errorCode: errorCode, responseData: responseData});
       }
     });
   });
@@ -514,7 +506,7 @@ module.exports.getUserData = function(userId) {
     }).catch(err => {
       winston.debug(err);
       responseData.success = false;
-      responseData.payload.dataPath = 'group';
+      responseData.payload.dataPath = 'user';
       let errorCode;
       if (err.isSelfProvided) {
         responseData.payload.message = err.message;
@@ -543,7 +535,7 @@ function checkIfUserIdIsGiven(userId) {
 
 function findUserById(userId) {
   let query = {userId: userId};
-  let options = {fields: {username: true, groupIds: true, email: true, userId: true}};
+  let options = {fields: {username: true, groupIds: true, email: true, userId: true, role: true}};
   return database.collections.users.findOne(query, options);
 }
 
@@ -559,3 +551,69 @@ function checkIfUserResultIsNotNull(userResult) {
     }
   });
 }
+
+module.exports.verifyRole = function(userId, role) {
+  return new Promise((resolve, reject) => {
+    let responseData = {payload: {}};
+    checkIfUserIdIsGiven(userId).then(() => {
+        const query = {userId: userId, role: role};
+        return database.collections.users.findOne(query);
+      })
+    .then(checkIfUserResultIsNotNull)
+    .then(userResult => {
+      responseData.success = true;
+      responseData.payload.userId = userResult.userId;
+      responseData.payload.role = userResult.role;
+      resolve(responseData);
+    }).catch(err => {
+      winston.debug(err);
+      responseData.success = false;
+      responseData.payload.dataPath = 'authorization';
+      let errorCode;
+      if (err.isSelfProvided) {
+        responseData.payload.message = err.message;
+        errorCode = err.errorCode;
+      } else {
+        responseData.payload.message = 'unknown database error';
+        errorCode = ERROR.DB_ERROR;
+      }
+      reject({errorCode: errorCode, responseData: responseData});
+    });
+  });
+};
+
+module.exports.getAllUsers = function() {
+  winston.debug('getAllUsers');
+  return new Promise((resolve, reject) => {
+    let responseData = {payload: {}};
+    const aggregation = {
+      $project: {
+        _id: 0,
+        username: 1,
+        email: 1,
+        userId: 1,
+        role: 1,
+        countGroupIds: {'$size': {'$ifNull': ['$groupIds', []]}}
+      }
+    };
+    database.collections.users.aggregate([aggregation]).toArray()
+    .then(result => {
+      responseData.payload.users = result;
+      responseData.success = true;
+      resolve(responseData);
+    }).catch(err => {
+      winston.debug(err);
+      responseData.success = false;
+      responseData.payload.dataPath = 'user';
+      let errorCode;
+      if (err.isSelfProvided) {
+        responseData.payload.message = err.message;
+        errorCode = err.errorCode;
+      } else {
+        responseData.payload.message = 'unknown database error';
+        errorCode = ERROR.DB_ERROR;
+      }
+      reject({errorCode: errorCode, responseData: responseData});
+    });
+  });
+};
