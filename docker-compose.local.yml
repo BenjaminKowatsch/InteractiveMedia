@@ -30,7 +30,7 @@ services:
       - ORIGIN=http://localhost:8088
       - LOGLEVEL=debug
       - ADMIN_USERNAME=admin
-      - ADMIN_PASSWORD=admin
+      - ADMIN_PASSWORD=inter@kt!veMedien
       - ADMIN_EMAIL=admin@example.com
     image: localhost:5000/backend
     ports:
