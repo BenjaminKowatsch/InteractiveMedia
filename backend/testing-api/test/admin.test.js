@@ -33,10 +33,8 @@ const registerUser = index => chai.request(HOST).post(URL.BASE_USER).send({
 
 describe('Admin', () => {
   describe('Login', () => {
-    before('add admin', done => {
-      databaseHelper.promiseResetDB().then(() => {
-        return chai.request(HOST).post(URL.BASE_ADMIN + '/add');
-      }).then(res => {done();})
+    before('reset db', done => {
+      databaseHelper.promiseResetDB().then(() => {done();})
       .catch((err) => {console.error('Error add admin');});
     });
 
@@ -58,13 +56,15 @@ describe('Admin', () => {
 
   describe('User data', () => {
     let adminToken;
-    before('add admin and login', done => {
-      databaseHelper.promiseResetDB().then(() => {
-        return chai.request(HOST).post(URL.BASE_ADMIN + '/add');
-      }).then(res => {
-        return chai.request(HOST).post(URL.BASE_USER + '/login?type=0')
-          .send({username: adminData.username, password: adminData.password});
-      }).then(res => {
+    before('reset db', done => {
+      databaseHelper.promiseResetDB().then(() => {done();})
+        .catch((err) => {console.error('Error add admin');});
+    });
+
+    before('login admin', done => {
+      chai.request(HOST).post(URL.BASE_USER + '/login?type=0')
+          .send({username: adminData.username, password: adminData.password})
+      .then(res => {
           adminToken = res.body.payload.accessToken;
           done();
         }).catch((err) => {console.error('Error add admin');});
@@ -95,13 +95,18 @@ describe('Admin', () => {
       let adminToken;
       let tokens = {};
       let groupIds = {};
-      before('add admin', done => {
-        databaseHelper.promiseResetDB().then(() => {
-          return chai.request(HOST).post(URL.BASE_ADMIN + '/add');
-        }).then(res => {
-          adminToken = res.body.payload.accessToken;
-          done();
-        }).catch((err) => {console.error('Error add admin');});
+      before('reset db', done => {
+        databaseHelper.promiseResetDB().then(() => {done();})
+          .catch((err) => {console.error('Error add admin');});
+      });
+
+      before('login admin', done => {
+        chai.request(HOST).post(URL.BASE_USER + '/login?type=0')
+            .send({username: adminData.username, password: adminData.password})
+        .then(res => {
+            adminToken = res.body.payload.accessToken;
+            done();
+          }).catch((err) => {console.error('Error add admin');});
       });
 
       before('register users, create groups', done => {
@@ -177,13 +182,18 @@ describe('Admin', () => {
       let adminToken;
       let tokens = {};
       let groupId;
-      before('add admin', done => {
-        databaseHelper.promiseResetDB().then(() => {
-          return chai.request(HOST).post(URL.BASE_ADMIN + '/add');
-        }).then(res => {
-          adminToken = res.body.payload.accessToken;
-          done();
-        }).catch((err) => {console.error('Error add admin');});
+      before('reset db', done => {
+        databaseHelper.promiseResetDB().then(() => {done();})
+          .catch((err) => {console.error('Error add admin');});
+      });
+
+      before('login admin', done => {
+        chai.request(HOST).post(URL.BASE_USER + '/login?type=0')
+            .send({username: adminData.username, password: adminData.password})
+        .then(res => {
+            adminToken = res.body.payload.accessToken;
+            done();
+          }).catch((err) => {console.error('Error add admin');});
       });
 
       before('register users, create group', done => {
@@ -265,13 +275,18 @@ describe('Admin', () => {
       let adminToken;
       let tokens = {};
       let groupId;
-      before('add admin', done => {
-        databaseHelper.promiseResetDB().then(() => {
-          return chai.request(HOST).post(URL.BASE_ADMIN + '/add');
-        }).then(res => {
-          adminToken = res.body.payload.accessToken;
-          done();
-        }).catch((err) => {console.error('Error add admin');});
+      before('reset db', done => {
+        databaseHelper.promiseResetDB().then(() => {done();})
+          .catch((err) => {console.error('Error add admin');});
+      });
+
+      before('login admin', done => {
+        chai.request(HOST).post(URL.BASE_USER + '/login?type=0')
+            .send({username: adminData.username, password: adminData.password})
+        .then(res => {
+            adminToken = res.body.payload.accessToken;
+            done();
+          }).catch((err) => {console.error('Error add admin');});
       });
 
       before('register users, create group', done => {
@@ -342,13 +357,18 @@ describe('Admin', () => {
       let tokens = {};
       let userIds = {};
       let groupId;
-      before('add admin', done => {
-        databaseHelper.promiseResetDB().then(() => {
-          return chai.request(HOST).post(URL.BASE_ADMIN + '/add');
-        }).then(res => {
-          adminToken = res.body.payload.accessToken;
-          done();
-        }).catch((err) => {console.error('Error add admin');});
+      before('reset db', done => {
+        databaseHelper.promiseResetDB().then(() => {done();})
+          .catch((err) => {console.error('Error add admin');});
+      });
+
+      before('login admin', done => {
+        chai.request(HOST).post(URL.BASE_USER + '/login?type=0')
+            .send({username: adminData.username, password: adminData.password})
+        .then(res => {
+            adminToken = res.body.payload.accessToken;
+            done();
+          }).catch((err) => {console.error('Error add admin');});
       });
 
       before('register users, create group', done => {

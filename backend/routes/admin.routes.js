@@ -9,8 +9,6 @@ const adminController = require('../controllers/admin.controller');
 const authenticationService = require('../services/authentication.service');
 const authorizationService = require('../services/authorization.service');
 
-router.post('/add', adminController.addAdmin);
-
 /**
  * @api {GET} /v1/admin/groups/ Get groups
  * @apiName GetGroups
