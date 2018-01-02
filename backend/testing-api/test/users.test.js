@@ -2,9 +2,9 @@
 
 /*jshint expr: true, node:true, mocha:true*/
 
-var chai = require('chai');
-var fs = require('fs');
-var expect = require('chai').expect;
+const chai = require('chai');
+const fs = require('fs');
+const expect = require('chai').expect;
 const databaseHelper = require('./data/databaseHelper');
 
 chai.use(require('chai-http'));
@@ -16,8 +16,8 @@ const URL = {
   BASE_TEST: '/v1/test'
 };
 
-var https = require('https');
-var config = {
+const https = require('https');
+const config = {
   'facebookUrlAppToken': process.env.FACEBOOK_URL_APP_TOKEN,
   'facebookAppId': process.env.FACEBOOK_APP_ID
 };
@@ -29,14 +29,14 @@ function getFacebookTestAccessToken() {
     https.get('https://graph.facebook.com/v2.11/' + config.facebookAppId + '/' +
     'accounts/test-users?access_token=' +
     config.facebookUrlAppToken, function(response) {
-      var responseMessage = '';
+      let responseMessage = '';
 
       response.on('data', function(chunk) {
         responseMessage += chunk;
       });
 
       response.on('end', function() {
-        var data = JSON.parse(responseMessage);
+        const data = JSON.parse(responseMessage);
         if (data.length <= 0) {
           reject(data);
         } else {
@@ -51,7 +51,7 @@ describe('User-Controller', () => {
 
   describe('Auth-Type: Facebook', function() {
     before('Clean DB', databaseHelper.cbResetDB);
-    var facebookToken;
+    let facebookToken;
     before(function(done) {
       getFacebookTestAccessToken()
         .then((token) => {

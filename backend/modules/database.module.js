@@ -1,18 +1,18 @@
 'use strict';
 
-var database = module.exports = {};
+let database = module.exports = {};
 
 const winston = require('winston');
 
 /* MongoDB Client */
-var MongoClient = require('mongodb').MongoClient;
+const MongoClient = require('mongodb').MongoClient;
 
-var mongoConnectConfig = {
+const mongoConnectConfig = {
   bufferMaxEntries: 0,
   autoReconnect: true
 };
 
-var tryConnectOptions = {
+const tryConnectOptions = {
   maxRetries: 100,
   retryInterval: 500, // in milliseconds
   currentRetryCount: 0,

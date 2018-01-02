@@ -4,7 +4,7 @@ const MongoClient = require('mongodb').MongoClient;
 const winston = require('winston');
 const adminData = require('./admin.data');
 
-var database = {};
+let database = {};
 database.collections = {};
 const mongoConnectConfig = {
   bufferMaxEntries: 0,

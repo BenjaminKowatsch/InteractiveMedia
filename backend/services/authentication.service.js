@@ -1,12 +1,12 @@
 'use strict';
 
-var express = require('express');
-var router = express.Router();
+const express = require('express');
+const router = express.Router();
 
-var winston = require('winston');
+const winston = require('winston');
 
-var user = require('../modules/user.module');
-var httpResponseService = require('./httpResponse.service');
+const user = require('../modules/user.module');
+const httpResponseService = require('./httpResponse.service');
 
 const ERROR = require('../config.error');
 const AUTH_TYPE = require('../config.authType');
