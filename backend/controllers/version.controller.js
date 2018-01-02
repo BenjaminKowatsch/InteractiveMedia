@@ -1,6 +1,6 @@
 'use strict';
 
-var appVersionService = require('../services/appVersion.service');
+const appVersionService = require('../services/appVersion.service');
 const httpResponseService = require('../services/httpResponse.service');
 
 exports.getVersion = function(req, res) {

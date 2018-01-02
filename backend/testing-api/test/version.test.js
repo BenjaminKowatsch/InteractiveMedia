@@ -2,13 +2,13 @@
 
 /*jshint expr: true, node:true, mocha:true*/
 
-var chai = require('chai');
-var expect = require('chai').expect;
+const chai = require('chai');
+const expect = require('chai').expect;
 
 chai.use(require('chai-http'));
 
-var host = 'http://backend:8081';
-var baseUrl = '/v1/version';
+const host = 'http://backend:8081';
+const baseUrl = '/v1/version';
 
 describe('Get version', function() {
     this.timeout(5000); // How long to wait for a response (ms)

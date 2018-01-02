@@ -1,8 +1,8 @@
-var    gulp = require('gulp');
-var  jshint = require('gulp-jshint');
-var    jscs = require('gulp-jscs');
-var stylish = require('gulp-jscs-stylish');
-var apidoc = require('gulp-apidoc');
+const    gulp = require('gulp');
+const  jshint = require('gulp-jshint');
+const    jscs = require('gulp-jscs');
+const stylish = require('gulp-jscs-stylish');
+const apidoc = require('gulp-apidoc');
 
 gulp.task('static-code-analysis', function() {
   return gulp.src(['./*.js','./**/*.js',

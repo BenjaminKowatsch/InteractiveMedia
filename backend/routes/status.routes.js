@@ -1,9 +1,9 @@
 'use strict';
 
-var express = require('express');
-var router = express.Router();
+const express = require('express');
+const router = express.Router();
 
-var statusController = require('../controllers/status.controller');
+const statusController = require('../controllers/status.controller');
 
 /**
  * @api {GET} /v1/status/ Get status

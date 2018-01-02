@@ -1,7 +1,7 @@
 'use strict';
 
 // Define configuration options in separate node module
-var settings = {
+const settings = {
   'port': process.env.PORT,
   'mongodbURL': process.env.MONGODB_URL,
   'origin': process.env.ORIGIN,

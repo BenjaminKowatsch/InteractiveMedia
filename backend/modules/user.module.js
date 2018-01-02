@@ -44,14 +44,14 @@ exports.verifyGoogleAccessToken = function(token, verifyDatabase) {
     googleAuthClient.verifyIdToken(token, config.googleOAuthClientID,
     function(error, login) {
       if (error === null) {
-        var payload = login.getPayload();
-        var userId = payload.sub;
-        var email = payload.email;
-        var expiryDate = new Date(payload.exp * 1000);
+        const payload = login.getPayload();
+        const userId = payload.sub;
+        const email = payload.email;
+        const expiryDate = new Date(payload.exp * 1000);
         // if verifyDatabase flag is set also check if expiryDate is valid
         if (verifyDatabase === true) {
           // check database
-          var query = {
+          const query = {
             'userId': userId,
             'email': email,
             'authType': AUTH_TYPE.GOOGLE,
@@ -60,7 +60,7 @@ exports.verifyGoogleAccessToken = function(token, verifyDatabase) {
             }
           };
           winston.debug('query:', query);
-          var options = {fields: {userId: 1, authType: 1, email: 1, expiryDate: 1}};
+          const options = {fields: {userId: 1, authType: 1, email: 1, expiryDate: 1}};
           database.collections.users.findOne(query, options, function(error, result) {
             if (error === null && result !== null) {
               responseData.success = true;
@@ -122,7 +122,7 @@ exports.verifyPasswordAccessToken = function(token) {
   return new Promise((resolve, reject) => {
     let responseData = {payload: {}};
     tokenService.decodeToken(token).then(promiseData => {
-      var query = {
+      const query = {
         userId: promiseData.payload.userId,
         authType: AUTH_TYPE.PASSWORD,
         expiryDate: {
@@ -130,7 +130,7 @@ exports.verifyPasswordAccessToken = function(token) {
         }
       };
       winston.debug('verifyPasswordAccessToken: query', JSON.stringify(query));
-      var options = {fields: {userId: 1, expiryDate: 1}};
+      const options = {fields: {userId: 1, expiryDate: 1}};
       database.collections.users.findOne(query, options, function(error, result) {
         if (error === null && result !== null) {
           responseData.success = true;
@@ -171,7 +171,7 @@ function httpsGetRequest(options) {
   return new Promise((resolve, reject) => {
     winston.debug('get: https://' + options.host + options.path);
     https.get(options, function(response) {
-      var responseMessage = '';
+      let responseMessage = '';
 
       response.on('data', function(chunk) {
         responseMessage += chunk;
@@ -253,7 +253,7 @@ function verifyFacbookTokenAtDatabase(data, verifyDatabase) {
  */
 exports.verifyFacebookAccessToken = function(token, verifyDatabase, verifyEmail) {
   let responseData = {payload: {}};
-  var options = {
+  const options = {
     host: 'graph.facebook.com',
     path: ('/v2.9/debug_token?access_token=' +
             config.facebookUrlAppToken + '&input_token=' + token)
@@ -419,12 +419,12 @@ exports.passwordLogin = function(username, password) {
  */
 exports.logout = function(userId, authType) {
   return new Promise((resolve, reject) => {
-    var update = {
+    const update = {
       '$set': {
         'expiryDate': new Date()
       }
     };
-    var query = {
+    const query = {
       'userId': userId,
       'authType': authType
     };
