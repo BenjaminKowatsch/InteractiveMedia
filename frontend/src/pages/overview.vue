@@ -28,6 +28,25 @@
          <h3>Number of groups: {{groupCount}}</h3>
       </div>
 
+       <br/>
+
+      <h2>Users overview</h2> 
+      <div v-if="userCount > 0">
+        <li v-for="user in users">
+          <p><b>User name:</b> {{user.username}}, <b>User id:</b> {{user.userId}}, <b>User email:</b> {{user.email}}</p>
+          <p><b>User role:</b> {{user.role}}, <b>Group Count:</b> {{user.countGroupIds}}</p>
+        </li>
+      </div>
+      <div v-else>
+        <h2>NO USERS FOUND</h2>
+      </div>
+
+      <div id="usercount">
+         <h3>Number of users: {{userCount}}</h3>
+      </div>
+
+      <br/>
+
       <div v-if="version">
         <p>Debts² admin panel version informations: 
           {{version.name}}  {{version.version}}
@@ -62,24 +81,33 @@ export default {
   data() {
     return {
       version: [],
-      groups: "",
+      groups: [],
+      users: [],
       errors: [],
       authToken: "",
       groupId: "",
-      groupCount: ""
+      userId: "",
+      groupCount: "",
+      userCount: ""
     };
   },
 
   mounted: function() {
-    var groupCountLoaded = false;
-    console.log(groupCountLoaded);
+    // var groupCountLoaded = false;
+    // console.log(groupCountLoaded);
     this.authToken = Cookie.getJSONCookie("accessToken").accessToken;
     console.log("The cookie authToken is: " + this.authToken);
-    this.authorizeAdmin();
+
     this.groups = [];
-    this.getGroups();
+    this.users = [];
     this.groupId = "9a7fb2f3-8b39-4849-ac81-48c1835220d0";
+    this.userId = "facad137-28e7-49a2-a39c-6ecc0c1a7e85";
+
+    this.authorizeAdmin();
+    this.getGroups();
     this.getGroupById(this.groupId);
+    this.getUsers();
+    this.getUserById(this.userId);
     this.getVersionInfos();
   },
 
@@ -128,7 +156,7 @@ export default {
         .then(response => {
           this.groups = response.data.payload;
           this.groupCount = this.countProperties(this.groups);
-          this.groupCountLoaded = true;
+          // this.groupCountLoaded = true;
           console.log("Anzahl Gruppen: " + this.groupCount);
           console.log("Existing Groups: " + JSON.stringify(this.groups));
         })
@@ -138,7 +166,7 @@ export default {
         });
     },
 
-    getGroupById: function getGroupById(id) {
+    getGroupById: function(id) {
       axios
         .get(Config.webServiceURL + "/v1/admin/groups/" + id, {
           headers: { Authorization: "0 " + this.authToken }
@@ -151,6 +179,37 @@ export default {
         .catch(e => {
           this.errors.push(e);
           console.log("Errors in GET admin/groups/:groupID: " + e);
+        });
+    },
+
+    getUsers: function() {
+      axios
+        .get(Config.webServiceURL + "/v1/admin/users", {
+          headers: { Authorization: "0 " + this.authToken }
+        })
+        .then(response => {
+          this.users = response.data.payload;
+          this.userCount = this.countProperties(this.users);
+          console.log("Count Users: " + this.userCount);
+          console.log("Existing Users: " + JSON.stringify(this.users));
+        })
+        .catch(e => {
+          this.errors.push(e);
+          console.log("Errors in GET admin/users: " + e);
+        });
+    },
+
+    getUserById: function(id) {
+      axios
+        .get(Config.webServiceURL + "/v1/admin/users/" + id, {
+          headers: { Authorization: "0 " + this.authToken }
+        })
+        .then(response => {
+          console.log("Desired User: " + JSON.stringify(response.data.payload));
+        })
+        .catch(e => {
+          this.errors.push(e);
+          console.log("Errors in GET admin/users/:userID : " + e);
         });
     },
 
@@ -167,16 +226,17 @@ export default {
           console.log("Errors in Version: " + e);
         });
     },
-
-    checkResponse: function checkResponse(response, onValid, failure) {
+       //Deprecated?
+/*     checkResponse: function(response, onValid, failure) {
       if (response.data.success === true) {
         onValid(response.data.payload);
       } else {
         console.log("An error occured...");
         failure(response.data);
       }
-    },
+    }, */
 
+    //Counts the elements of an object
     countProperties: function(obj) {
       var count = 0;
       for (var property in obj) {
