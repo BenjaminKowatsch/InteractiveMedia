@@ -33,6 +33,21 @@ describe('Authorization', () => {
   describe('No authorization required', () => {
     let userToken;
     let adminToken;
+
+    before('reset db', done => {
+      databaseHelper.promiseResetDB().then(() => {done();})
+        .catch((err) => {console.error('Error add admin');});
+    });
+
+    before('login admin', done => {
+      chai.request(HOST).post(URL.BASE_USER + '/login?type=0')
+          .send({username: adminData.username, password: adminData.password})
+      .then(res => {
+          adminToken = res.body.payload.accessToken;
+          done();
+        }).catch((err) => {console.error('Error add admin');});
+    });
+
     before('register User 0', done => {
       registerUser(0).then(res => {
         userToken = res.body.payload.accessToken;
@@ -40,15 +55,6 @@ describe('Authorization', () => {
       }).catch((error) => {
         console.log('Register User Error: ' + error);
       });
-    });
-
-    before('add admin', done => {
-      databaseHelper.promiseResetDB().then(() => {
-        return chai.request(HOST).post(URL.BASE_ADMIN + '/add');
-      }).then(res => {
-          adminToken = res.body.payload.accessToken;
-          done();
-        }).catch((err) => {console.error('Error add admin');});
     });
 
     it('should be accessible with no authorization', () => {
@@ -94,16 +100,23 @@ describe('Authorization', () => {
   describe('required to be Admin', () => {
     let adminToken;
     let userToken;
-    before('add admin', done => {
-      databaseHelper.promiseResetDB().then(() => {
-        return chai.request(HOST).post(URL.BASE_ADMIN + '/add');
-      }).then(res => {
+
+    before('reset db', done => {
+      databaseHelper.promiseResetDB().then(() => {done();})
+        .catch((err) => {console.error('Error add admin');});
+    });
+
+    before('login admin', done => {
+      chai.request(HOST).post(URL.BASE_USER + '/login?type=0')
+          .send({username: adminData.username, password: adminData.password})
+      .then(res => {
           adminToken = res.body.payload.accessToken;
           done();
         }).catch((err) => {console.error('Error add admin');});
     });
-    before('register User 1', done => {
-      registerUser(1).then(res => {
+
+    before('register User 0', done => {
+      registerUser(0).then(res => {
         userToken = res.body.payload.accessToken;
         done();
       }).catch((error) => {
