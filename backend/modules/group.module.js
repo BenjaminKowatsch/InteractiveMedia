@@ -156,6 +156,42 @@ module.exports.getAllGroups = function() {
   });
 };
 
+module.exports.createNewTransaction = function(groupId, transactionData) {
+  return new Promise((resolve, reject) => {
+    winston.debug('Hello from module createNewGroup');
+    let responseData = {payload: {}};
+    transactionData.publishedAt = new Date();
+
+    checkIfGroupIdIsGiven(groupId)
+    .then(findGroupById)
+    .then(checkForGroupResult)
+    .then(groupResult => checkIfUserIdIsInGroup(groupResult, transactionData.paidBy))
+    .then(groupResult => checkIfDateIsGtGroupCreateDate(groupResult, transactionData.infoCreatedAt))
+    .then(groupResult => addTransactionToGroup(groupId, transactionData))
+    .then(transactionResult => {
+      winston.debug('Creating a new group successful');
+      responseData.payload = transactionData;
+      responseData.success = true;
+      resolve(responseData);
+    }).catch(err => {
+      let errorCode;
+      winston.debug('Creating a new group failed');
+      winston.debug(err);
+      responseData.success = false;
+      if (err.isSelfProvided) {
+        responseData.payload.dataPath = err.dataPath;
+        responseData.payload.message = err.message;
+        errorCode = err.errorCode;
+      } else {
+        responseData.payload.dataPath = 'group';
+        responseData.payload.message = 'unknown database error';
+        errorCode = ERROR.DB_ERROR;
+      }
+      reject({errorCode: errorCode, responseData: responseData});
+    });
+  });
+};
+
 function aggregateGroups(query) {
   return database.collections.groups.aggregate([query]).toArray();
 }
@@ -258,6 +294,30 @@ function checkIfUserIdIsInGroup(groupResult, userId) {
     errorToReturn.dataPath = 'authorization';
     errorToReturn.message = 'user is not but has to be a member of the group';
     errorToReturn.errorCode = ERROR.USER_NOT_IN_GROUP;
+    return Promise.reject(errorToReturn);
+  } else {
+    return groupResult;
+  }
+}
+
+function addTransactionToGroup(groupId, transaction) {
+  const update = {
+    '$push': {
+      'transactions': transaction
+    }
+  };
+  return database.collections.groups.updateOne({groupId: groupId}, update);
+}
+
+function checkIfDateIsGtGroupCreateDate(groupResult, transactionDate) {
+  console.log('groupResult.createdAt: ' + groupResult.createdAt + ', type: ' + (typeof groupResult.createdAt));
+  console.log('transactionDate: ' + transactionDate + ', type: ' + (typeof transactionDate));
+
+  if (groupResult.createdAt > transactionDate) {
+    let errorToReturn = {isSelfProvided: true};
+    errorToReturn.dataPath = 'transaction';
+    errorToReturn.message = 'invalide time adjustment: group.createdAt is gt transaction.infoCreatedAt';
+    errorToReturn.errorCode = ERROR.INVALID_CREATE_TRANSACTION_VALUES;
     return Promise.reject(errorToReturn);
   } else {
     return groupResult;

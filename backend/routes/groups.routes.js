@@ -111,15 +111,18 @@ router.get('/:groupId', authenticationService.isAuthenticated,
  * @apiSuccess (Success) {string} payload[publishedAt] Date when transaction was created in backend
  *
  * @apiUse error400InvalidBody
+ * @apiUse error400UserNotInGroup
+ * error400MissingUnknownUrlParameter
  * @apiUse error401Unauthorized
  * @apiUse error403Forbidden
+ * @apiUse error409UnknownUser
  * @apiUse error418UncaughtError
  * @apiUse error500DatabaseError
  * @apiUse errorBodyCommonStructure
  *
  * @apiUse errorExampleCommon
  */
-// router.post('/:groupId/transactions', authenticationService.isAuthenticated,
-//     authorizationService.isGroupMember, groupsController.addTransaction);
+router.post('/:groupId/transactions', authenticationService.isAuthenticated,
+    authorizationService.isGroupMember, groupsController.createNewTransaction);
 
 module.exports = router;

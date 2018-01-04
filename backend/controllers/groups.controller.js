@@ -11,7 +11,7 @@ const httpResponseService = require('../services/httpResponse.service');
 
 const jsonSchema = {
   groupPayloadData: require('../JSONSchema/groupPayloadData.json'),
-  postData: require('../JSONSchema/postData.json')
+  transactionPayloadData: require('../JSONSchema/transactionPayloadData.json')
 };
 
 exports.createNewGroup = function(req, res) {
@@ -60,6 +60,34 @@ exports.getGroupById = function(req, res) {
         statusCode = 404;
         break;
       case ERROR.UNKNOWN_USER:
+      case ERROR.DB_ERROR:
+        statusCode = 500;
+        break;
+    }
+    httpResponseService.send(res, statusCode, errorResult.responseData);
+  });
+};
+
+exports.createNewTransaction = function(req, res) {
+  winston.debug('Creating a new transaction');
+  // validate data in request body
+  validateJsonService.againstSchema(req.body, jsonSchema.transactionPayloadData).then(() => {
+    return group.createNewTransaction(req.params.groupId, req.body);
+  }).then(transactionResult =>  {
+    httpResponseService.send(res, 201, transactionResult);
+  }).catch(errorResult => {
+    winston.debug(errorResult);
+    let statusCode = 418;
+    switch (errorResult.errorCode) {
+      case ERROR.MISSING_ID_IN_URL:
+      case ERROR.UNKNOWN_GROUP:
+      case ERROR.INVALID_REQUEST_BODY:
+      case ERROR.INVALID_CREATE_TRANSACTION_VALUES:
+        statusCode = 400;
+        break;
+      case ERROR.UNKNOWN_USER:
+        statusCode = 409;
+        break;
       case ERROR.DB_ERROR:
         statusCode = 500;
         break;

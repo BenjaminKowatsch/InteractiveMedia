@@ -209,7 +209,7 @@
 
 /**
  * @apiDefine error409UnknownUser
-    @apiError (ErrorCode) {409} UnknownUser Unknown user: {{wrong_mail@mail.com}}
+    @apiError (ErrorCode) {409} UnknownUser Unknown user or userId: {{unknwon_mail@mail.com || unknwonUserId}}
  */
 /**
  * @apiDefine error400DuplicatedUsers
@@ -364,6 +364,19 @@
         "paidBy": "6367e722-e857-4d0f-bf78-278a92260418",
         "split": "even"
     }
+    @apiParamExample {type} Create Transaction with null
+    {
+        "amount": 1234.13,
+        "infoName": "A very expensive Beer",
+        "infoLocation": {
+            "latitude": null,
+            "longitude": null
+        },
+        "infoCreatedAt": "2017-04-23T18:25:43.511Z",
+        "infoImageUrl": null,
+        "paidBy": "6367e722-e857-4d0f-bf78-278a92260418",
+        "split": "even"
+    }
 */
 /**
  * @apiDefine successExampleTransaction
@@ -386,3 +399,6 @@
     }
  */
 
+/* @apiDefine error400UserNotInGroup
+@apiError (ErrorCode) {400} UserNotInGroup A given userId is not part of the given group
+*/
