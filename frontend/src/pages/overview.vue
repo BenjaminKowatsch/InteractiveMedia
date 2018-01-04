@@ -8,181 +8,185 @@
 <template>
 <!-- START Framework 7 Template Elements for establishing the view -->
   <f7-page toolbar-fixed>
-  <!-- navigation -->
     <f7-navbar>
       <f7-nav-center sliding>Dashboard</f7-nav-center>
-      <!-- label which asks for the actual feeling -->
     </f7-navbar>
-
-    <f7-popup>
-      Bitte etwas eintragen
-      <!-- popup which apears if one doesn't enter anything -->
-    </f7-popup>
-
-<!--     <v-touch class="outerMoodslider" v-on:panstart="start($event)" v-on:panmove="move($event)" v-on:panend="end($event)" v-bind:pan-options="{ direction: 'vertical' }">
-      <moodslider></moodslider>
-    </v-touch> -->
-    <!-- area for import of the moodslider component -->
     <f7-list form>
-      <f7-button id="launeButton" v-on:click="navigate()">.Just a dummy button.</f7-button>
-      <!-- Emotion button -->
+
+      <li v-for="group in groups">
+       <p>{{group.name}}</p>
+<!--         <p>{{group.users}}</p>      
+ -->        </li>
+      <div id="groupcount">
+<!--         <h2>{{groupCount}}</h2>
+ -->      </div>
+
+
+  <div v-if="groups.length = 0">
+    <h1>NO GROUPS FOUND</h1>
+  </div>
+
+  <div v-if="version">
+    <p>Aktuelle Versionshinweise: 
+     {{version.name}}  {{version.version}}
+    </p>
+  </div>
+       </f7-list form>  
+    <f7-list>
+      <f7-list-button title="CreateDummyGroup" v-on:click="createDummyGroup()"></f7-list-button>
+<!--       <f7-list-button title="logout" v-on:click="createDummyGroup()"></f7-list-button>
+ -->
     </f7-list>
   </f7-page>
     <!-- END of Template Elements -->
 </template>
 
 <script>
- /*
-  * START JScript Elements for establishing the view according to the template elements
-  * imports Moodslider (to be found in component folder), Axios
-  */
-/*   import Moodslider from '@/components/moodslider'
- */  import Axios from 'axios'
+import Config from "../js/Config.js";
+import axios from "axios";
+import Cookie from "../js/Cookie.js";
 
+export default {
+  name: "overview",
 
-  export default {
-    name: 'overview',
-    components: {
-/*       Moodslider
- */      //adds the moodslider as component
-    },
+  data() {
+    return {
+      version: [],
+      groups: "",
+      errors: [],
+      authToken: "",
+      groupCount: ""
+    };
+  },
 
-    data() {
-      return {
-/*         moodbarHeight: 0,
-        topOffset: 0,
-        progressbar: {},
-        laune: 0, */
-        // sets the variables and defines them
-      }
-    },
-    mounted: function() {
-      // loads the moodslider as moodbar and gets template elements by their classes
- /*      var moodbar = document.getElementsByClassName('outerMoodslider')[0];
-      this.moodbarHeight = moodbar.clientHeight;
-      this.topOffset = moodbar.getBoundingClientRect().top;
-      this.progressbar = document.getElementsByClassName('inner')[0]; */
-    },
-    methods: {
+  // Fetches posts when the component is created.
+  mounted: function() {
+    //groupCount = ""
+    this.authToken = Cookie.getJSONCookie("accessToken").accessToken;
+    console.log("The cookie authToken is: " + this.authToken);
 
-      /**
-       * Handles Touch Event when starting touch
-       * All these events set the height of the progressbar
-       * according to the touch position
-       */
-
-      start: function(event) {
-
- /*        this.progressbar.setAttribute("style", "height:" +
-          this.getProgressBarHeightInPercent(event.center.y) + "%;"); */
-        // raises the height when starting to slide the moodbar via percentage
-      },
-
-      /**
-       * Triggered when moving finger
-       *
-       * @param  event  event   The event
-       */
-      move: function(event) {
-/*         this.progressbar.setAttribute("style", "height:" +
-          this.getProgressBarHeightInPercent(event.center.y) + "%;"); */
-        // raises the height while sliding the moodbar via percentage
-      },
-
-      /**
-       * Triggered when touch gesture ended
-       *
-       * @param      {<type>}  event   The event
-       */
-      end: function(event) {
-       /*  this.progressbar.setAttribute("style", "height:" +
-        this.getProgressBarHeightInPercent(event.center.y) + "%;");
-        this.laune = this.getProgressBarHeightInPercent(event.center.y); */
-        /* 
-        *  raises the height until stopping to slide the moodbar 
-        *  via percentage and gets the actual level as variable
-        */
-      },
-
-      /**
-       * Gets the progress bar height in percent.
-       * This way the moodbar height can be calculated
-       *
-       * @param      {number}  yCoordinate  The y coordinate used to calculate the
-       * percentage
-       * @return     {number}  The progress bar height in percent.
-       */
-    /*   getProgressBarHeightInPercent: function(yCoordinate) {
-        var absoluteCoordinate = yCoordinate - this.topOffset;
-        var percentage = 100 * (1 - (absoluteCoordinate / this.moodbarHeight));
-        // computes the percentage via moodbar height
-        this.setButtonLabel(percentage);
-        // sets the percentage of the height as label of the button
-        return percentage;
-      },
+   /*  axios
+        .get(Config.webServiceURL + "/v1/users/user", {
+          headers: { Authorization: `0 ${this.authToken}` }
+        })
+        .then(response => {
+          var userData = response.data;
+          console.log("Response from Userrequest: " + this.userData);
+        })
+        .catch(e => {
+          this.errors.push(e);
+          console.log("Errors userrequest: " + e);
+        })
  */
-      /**
-       * Sets the button label for each mood according to height.
-       *
-       * @param      {number}  percentage  The percentage
-       */
+    //Gets groupnames. To access all groups, admin access required. For testing specific groupid is used
+    //Seltsames: object enthält bei response.data zwei Objecte, da success: true als eingenes object gehandelt wird (bzw nur true)
+    //Mögliches unsauberes mocking für gesamtanzahl anzeige: Resultat/2 ...
+   /*  axios
+      .get(
+        Config.webServiceURL +
+          "/v1/groups/a43f1597-b23d-4c8e-96d3-e707d8e00d51",
+        {
+          headers: { Authorization: `0 ${this.authToken}` }
+        },
+        { responseType: "stream" }
+      )
+      .then(response => {
+        // JSON responses are automatically parsed.
+        this.groups = response.data;
 
-    /*   setButtonLabel: function(percentage) { */
-        // sets the label of the mood button
-      /*   var moods = ['Miserabel', 'Schlecht', 'Heiter bis wolkig', 'Gut', 'Überragend'];
-        var button = document.getElementById('launeButton'); */
-        /* 
-        *  sets an array of possible moods and sets the template element 
-        *  emotion button as button variable
-        */
+        console.log("Groups: " + response.statusText);
+        console.log("Headers: " + response.headers);
+        console.log("Config: " + response.config);
+        console.log("Data: " + response.data);
+        console.log("Typ: " + typeof response.data);
+        console.log("Objectlength: " + Object.keys(this.groups).length);
+        console.log("Groups in array: " + this.groups);
+        console.log("Groups in Array JSON: " + JSON.stringify(this.groups));
+        console.log(
+          "Array with JSONStringy: " + JSON.stringify(this.groups.length)
+        );
+        console.log("Groupsarray size: " + this.groups.size);
+        console.log("Groupsarray length: " + this.groups.length); */
+        /* var filteredGroups = groups.filter(function(el) {
+          return el.success != true;
+        }); */
+/*         console.log(
+          "Groupsarray after filtering: " + JSON.stringify(this.filteredGroups)
+        );
+        console.log(
+          "Groupsarray count after filtering: " +
+            Object.keys(this.filteredGroups).length
+        ); */
+  /*     })
+      .catch(e => {
+        this.errors.push(e);
+        console.log("Errors in Groups: " + e);
+      }); */
 
-  /*       if (percentage >= 0 && percentage <= 20) {
-          button.innerHTML = moods[0];
-        } else if (percentage >= 20 && percentage <= 40) {
-          button.innerHTML = moods[1];
-        } else if (percentage >= 40 && percentage <= 60) {
-          button.innerHTML = moods[2];
-        } else if (percentage >= 60 && percentage <= 80) {
-          button.innerHTML = moods[3];
-        } else if (percentage >= 80 && percentage <= 100) {
-          button.innerHTML = moods[4];
-        } */
-        /*
-        *  selects a mood out of the array according to the percentage 
-        *  of the chosen emotion level
-        */
-     /*  }, */
+    //groupCount = this.countProperties(this.groups);
 
-      /**
-       * Checks if a mood has been selected
-       * then navigates the user to the emotions view.
-       *
-       * @return the correct view String.
-       */
-      /* navigate: function() {
+    axios
+      .get(Config.webServiceURL + "/v1/version")
+      .then(response => {
+        // JSON responses are automatically parsed.
+        this.version = response.data;
+        console.log("Version: " + response.statusText);
+      })
+      .catch(e => {
+        this.errors.push(e);
+        console.log("Errors in Version: " + e);
+      });
+  },
 
-        var framework7 = new Framework7();
-        var button = document.getElementById('launeButton');
-        // gets the emotion button by its id out of the template area and sets it to variable button
-        if (button != null) {
-          var buttonText = button.innerHTML;
-          if (buttonText !== '...') {
+  methods: {
+    /*     Create a dummy group for testpurpose. After creating, page has to be reloaded to see group*/
+    createDummyGroup: function() {
+      axios
+        .post(
+          Config.webServiceURL + "/v1/groups",
+          {
+            name: "Testgroup1",
+            imageUrl: null,
+            users: ["asdfg@web.de", "alexa@web.de"]
+          },
+          {
+            headers: { Authorization: `0 ${this.authToken}` }
+          }
+        )
+        .then(function(response) {
+          console.log(response);
+        })
+        .catch(function(error) {
+          console.log(error);
+        });
+    },
 
-            console.log(this.laune); */
-            // logs the mood to the console
+    countProperties: function(obj) {
+      var count = 0;
 
-           /*  this.$f7.mainView.router.loadPage('/emotion?mood=' +
-              this.laune); */
-            // loads next view and hands over the mood variable --> Example impl. for further implementations!
-
-          /* } else {
-            framework7.alert('Bitte trage etwas ein...'); */
-            // sends an alert to the user when nothing is chosen on the slider
-        /*   }
-        } */
-/* 
-      } */
-
+      for (var property in obj) {
+        if (Object.prototype.hasOwnProperty.call(obj, property)) {
+          count++;
+        }
+      }
+      return count;
     }
+    /* saveToken: function(response){
+      console.log("Entered TokenFunction")
+      
+      this.authToken = response.data.payload.accessToken
+      console.log("AuthToken: " + this.authToken)
+      this.getAccessToken()
+      console.log("THis was the getAccessToken call from Login.vue")
+
+    },
+
+      accessToken: function(){
+        console.log("Entered getterMethod")
+        this.tokenStr = this.login.getAccessToken()
+        console.log("Saved accessToken from login: " + tokenStr)
+
+      }, */
   }
+};
 </script>
