@@ -1,8 +1,10 @@
-/* jshint expr: true */
+'use strict';
 
-var chai = require('chai');
-var fs = require('fs');
-var expect = require('chai').expect;
+/*jshint expr: true, node:true, mocha:true*/
+
+const chai = require('chai');
+const fs = require('fs');
+const expect = require('chai').expect;
 const databaseHelper = require('./data/databaseHelper');
 
 chai.use(require('chai-http'));
@@ -14,8 +16,8 @@ const URL = {
   BASE_TEST: '/v1/test'
 };
 
-var https = require('https');
-var config = {
+const https = require('https');
+const config = {
   'facebookUrlAppToken': process.env.FACEBOOK_URL_APP_TOKEN,
   'facebookAppId': process.env.FACEBOOK_APP_ID
 };
@@ -27,14 +29,14 @@ function getFacebookTestAccessToken() {
     https.get('https://graph.facebook.com/v2.11/' + config.facebookAppId + '/' +
     'accounts/test-users?access_token=' +
     config.facebookUrlAppToken, function(response) {
-      var responseMessage = '';
+      let responseMessage = '';
 
       response.on('data', function(chunk) {
         responseMessage += chunk;
       });
 
       response.on('end', function() {
-        var data = JSON.parse(responseMessage);
+        const data = JSON.parse(responseMessage);
         if (data.length <= 0) {
           reject(data);
         } else {
@@ -49,11 +51,10 @@ describe('User-Controller', () => {
 
   describe('Auth-Type: Facebook', function() {
     before('Clean DB', databaseHelper.cbResetDB);
-    var facebookToken;
+    let facebookToken;
     before(function(done) {
       getFacebookTestAccessToken()
         .then((token) => {
-          console.log('Facbook Login got access token: ' + token);
           facebookToken = token;
           done();
         }).catch((error) => {
@@ -208,8 +209,8 @@ describe('User-Controller', () => {
           expect(res.body).to.be.an('object');
           expect(res.body.success).to.be.false;
           expect(res.body.payload).to.be.an('object');
-          expect(res.body.payload.dataPath).to.equal('username');
-          expect(res.body.payload.message).to.equal('Username already exists');
+          expect(res.body.payload.dataPath).to.equal('register');
+          expect(res.body.payload.message).to.equal('username already exists');
         });
       });
 
@@ -275,7 +276,7 @@ describe('User-Controller', () => {
           expect(res.body.success).to.be.true;
           expect(res.body.payload).to.be.an('object');
           expect(res.body.payload.authType).to.equal(0);
-          expect(res.body.payload.accessToken).to.have.lengthOf(84);
+          expect(res.body.payload.accessToken).to.have.lengthOf(200);
         });
       });
 
@@ -478,8 +479,8 @@ describe('User-Controller', () => {
   });
 
   describe('Get User', function() {
+    let tokens = {};
     before('Clean DB and register User 0 and 1', done => {
-      tokens = {};
       databaseHelper.promiseResetDB().then(()=> {
         return chai.request(HOST).post(URL.BASE_USER  + '/').send(testData.users.valid[0]);
       }).then(res => {
@@ -508,6 +509,7 @@ describe('User-Controller', () => {
         expect(res.body.payload._id).to.be.undefined;
         expect(res.body.payload.groupIds).to.be.undefined;
         expect(res.body.payload.userId).to.have.lengthOf(36).and.to.be.a('string');
+        expect(res.body.payload.role).to.equal('user');
       });
     });
 
@@ -526,6 +528,7 @@ describe('User-Controller', () => {
         expect(res.body.payload._id).to.be.undefined;
         expect(res.body.payload.groupIds).to.be.undefined;
         expect(res.body.payload.userId).to.have.lengthOf(36).and.to.be.a('string');
+        expect(res.body.payload.role).to.equal('user');
       });
     });
 

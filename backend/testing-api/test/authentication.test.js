@@ -1,4 +1,6 @@
-/* jshint expr: true */
+'use strict';
+
+/*jshint expr: true, node:true, mocha:true*/
 
 const chai = require('chai');
 const expect = require('chai').expect;
@@ -18,7 +20,7 @@ const userData = require('./data/user.data');
 
 // ************* Helper ***********//
 
-var registerUser = index => chai.request(HOST).post(URL.REGISTER_USER).send({
+const registerUser = index => chai.request(HOST).post(URL.REGISTER_USER).send({
   username: userData.users.valid[index].username,
   email: userData.users.valid[index].email,
   password: userData.users.valid[index].password

@@ -1,3 +1,5 @@
+'use strict';
+
 const winston = require('winston');
 const config = require('../modules/config');
 const Minio = require('minio');

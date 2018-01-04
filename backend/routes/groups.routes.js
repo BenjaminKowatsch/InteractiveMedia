@@ -1,3 +1,5 @@
+'use strict';
+
 // jscs:disable jsDoc
 
 const express = require('express');
@@ -50,12 +52,21 @@ router.post('/', authenticationService.isAuthenticated,
  * @apiGroup group
  * @apiVersion 0.1.0
  *
- * @apiParam (URL-Parameter) {string} groupId Id of the requested group
+ * @apiUse paramUrlGroupId
  *
  * @apiUse headerAuthorization
  * @apiUse headerExampleAuthorization
  *
- * @apiSuccess (SuccessCode) {200} ReturnsGroup
+ * @apiUse successBodyGroupName
+ * @apiUse successBodyGroupImageUrl
+ * @apiUse successBodyGroupId
+ * @apiUse successBodyGroupCreatedAt
+ * @apiUse successBodyGroupTransactions
+ * @apiUse successBodyGroupUsers
+ * @apiUse successBodyGroupUsersUserId
+ * @apiUse successBodyGroupUsersName
+ *
+ * @apiSuccess (SuccessCode) {200} Success Group
  * @apiUse successExampleGroup
  *
  * @apiUse error400MissingUnknownUrlParameter

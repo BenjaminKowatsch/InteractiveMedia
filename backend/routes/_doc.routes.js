@@ -1,3 +1,5 @@
+'use strict';
+
 // jscs:disable jsDoc
 
 /**
@@ -15,6 +17,14 @@
 /**
  * @apiDefine paramAuthtype
     @apiParam (Parameter) {int} authType Login type with authType=(0: Password, 1:Google, 2: Facebook)
+ */
+/**
+ * @apiDefine paramUrlGroupId
+    @apiParam (URL-Parameter) {string} groupId Id of the requested group
+ */
+/**
+ * @apiDefine paramUrlUserId
+    @apiParam (URL-Parameter) {string} userId Id of the requested user
  */
 
 /**
@@ -54,7 +64,7 @@
  */
 /**
  * @apiDefine error400MissingUnknownUrlParameter
-    @apiError (ErrorCode) {400} MissingType Missing or unknown parameter in url
+    @apiError (ErrorCode) {400} MissingUrlParameter Missing or unknown parameter in url
  */
 /**
  * @apiDefine error400BadRequest
@@ -223,25 +233,121 @@
             "username": "my_user_name",
             "email": "my_user_mail@example.com",
             "userId": "6367e722-e857-4d0f-bf78-278a92260418",
+            "role": "user",
             "groupIds": ["f2bed6b9-6a5a-4363-a9fa-e1f10579c0c1","2368218d-b5ec-4d4d-bc3c-6c249776ee11"]
         }
     }
  */
 /**
- * @apiDefine successBodyUsername
-    @apiSuccess (Success) {string} payload[username] Username of requesting user
+ * @apiDefine successExampleAdminGetAllGroups
+    @apiSuccessExample {type} Success-Response
+    {
+        "success": true,
+        "payload": [{
+            "name" : "test_group_1",
+            "imageUrl" : null,
+            "groupId" : "6367e722-e857-4d0f-bf78-278a92260418",
+            "createdAt" : "2017-12-25T10:56:13.234Z",
+            "countUsers" : 3,
+            "countTransactions" : 35
+        },{
+            "name" : "test_group_2",
+            "imageUrl" : null,
+            "groupId" : "d8gk54a9-f4g8-d2g6-h783-f2ajg83jf5ui",
+            "createdAt" : "2017-12-30T18:55:02.678Z",
+            "countUsers" : 5,
+            "countTransactions" : 11
+        }]
+    }
  */
 /**
- * @apiDefine successBodyEmail
-    @apiSuccess (Success) {string} payload[email] Email of requesting user
+ * @apiDefine successExampleAdminGetAllUsers
+    @apiSuccessExample {type} Success-Response
+    {
+        "success": true,
+        "payload": [{
+            "username" : "Harry Potter",
+            "email" : "harry.potter@hogwarts.edu",
+            "userId" : "d9gh1hs7-e8lk-495f-br48-2f4ds92260418",
+            "role" : "2017-12-25T10:56:13.234Z",
+            "countGroupIds" : 3,
+        },{
+            "name" : "Ron Weasly",
+            "imageUrl" : "ron.weasly@hogwarts.edu",
+            "groupId" : "4js8fg66-f4g8-ay98-ql04-f212343jf5ui",
+            "createdAt" : "2017-12-20T13:22:02.515Z",
+            "countGroupIds" : 5,
+        }]
+    }
  */
 /**
- * @apiDefine successBodyUserId
-    @apiSuccess (Success) {string} payload[userId] Id of requesting user
+ * @apiDefine successBodyUserUsername
+    @apiSuccess (Success) {string} payload[username] Name of user
  */
 /**
- * @apiDefine successBodyGroupIds
-    @apiSuccess (Success) {Array[string]} payload[groupIds] Ids of requesting user's groups
+ * @apiDefine successBodyUserEmail
+    @apiSuccess (Success) {string} payload[email] Email of user
+ */
+/**
+ * @apiDefine successBodyUserUserId
+    @apiSuccess (Success) {string} payload[userId] Id of user
+ */
+/**
+ * @apiDefine successBodyUserRole
+    @apiSuccess (Success) {string} payload[role] Role of user. Supported roles: user, admin
+ */
+/**
+ * @apiDefine successBodyUserGroupIds
+    @apiSuccess (Success) {Array[string]} payload[groupIds] Ids of groups the user belongs to
+ */
+/**
+ * @apiDefine successBodyUserCountGroupIds
+    @apiSuccess (Success) {int} payload[countGroupIds] Number of groups the user belongs to
+ */
+/**
+ * @apiDefine successBodyGroupName
+    @apiSuccess (Success) {string} payload[name] Name of group
+ */
+/**
+ * @apiDefine successBodyGroupImageUrl
+    @apiSuccess (Success) {string} payload[imageUrl] ImageUrl of group
+ */
+/**
+ * @apiDefine successBodyGroupId
+    @apiSuccess (Success) {string} payload[groupId] Id of group
+ */
+/**
+ * @apiDefine successBodyGroupCreatedAt
+    @apiSuccess (Success) {string} payload[createdAt] Date when group was created
+ */
+/**
+ * @apiDefine successBodyGroupCountTransactions
+    @apiSuccess (Success) {int} payload[countTransactions] Number of transaction in group
+ */
+/**
+ * @apiDefine successBodyGroupCountUsers
+    @apiSuccess (Success) {int} payload[countUsers] Number of users in group
+ */
+/**
+ * @apiDefine successBodyGroupTransactions
+    @apiSuccess (Success) {Array[transaction]} payload[transactions] List of transactions in group
+ */
+/**
+ * @apiDefine successBodyGroupUsers
+    @apiSuccess (Success) {Array[user]} payload[users] List of users in group
+ */
+/**
+ * @apiDefine successBodyGroupUsersUserId
+    @apiSuccess (Success) {string} users[userId] Id of user
+ */
+/**
+ * @apiDefine successBodyGroupUsersName
+    @apiSuccess (Success) {string} users[username] Name of user
+ */
+
+/**
+ * @apiDefine admin Administrator
+ *  role:'admin'
  */
 /**
  * @apiDefine paramExampleCreateTransaction

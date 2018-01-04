@@ -1,5 +1,7 @@
-var winston = require('winston');
-var config = require('../modules/config');
+'use strict';
+
+const winston = require('winston');
+const config = require('../modules/config');
 const httpResponseService = require('../services/httpResponse.service');
 const uuidService = require('../services/uuid.service');
 const objectStore = require('../modules/objectstore.module');

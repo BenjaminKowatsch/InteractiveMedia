@@ -1,4 +1,6 @@
-/* jshint expr: true */
+'use strict';
+
+/*jshint expr: true, node:true, mocha:true*/
 
 const chai = require('chai');
 const expect = require('chai').expect;
@@ -24,9 +26,9 @@ let getUserData = token => chai.request(HOST).get(URL.BASE_USER  + '/user').set(
 
 describe('Groups-Controller', () => {
   describe('Create new Group', () => {
+    let tokens = {};
+    let groupId = {};
     before('register User 0 and 1', done => {
-      tokens = {};
-      groupId = {};
       databaseHelper.promiseResetDB().then(()=> {
         return registerUser(0);
       }).then(res => {

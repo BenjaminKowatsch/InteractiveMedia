@@ -1,30 +1,40 @@
+'use strict';
+
 const express = require('express');
 
 const database = require('../modules/database.module');
 const group = require('../modules/group.module');
+const user = require('../modules/user.module');
 const winston = require('winston');
 const httpResponseService = require('./httpResponse.service');
 const ERROR = require('../config.error');
+const ROLES = require('../config.roles');
 
-//TODO: Refactor
 exports.isAuthorizedAdmin = function(req, res, next) {
   winston.debug('Authorizing request as admin');
-  let admin = 'admin';
-  if (isAuthenticated(req, res)) {
-    let userId = res.locals.userId;
-    verifyRole(userId, admin).
-        then(promise => next()).
-        catch((error) => {
-          winston.error('Non-admin user attempted to access /groups: ' +
-              userId);
-          const resBody = {'success': false, 'payload': error.message};
-          httpResponseService.send(res, 403, resBody);
-        });
-  } else {
-    let error = 'Authorization failed due to missing authentication';
-    let resBody = {'success': false, 'payload': error};
-    httpResponseService.send(res, 500, resBody);
-  }
+
+  isAuthenticated(res.locals).then(authResult => {
+    return user.verifyRole(authResult.payload.userId, ROLES.ADMIN);
+  }).then((verifyRoleResult) => {
+    winston.debug('User authorized as admin');
+    next();
+  }).catch(errorResult => {
+    let statusCode = 418;
+    switch (errorResult.errorCode) {
+      case ERROR.NOT_AUTHENTICATED:
+        statusCode = 401;
+        break;
+      case ERROR.UNKNOWN_USER:
+        statusCode = 403;
+        errorResult.responseData.payload.dataPath = 'authorization';
+        errorResult.responseData.payload.message = 'user is not authorized';
+        break;
+      case ERROR.DB_ERROR:
+        statusCode = 500;
+        break;
+    }
+    httpResponseService.send(res, statusCode, errorResult.responseData);
+  });
 };
 
 exports.isGroupMember = function(req, res, next) {
@@ -63,25 +73,19 @@ exports.isGroupMember = function(req, res, next) {
   });
 };
 
-//TODO: Refactor/Delete
-function isAuthenticated(req, res) {
-  if (res.locals.userId === undefined) {
-    let errorString = 'Request on baseUrl ' + req.baseUrl + ' with path ' +
-        req.path + ' cannot be authorized without prior authentication';
-    winston.error(errorString);
-    return false;
+function isAuthenticated(resLocals) {
+  let responseData = {payload: {}};
+  if (resLocals && 'userId' in resLocals && 'authType' in resLocals && 'authToken' in resLocals) {
+    responseData.success = true;
+    responseData.payload.userId = resLocals.userId;
+    responseData.payload.authType = resLocals.authType;
+    responseData.payload.authToken = resLocals.authToken;
+    return Promise.resolve(responseData);
   } else {
-    return true;
+    responseData.success = false;
+    responseData.payload.dataPath = 'authentication';
+    responseData.payload.message = 'user is not authenticated';
+    let errorCode = ERROR.NOT_AUTHENTICATED;
+    return Promise.reject({errorCode: errorCode, responseData: responseData});
   }
 }
-
-//TODO: Refactor/Delete
-function verifyRole(userId, roleId) {
-  if (roleId === 'admin') {
-    return Promise.reject(
-        {authorizedAdmin: false, message: 'Admin access required'});
-  } else {
-    return Promise.resolve({authorizedAdmin: true});
-  }
-}
-
