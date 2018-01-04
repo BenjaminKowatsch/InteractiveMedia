@@ -35,7 +35,9 @@ module.exports = [
       imageUrl: null,
       users: ['wrong_user_0_email@bar.foo', userData.users.valid[1].email]
     },
-  },{
+  },
+  // Secenario 2:
+  {
     createGroup0: {
       name: 'test_gruppe_0',
       imageUrl: null,
@@ -57,10 +59,10 @@ module.exports = [
     },
     users: [userData.users.valid[0], userData.users.valid[1], userData.users.valid[2]],
     nonGroupUser: userData.users.valid[3],
-    setTokenForUser: function(id, token) { module.exports[1].users[id].token = token;},
-    setIdForUser: function(id, userId) { module.exports[1].users[id].userId = userId;},
-    setTokenForNonGroupUser: function(token) { module.exports[1].nonGroupUser.token = token;},
-    setIdForNonGroupUser: function(userId) { module.exports[1].nonGroupUser.userId = userId;},
+    setTokenForUser: function(id, token) { module.exports[2].users[id].token = token;},
+    setIdForUser: function(id, userId) { module.exports[2].users[id].userId = userId;},
+    setTokenForNonGroupUser: function(token) { module.exports[2].nonGroupUser.token = token;},
+    setIdForNonGroupUser: function(userId) { module.exports[2].nonGroupUser.userId = userId;},
     transactions: [
       {
         amount: 9,
@@ -133,8 +135,8 @@ module.exports = [
       },
     ],
     setUserIdsInTransactions: function() {
-      let users =  module.exports[1].users;
-      let transactions = module.exports[1].transactions;
+      let users =  module.exports[2].users;
+      let transactions = module.exports[2].transactions;
       transactions[0].paidBy = users[0].userId;
       transactions[1].paidBy = users[1].userId;
       transactions[2].paidBy = users[2].userId;

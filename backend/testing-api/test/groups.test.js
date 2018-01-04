@@ -308,10 +308,10 @@ describe('Groups-Controller', () => {
   });
 });
 
-describe.skip('Create and get transactions', function() {
+describe.only('Create and get transactions', function() {
   let groupId;
-  let users = groupScenarios[1].users;
-  let transactions = groupScenarios[1].transactions;
+  let users = groupScenarios[2].users;
+  let transactions = groupScenarios[2].transactions;
 
   before('register user 0, 1, 2, create group, prepare testData', function(done) {
     this.timeout(10000);
@@ -337,10 +337,10 @@ describe.skip('Create and get transactions', function() {
       return chai.request(HOST)
         .post(URL.BASE_GROUP  + '/')
         .set('Authorization', '0 ' + users[0].token)
-        .send(groupScenarios[1].create);
+        .send(groupScenarios[2].create);
     }).then(res => {
       groupId = res.body.payload.groupId;
-      groupScenarios[1].setUserIdsInTransactions();
+      groupScenarios[2].setUserIdsInTransactions();
       done();
     }).catch((error) => {
       console.log('Register User or Group Error: ' + error);
