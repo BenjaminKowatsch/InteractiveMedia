@@ -1,8 +1,8 @@
 'use strict';
 
-var winston = require('winston');
+const winston = require('winston');
 
-var user = require('../modules/user.module');
+const user = require('../modules/user.module');
 const ROLES = require('../config.roles');
 const ERROR = require('../config.error');
 const AUTH_TYPE = require('../config.authType');
@@ -10,7 +10,7 @@ const AUTH_TYPE = require('../config.authType');
 const validateJsonService = require('../services/validateJson.service');
 const httpResponseService = require('../services/httpResponse.service');
 
-var jsonSchema = {
+const jsonSchema = {
   userData: require('../JSONSchema/userData.json'),
   googleFacebookLogin: require('../JSONSchema/googleFacebookLogin.json')
 };
@@ -19,7 +19,7 @@ exports.registerNewUser = function(req, res) {
   winston.debug('req.body', req.body);
 
   // validate data in request body
-  var validationResult = validateJsonService.validateAgainstSchema(req.body, jsonSchema.userData);
+  const validationResult = validateJsonService.validateAgainstSchema(req.body, jsonSchema.userData);
 
   if (validationResult.valid === true) {
     // request body is valid
@@ -28,17 +28,17 @@ exports.registerNewUser = function(req, res) {
     user.register(req.body.username, req.body.password, req.body.email, ROLES.USER)
       .then(function(registerResult) {
         // mongo update was successful
-        var resBody = {'success': true, 'payload': registerResult.payload};
+        const resBody = {'success': true, 'payload': registerResult.payload};
         httpResponseService.send(res, 201, resBody);
       })
       .catch(function(errorResult) {
         // mongo update failed
-        var resBody = {'success': false, 'payload': errorResult.responseData.payload};
+        const resBody = {'success': false, 'payload': errorResult.responseData.payload};
         httpResponseService.send(res, 400, resBody);
       });
   } else {
     // request body is invalid
-    var resBody = {'success': false, 'payload': validationResult.error};
+    const resBody = {'success': false, 'payload': validationResult.error};
     httpResponseService.send(res, 400, resBody);
   }
 };
@@ -159,11 +159,11 @@ exports.logout = function(req, res) {
 
   user.logout(res.locals.userId, res.locals.authType)
     .then(function() {
-      var resBody = {'success': true, 'payload': {}};
+      const resBody = {'success': true, 'payload': {}};
       httpResponseService.send(res, 200, resBody);
     })
     .catch(function() {
-      var resBody = {'success': true, 'payload': {}};
+      const resBody = {'success': true, 'payload': {}};
       httpResponseService.send(res, 400, resBody);
     });
 };
