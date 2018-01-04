@@ -8,30 +8,6 @@ const httpResponseService = require('../services/httpResponse.service');
 const ERROR = require('../config.error');
 const ROLES = require('../config.roles');
 
-module.exports.addAdmin = function(req, res) {
-    let responseData = {payload: {}};
-    user.register(config.adminUsername, config.adminPassword, config.adminEmail, ROLES.ADMIN).then(registerResult => {
-        winston.info('register admin successful');
-        responseData.success = true;
-        responseData.payload.accessToken = registerResult.payload.accessToken;
-        responseData.payload.authType = registerResult.payload.authType;
-        httpResponseService.send(res, 201, responseData);
-      }).catch(errorResult => {
-        winston.error(JSON.stringify(errorResult));
-        let statusCode = 418;
-        switch (errorResult.errorCode) {
-          case ERROR.DUPLICATED_USER:
-            // admin already exists
-            statusCode = 422;
-            break;
-          case ERROR.DB_ERROR:
-            statusCode = 500;
-            break;
-        }
-        httpResponseService.send(res, statusCode, errorResult.responseData);
-      });
-  };
-
 module.exports.getAllGroups = function(req, res) {
   group.getAllGroups().then(groupResult => {
       let responseData = {payload: {}};
@@ -58,7 +34,7 @@ module.exports.getGroupById = function(req, res) {
     responseData.payload = groupResult.payload;
     httpResponseService.send(res, 200, groupResult);
   }).catch(errorResult => {
-    winston.debug(errorResult);
+    winston.error(errorResult.errorCode);
     let statusCode = 418;
     switch (errorResult.errorCode) {
       case ERROR.MISSING_ID_IN_URL:
@@ -92,4 +68,26 @@ module.exports.getAllUsers = function(req, res) {
       }
       httpResponseService.send(res, statusCode, errorResult.responseData);
     });
+};
+
+module.exports.getUserById = function(req, res) {
+  const userId = req.params.userId;
+  user.getUserData(userId).then(userResult =>  {
+    let responseData = {payload: {}};
+    responseData.success = true;
+    responseData.payload = userResult.payload;
+    httpResponseService.send(res, 200, userResult);
+  }).catch(errorResult => {
+    winston.error(errorResult.errorCode);
+    let statusCode = 418;
+    switch (errorResult.errorCode) {
+      case ERROR.UNKNOWN_USER:
+        statusCode = 404;
+        break;
+      case ERROR.DB_ERROR:
+        statusCode = 500;
+        break;
+    }
+    httpResponseService.send(res, statusCode, errorResult.responseData);
+  });
 };

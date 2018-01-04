@@ -2,11 +2,11 @@
 
 // jscs:disable jsDoc
 
-var express = require('express');
-var router = express.Router();
+const express = require('express');
+const router = express.Router();
 
-var testController = require('../controllers/test.controller');
-var authenticationService = require('../services/authentication.service');
+const testController = require('../controllers/test.controller');
+const authenticationService = require('../services/authentication.service');
 const authorizationService = require('../services/authorization.service');
 
 /**

@@ -12,17 +12,11 @@ const tokenService = require('../services/token.service');
 const database = require('../modules/database.module');
 const ERROR = require('../config.error');
 const ROLES = require('../config.roles');
+const AUTH_TYPE = require('../config.authType');
 
 const MONGO_ERRCODE = {
   'DUPLICATEKEY': 11000
 };
-
-const AUTH_TYPE = {
-  'PASSWORD': 0,
-  'GOOGLE': 1,
-  'FACEBOOK': 2
-};
-exports.AUTH_TYPE = AUTH_TYPE;
 
 // 60 minutes in ms
 const validTimeOfTokenInMs = 3600000;
@@ -50,14 +44,14 @@ exports.verifyGoogleAccessToken = function(token, verifyDatabase) {
     googleAuthClient.verifyIdToken(token, config.googleOAuthClientID,
     function(error, login) {
       if (error === null) {
-        var payload = login.getPayload();
-        var userId = payload.sub;
-        var email = payload.email;
-        var expiryDate = new Date(payload.exp * 1000);
+        const payload = login.getPayload();
+        const userId = payload.sub;
+        const email = payload.email;
+        const expiryDate = new Date(payload.exp * 1000);
         // if verifyDatabase flag is set also check if expiryDate is valid
         if (verifyDatabase === true) {
           // check database
-          var query = {
+          const query = {
             'userId': userId,
             'email': email,
             'authType': AUTH_TYPE.GOOGLE,
@@ -66,7 +60,7 @@ exports.verifyGoogleAccessToken = function(token, verifyDatabase) {
             }
           };
           winston.debug('query:', query);
-          var options = {fields: {userId: 1, authType: 1, email: 1, expiryDate: 1}};
+          const options = {fields: {userId: 1, authType: 1, email: 1, expiryDate: 1}};
           database.collections.users.findOne(query, options, function(error, result) {
             if (error === null && result !== null) {
               responseData.success = true;
@@ -128,7 +122,7 @@ exports.verifyPasswordAccessToken = function(token) {
   return new Promise((resolve, reject) => {
     let responseData = {payload: {}};
     tokenService.decodeToken(token).then(promiseData => {
-      var query = {
+      const query = {
         userId: promiseData.payload.userId,
         authType: AUTH_TYPE.PASSWORD,
         expiryDate: {
@@ -136,7 +130,7 @@ exports.verifyPasswordAccessToken = function(token) {
         }
       };
       winston.debug('verifyPasswordAccessToken: query', JSON.stringify(query));
-      var options = {fields: {userId: 1, expiryDate: 1}};
+      const options = {fields: {userId: 1, expiryDate: 1}};
       database.collections.users.findOne(query, options, function(error, result) {
         if (error === null && result !== null) {
           responseData.success = true;
@@ -177,7 +171,7 @@ function httpsGetRequest(options) {
   return new Promise((resolve, reject) => {
     winston.debug('get: https://' + options.host + options.path);
     https.get(options, function(response) {
-      var responseMessage = '';
+      let responseMessage = '';
 
       response.on('data', function(chunk) {
         responseMessage += chunk;
@@ -259,7 +253,7 @@ function verifyFacbookTokenAtDatabase(data, verifyDatabase) {
  */
 exports.verifyFacebookAccessToken = function(token, verifyDatabase, verifyEmail) {
   let responseData = {payload: {}};
-  var options = {
+  const options = {
     host: 'graph.facebook.com',
     path: ('/v2.9/debug_token?access_token=' +
             config.facebookUrlAppToken + '&input_token=' + token)
@@ -315,7 +309,7 @@ exports.verifyFacebookAccessToken = function(token, verifyDatabase, verifyEmail)
  *
  * @param {String} userId String to uniquely identify the user, to find the user at the database
  * @param {Date} expiryDate Date to indicate the expiration of the accessToken, will be stored into the database
- * @param  {user.AUTH_TYPE} authType An enumeration value, which specifies the current type of authentication,
+ * @param  {AUTH_TYPE} authType An enumeration value, which specifies the current type of authentication,
  *                                   to be stored into the responseData, so the client will received it and store it into a cookie
  * @param  {String} accessToken    AccessToken to be stored into the responseData, so the client will received it and store it into a cookie
  * @return {Promise}                then:  {JSONObject} object containing access token and auth type
@@ -425,12 +419,12 @@ exports.passwordLogin = function(username, password) {
  */
 exports.logout = function(userId, authType) {
   return new Promise((resolve, reject) => {
-    var update = {
+    const update = {
       '$set': {
         'expiryDate': new Date()
       }
     };
-    var query = {
+    const query = {
       'userId': userId,
       'authType': authType
     };
@@ -512,7 +506,7 @@ module.exports.getUserData = function(userId) {
     }).catch(err => {
       winston.debug(err);
       responseData.success = false;
-      responseData.payload.dataPath = 'group';
+      responseData.payload.dataPath = 'user';
       let errorCode;
       if (err.isSelfProvided) {
         responseData.payload.message = err.message;

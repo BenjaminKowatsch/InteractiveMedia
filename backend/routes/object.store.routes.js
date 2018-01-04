@@ -2,11 +2,11 @@
 
 // jscs:disable jsDoc
 
-var express = require('express');
-var multer = require('multer');
-var router = express.Router();
+const express = require('express');
+const multer = require('multer');
+const router = express.Router();
 
-var authenticationService = require('../services/authentication.service');
+const authenticationService = require('../services/authentication.service');
 const objectStoreController = require('../controllers/object.store.controller');
 
 /**
