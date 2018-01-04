@@ -2,6 +2,11 @@
 
 const userData = require('./user.data.json');
 
+const MINUTE = 60000;
+const HOURE = 60 * MINUTE;
+const DAY = 24 * HOURE;
+const nowPlus = time => new Date(new Date().getTime() + time).toISOString();
+
 module.exports = [
   // Secenario 0:
   // User 0 + 1
@@ -68,10 +73,10 @@ module.exports = [
         amount: 9,
         infoName: 'Test transaction 0',
         infoLocation: {
-          latitude: 48.947,
-          longitude: 9.131
+          longitude: 9.131,
+          latitude: 48.947
         },
-        infoCreatedAt: '2017-11-01T18:00:00.000Z', // 01.11.2017, 18:00 Uhr
+        infoCreatedAt: nowPlus(1 * MINUTE),
         infoImageUrl: '10896cb8-d2a4-4bb6-b4d7-c3063553fee9.image.jpg',
         //paidBy: User 0,
         split: 'even'
@@ -79,8 +84,11 @@ module.exports = [
       {
         amount: 6.6,
         infoName: 'Test transaction 1',
-        infoLocation: null,
-        infoCreatedAt: '2017-11-01T19:00:00.000Z', // 01.11.2017, 19:00 Uhr
+        infoLocation: {
+          longitude: null,
+          latitude: null
+        },
+        infoCreatedAt: nowPlus(3 * HOURE),
         infoImageUrl: null,
         //paidBy: User 1,
         split: 'even'
@@ -88,8 +96,11 @@ module.exports = [
       {
         amount: 3.3,
         infoName: 'Test transaction 2',
-        infoLocation: null,
-        infoCreatedAt: '2017-11-02T16:00:00.000Z', // 02.11.2017, 16:00 Uhr
+        infoLocation: {
+          longitude: null,
+          latitude: null
+        },
+        infoCreatedAt: nowPlus(12 * HOURE),
         infoImageUrl: null,
         //paidBy: User 2,
         split: 'even'
@@ -98,10 +109,10 @@ module.exports = [
         amount: 12.9,
         infoName: 'Test transaction 3',
         infoLocation: {
-          latitude: 48.258534,
-          longitude: 9.660790
+          longitude: 9.660790,
+          latitude: 48.258534
         },
-        infoCreatedAt: '2017-11-02T23:30:00.000Z', // 02.11.2017, 23:30 Uhr
+        infoCreatedAt: nowPlus(1 * DAY + 2 * HOURE),
         infoImageUrl: null,
         //paidBy: User 0,
         split: 'even'
@@ -109,8 +120,11 @@ module.exports = [
       { //liegt zwischen  1 und 2
         amount: 9,
         infoName: 'Test transaction 4',
-        infoLocation: null,
-        infoCreatedAt: '2017-11-02T11:00:00.000Z', // 02.11.2017, 11:00 Uhr
+        infoLocation: {
+          longitude: null,
+          latitude: null
+        },
+        infoCreatedAt: nowPlus(5 * HOURE),
         infoImageUrl: null,
         //paidBy: User 1,
         split: 'even'
@@ -118,8 +132,11 @@ module.exports = [
       { //nicht durch 3 teilbar
         amount: 10,
         infoName: 'Test transaction 5',
-        infoLocation: null,
-        infoCreatedAt: '2017-11-03T00:30:00.000Z', // 03.11.2017, 00:30 Uhr
+        infoLocation: {
+          longitude: null,
+          latitude: null
+        },
+        infoCreatedAt: nowPlus(2 * DAY + 2 * HOURE),
         infoImageUrl: null,
         //paidBy:  User 2,
         split: 'even'
@@ -127,16 +144,79 @@ module.exports = [
       { // wie transaktion 4 aber anderer paidBy
         amount: 9,
         infoName: 'Test transaction 6',
-        infoLocation: null,
-        infoCreatedAt: '2017-11-02T11:00:00.000Z', // 02.11.2017, 11:00 Uhr
+        infoLocation: {
+          longitude: null,
+          latitude: null
+        },
+        infoCreatedAt: nowPlus(2 * DAY + 5 * HOURE),
         infoImageUrl: null,
         //paidBy: User 0,
         split: 'even'
       },
     ],
-    setUserIdsInTransactions: function() {
-      let users =  module.exports[2].users;
+    transactionWrongUserId: {
+      amount: 9,
+      infoName: 'transactionWrongUserId',
+      infoLocation: {
+        longitude: null,
+        latitude: null
+      },
+      infoCreatedAt: nowPlus(1 * DAY),
+      infoImageUrl: '10896cb8-d2a4-4bb6-b4d7-c3063553fee9.image.jpg',
+      paidBy: '6367e722-e857-4d0f-bf78-278a92260418',
+      split: 'even'
+    },
+    transactionWrongLocation1: {
+      amount: 6.6,
+      infoName: 'Test transaction 1',
+      infoLocation: {
+        longitude: 50,
+        latitude: null
+      },
+      infoCreatedAt: nowPlus(1 * DAY),
+      infoImageUrl: null,
+      //paidBy: User 1,
+      split: 'even'
+    },
+    transactionWrongLocation2: {
+      amount: 6.6,
+      infoName: 'Test transaction 1',
+      infoLocation: {
+        longitude: 190,
+        latitude: 50
+      },
+      infoCreatedAt: nowPlus(1 * DAY),
+      infoImageUrl: null,
+      //paidBy: User 1,
+      split: 'even'
+    },
+    transactionWrongLocation3: {
+      amount: 6.6,
+      infoName: 'Test transaction 1',
+      infoLocation: {
+        longitude: 50,
+        latitude: 100
+      },
+      infoCreatedAt: nowPlus(1 * DAY),
+      infoImageUrl: null,
+      //paidBy: User 1,
+      split: 'even'
+    },
+    transactionWrongInfoCreatedAt: {
+      amount: 6.6,
+      infoName: 'Test transaction 1',
+      infoLocation: {
+        longitude: null,
+        latitude: null
+      },
+      infoCreatedAt: nowPlus(-1 * HOURE),
+      infoImageUrl: null,
+      //paidBy: User 1,
+      split: 'even'
+    },
+    setUserIdsInTransactions: function(users) {
       let transactions = module.exports[2].transactions;
+      let self = module.exports[2];
       transactions[0].paidBy = users[0].userId;
       transactions[1].paidBy = users[1].userId;
       transactions[2].paidBy = users[2].userId;
@@ -144,15 +224,12 @@ module.exports = [
       transactions[4].paidBy = users[1].userId;
       transactions[5].paidBy = users[2].userId;
       transactions[6].paidBy = users[0].userId;
-    },
-    transactionWrongUserId: {
-      amount: 9,
-      infoName: 'transactionWrongUserId',
-      infoLocation: null,
-      infoCreatedAt: '2017-04-23T18:25:43.511Z',
-      infoImageUrl: '10896cb8-d2a4-4bb6-b4d7-c3063553fee9.image.jpg',
-      paidBy: '6367e722-e857-4d0f-bf78-278a92260418',
-      split: 'even'
+      self.transactionWrongUserId.paidBy = users[0].userId;
+      self.transactionWrongLocation1.paidBy = users[0].userId;
+      self.transactionWrongLocation2.paidBy = users[0].userId;
+      self.transactionWrongLocation3.paidBy = users[0].userId;
+      self.transactionWrongInfoCreatedAt.paidBy = users[0].userId;
+
     }
   },
 ];
