@@ -12,7 +12,8 @@ const httpResponseService = require('../services/httpResponse.service');
 
 const jsonSchema = {
   userData: require('../JSONSchema/userData.json'),
-  googleFacebookLogin: require('../JSONSchema/googleFacebookLogin.json')
+  googleFacebookLogin: require('../JSONSchema/googleFacebookLogin.json'),
+  updateFcmTokenPayload: require('../JSONSchema/userUpdateFcmTokenPayloadData.json')
 };
 
 exports.registerNewUser = function(req, res) {
@@ -177,6 +178,35 @@ exports.getUserData = function(req, res) {
     let statusCode = 418;
     switch (errorResult.errorCode) {
       case ERROR.UNKNOWN_USER:
+      case ERROR.DB_ERROR:
+        statusCode = 500;
+        break;
+    }
+    httpResponseService.send(res, statusCode, errorResult.responseData);
+  });
+};
+
+exports.updateFcmToken = function(req, res) {
+  winston.debug('Hello from updateFcmToken');
+  validateJsonService.againstSchema(req.body, jsonSchema.updateFcmTokenPayload)
+  .then(() => {
+    const fcmToken = req.body.fcmToken;
+    return user.updateFcmToken(res.locals.userId, fcmToken);
+  })
+  .then(updateResult => {
+    httpResponseService.send(res, 200, updateResult);
+  }).catch(errorResult => {
+    winston.debug(errorResult);
+    let statusCode = 418;
+    switch (errorResult.errorCode) {
+      case ERROR.INVALID_REQUEST_BODY:
+        statusCode = 400;
+        break;
+      case ERROR.UNKNOWN_USER:
+        statusCode = 500;
+        errorResult.responseData.dataPath = 'user';
+        errorResult.responseData.message = 'internal server error';
+        break;
       case ERROR.DB_ERROR:
         statusCode = 500;
         break;
