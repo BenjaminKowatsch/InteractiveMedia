@@ -22,6 +22,8 @@ const user = require('./modules/user.module');
 const database = require('./modules/database.module');
 const objectstore = require('./modules/objectstore.module');
 
+const pushNotificationService = require('./services/pushNotification.service');
+
 const ERROR = require('./config.error');
 const ROLES = require('./config.roles');
 
@@ -121,7 +123,13 @@ function startServer() {
  * ===================
  */
 database.tryConnect(config.mongodbURL, function() {
-  objectstore.makeBucket(config.minioBucketName).then(promiseData => {
+  Promise.resolve().then(() => {
+    return pushNotificationService.initFcm();
+  })
+  .then(() => {
+    return objectstore.makeBucket(config.minioBucketName);
+  })
+  .then(promiseData => {
     return user.register(config.adminUsername, config.adminPassword, config.adminEmail, ROLES.ADMIN);
   }).then(registerResult => {
     winston.info('register admin successful');

@@ -18,5 +18,6 @@ const settings = {
   'adminUsername': process.env.ADMIN_USERNAME || 'admin',
   'adminPassword': process.env.ADMIN_PASSWORD || 'inter@kt!veMedien',
   'adminEmail': process.env.ADMIN_EMAIL || 'admin@example.com',
+  'fcmServerKey': process.env.FCM_SERVER_KEY
 };
 module.exports = settings;

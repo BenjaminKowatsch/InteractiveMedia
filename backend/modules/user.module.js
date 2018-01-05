@@ -666,3 +666,31 @@ module.exports.updateFcmToken = function(userId, fcmToken) {
     });
   });
 };
+
+module.exports.getFcmTokensByUserIds = function(userIds) {
+  return new Promise((resolve, reject) => {
+    let responseData = {payload: {}};
+    const query = {userId: {'$in': userIds}};
+    const options = {fcmToken: 1, _id: 0};
+    database.collections.users.find(query, options).toArray().then(result => {
+      const fcmTokens = result.map(user => {return user.fcmToken;});
+      responseData.success = true;
+      responseData.payload = fcmTokens;
+      resolve(responseData);
+    })
+    .catch(err => {
+      winston.debug(err);
+      responseData.success = false;
+      responseData.payload.dataPath = 'user';
+      let errorCode;
+      if (err.isSelfProvided) {
+        responseData.payload.message = err.message;
+        errorCode = err.errorCode;
+      } else {
+        responseData.payload.message = 'unknown database error';
+        errorCode = ERROR.DB_ERROR;
+      }
+      reject({errorCode: errorCode, responseData: responseData});
+    });
+  });
+};
