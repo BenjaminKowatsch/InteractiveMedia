@@ -401,6 +401,21 @@
     }
  */
 
-/* @apiDefine error400UserNotInGroup
-@apiError (ErrorCode) {400} UserNotInGroup A given userId is not part of the given group
+/**
+ * @apiDefine error400UserNotInGroup
+    @apiError (ErrorCode) {400} UserNotInGroup A given userId is not part of the given group
+*/
+
+/**
+ * @apiDefine paramTransactionObject
+    @apiParam (Parameter) {Number} amount Amout of the transaction
+    @apiParam (Parameter) {string} infoName Name or reason for the transaction
+    @apiParam (Parameter) {Number} infoLocation[latitude] Geoinformation: Latitude, can be null
+    @apiParam (Parameter) {Number} infoLocation[longitude] Geoinformation: Longitude, can be null
+    @apiParam (Parameter) {string} infoCreatedAt Daten when the transaction was created in the app
+    @apiParam (Parameter) {string} infoImageUrl URL of the transaction-image, can be null
+    @apiParam (Parameter) {string} paidBy Id of user who payed the expense
+    @apiParam (Parameter) {string} split Methode to split
+ */
+
 */
