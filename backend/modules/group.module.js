@@ -203,7 +203,11 @@ function checkForInvalidCreateGroupValues(findUsersResult, requestedUserEmails, 
   // return all groupUserIds if object is not null
   let groupUserIds = findUsersResult.map(val => val ? val.userId : null);
   let groupUserEmails = findUsersResult.map(val => val ? val.email : null);
-  let groupUserObjects = findUsersResult.map(val => val ? {userId: val.userId, username: val.username} : null);
+  let groupUserObjects = findUsersResult.map(val => val ? {
+    userId: val.userId,
+    username: val.username,
+    email: val.email
+  } : null);
   // checken if an id is null => unknonw user
   if (groupUserIds.includes(null)) {
     //filter returns true, if email of groupData.users is not in groupUserEmails

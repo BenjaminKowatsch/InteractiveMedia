@@ -63,6 +63,8 @@ describe('Groups-Controller: Groups:', () => {
           expect(res.body.payload.users).to.have.lengthOf(groupScenarios[0].create.users.length);
           expect(res.body.payload.users.map(val => val.username))
           .to.have.members([userData.users.valid[0].username, userData.users.valid[1].username]);
+          expect(res.body.payload.users.map(val => val.email))
+          .to.have.members([userData.users.valid[0].email, userData.users.valid[1].email]);
           expect(res.body.payload.transactions).to.be.empty;
           expect(res.body.payload.groupId).to.be.an('string').and.not.to.be.empty;
           expect(res.body.payload.createdAt).to.be.an('string').and.not.to.be.empty;
