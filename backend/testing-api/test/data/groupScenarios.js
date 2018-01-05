@@ -93,9 +93,21 @@ module.exports = [
         //paidBy: User 1,
         split: 'even'
       },
+      { //offline
+        amount: 9,
+        infoName: 'Test transaction 2',
+        infoLocation: {
+          longitude: null,
+          latitude: null
+        },
+        infoCreatedAt: nowPlus(5 * HOURE),
+        infoImageUrl: null,
+        //paidBy: User 1,
+        split: 'even'
+      },
       {
         amount: 3.3,
-        infoName: 'Test transaction 2',
+        infoName: 'Test transaction 3',
         infoLocation: {
           longitude: null,
           latitude: null
@@ -105,9 +117,9 @@ module.exports = [
         //paidBy: User 2,
         split: 'even'
       },
-      {
+      { //ofline
         amount: 12.9,
-        infoName: 'Test transaction 3',
+        infoName: 'Test transaction 4',
         infoLocation: {
           longitude: 9.660790,
           latitude: 48.258534
@@ -115,18 +127,6 @@ module.exports = [
         infoCreatedAt: nowPlus(1 * DAY + 2 * HOURE),
         infoImageUrl: null,
         //paidBy: User 0,
-        split: 'even'
-      },
-      { //liegt zwischen  1 und 2
-        amount: 9,
-        infoName: 'Test transaction 4',
-        infoLocation: {
-          longitude: null,
-          latitude: null
-        },
-        infoCreatedAt: nowPlus(5 * HOURE),
-        infoImageUrl: null,
-        //paidBy: User 1,
         split: 'even'
       },
       { //nicht durch 3 teilbar
