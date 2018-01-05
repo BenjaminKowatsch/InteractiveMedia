@@ -90,10 +90,13 @@
  */
 
 /**
+ * @apiDefine error500InternalServerError
+    @apiError (ErrorCode) {500} InternalServerError Internal server error
+ */
+/**
  * @apiDefine error500MinioInternalError
     @apiError (ErrorCode) {500} MinioInternalError Minio internal error
  */
-
 /**
  * @apiDefine error500DatabaseError
     @apiError (ErrorCode) {500} DatabaseError Database internal error
@@ -198,6 +201,13 @@
         users: ['user_1@example.de', 'user_2@example.de', 'user_3@example.de']
     }
  */
+/**
+ * @apiDefine paramExampleUserUpdateFcmToken
+    @apiParamExample {JSON} Request Body
+    {
+        fcmToken: 'asdfn489ha9hv89earaji838fae89f849h9arh9a48hf9r'
+    }
+ */
 
 /**
  * @apiDefine error409UnknownUser
@@ -216,6 +226,13 @@
     @apiError (ErrorCode) {500} UnknownUser Requestd group or user references a non-existing userId
  */
 
+/**
+ * @apiDefine successExampleSuccess
+    @apiSuccessExample {type} Success-Response
+    {
+        "success": true
+    }
+ */
 /**
  * @apiDefine successExampleUser
     @apiSuccessExample {type} Success-Response

@@ -117,4 +117,33 @@ router.post('/logout', authenticationService.isAuthenticated, usersController.lo
  */
 router.get('/user', authenticationService.isAuthenticated, usersController.getUserData);
 
+/**
+ * @api {PUT} /v1/users/user/fcmtoken Update FCM token
+ * @apiName putFcmToken
+ * @apiGroup user
+ * @apiVersion 0.1.0
+ * @apiDescription Update token for Firebase Cloud Messaging. FCM token is used for push notifications on Android.
+ *  User is identified by auth token.
+ *
+ * @apiUse headerAuthorization
+ * @apiUse headerExampleAuthorization
+ *
+ * @apiUse paramExampleUserUpdateFcmToken
+ *
+ * @apiUse successBodySuccess
+ * @apiSuccess (SuccessCode) {200} Success Update successful
+ *
+ * @apiUse successExampleSuccess
+ *
+ * @apiUse error400InvalidBody
+ * @apiUse error401Unauthorized
+ * @apiUse error418UncaughtError
+ * @apiUse error500InternalServerError
+ * @apiUse error500DatabaseError
+ * @apiUse errorBodyCommonStructure
+ *
+ * @apiUse errorExampleCommon
+ */
+router.put('/user/fcmtoken', authenticationService.isAuthenticated, usersController.updateFcmToken);
+
 module.exports = router;
