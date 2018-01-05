@@ -168,7 +168,7 @@ module.exports = [
     },
     transactionWrongLocation1: {
       amount: 6.6,
-      infoName: 'Test transaction 1',
+      infoName: 'Test transaction wrong location 1',
       infoLocation: {
         longitude: 50,
         latitude: null
@@ -180,7 +180,7 @@ module.exports = [
     },
     transactionWrongLocation2: {
       amount: 6.6,
-      infoName: 'Test transaction 1',
+      infoName: 'Test transaction wrong location 2',
       infoLocation: {
         longitude: 190,
         latitude: 50
@@ -192,7 +192,7 @@ module.exports = [
     },
     transactionWrongLocation3: {
       amount: 6.6,
-      infoName: 'Test transaction 1',
+      infoName: 'Test transaction wrong location 3',
       infoLocation: {
         longitude: 50,
         latitude: 100
@@ -224,7 +224,6 @@ module.exports = [
       transactions[4].paidBy = users[1].userId;
       transactions[5].paidBy = users[2].userId;
       transactions[6].paidBy = users[0].userId;
-      self.transactionWrongUserId.paidBy = users[0].userId;
       self.transactionWrongLocation1.paidBy = users[0].userId;
       self.transactionWrongLocation2.paidBy = users[0].userId;
       self.transactionWrongLocation3.paidBy = users[0].userId;
