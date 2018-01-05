@@ -173,13 +173,13 @@ module.exports.createNewTransaction = function(groupId, transactionData) {
     .then(groupResult => checkIfDateIsGtGroupCreateDate(groupResult, transactionData.infoCreatedAt))
     .then(groupResult => addTransactionToGroup(groupId, transactionData))
     .then(transactionResult => {
-      winston.debug('Creating a new group successful');
+      winston.debug('Creating a new transaction successful');
       responseData.payload = transactionData;
       responseData.success = true;
       resolve(responseData);
     }).catch(err => {
       let errorCode;
-      winston.debug('Creating a new group failed');
+      winston.debug('Creating a new transaction failed');
       winston.debug(err);
       responseData.success = false;
       if (err.isSelfProvided) {
@@ -188,6 +188,35 @@ module.exports.createNewTransaction = function(groupId, transactionData) {
         errorCode = err.errorCode;
       } else {
         responseData.payload.dataPath = 'group';
+        responseData.payload.message = 'unknown database error';
+        errorCode = ERROR.DB_ERROR;
+      }
+      reject({errorCode: errorCode, responseData: responseData});
+    });
+  });
+};
+
+module.exports.getTransactionAfterDate = function(groupId, date) {
+  winston.debug('Hello from module getTransactionAfterDate');
+  return new Promise((resolve, reject) => {
+    let responseData = {payload: {}};
+    checkIfGroupIdIsGiven(groupId)
+    .then(findGroupById)
+    .then(checkForGroupResult)
+    .then(groupResult => filterTransactionsAfterDate(groupResult.transactions, date))
+    .then(transactionsResult => {
+      responseData.payload = transactionsResult;
+      responseData.success = true;
+      resolve(responseData);
+    }).catch(err => {
+      winston.debug(err);
+      responseData.success = false;
+      responseData.payload.dataPath = 'group';
+      let errorCode;
+      if (err.isSelfProvided) {
+        responseData.payload.message = err.message;
+        errorCode = err.errorCode;
+      } else {
         responseData.payload.message = 'unknown database error';
         errorCode = ERROR.DB_ERROR;
       }
@@ -326,5 +355,17 @@ function checkIfDateIsGtGroupCreateDate(groupResult, transactionDate) {
     return Promise.reject(errorToReturn);
   } else {
     return groupResult;
+  }
+}
+
+function filterTransactionsAfterDate(allTransactions, date) {
+  const td = dateSting => new Date(dateSting);
+  if (allTransactions.length) {
+    let transactions = allTransactions.filter((val, i, self) => td(val.publishedAt) > td(date));
+    transactions  // sort ascending by publishedAt
+    .sort((a,b) => td(a.publishedAt) > td(b.publishedAt) ? 1 : td(a.publishedAt) < td(b.publishedAt) ? -1 : 0);
+    return transactions;
+  } else {
+    return [];
   }
 }

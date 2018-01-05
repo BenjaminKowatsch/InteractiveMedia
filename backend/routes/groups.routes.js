@@ -142,4 +142,7 @@ router.post('/:groupId/transactions', authenticationService.isAuthenticated,
  *
  * @apiUse errorExampleCommon
  */
+router.get('/:groupId/transactions', authenticationService.isAuthenticated,
+authorizationService.isGroupMember, groupsController.getTransactionAfterDate);
+
 module.exports = router;

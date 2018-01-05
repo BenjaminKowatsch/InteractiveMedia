@@ -93,3 +93,22 @@ exports.createNewTransaction = function(req, res) {
     httpResponseService.send(res, statusCode, errorResult.responseData);
   });
 };
+
+exports.getTransactionAfterDate = function(req, res) {
+  const date = req.query.after;
+  group.getTransactionAfterDate(req.params.groupId, date).then(transactionResult =>  {
+    httpResponseService.send(res, 200, transactionResult);
+  }).catch(errorResult => {
+    winston.debug(errorResult);
+    let statusCode = 418;
+    switch (errorResult.errorCode) {
+      case ERROR.MISSING_ID_IN_URL:
+        statusCode = 400;
+        break;
+      case ERROR.DB_ERROR:
+        statusCode = 500;
+        break;
+    }
+    httpResponseService.send(res, statusCode, errorResult.responseData);
+  });
+};
