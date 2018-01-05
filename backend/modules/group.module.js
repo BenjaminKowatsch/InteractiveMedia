@@ -73,7 +73,11 @@ module.exports.getGroupById = function(groupId) {
       return findUsersByField('userId', groupResult.users);
     }).then(checkUserResults)
     .then(userResults => {
-      let groupUserObjects = userResults.map(val => ({userId: val.userId, username: val.username}));
+      let groupUserObjects = userResults.map(val => ({
+        userId: val.userId,
+        username: val.username,
+        email: val.email
+      }));
       responseData.payload.users = groupUserObjects;
       responseData.success = true;
       resolve(responseData);
