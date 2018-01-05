@@ -23,6 +23,11 @@
     @apiParam (URL-Parameter) {string} groupId Id of the requested group
  */
 /**
+ * @apiDefine paramUrlTransactionsAfterDate
+    @apiParam (URL-Parameter) {string} after ISO-Date to get all transactions after the date
+ */
+
+/**
  * @apiDefine paramUrlUserId
     @apiParam (URL-Parameter) {string} userId Id of the requested user
  */
@@ -394,7 +399,7 @@
                 "longitude": 9.131
             },
             "infoCreatedAt": "2017-04-23T18:25:43.511Z",
-            "infoImageUrl":"a97c6b8e08f9d7a.image.jpg",
+            "infoImageUrl": "a97c6b8e08f9d7a.image.jpg",
             "paidBy": "6367e722-e857-4d0f-bf78-278a92260418",
             "split": "even"
         }
@@ -418,4 +423,35 @@
     @apiParam (Parameter) {string} split Methode to split
  */
 
+/**
+ * @apiDefine successExampleTransactions
+    @apiSuccessExample {type} Success-Response
+    {
+        "success": true,
+        "payload": [{
+            "publishedAt" : "2017-04-23T19:34:23.321Z",
+            "amount": 1234.13,
+            "infoName": "A very expensive Beer",
+            "infoLocation": {
+                "latitude": 48.947,
+                "longitude": 9.131
+            },
+            "infoCreatedAt": "2017-04-23T18:25:43.511Z",
+            "infoImageUrl": "a97c6b8e08f9d7a.image.jpg",
+            "paidBy": "6367e722-e857-4d0f-bf78-278a92260418",
+            "split": "even"
+        },
+        {
+            "amount": 9999.99,
+            "infoName": "A unicorn for Simon",
+            "infoLocation": {
+                "latitude": null,
+                "longitude": null
+            },
+            "infoCreatedAt": "2017-07-17T17:17:17.017Z",
+            "infoImageUrl": null,
+            "paidBy": "d8gk54a9-f4g8-d2g6-h783-f2ajg83jf5ui",
+            "split": "even"
+        }]
+    }
 */

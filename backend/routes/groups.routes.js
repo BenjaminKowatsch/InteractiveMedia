@@ -117,4 +117,29 @@ router.get('/:groupId', authenticationService.isAuthenticated,
 router.post('/:groupId/transactions', authenticationService.isAuthenticated,
     authorizationService.isGroupMember, groupsController.createNewTransaction);
 
+/**
+ * @api {GET} /v1/groups/:groupId/transactions?after=ISOdate Get Transactions After
+ * @apiName GetTransactionsAfter
+ * @apiGroup group
+ * @apiVersion 0.1.0
+ *
+ * @apiUse paramUrlGroupId
+ * @apiUse paramUrlTransactionsAfterDate
+ *
+ * @apiUse headerAuthorization
+ * @apiUse headerExampleAuthorization
+ *
+ * @apiSuccess (SuccessCode) {200} Success Success get transactions
+ * @apiUse successExampleTransactions
+ *
+ * @apiUse error400MissingUnknownUrlParameter
+ * @apiUse error401Unauthorized
+ * @apiUse error403Forbidden
+ * @apiUse error404UnknownId
+ * @apiUse error418UncaughtError
+ * @apiUse error500DatabaseError
+ * @apiUse errorBodyCommonStructure
+ *
+ * @apiUse errorExampleCommon
+ */
 module.exports = router;
