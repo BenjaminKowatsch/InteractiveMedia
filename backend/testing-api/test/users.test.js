@@ -24,6 +24,14 @@ const config = {
 
 const testData = require('./data/user.data');
 
+// ************* Helper ***********//
+
+const registerUser = index => chai.request(HOST).post(URL.BASE_USER).send({
+  username: testData.users.valid[index].username,
+  email: testData.users.valid[index].email,
+  password: testData.users.valid[index].password
+});
+
 function getFacebookTestAccessToken() {
   return new Promise((resolve, reject) => {
     https.get('https://graph.facebook.com/v2.11/' + config.facebookAppId + '/' +
@@ -558,6 +566,50 @@ describe('User-Controller', () => {
         expect(res.body.payload).to.be.an('object');
         expect(res.body.payload.dataPath).to.equal('authentication');
         expect(res.body.payload.message).to.equal('no http request header Authorization provided');
+      });
+    });
+  });
+
+  describe('Update fcm token', () => {
+    let token;
+    const fcmToken = 'cUf35139J8U:APA91bH6pkjWHRAUAW52QGQV6tR8SQdbpJK20QitJrAyWfX22VP4G0OUL-' +
+    'cwnXQob507qnBILDkZaoY0IW3eAvAevjM5dgCTbL297n1pbXoEHLzNDKV-86xJkle0TR6RBi8fA3BzEEOr';
+    before('Clean DB and register User 0', done => {
+      databaseHelper.promiseResetDB().then(()=> {
+        return registerUser(0);
+      }).then(res => {
+        token = res.body.payload.accessToken;
+        done();
+      }).catch((error) => {
+        console.log('Register User Error: ' + error);
+      });
+    });
+
+    it('should update fcm token of user_0', function() {
+      return chai.request(HOST)
+      .put(URL.BASE_USER  + '/user/fcmtoken')
+      .set('Authorization', '0 ' + token)
+      .send({fcmToken: fcmToken})
+      .then(res => {
+        expect(res).to.have.status(200);
+        expect(res).to.be.json;
+        expect(res.body).to.be.an('object');
+        expect(res.body.success).to.be.true;
+      });
+    });
+
+    it('should fail to update due to missing payload', function() {
+      return chai.request(HOST)
+      .put(URL.BASE_USER  + '/user/fcmtoken')
+      .set('Authorization', '0 ' + token)
+      .then(res => {
+        expect(res).to.have.status(400);
+        expect(res).to.be.json;
+        expect(res.body).to.be.an('object');
+        expect(res.body.success).to.be.false;
+        expect(res.body.payload).to.be.an('object');
+        expect(res.body.payload.dataPath).to.equal('validation');
+        expect(res.body.payload.message).to.equal('Invalid body');
       });
     });
   });
