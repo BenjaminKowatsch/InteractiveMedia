@@ -158,7 +158,7 @@ module.exports.getAllGroups = function() {
 
 module.exports.createNewTransaction = function(groupId, transactionData) {
   return new Promise((resolve, reject) => {
-    winston.debug('Hello from module createNewGroup');
+    winston.debug('Hello from module createNewTransaction');
     let responseData = {payload: {}};
     transactionData.publishedAt = new Date();
 
@@ -310,10 +310,7 @@ function addTransactionToGroup(groupId, transaction) {
 }
 
 function checkIfDateIsGtGroupCreateDate(groupResult, transactionDate) {
-  console.log('groupResult.createdAt: ' + groupResult.createdAt + ', type: ' + (typeof groupResult.createdAt));
-  console.log('transactionDate: ' + transactionDate + ', type: ' + (typeof transactionDate));
-
-  if (groupResult.createdAt > transactionDate) {
+  if (new Date(groupResult.createdAt) > new Date(transactionDate)) {
     let errorToReturn = {isSelfProvided: true};
     errorToReturn.dataPath = 'transaction';
     errorToReturn.message = 'invalide time adjustment: group.createdAt is gt transaction.infoCreatedAt';

@@ -112,10 +112,9 @@ router.get('/:groupId', authenticationService.isAuthenticated,
  *
  * @apiUse error400InvalidBody
  * @apiUse error400UserNotInGroup
- * error400MissingUnknownUrlParameter
+ * @apiUse error400MissingUnknownUrlParameter
  * @apiUse error401Unauthorized
  * @apiUse error403Forbidden
- * @apiUse error409UnknownUser
  * @apiUse error418UncaughtError
  * @apiUse error500DatabaseError
  * @apiUse errorBodyCommonStructure

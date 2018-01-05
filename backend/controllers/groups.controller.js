@@ -83,10 +83,8 @@ exports.createNewTransaction = function(req, res) {
       case ERROR.UNKNOWN_GROUP:
       case ERROR.INVALID_REQUEST_BODY:
       case ERROR.INVALID_CREATE_TRANSACTION_VALUES:
+      case ERROR.USER_NOT_IN_GROUP:
         statusCode = 400;
-        break;
-      case ERROR.UNKNOWN_USER:
-        statusCode = 409;
         break;
       case ERROR.DB_ERROR:
         statusCode = 500;
