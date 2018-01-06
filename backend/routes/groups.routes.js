@@ -100,8 +100,8 @@ router.get('/:groupId', authenticationService.isAuthenticated,
  * @apiUse successExampleTransaction
  *
  * @apiUse successBodySuccess
- * @apiSuccess (Success) {string} payload Transaction which was send to the backend
- * @apiSuccess (Success) {string} payload[publishedAt] Date when transaction was created in backend
+ * @apiSuccess (Success) {string} payload Recevied transaction object
+ * @apiSuccess (Success) {string} payload[publishedAt] Date when transaction was created in backend (ISO-8601, format: YYYY-MM-DDTHH:mm:ss.sssZ)
  *
  * @apiUse error400InvalidBody
  * @apiUse error400UserNotInGroup

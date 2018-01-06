@@ -24,7 +24,7 @@
  */
 /**
  * @apiDefine paramUrlTransactionsAfterDate
-    @apiParam (URL-Parameter) {string} after ISO-Date to get all transactions after the date
+    @apiParam (URL-Parameter) {string} after ISO-8601-Date to get all transactions after the date, format format: YYYY-MM-DDTHH:mm:ss.sssZ
  */
 
 /**
@@ -371,7 +371,7 @@
         "paidBy": "6367e722-e857-4d0f-bf78-278a92260418",
         "split": "even"
     }
-    @apiParamExample {type} Create Transaction with null
+    @apiParamExample {type} Create Transaction without optional values
     {
         "amount": 1234.13,
         "infoName": "A very expensive Beer",
@@ -417,10 +417,10 @@
     @apiParam (Parameter) {string} infoName Name or reason for the transaction
     @apiParam (Parameter) {Number} infoLocation[latitude] Geoinformation: Latitude, can be null
     @apiParam (Parameter) {Number} infoLocation[longitude] Geoinformation: Longitude, can be null
-    @apiParam (Parameter) {string} infoCreatedAt Daten when the transaction was created in the app
+    @apiParam (Parameter) {string} infoCreatedAt Date when the transaction was created in the app (ISO-8601, format: YYYY-MM-DDTHH:mm:ss.sssZ)
     @apiParam (Parameter) {string} infoImageUrl URL of the transaction-image, can be null
     @apiParam (Parameter) {string} paidBy Id of user who payed the expense
-    @apiParam (Parameter) {string} split Methode to split
+    @apiParam (Parameter) {string} split Methode to split, currently supported: [even-spilt: value="even"]
  */
 
 /**
