@@ -205,6 +205,7 @@ module.exports.getTransactionAfterDate = function(groupId, date) {
     .then(findGroupById)
     .then(checkForGroupResult)
     .then(groupResult => filterTransactionsAfterDate(groupResult.transactions, date))
+    .then(sortTransactionsByPublishedAt)
     .then(transactionsResult => {
       responseData.payload = transactionsResult;
       responseData.success = true;
@@ -364,12 +365,16 @@ function filterTransactionsAfterDate(allTransactions, date) {
   const td = dateSting => new Date(dateSting);
   if (allTransactions.length) {
     let transactions = allTransactions.filter((val, i, self) => td(val.publishedAt) > td(date));
-    transactions  // sort ascending by publishedAt
-    .sort((a,b) => td(a.publishedAt) > td(b.publishedAt) ? 1 : td(a.publishedAt) < td(b.publishedAt) ? -1 : 0);
     return transactions;
   } else {
     return [];
   }
+}
+
+function sortTransactionsByPublishedAt(transactions) {
+  const td = dateSting => new Date(dateSting);
+  return transactions  // sort ascending by publishedAt
+  .sort((a,b) => td(a.publishedAt) > td(b.publishedAt) ? 1 : td(a.publishedAt) < td(b.publishedAt) ? -1 : 0);
 }
 
 function checkIfDateIsGivenAndValid(date) {
