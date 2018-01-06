@@ -20,4 +20,6 @@ module.exports = {
     NOT_AUTHENTICATED: 'user is not authenticated',
     DUPLICATED_USER: 'duplicated user',
     SEND_FCM_FAILED: 'failed to send push notification via firebase cloud messaging',
+    INVALID_CREATE_TRANSACTION_VALUES: 'invalid create transaction values',
+    INVALID_DATE_FORMAT: 'invalid date format',
   };

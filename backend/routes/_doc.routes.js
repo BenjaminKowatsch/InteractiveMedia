@@ -23,6 +23,11 @@
     @apiParam (URL-Parameter) {string} groupId Id of the requested group
  */
 /**
+ * @apiDefine paramUrlTransactionsAfterDate
+    @apiParam (URL-Parameter) {string} after ISO-8601-Date to get all transactions after the date, format format: YYYY-MM-DDTHH:mm:ss.sssZ
+ */
+
+/**
  * @apiDefine paramUrlUserId
     @apiParam (URL-Parameter) {string} userId Id of the requested user
  */
@@ -40,7 +45,7 @@
 
 /**
  * @apiDefine successBodySuccess
-    @apiSuccess (Success) {string} success Request successful
+    @apiSuccess (Success) {boolean} success Request successful
  */
 /**
  * @apiDefine successBodyAuthtype
@@ -194,10 +199,12 @@
             "imageUrl" : null,
             "users" : [{
                 "userId": "f2bed6b9-6a5a-4363-a9fa-e1f10579c0c1",
-                "username": "user_1_name"
+                "username": "user_1_name",
+                "email": "user_1_email"
             },{
                 "userId": "2368218d-b5ec-4d4d-bc3c-6c249776ee11",
-                "username": "user_2_name"
+                "username": "user_2_name",
+                "email": "user_2_email"
             }]
             "transactions" : [ ... ], // all transaction-objects, length=0 if group was just created
             "groupId" : "6367e722-e857-4d0f-bf78-278a92260418",
@@ -223,7 +230,7 @@
 
 /**
  * @apiDefine error409UnknownUser
-    @apiError (ErrorCode) {409} UnknownUser Unknown user: {{wrong_mail@mail.com}}
+    @apiError (ErrorCode) {409} UnknownUser Unknown user or userId: {{unknwon_mail@mail.com || unknwonUserId}}
  */
 /**
  * @apiDefine error400DuplicatedUsers
@@ -370,3 +377,102 @@
  * @apiDefine admin Administrator
  *  role:'admin'
  */
+/**
+ * @apiDefine paramExampleCreateTransaction
+    @apiParamExample {type} Create Transaction
+    {
+        "amount": 1234.13,
+        "infoName": "A very expensive Beer",
+        "infoLocation": {
+            "latitude": 48.947,
+            "longitude": 9.131
+        },
+        "infoCreatedAt": "2017-04-23T18:25:43.511Z",
+        "infoImageUrl": "a97c6b8e08f9d7a.image.jpg",
+        "paidBy": "6367e722-e857-4d0f-bf78-278a92260418",
+        "split": "even"
+    }
+    @apiParamExample {type} Create Transaction without optional values
+    {
+        "amount": 1234.13,
+        "infoName": "A very expensive Beer",
+        "infoLocation": {
+            "latitude": null,
+            "longitude": null
+        },
+        "infoCreatedAt": "2017-04-23T18:25:43.511Z",
+        "infoImageUrl": null,
+        "paidBy": "6367e722-e857-4d0f-bf78-278a92260418",
+        "split": "even"
+    }
+*/
+/**
+ * @apiDefine successExampleTransaction
+    @apiSuccessExample {type} Success-Response
+    {
+        "success": true,
+        "payload": {
+            "publishedAt" : "2017-04-23T19:34:23.321Z",
+            "amount": 1234.13,
+            "infoName": "A very expensive Beer",
+            "infoLocation": {
+                "latitude": 48.947,
+                "longitude": 9.131
+            },
+            "infoCreatedAt": "2017-04-23T18:25:43.511Z",
+            "infoImageUrl": "a97c6b8e08f9d7a.image.jpg",
+            "paidBy": "6367e722-e857-4d0f-bf78-278a92260418",
+            "split": "even"
+        }
+    }
+ */
+
+/**
+ * @apiDefine error400UserNotInGroup
+    @apiError (ErrorCode) {400} UserNotInGroup A given userId is not part of the given group
+*/
+
+/**
+ * @apiDefine paramTransactionObject
+    @apiParam (Parameter) {Number} amount Amout of the transaction
+    @apiParam (Parameter) {string} infoName Name or reason for the transaction
+    @apiParam (Parameter) {Number} infoLocation[latitude] Geoinformation: Latitude, can be null
+    @apiParam (Parameter) {Number} infoLocation[longitude] Geoinformation: Longitude, can be null
+    @apiParam (Parameter) {string} infoCreatedAt Date when the transaction was created in the app (ISO-8601, format: YYYY-MM-DDTHH:mm:ss.sssZ)
+    @apiParam (Parameter) {string} infoImageUrl URL of the transaction-image, can be null
+    @apiParam (Parameter) {string} paidBy Id of user who payed the expense
+    @apiParam (Parameter) {string} split Methode to split, currently supported: [even-spilt: value="even"]
+ */
+
+/**
+ * @apiDefine successExampleTransactions
+    @apiSuccessExample {type} Success-Response
+    {
+        "success": true,
+        "payload": [{
+            "publishedAt" : "2017-04-23T19:34:23.321Z",
+            "amount": 1234.13,
+            "infoName": "A very expensive Beer",
+            "infoLocation": {
+                "latitude": 48.947,
+                "longitude": 9.131
+            },
+            "infoCreatedAt": "2017-04-23T18:25:43.511Z",
+            "infoImageUrl": "a97c6b8e08f9d7a.image.jpg",
+            "paidBy": "6367e722-e857-4d0f-bf78-278a92260418",
+            "split": "even"
+        },
+        {
+            "amount": 9999.99,
+            "infoName": "A unicorn for Simon",
+            "infoLocation": {
+                "latitude": null,
+                "longitude": null
+            },
+            "infoCreatedAt": "2017-07-17T17:17:17.017Z",
+            "infoImageUrl": null,
+            "paidBy": "d8gk54a9-f4g8-d2g6-h783-f2ajg83jf5ui",
+            "split": "even"
+        }]
+    }
+*/

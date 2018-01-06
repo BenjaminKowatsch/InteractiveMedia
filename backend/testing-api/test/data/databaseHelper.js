@@ -110,7 +110,7 @@ function promiseResetDB() {
           return database.collections.users.insertOne(adminUser);
         })
         .then(() => {
-          winston.info('Database cleaned successfully');
+          winston.debug('Database cleaned successfully');
           mutexResolver();
           resolve();
         }).catch(error => {
