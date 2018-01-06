@@ -378,6 +378,7 @@ function sortTransactionsByPublishedAt(transactions) {
 }
 
 function checkIfDateIsGivenAndValid(date) {
+  //matches exactly ISO-8601, format: YYYY-MM-DDTHH:mm:ss.sssZ
   let dateRegExp = /^\d{4}-[01]\d-[0-3]\dT[0-2]\d:[0-5]\d:[0-5]\d\.\d{3}Z$/;
   let errorToReturn = {isSelfProvided: true};
   errorToReturn.dataPath = 'urlParamAfter';
