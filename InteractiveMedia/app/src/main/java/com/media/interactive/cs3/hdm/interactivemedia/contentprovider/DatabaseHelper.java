@@ -74,6 +74,17 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         db.delete("users", null, null);
         db.delete("login", null, null);
     }
+    
+    public Cursor getAllGroupAndUsersByGroup(long groupId){
+        final SQLiteDatabase db = this.getWritableDatabase();
+        final String query = "SELECT *"
+            +" FROM "+ UserTable.TABLE_NAME + " u, "
+            + GroupUserTable.TABLE_NAME + " gu"
+            + " WHERE u."+UserTable.COLUMN_ID+" = gu." + GroupUserTable.COLUMN_USER_ID
+            + " AND gu."+GroupUserTable.COLUMN_GROUP_ID+" =  ?";
+        final Cursor data = db.rawQuery(query, new String[]{ String.valueOf(groupId) });
+        return data;
+    }
 
     public Cursor getTransactionsForGroup(long groupId) {
         final SQLiteDatabase db = this.getWritableDatabase();
@@ -85,58 +96,5 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         final Cursor cursor = db.rawQuery(query, new String[]{"" + groupId});
         return cursor;
     }
-    /*
-    public Cursor getUsers() {
-        final SQLiteDatabase db = this.getWritableDatabase();
-        final String query = "SELECT * FROM " + TABLE_NAME;
-        final Cursor data = db.rawQuery(query, null);
-        return data;
-    }
-
-    public boolean checkForCachedCredentials(Login login){
-            boolean result = false;
-            final SQLiteDatabase db = this.getWritableDatabase();
-            final String query = "SELECT * FROM " + TABLE_NAME + " ORDER BY "+COL4+" DESC LIMIT 1";
-            final Cursor cursor = db.rawQuery(query, null);
-            result = cursor.getCount() > 0;
-            while(cursor.moveToNext()){
-                login.setId(cursor.getLong(0));
-                login.setUsername(cursor.getString(1));
-                login.setHashedPassword(cursor.getString(2));
-                login.setEmail(cursor.getString(3));
-                login.setUserType(UserType.values()[cursor.getInt(4)]);
-                Log.d(TAG,"Latest Credentials cache: " + cursor.getString(4)+ " "+ login);
-            }
-        return result;
-    }
-
-
-    public boolean cacheCredentials(Login login) {
-        final SQLiteDatabase db = this.getWritableDatabase();
-        final ContentValues contentValues = new ContentValues();
-        contentValues.put(COL1, login.getUsername());
-        contentValues.put(COL2, login.getHashedPassword());
-        contentValues.put(COL4, login.getUserType().getValue());
-
-        Log.d(TAG, "cacheCredentials: Adding " + login + " to " + TABLE_NAME);
-
-        long result = db.insert(TABLE_NAME, null, contentValues);
-
-        if (result == -1) {
-            return false;
-        } else {
-            login.setId(result);
-            return true;
-        }
-    }
-
-    public boolean deleteUser(Login login) {
-        final SQLiteDatabase db = this.getWritableDatabase();
-        final String sql = "DELETE FROM "+TABLE_NAME +" WHERE "+COL0+"=?";
-        final SQLiteStatement statement = db.compileStatement(sql);
-
-        statement.bindLong(1, login.getId());
-
-        return statement.executeUpdateDelete() > 0;
-    }*/
+    
 }

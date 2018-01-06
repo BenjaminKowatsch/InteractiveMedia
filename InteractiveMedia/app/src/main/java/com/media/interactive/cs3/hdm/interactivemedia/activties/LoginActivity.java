@@ -16,6 +16,8 @@ import android.widget.Toast;
 import com.facebook.CallbackManager;
 import com.facebook.FacebookCallback;
 import com.facebook.FacebookException;
+import com.facebook.GraphRequest;
+import com.facebook.GraphResponse;
 import com.facebook.login.LoginResult;
 import com.facebook.login.widget.LoginButton;
 import com.google.android.gms.auth.api.Auth;
@@ -31,6 +33,7 @@ import com.media.interactive.cs3.hdm.interactivemedia.data.Hash;
 import com.media.interactive.cs3.hdm.interactivemedia.data.Login;
 import com.media.interactive.cs3.hdm.interactivemedia.data.UserType;
 
+import org.json.JSONException;
 import org.json.JSONObject;
 
 
@@ -54,7 +57,6 @@ public class LoginActivity extends AppCompatActivity
     // Register variables
     private Button registerButton;
 
-    @RequiresApi(api = Build.VERSION_CODES.N)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -62,7 +64,6 @@ public class LoginActivity extends AppCompatActivity
         loginButton = (LoginButton) findViewById(R.id.fb_login_bn);
         callbackManager = CallbackManager.Factory.create();
         loginButton.registerCallback(callbackManager, new FacebookCallback<LoginResult>() {
-            @RequiresApi(api = Build.VERSION_CODES.N)
             @Override
             public void onSuccess(LoginResult loginResult) {
                 final Login login = Login.getInstance();
@@ -133,12 +134,9 @@ public class LoginActivity extends AppCompatActivity
         Toast toast = Toast.makeText(context, text, duration);
         toast.show();
         this.navigateToHome();
-        //Log.d(TAG,"Login failed");
-        //throw new RuntimeException(error.getMessage());
         return nil;
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.N)
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
@@ -153,7 +151,7 @@ public class LoginActivity extends AppCompatActivity
                 break;
             case R.id.bn_default_login:
                 final Login login = Login.getInstance();
-                login.setUsername(loginUsername.getText().toString());
+                login.getUser().setUsername(loginUsername.getText().toString());
                 login.setHashedPassword(Hash.hashStringSha256(loginPassword.getText().toString()));
                 login.setUserType(UserType.DEFAULT);
                 login.login(LoginActivity.this, new CallbackListener<JSONObject, Exception>() {
@@ -188,12 +186,12 @@ public class LoginActivity extends AppCompatActivity
     private void signOut() {
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.N)
     private void handleResult(GoogleSignInResult result) {
         if (result.isSuccess()) {
             final GoogleSignInAccount account = result.getSignInAccount();
             final Login login = Login.getInstance();
             login.setAccessToken(account.getIdToken());
+            login.getUser().setUsername(account.getDisplayName());
             login.setUserType(UserType.GOOGLE);
             login.login(LoginActivity.this, new CallbackListener<JSONObject, Exception>() {
                 @Override
@@ -218,7 +216,6 @@ public class LoginActivity extends AppCompatActivity
     }
 
 
-    //@RequiresApi(api = Build.VERSION_CODES.N)
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);

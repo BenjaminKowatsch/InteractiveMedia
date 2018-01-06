@@ -2,7 +2,7 @@ package com.media.interactive.cs3.hdm.interactivemedia.fragments;
 
 import android.app.ListFragment;
 import android.app.LoaderManager;
-import android.content.ContentResolver;
+import android.content.ContentProvider;
 import android.content.Context;
 import android.content.CursorLoader;
 import android.content.Intent;
@@ -13,29 +13,35 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ListView;
-import android.widget.SimpleCursorAdapter;
+import android.widget.SearchView;
 import android.widget.Toast;
 
+import com.media.interactive.cs3.hdm.interactivemedia.GroupAdapter;
 import com.media.interactive.cs3.hdm.interactivemedia.R;
 import com.media.interactive.cs3.hdm.interactivemedia.activties.AddGroupActivity;
+import com.media.interactive.cs3.hdm.interactivemedia.activties.GroupDetailViewActivity;
+import com.media.interactive.cs3.hdm.interactivemedia.activties.MainActivity;
 import com.media.interactive.cs3.hdm.interactivemedia.contentprovider.DatabaseProvider;
 import com.media.interactive.cs3.hdm.interactivemedia.contentprovider.tables.GroupTable;
-import com.media.interactive.cs3.hdm.interactivemedia.contentprovider.tables.GroupUserTable;
+import com.media.interactive.cs3.hdm.interactivemedia.data.Group;
+import com.media.interactive.cs3.hdm.interactivemedia.data.Login;
 
 
 public class GroupFragment extends ListFragment implements LoaderManager.LoaderCallbacks<Cursor>, IMyFragment {
 
     public static final String LIST_FRAGMENT_NAME = "group";
-    private static final String TAG = "GroupFragment";
-
+    private static final String TAG = GroupFragment.class.getSimpleName();
 
     private AdapterView.OnItemSelectedListener onItemSelectedListener;
 
-    private SimpleCursorAdapter simpleCursorAdapter;
+    private GroupAdapter groupAdapter;
+    private static final int CURSOR_LOADER_GROUPS = 0;
+    private String GROUP_FILTER = "search";
 
     /**
      * Mandatory empty constructor for the fragment manager to instantiate the
@@ -49,6 +55,28 @@ public class GroupFragment extends ListFragment implements LoaderManager.LoaderC
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         inflater.inflate(R.menu.fragment_group, menu);
+
+        final MenuItem searchItem = menu.findItem(R.id.menu_item_search);
+
+        final SearchView searchView = (SearchView) searchItem.getActionView();
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String s) {
+                final Bundle bundle = new Bundle();
+                bundle.putString(GROUP_FILTER,s);
+                getLoaderManager().restartLoader(CURSOR_LOADER_GROUPS, bundle, GroupFragment.this);
+                return true;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String s) {
+                final Bundle bundle = new Bundle();
+                bundle.putString(GROUP_FILTER,s);
+                getLoaderManager().restartLoader(CURSOR_LOADER_GROUPS, bundle, GroupFragment.this);
+                return true;
+            }
+        });
+
         super.onCreateOptionsMenu(menu, inflater);
     }
 
@@ -58,15 +86,7 @@ public class GroupFragment extends ListFragment implements LoaderManager.LoaderC
 
         setHasOptionsMenu(true);
 
-        // Initializing the SimpleCursorAdapter and the CursorLoader
-        String[] projection = new String[] {GroupTable.COLUMN_NAME, GroupTable.COLUMN_CREATED_AT};
         getLoaderManager().initLoader(0, null, this);
-        simpleCursorAdapter = new SimpleCursorAdapter(getActivity(), R.layout.fragment_group, null, projection,
-            new int[] {R.id.group_title, R.id.group_creation_date}, 0);
-
-        setListAdapter(simpleCursorAdapter);
-
-
     }
 
     @Override
@@ -97,48 +117,67 @@ public class GroupFragment extends ListFragment implements LoaderManager.LoaderC
         onItemSelectedListener = null;
     }
 
+    private void startGroupDetailActivity(Group group){
+        final Intent intent = new Intent(this.getActivity(), GroupDetailViewActivity.class);
+        final Bundle b = new Bundle();
+        b.putLong("id", group.getId());
+        b.putString("imageUrl", group.getImageUrl());
+        b.putString("name", group.getName());
+        b.putString("createdAt", group.getCreatedAt());
+        b.putString("groupId", group.getGroupId());
+        b.putBoolean("sync", group.getSync());
+
+        intent.putExtras(b); //Put your id to your next Intent
+        startActivity(intent);
+    }
+
     @Override
     public void onListItemClick(ListView l, View v, int position, long id) {
         //super.onListItemClick(l, v, position, id);
         //onItemSelectedListener.onItemSelected(l, v, position, id);
-        ContentResolver dummyContentResolver = getContext().getContentResolver();
+        final Group group = ((GroupAdapter.ViewHolder) v.getTag()).getGroup();
+        startGroupDetailActivity(group);
+        Toast.makeText(v.getContext(), group.getName() + group.getCreatedAt(), Toast.LENGTH_SHORT).show();
 
-        final String[] projection = {GroupUserTable.COLUMN_USER_ID, GroupUserTable.COLUMN_GROUP_ID};
-        final String selection = GroupUserTable.COLUMN_GROUP_ID + " = ?";
-        String[] selectionArgs = {String.valueOf(id)};
-
-        Cursor query = dummyContentResolver.query(DatabaseProvider.CONTENT_GROUP_USER_URI, projection, selection , selectionArgs, null);
-
-        String ids = " IDs: ";
-
-        while (query.moveToNext()) {
-            String user_id =query.getString(0);
-            String group_id = query.getString(1);
-            ids += user_id + ", ";
-
-        }
-
-        Toast.makeText(v.getContext(), "Selected Group: "+id+ ids, Toast.LENGTH_SHORT).show();
     }
 
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-        final String[] projection = {GroupTable.COLUMN_ID, GroupTable.COLUMN_NAME, GroupTable.COLUMN_CREATED_AT};
+        String selection = null;
+        String[] selectionArgs = null;
+        switch (id) {
+            case CURSOR_LOADER_GROUPS:
+                if (args != null) {
+                    selection =  GroupTable.COLUMN_NAME + " like ? OR " + GroupTable.COLUMN_CREATED_AT + " like ?";
+                    final String search = "%"+args.getString(GROUP_FILTER)+"%";
+                    selectionArgs = new String[] { search, search };
+                }
+                break;
+             default:
+                break;
+        }
+        final String[] projection = {GroupTable.COLUMN_ID, GroupTable.COLUMN_NAME, GroupTable.COLUMN_CREATED_AT, GroupTable.COLUMN_IMAGE_URL, GroupTable.COLUMN_SYNCHRONIZED};
         final CursorLoader cursorLoader = new CursorLoader(getActivity(),
             DatabaseProvider.CONTENT_GROUP_URI,
-            projection, null,
-            null, null);
+            projection, selection,
+            selectionArgs, null);
         return cursorLoader;
     }
 
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
-        simpleCursorAdapter.swapCursor(data);
+        data.moveToFirst();
+        if(groupAdapter == null) {
+            groupAdapter = new GroupAdapter(getContext(), R.layout.fragment_group, data);
+        } else {
+            groupAdapter.swapCursor(data);
+        }
+        setListAdapter(groupAdapter);
     }
 
     @Override
     public void onLoaderReset(Loader<Cursor> loader) {
-        simpleCursorAdapter.swapCursor(null);
+        groupAdapter.swapCursor(null);
     }
 
     @Override

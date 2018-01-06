@@ -73,7 +73,7 @@ public class DatabaseProvider extends android.content.ContentProvider {
     @Override
     public Cursor query(Uri uri, String[] projection, String selection, String[] selectionArgs, String sortOrder) {
 
-        SQLiteQueryBuilder sqLiteQueryBuilder = new SQLiteQueryBuilder();
+        final SQLiteQueryBuilder sqLiteQueryBuilder = new SQLiteQueryBuilder();
         //checkColumns(projection);
         switch (mUriMatcher.match(uri)) {
             case DEBT_CODE:
@@ -101,7 +101,7 @@ public class DatabaseProvider extends android.content.ContentProvider {
                 Log.e(TAG, "Error: Calling query method at DatabaseProvider with invalid uri.");
                 break;
         }
-        Cursor cursor = sqLiteQueryBuilder.query(databaseHelper.getWritableDatabase(),
+        final Cursor cursor = sqLiteQueryBuilder.query(databaseHelper.getWritableDatabase(),
             projection,
             selection,
             selectionArgs,
@@ -119,7 +119,7 @@ public class DatabaseProvider extends android.content.ContentProvider {
 
     @Override
     public Uri insert(Uri uri, ContentValues values) {
-        SQLiteDatabase sqLiteDatabase = databaseHelper.getWritableDatabase();
+        final SQLiteDatabase sqLiteDatabase = databaseHelper.getWritableDatabase();
         long id = 0;
         String tablename = "";
         switch (mUriMatcher.match(uri)) {
@@ -189,7 +189,7 @@ public class DatabaseProvider extends android.content.ContentProvider {
 
     @Override
     public int update(Uri uri, ContentValues values, String selection, String[] selectionArgs) {
-        SQLiteDatabase sqLiteDatabase = databaseHelper.getWritableDatabase();
+        final SQLiteDatabase sqLiteDatabase = databaseHelper.getWritableDatabase();
         int rowsUpdated = 0;
         switch (mUriMatcher.match(uri)) {
             case DEBT_CODE:

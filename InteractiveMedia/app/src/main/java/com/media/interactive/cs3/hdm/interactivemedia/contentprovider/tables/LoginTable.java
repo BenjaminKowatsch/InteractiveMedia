@@ -22,26 +22,21 @@ public class LoginTable {
      */
     public static final String COLUMN_HASHED_PASSWORD = "hashed_password";
     /**
-     * Fourth attribute, type TEXT.
-     */
-    public static final String COLUMN_EMAIL = "email";
-    /**
-     * Fifth attribute, type INTEGER NOT NULL.
+     * Fourth attribute, type INTEGER NOT NULL.
      */
     public static final String COLUMN_LOGIN_TYPE = "login_type";
     /**
-     * Sixth attribute, type TIMESTAMP DEFAULT CURRENT_TIMESTAMP.
+     * Fifth attribute, type TIMESTAMP DEFAULT CURRENT_TIMESTAMP.
      */
     public static final String COLUMN_CREATED_AT = "created_at";
 
     public static final String DATABASE_CREATE =
         "create table if not exists " + TABLE_NAME + "("
-           + COLUMN_ID + " integer unique primary key AUTOINCREMENT,"
-           + COLUMN_USERNAME + " TEXT,"
-           + COLUMN_HASHED_PASSWORD + " TEXT,"
-           + COLUMN_EMAIL + " TEXT,"
-           + COLUMN_LOGIN_TYPE + " INTEGER NOT NULL,"
-           + COLUMN_CREATED_AT + " TIMESTAMP DEFAULT CURRENT_TIMESTAMP)";
+            + COLUMN_ID + " integer unique primary key AUTOINCREMENT,"
+            + COLUMN_USERNAME + " TEXT,"
+            + COLUMN_HASHED_PASSWORD + " TEXT,"
+            + COLUMN_LOGIN_TYPE + " INTEGER NOT NULL,"
+            + COLUMN_CREATED_AT + " TIMESTAMP DEFAULT CURRENT_TIMESTAMP)";
     public static final String DATABASE_DROP = "drop table if exists " + TABLE_NAME;
 
     public static void onCreate(SQLiteDatabase database) {
