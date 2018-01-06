@@ -283,20 +283,20 @@
  */
 /**
  * @apiDefine successExampleAdminGetAllUsers
-    @apiSuccessExample {type} Success-Response
+    @apiSuccessExample {JSON} Success-Response
     {
         "success": true,
         "payload": [{
             "username" : "Harry Potter",
             "email" : "harry.potter@hogwarts.edu",
             "userId" : "d9gh1hs7-e8lk-495f-br48-2f4ds92260418",
-            "role" : "2017-12-25T10:56:13.234Z",
+            "role" : "user",
             "countGroupIds" : 3,
         },{
-            "name" : "Ron Weasly",
-            "imageUrl" : "ron.weasly@hogwarts.edu",
-            "groupId" : "4js8fg66-f4g8-ay98-ql04-f212343jf5ui",
-            "createdAt" : "2017-12-20T13:22:02.515Z",
+            "username" : "Ron Weasly",
+            "email" : "ron.weasly@hogwarts.edu",
+            "userId" : "4js8fg66-f4g8-ay98-ql04-f212343jf5ui",
+            "role" : "user",
             "countGroupIds" : 5,
         }]
     }
