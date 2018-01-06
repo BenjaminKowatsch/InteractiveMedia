@@ -353,6 +353,146 @@ describe('Groups-Controller: Transactions:', () => {
     });
   });
 
+  describe('Get transactions with error', () => {
+    let s1GroupId;
+    let s1GroupCreatedAt;
+    let s2GroupId;
+    let s2GroupCreatedAt;
+    let users = deepCopy(groupScenarios[2].users);
+    let transactions = groupScenarios[2].transactions;
+
+    before('register user 0, 1, 2, create two groups, prepare testData, add t_0 for each group', function(done) {
+      this.timeout(10000);
+      databaseHelper.promiseResetDB().then(()=> {
+        return registerUser(0);
+      }).then(res => {
+        users[0].token = res.body.payload.accessToken;
+        return getUserData(users[0].token);
+      }).then(res => {
+        users[0].userId = res.body.payload.userId;
+        return registerUser(1);
+      }).then(res => {
+        users[1].token = res.body.payload.accessToken;
+        return getUserData(users[1].token);
+      }).then(res => {
+        users[1].userId = res.body.payload.userId;
+        return registerUser(2);
+      }).then(res => {
+        users[2].token = res.body.payload.accessToken;
+        return getUserData(users[2].token);
+      }).then(res => {
+        users[2].userId = res.body.payload.userId;
+        return chai.request(HOST)
+          .post(URL.BASE_GROUP  + '/')
+          .set('Authorization', '0 ' + users[0].token)
+          .send(groupScenarios[2].createGroup);
+      }).then(res => {
+        s2GroupCreatedAt = res.body.payload.createdAt;
+        s2GroupId = res.body.payload.groupId;
+        groupScenarios[2].setUserIdsInTransactions(users);
+        return chai.request(HOST)
+        .post(URL.BASE_GROUP  + '/')
+        .set('Authorization', '0 ' + users[0].token)
+        .send(groupScenarios[1].createGroup0); //only user 0 + 1
+      }).then(res => {
+        s1GroupCreatedAt = res.body.payload.createdAt;
+        s1GroupId = res.body.payload.groupId;
+        return chai.request(HOST)
+        .post(URL.BASE_GROUP  + '/' + s1GroupId + '/transactions')
+        .set('Authorization', '0 ' + users[0].token)
+        .send(transactions[0]);
+      }).then(res => {
+        return chai.request(HOST)
+        .post(URL.BASE_GROUP  + '/' + s2GroupId + '/transactions')
+        .set('Authorization', '0 ' + users[0].token)
+        .send(transactions[0]);
+      }).then(res => wait(2000)).then(() => {
+        done();
+      }).catch((error) => {
+        console.log('Register User or Group Error: ' + error);
+      });
+    });
+
+    it('should fail to get transactions due to unknown groupId', () => {
+      return chai.request(HOST)
+      .get(URL.BASE_GROUP  + '/wrong_group_id/transactions?after=' + s2GroupCreatedAt)
+      .set('Authorization', '0 ' + users[1].token)
+      .then(res => {
+        expect(res).to.have.status(404);
+        expect(res).to.be.json;
+        expect(res.body).to.be.an('object');
+        expect(res.body.success).to.be.false;
+        expect(res.body.payload).to.be.an('object');
+        expect(res.body.payload.dataPath).to.equal('group');
+        expect(res.body.payload.message).to.equal('group not found');
+      });
+    });
+
+    it('should fail to get transactions due to user not in group', () => {
+      return chai.request(HOST)
+      .get(URL.BASE_GROUP  + '/' + s1GroupId + '/transactions?after=' + s1GroupCreatedAt)
+      .set('Authorization', '0 ' + users[2].token)
+      .then(res => {
+        expect(res).to.have.status(403);
+        expect(res).to.be.json;
+        expect(res.body).to.be.an('object');
+        expect(res.body.success).to.be.false;
+        expect(res.body.payload).to.be.an('object');
+        expect(res.body.payload.dataPath).to.equal('authorization');
+        expect(res.body.payload.message).to.equal('user is not but has to be a member of the group');
+      });
+    });
+
+    it('should fail to get transactions due to invalid date-format', () => {
+      return chai.request(HOST)
+      .get(URL.BASE_GROUP  + '/' + s2GroupId + '/transactions?after=foobar')
+      .set('Authorization', '0 ' + users[1].token)
+      .then(res => {
+        console.log(res.body);
+        expect(res).to.have.status(400);
+        expect(res).to.be.json;
+        expect(res.body).to.be.an('object');
+        expect(res.body.success).to.be.false;
+        expect(res.body.payload).to.be.an('object');
+        expect(res.body.payload.dataPath).to.equal('urlParamAfter');
+        expect(res.body.payload.message).to.equal('invalid date format');
+      });
+    });
+
+    it('should fail to get transactions due to invalid date-format', () => {
+      return chai.request(HOST)
+      .get(URL.BASE_GROUP  + '/' + s2GroupId + '/transactions?after=2018-01-01')
+      .set('Authorization', '0 ' + users[1].token)
+      .then(res => {
+        console.log(res.body);
+        expect(res).to.have.status(400);
+        expect(res).to.be.json;
+        expect(res.body).to.be.an('object');
+        expect(res.body.success).to.be.false;
+        expect(res.body.payload).to.be.an('object');
+        expect(res.body.payload.dataPath).to.equal('urlParamAfter');
+        expect(res.body.payload.message).to.equal('invalid date format');
+      });
+    });
+
+    it('should fail to get transactions due to missing param after', () => {
+      return chai.request(HOST)
+      .get(URL.BASE_GROUP  + '/' + s2GroupId + '/transactions')
+      .set('Authorization', '0 ' + users[1].token)
+      .then(res => {
+        console.log(res.body);
+        expect(res).to.have.status(400);
+        expect(res).to.be.json;
+        expect(res.body).to.be.an('object');
+        expect(res.body.success).to.be.false;
+        expect(res.body.payload).to.be.an('object');
+        expect(res.body.payload.dataPath).to.equal('urlParamAfter');
+        expect(res.body.payload.message).to.equal('missing param after in URL');
+      });
+    });
+
+  });
+
   describe('Create and get transactions', function() {
     let groupId;
     let groupCreatedAt;
