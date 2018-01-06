@@ -448,7 +448,6 @@ describe('Groups-Controller: Transactions:', () => {
       .get(URL.BASE_GROUP  + '/' + s2GroupId + '/transactions?after=foobar')
       .set('Authorization', '0 ' + users[1].token)
       .then(res => {
-        console.log(res.body);
         expect(res).to.have.status(400);
         expect(res).to.be.json;
         expect(res.body).to.be.an('object');
@@ -464,7 +463,6 @@ describe('Groups-Controller: Transactions:', () => {
       .get(URL.BASE_GROUP  + '/' + s2GroupId + '/transactions?after=2018-01-01')
       .set('Authorization', '0 ' + users[1].token)
       .then(res => {
-        console.log(res.body);
         expect(res).to.have.status(400);
         expect(res).to.be.json;
         expect(res.body).to.be.an('object');
@@ -480,7 +478,6 @@ describe('Groups-Controller: Transactions:', () => {
       .get(URL.BASE_GROUP  + '/' + s2GroupId + '/transactions')
       .set('Authorization', '0 ' + users[1].token)
       .then(res => {
-        console.log(res.body);
         expect(res).to.have.status(400);
         expect(res).to.be.json;
         expect(res.body).to.be.an('object');
