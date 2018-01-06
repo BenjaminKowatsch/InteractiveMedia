@@ -14,7 +14,7 @@ const jsonSchema = {
   transactionPayloadData: require('../JSONSchema/transactionPayloadData.json')
 };
 
-exports.createNewGroup = function(req, res) {
+module.exports.createNewGroup = function(req, res) {
   winston.debug('Creating a new group');
   // validate data in request body
   validateJsonService.againstSchema(req.body, jsonSchema.groupPayloadData).then(() => {
@@ -40,12 +40,12 @@ exports.createNewGroup = function(req, res) {
   });
 };
 
-exports.getAll = function(req, res) {
+module.exports.getAll = function(req, res) {
   winston.debug('Getting all groups');
   httpResponseService.send(res, 404, 'Not implemented');
 };
 
-exports.getGroupById = function(req, res) {
+module.exports.getGroupById = function(req, res) {
   const groupId = req.params.groupId;
   group.getGroupById(groupId).then(groupResult =>  {
     httpResponseService.send(res, 200, groupResult);
@@ -68,7 +68,7 @@ exports.getGroupById = function(req, res) {
   });
 };
 
-exports.createNewTransaction = function(req, res) {
+module.exports.createNewTransaction = function(req, res) {
   winston.debug('Creating a new transaction');
   // validate data in request body
   validateJsonService.againstSchema(req.body, jsonSchema.transactionPayloadData).then(() => {
@@ -94,7 +94,7 @@ exports.createNewTransaction = function(req, res) {
   });
 };
 
-exports.getTransactionAfterDate = function(req, res) {
+module.exports.getTransactionAfterDate = function(req, res) {
   const date = req.query.after;
   group.getTransactionAfterDate(req.params.groupId, date).then(transactionResult =>  {
     httpResponseService.send(res, 200, transactionResult);
