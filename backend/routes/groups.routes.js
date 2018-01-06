@@ -15,8 +15,8 @@ router.get('/', authenticationService.isAuthenticated,
     authorizationService.isAuthorizedAdmin, groupsController.getAll);
 
 /**
- * @api {POST} /v1/groups/ Create Group
- * @apiName CreateGroup
+ * @api {POST} /v1/groups/ Create
+ * @apiName Create
  * @apiGroup group
  * @apiVersion 0.1.0
  *
@@ -47,17 +47,26 @@ router.post('/', authenticationService.isAuthenticated,
     groupsController.createNewGroup);
 
 /**
- * @api {GET} /v1/groups/:groupId Get Group
- * @apiName GetGroup
+ * @api {GET} /v1/groups/:groupId Get by id
+ * @apiName GetById
  * @apiGroup group
  * @apiVersion 0.1.0
  *
- * @apiParam (URL-Parameter) {string} groupId Id of the requested group
+ * @apiUse paramUrlGroupId
  *
  * @apiUse headerAuthorization
  * @apiUse headerExampleAuthorization
  *
- * @apiSuccess (SuccessCode) {200} ReturnsGroup
+ * @apiUse successBodyGroupName
+ * @apiUse successBodyGroupImageUrl
+ * @apiUse successBodyGroupId
+ * @apiUse successBodyGroupCreatedAt
+ * @apiUse successBodyGroupTransactions
+ * @apiUse successBodyGroupUsers
+ * @apiUse successBodyGroupUsersUserId
+ * @apiUse successBodyGroupUsersName
+ *
+ * @apiSuccess (SuccessCode) {200} Success Group
  * @apiUse successExampleGroup
  *
  * @apiUse error400MissingUnknownUrlParameter
@@ -73,44 +82,4 @@ router.post('/', authenticationService.isAuthenticated,
  */
 router.get('/:groupId', authenticationService.isAuthenticated,
     authorizationService.isGroupMember, groupsController.getGroupById);
-
-/**
- * @api {POST} /v1/groups/:groupId/transactions Create Transaction
- * @apiName CreateTransaction
- * @apiGroup group
- * @apiVersion 0.1.0
- *
- * @apiParam (Parameter) {Number} amount Amout of the transaction
- * @apiParam (Parameter) {string} infoName Name or reason for the transaction
- * @apiParam (Parameter) {Number} infoLocation[latitude] Geoinformation: Latitude, can be null
- * @apiParam (Parameter) {Number} infoLocation[longitude] Geoinformation: Longitude, can be null
- * @apiParam (Parameter) {string} infoCreatedAt Daten when the transaction was created in the app
- * @apiParam (Parameter) {string} infoImageUrl URL of the transaction-image, can be null
- * @apiParam (Parameter) {string} paidBy Id of user who payed the expense
- * @apiParam (Parameter) {string} split Methode to split
- *
- * @apiUse paramExampleCreateTransaction
- *
- * @apiUse headerAuthorization
- * @apiUse headerExampleAuthorization
- *
- * @apiSuccess (SuccessCode) {201} Success Transaction Created
- * @apiUse successExampleTransaction
- *
- * @apiUse successBodySuccess
- * @apiSuccess (Success) {string} payload Transaction which was send to the backend
- * @apiSuccess (Success) {string} payload[publishedAt] Date when transaction was created in backend
- *
- * @apiUse error400InvalidBody
- * @apiUse error401Unauthorized
- * @apiUse error403Forbidden
- * @apiUse error418UncaughtError
- * @apiUse error500DatabaseError
- * @apiUse errorBodyCommonStructure
- *
- * @apiUse errorExampleCommon
- */
-// router.post('/:groupId/transactions', authenticationService.isAuthenticated,
-//     authorizationService.isGroupMember, groupsController.addTransaction);
-
 module.exports = router;
