@@ -3,8 +3,8 @@
 const userData = require('./user.data.json');
 
 const MINUTE = 60000;
-const HOURE = 60 * MINUTE;
-const DAY = 24 * HOURE;
+const HOUR = 60 * MINUTE;
+const DAY = 24 * HOUR;
 const nowPlus = time => new Date(new Date().getTime() + time).toISOString();
 
 module.exports = [
@@ -88,7 +88,7 @@ module.exports = [
           longitude: null,
           latitude: null
         },
-        infoCreatedAt: nowPlus(3 * HOURE),
+        infoCreatedAt: nowPlus(3 * HOUR),
         infoImageUrl: null,
         //paidBy: User 1,
         split: 'even'
@@ -100,7 +100,7 @@ module.exports = [
           longitude: null,
           latitude: null
         },
-        infoCreatedAt: nowPlus(5 * HOURE),
+        infoCreatedAt: nowPlus(5 * HOUR),
         infoImageUrl: null,
         //paidBy: User 1,
         split: 'even'
@@ -112,7 +112,7 @@ module.exports = [
           longitude: null,
           latitude: null
         },
-        infoCreatedAt: nowPlus(12 * HOURE),
+        infoCreatedAt: nowPlus(12 * HOUR),
         infoImageUrl: null,
         //paidBy: User 2,
         split: 'even'
@@ -124,7 +124,7 @@ module.exports = [
           longitude: 9.660790,
           latitude: 48.258534
         },
-        infoCreatedAt: nowPlus(1 * DAY + 2 * HOURE),
+        infoCreatedAt: nowPlus(1 * DAY + 2 * HOUR),
         infoImageUrl: null,
         //paidBy: User 0,
         split: 'even'
@@ -136,7 +136,7 @@ module.exports = [
           longitude: null,
           latitude: null
         },
-        infoCreatedAt: nowPlus(2 * DAY + 2 * HOURE),
+        infoCreatedAt: nowPlus(2 * DAY + 2 * HOUR),
         infoImageUrl: null,
         //paidBy:  User 2,
         split: 'even'
@@ -148,7 +148,7 @@ module.exports = [
           longitude: null,
           latitude: null
         },
-        infoCreatedAt: nowPlus(2 * DAY + 5 * HOURE),
+        infoCreatedAt: nowPlus(2 * DAY + 5 * HOUR),
         infoImageUrl: null,
         //paidBy: User 0,
         split: 'even'
@@ -209,7 +209,7 @@ module.exports = [
         longitude: null,
         latitude: null
       },
-      infoCreatedAt: nowPlus(-1 * HOURE),
+      infoCreatedAt: nowPlus(-1 * HOUR),
       infoImageUrl: null,
       //paidBy: User 1,
       split: 'even'
