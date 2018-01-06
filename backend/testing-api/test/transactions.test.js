@@ -35,6 +35,16 @@ const expectTransaction = (given, expected) => {
   expect(given.paidBy).to.equal(expected.paidBy);
   expect(given.publishedAt).to.be.a('string').with.lengthOf(24);
 };
+const sortByInfoCreatedAt = (a,b) => {
+  const td = dateSting => new Date(dateSting);
+  return td(a.infoCreatedAt) > td(b.infoCreatedAt) ? 1 : td(a.infoCreatedAt) < td(b.infoCreatedAt) ? -1 : 0;
+};
+const expectTransactionsSorted = transactions => {
+  const names = transactions.map(t => t.infoName);
+  for (let i = 0; i < transactions.length; i++) {
+    expect(names[i]).to.equal('Test transaction ' + i);
+  }
+};
 
 // ************* Tests ***********//
 describe('Groups-Controller: Transactions:', () => {
@@ -700,6 +710,8 @@ describe('Groups-Controller: Transactions:', () => {
           expectTransaction(res.body.payload, transaction);
           user.localTransactions.push(res.body.payload);
           expect(user.localTransactions).to.have.a.lengthOf(7);
+          user.localTransactions.sort(sortByInfoCreatedAt);
+          expectTransactionsSorted(user.localTransactions);
         });
       });
       it('should request new transactions(t_6) by user_1', () => {
@@ -718,6 +730,8 @@ describe('Groups-Controller: Transactions:', () => {
           expectTransaction(res.body.payload[0], transaction);
           user.localTransactions.push(res.body.payload[0]);
           expect(user.localTransactions).to.have.a.lengthOf(7);
+          user.localTransactions.sort(sortByInfoCreatedAt);
+          expectTransactionsSorted(user.localTransactions);
         });
       });
       it('should request new transactions(t_6) by user_2', () => {
@@ -736,6 +750,8 @@ describe('Groups-Controller: Transactions:', () => {
           expectTransaction(res.body.payload[0], transaction);
           user.localTransactions.push(res.body.payload[0]);
           expect(user.localTransactions).to.have.a.lengthOf(7);
+          user.localTransactions.sort(sortByInfoCreatedAt);
+          expectTransactionsSorted(user.localTransactions);
         });
       });
       it('should request new transactions(none) by user_0', () => {
