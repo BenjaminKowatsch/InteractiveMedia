@@ -109,6 +109,10 @@
  * @apiDefine error500DatabaseError
     @apiError (ErrorCode) {500} DatabaseError Database internal error
  */
+/**
+ * @apiDefine error500FcmError
+    @apiError (ErrorCode) {500} FcmError Firebase Cloud Messaging error
+ */
 
 /**
  * @apiDefine paramExamplePassword

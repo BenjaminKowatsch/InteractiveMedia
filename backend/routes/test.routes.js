@@ -101,4 +101,34 @@ router.get('/authorization/none', testController.getAuthorizationNotRequired);
  */
 router.get('/authorization/admin', authenticationService.isAuthenticated, authorizationService.isAuthorizedAdmin,
     testController.getAuthorizationAdminRequired);
+
+/**
+ * @api {POST} /v1/test/notification/user Send push notification to user
+ * @apiName sendPushNotificationToUser
+ * @apiGroup test
+ * @apiVersion 0.1.0
+ * @apiDescription User is identified by auth token.
+ *
+ * @apiUse headerAuthorization
+ * @apiUse headerExampleAuthorization
+ *
+ * @apiParam (Parameter) {string} dryRun Mock the last step to send the notification. Allowed values: true, false. Default: true.
+ * @apiParamExample {JSON} Body
+    {
+        "dryRun" : "true"
+    }
+ *
+ * @apiSuccess (SuccessCode) {200} Success Notification sent
+ * @apiUse successExampleSuccess
+ *
+ * @apiUse error401Unauthorized
+ * @apiUse error418UncaughtError
+ * @apiUse error500DatabaseError
+ * @apiUse error500FcmError
+ * @apiUse errorBodyCommonStructure
+ *
+ * @apiUse errorExampleCommon
+ */
+router.post('/notification/user', authenticationService.isAuthenticated, testController.sendPushNotificationToUser);
+
 module.exports = router;
