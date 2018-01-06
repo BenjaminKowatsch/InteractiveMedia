@@ -103,6 +103,7 @@ module.exports.getTransactionAfterDate = function(req, res) {
     let statusCode = 418;
     switch (errorResult.errorCode) {
       case ERROR.MISSING_ID_IN_URL:
+      case ERROR.INVALID_DATE_FORMAT:
         statusCode = 400;
         break;
       case ERROR.DB_ERROR:

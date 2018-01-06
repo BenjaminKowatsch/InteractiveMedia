@@ -200,7 +200,8 @@ module.exports.getTransactionAfterDate = function(groupId, date) {
   winston.debug('Hello from module getTransactionAfterDate');
   return new Promise((resolve, reject) => {
     let responseData = {payload: {}};
-    checkIfGroupIdIsGiven(groupId)
+    checkIfDateIsGivenAndValid(date)
+    .then(() => checkIfGroupIdIsGiven(groupId))
     .then(findGroupById)
     .then(checkForGroupResult)
     .then(groupResult => filterTransactionsAfterDate(groupResult.transactions, date))
@@ -216,6 +217,7 @@ module.exports.getTransactionAfterDate = function(groupId, date) {
       if (err.isSelfProvided) {
         responseData.payload.message = err.message;
         errorCode = err.errorCode;
+        responseData.payload.dataPath = err.dataPath || responseData.payload.dataPath;
       } else {
         responseData.payload.message = 'unknown database error';
         errorCode = ERROR.DB_ERROR;
@@ -367,5 +369,22 @@ function filterTransactionsAfterDate(allTransactions, date) {
     return transactions;
   } else {
     return [];
+  }
+}
+
+function checkIfDateIsGivenAndValid(date) {
+  let dateRegExp = /^\d{4}-[01]\d-[0-3]\dT[0-2]\d:[0-5]\d:[0-5]\d\.\d{3}Z$/;
+  let errorToReturn = {isSelfProvided: true};
+  errorToReturn.dataPath = 'urlParamAfter';
+  if (!date) {
+    errorToReturn.message = 'missing param after in URL';
+    errorToReturn.errorCode = ERROR.MISSING_ID_IN_URL;
+    return Promise.reject(errorToReturn);
+  } else if (!dateRegExp.test(date)) {
+    errorToReturn.message = 'invalid date format';
+    errorToReturn.errorCode = ERROR.INVALID_DATE_FORMAT;
+    return Promise.reject(errorToReturn);
+  } else {
+    return Promise.resolve(date); // must resolve -> date is not an object
   }
 }
