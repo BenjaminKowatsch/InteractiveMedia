@@ -350,7 +350,7 @@ function checkIfDateIsGtGroupCreateDate(groupResult, transactionDate) {
   if (new Date(groupResult.createdAt) > new Date(transactionDate)) {
     let errorToReturn = {isSelfProvided: true};
     errorToReturn.dataPath = 'transaction';
-    errorToReturn.message = 'invalide time adjustment: group.createdAt is gt transaction.infoCreatedAt';
+    errorToReturn.message = 'invalid time adjustment: group.createdAt is gt transaction.infoCreatedAt';
     errorToReturn.errorCode = ERROR.INVALID_CREATE_TRANSACTION_VALUES;
     return Promise.reject(errorToReturn);
   } else {

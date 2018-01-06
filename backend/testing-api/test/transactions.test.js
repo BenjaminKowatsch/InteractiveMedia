@@ -149,7 +149,7 @@ describe('Groups-Controller: Transactions:', () => {
       });
     });
 
-    it('should fail to add a transaction due to invalide longitude location data', () => {
+    it('should fail to add a transaction due to invalid longitude location data', () => {
       return chai.request(HOST)
       .post(URL.BASE_GROUP  + '/' + groupId + '/transactions')
       .set('Authorization', '0 ' + users[0].token)
@@ -165,7 +165,7 @@ describe('Groups-Controller: Transactions:', () => {
       });
     });
 
-    it('should fail to add a transaction due to invalide latitude location data', () => {
+    it('should fail to add a transaction due to invalid latitude location data', () => {
       return chai.request(HOST)
       .post(URL.BASE_GROUP  + '/' + groupId + '/transactions')
       .set('Authorization', '0 ' + users[0].token)
@@ -181,7 +181,7 @@ describe('Groups-Controller: Transactions:', () => {
       });
     });
 
-    it('should fail to add a transaction due to invalide info-created-at', () => {
+    it('should fail to add a transaction due to invalid info-created-at', () => {
       return chai.request(HOST)
       .post(URL.BASE_GROUP  + '/' + groupId + '/transactions')
       .set('Authorization', '0 ' + users[0].token)
@@ -194,7 +194,7 @@ describe('Groups-Controller: Transactions:', () => {
         expect(res.body.payload).to.be.an('object');
         expect(res.body.payload.dataPath).to.equal('transaction');
         expect(res.body.payload.message)
-        .to.equal('invalide time adjustment: group.createdAt is gt transaction.infoCreatedAt');
+        .to.equal('invalid time adjustment: group.createdAt is gt transaction.infoCreatedAt');
       });
     });
 
