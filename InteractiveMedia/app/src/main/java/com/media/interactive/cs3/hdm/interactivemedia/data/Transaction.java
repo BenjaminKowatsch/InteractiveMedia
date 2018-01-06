@@ -35,4 +35,8 @@ public class Transaction {
         out.put(TransactionTable.COLUMN_AMOUNT, amount);
         return out;
     }
+
+    public long getGroupId() {
+        return groupId;
+    }
 }
