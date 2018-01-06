@@ -16,6 +16,6 @@
     <string name="hello_blank_fragment">Hello blank fragment</string>
 
 
-    <string name="web_service_url">http://10.0.2.2:8081</string>
-
+    <string name="web_service_url">http://10.0.0.107:8081</string>
+    <string name="pick_image_source">Image Source</string>
 </resources>

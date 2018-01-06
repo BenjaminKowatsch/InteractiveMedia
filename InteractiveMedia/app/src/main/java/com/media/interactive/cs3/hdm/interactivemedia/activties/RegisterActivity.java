@@ -40,16 +40,14 @@ public class RegisterActivity extends AppCompatActivity
         register.setOnClickListener(this);
     }
 
-
-    @RequiresApi(api = Build.VERSION_CODES.N)
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.bn_register:
                 final Login login = Login.getInstance();
-                login.setUsername(registerUsername.getText().toString());
+                login.getUser().setUsername(registerUsername.getText().toString());
                 login.setUserType(UserType.DEFAULT);
-                login.setEmail(registerEmail.getText().toString());
+                login.getUser().setEmail(registerEmail.getText().toString());
                 login.setHashedPassword(Hash.hashStringSha256(registerPassword.getText().toString()));
                 login.register(RegisterActivity.this, new CallbackListener<JSONObject, Exception>() {
                     @Override

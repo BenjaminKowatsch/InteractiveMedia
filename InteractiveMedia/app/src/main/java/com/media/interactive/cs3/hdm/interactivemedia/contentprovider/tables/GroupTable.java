@@ -26,9 +26,13 @@ public class GroupTable {
      */
     public static final String COLUMN_CREATED_AT = "created_at";
     /**
-     * Fifth attribute, type INTEGER references
+     * Fifth attribute, type STRING references the server group id
      */
-    public static final String COLUMN_ADMIN_ID = "admin_id";
+    public static final String COLUMN_GROUP_ID = "group_id";
+    /**
+     * Sixth attribute, type INTEGER representing an boolean 0/1 not synced/synched
+     */
+    public static final String COLUMN_SYNCHRONIZED = "synchronized";
 
     public static final String DATABASE_CREATE =
 
@@ -37,7 +41,8 @@ public class GroupTable {
                 COLUMN_NAME+" TEXT NOT NULL," +
                 COLUMN_IMAGE_URL+" TEXT," +
                 COLUMN_CREATED_AT+" TIMESTAMP DEFAULT CURRENT_TIMESTAMP," +
-                COLUMN_ADMIN_ID +" INTEGER references "+UserTable.TABLE_NAME+" ("+UserTable.COLUMN_ID+") on delete cascade on update cascade)";
+                COLUMN_GROUP_ID +" TEXT," +
+                COLUMN_SYNCHRONIZED +" INTEGER NOT NULL)";
 
 
     public static final String DATABASE_DROP = "drop table if exists " + TABLE_NAME;

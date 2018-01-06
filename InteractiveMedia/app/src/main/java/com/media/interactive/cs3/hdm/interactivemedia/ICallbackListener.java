@@ -1,5 +1,7 @@
 package com.media.interactive.cs3.hdm.interactivemedia;
 
+import org.json.JSONException;
+
 /**
  * Created by benny on 21.12.17.
  */

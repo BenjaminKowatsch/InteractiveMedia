@@ -2,6 +2,7 @@ package com.media.interactive.cs3.hdm.interactivemedia.activties;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.database.Cursor;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.RequiresApi;
@@ -26,19 +27,17 @@ public class MainActivity extends AppCompatActivity {
     private SharedPreferences sharedPreferences;
     private DatabaseHelper databaseHelper;
 
-    @RequiresApi(api = Build.VERSION_CODES.N)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         databaseHelper = new DatabaseHelper(this);
 
-
         //databaseHelper.deleteAllUsers();
-        databaseHelper.resetDatabase();
+/*        databaseHelper.resetDatabase();
 
         final Login testUser = Login.getInstance();
-        testUser.setUsername("Test User");
-        testUser.setEmail("user.test@gmail.com");
+        testUser.getUser().setUsername("Test User");
+        testUser.getUser().setEmail("user.test@gmail.com");
         testUser.setHashedPassword(Hash.hashStringSha256("Passwort1234"));
         //databaseHelper.deleteAllUsers();
 
@@ -46,6 +45,12 @@ public class MainActivity extends AppCompatActivity {
         dummyDataAdder.addAllDummyData();
 
 
+        Cursor c = databaseHelper.getAllGroupAndUsersByGroup(1);
+        while (c.moveToNext()) {
+            for(int i = 0; i<  c.getColumnCount();i++) {
+                Log.d(TAG, i+"  " + c.getColumnName(i));
+            }
+        }*/
         Login.getInstance().clear();
 
         appTag = getResources().getString(R.string.app_tag);
@@ -56,7 +61,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-    @RequiresApi(api = Build.VERSION_CODES.N)
+
     private void launchNextActivity() {
         Login.getInstance().login(MainActivity.this, new CallbackListener<JSONObject, Exception>() {
             @Override
@@ -91,7 +96,6 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-    @RequiresApi(api = Build.VERSION_CODES.N)
     @Override
     protected void onResume() {
         super.onResume();
