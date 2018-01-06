@@ -18,8 +18,12 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.ImageView;
 import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.model.GlideUrl;
+import com.bumptech.glide.load.model.LazyHeaders;
 import com.media.interactive.cs3.hdm.interactivemedia.CallbackListener;
 import com.media.interactive.cs3.hdm.interactivemedia.R;
 import com.media.interactive.cs3.hdm.interactivemedia.data.Login;
@@ -42,7 +46,7 @@ public class HomeActivity extends AppCompatActivity
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        final Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
         fab = (FloatingActionButton) findViewById(R.id.fab);
@@ -55,11 +59,29 @@ public class HomeActivity extends AppCompatActivity
         drawer.addDrawerListener(toggle);
         toggle.syncState();
 
-        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
+        final NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
+
+        loadProfilePicture(navigationView);
 
         displayFragment(R.id.nav_groups);
 
+    }
+
+    private void loadProfilePicture(NavigationView navigationView){
+        final String imageName = Login.getInstance().getProfilePicture();
+        if(imageName != null) {
+            final ImageView profilePicture = (ImageView) navigationView.getHeaderView(0).findViewById(R.id.imageView);
+
+            String imageUrl = getResources().getString(R.string.web_service_url).concat("/v1/object-store/download?filename=").concat(imageName);
+            Log.d(TAG, "Try to download URL: "+ imageUrl);
+
+            final LazyHeaders.Builder builder = new LazyHeaders.Builder()
+                .addHeader("Authorization", Login.getInstance().getUserType().getValue()+" "+ Login.getInstance().getAccessToken());
+
+            final GlideUrl glideUrl = new GlideUrl(imageUrl, builder.build());
+            Glide.with(this).load(glideUrl).into(profilePicture);
+        }
     }
 
     @Override

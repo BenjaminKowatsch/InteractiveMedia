@@ -26,6 +26,7 @@ public class MainActivity extends AppCompatActivity {
     private SharedPreferences sharedPreferences;
     private DatabaseHelper databaseHelper;
 
+
     @RequiresApi(api = Build.VERSION_CODES.N)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -78,7 +79,7 @@ public class MainActivity extends AppCompatActivity {
                 Log.d(TAG, "Login failed due to " + error.getMessage());
                 Toast.makeText(getApplicationContext(), "Login failed", Toast.LENGTH_SHORT).show();
                 // Do first run stuff
-                Log.d(TAG, "Launching Login Activity"); // TODO: change intent to Login activity
+                Log.d(TAG, "Launching Login Activity");
                 final Intent intent = new Intent(MainActivity.this, LoginActivity.class);
                 intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
                 startActivity(intent);
@@ -89,7 +90,6 @@ public class MainActivity extends AppCompatActivity {
             }
         });
     }
-
 
     @RequiresApi(api = Build.VERSION_CODES.N)
     @Override

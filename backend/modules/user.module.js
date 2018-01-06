@@ -617,3 +617,80 @@ module.exports.getAllUsers = function() {
     });
   });
 };
+
+function checkIfUpdateOneWasSuccessful(resultRaw) {
+  return new Promise((resolve, reject) => {
+    const result = JSON.parse(resultRaw);
+    if (result && result.n === 1 && result.nModified === 1 && result.ok === 1) {
+      resolve(result);
+    } else {
+      let errorToReturn = {isSelfProvided: true};
+      errorToReturn.message = 'database error';
+      errorToReturn.errorCode = ERROR.DB_ERROR;
+      reject(errorToReturn);
+    }
+  });
+}
+
+module.exports.updateFcmToken = function(userId, fcmToken) {
+  return new Promise((resolve, reject) => {
+    let responseData = {payload: {}};
+    checkIfUserIdIsGiven(userId).then(() => {
+      const query = {'userId': userId};
+      const update = {
+        '$set': {
+          'fcmToken': fcmToken
+        }
+      };
+      const options = {upsert: false};
+      return database.collections.users.updateOne(query, update, options);
+    })
+    .then(checkIfUpdateOneWasSuccessful)
+    .then(updateResult => {
+      responseData.success = true;
+      resolve(responseData);
+    })
+    .catch(err => {
+      winston.debug(err);
+      responseData.success = false;
+      responseData.payload.dataPath = 'user';
+      let errorCode;
+      if (err.isSelfProvided) {
+        responseData.payload.message = err.message;
+        errorCode = err.errorCode;
+      } else {
+        responseData.payload.message = 'unknown database error';
+        errorCode = ERROR.DB_ERROR;
+      }
+      reject({errorCode: errorCode, responseData: responseData});
+    });
+  });
+};
+
+module.exports.getFcmTokensByUserIds = function(userIds) {
+  return new Promise((resolve, reject) => {
+    let responseData = {payload: {}};
+    const query = {userId: {'$in': userIds}};
+    const options = {fcmToken: 1, _id: 0};
+    database.collections.users.find(query, options).toArray().then(result => {
+      const fcmTokens = result.map(user => {return user.fcmToken;});
+      responseData.success = true;
+      responseData.payload = fcmTokens;
+      resolve(responseData);
+    })
+    .catch(err => {
+      winston.debug(err);
+      responseData.success = false;
+      responseData.payload.dataPath = 'user';
+      let errorCode;
+      if (err.isSelfProvided) {
+        responseData.payload.message = err.message;
+        errorCode = err.errorCode;
+      } else {
+        responseData.payload.message = 'unknown database error';
+        errorCode = ERROR.DB_ERROR;
+      }
+      reject({errorCode: errorCode, responseData: responseData});
+    });
+  });
+};

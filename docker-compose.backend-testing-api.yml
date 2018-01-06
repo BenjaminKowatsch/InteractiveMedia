@@ -23,6 +23,7 @@ services:
       - ADMIN_USERNAME=admin
       - ADMIN_PASSWORD=inter@kt!veMedien
       - ADMIN_EMAIL=admin@example.com
+      - FCM_SERVER_KEY=AAAA03Mtpdk:APA91bGy9qAosK5suZI3ctH2mhYbtyS1f7pXajkaPePTuZ58IiZcYy_2PUlpwfXnuqck9KZIXDZvDzvJyfgg7uJS5YJsy5uIYjOXTTxhapMhbtjBfimnbDYA3nJAN76-XVU--g0KVoLM
     image: localhost:5000/backend
     depends_on:
       mongo:
