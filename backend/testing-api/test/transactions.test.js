@@ -394,7 +394,7 @@ describe('Groups-Controller: Transactions:', () => {
         .post(URL.BASE_GROUP  + '/' + groupId + '/transactions')
         .set('Authorization', '0 ' + users[0].token)
         .send(transaction)
-        .then(function(res) {
+        .then(res => {
           expect(res).to.have.status(201);
           expect(res).to.be.json;
           expect(res.body).to.be.an('object');
@@ -409,7 +409,7 @@ describe('Groups-Controller: Transactions:', () => {
         return chai.request(HOST)
         .get(URL.BASE_GROUP  + '/' + groupId + '/transactions?after=' + groupCreatedAt)
         .set('Authorization', '0 ' + users[1].token)
-        .then(function(res) {
+        .then(res => {
           expect(res).to.have.status(200);
           expect(res).to.be.json;
           expect(res.body).to.be.an('object');
@@ -425,7 +425,7 @@ describe('Groups-Controller: Transactions:', () => {
         return chai.request(HOST)
         .get(URL.BASE_GROUP  + '/' + groupId + '/transactions?after=' + groupCreatedAt)
         .set('Authorization', '0 ' + users[2].token)
-        .then(function(res) {
+        .then(res => {
           expect(res).to.have.status(200);
           expect(res).to.be.json;
           expect(res.body).to.be.an('object');
@@ -442,7 +442,7 @@ describe('Groups-Controller: Transactions:', () => {
         .post(URL.BASE_GROUP  + '/' + groupId + '/transactions')
         .set('Authorization', '0 ' + users[1].token)
         .send(transaction))
-        .then(function(res) {
+        .then(res => {
           expect(res).to.have.status(201);
           expect(res).to.be.json;
           expect(res.body).to.be.an('object');
@@ -459,7 +459,7 @@ describe('Groups-Controller: Transactions:', () => {
         return chai.request(HOST)
         .get(URL.BASE_GROUP  + '/' + groupId + '/transactions?after=' + lastTransactionDate)
         .set('Authorization', '0 ' + user.token)
-        .then(function(res) {
+        .then(res => {
           expect(res).to.have.status(200);
           expect(res).to.be.json;
           expect(res.body).to.be.an('object');
@@ -477,7 +477,7 @@ describe('Groups-Controller: Transactions:', () => {
         return chai.request(HOST)
         .get(URL.BASE_GROUP  + '/' + groupId + '/transactions?after=' + lastTransactionDate)
         .set('Authorization', '0 ' + user.token)
-        .then(function(res) {
+        .then(res => {
           expect(res).to.have.status(200);
           expect(res).to.be.json;
           expect(res.body).to.be.an('object');
@@ -495,7 +495,7 @@ describe('Groups-Controller: Transactions:', () => {
         .post(URL.BASE_GROUP  + '/' + groupId + '/transactions')
         .set('Authorization', '0 ' + user.token)
         .send(transaction))
-        .then(function(res) {
+        .then(res => {
           expect(res).to.have.status(201);
           expect(res).to.be.json;
           expect(res.body).to.be.an('object');
@@ -512,7 +512,7 @@ describe('Groups-Controller: Transactions:', () => {
         return chai.request(HOST)
         .get(URL.BASE_GROUP  + '/' + groupId + '/transactions?after=' + lastTransactionDate)
         .set('Authorization', '0 ' + user.token)
-        .then(function(res) {
+        .then(res => {
           expect(res).to.have.status(200);
           expect(res).to.be.json;
           expect(res.body).to.be.an('object');
@@ -530,7 +530,7 @@ describe('Groups-Controller: Transactions:', () => {
         .post(URL.BASE_GROUP  + '/' + groupId + '/transactions')
         .set('Authorization', '0 ' + user.token)
         .send(transaction))
-        .then(function(res) {
+        .then(res => {
           expect(res).to.have.status(201);
           expect(res).to.be.json;
           expect(res.body).to.be.an('object');
@@ -547,7 +547,7 @@ describe('Groups-Controller: Transactions:', () => {
         return chai.request(HOST)
         .get(URL.BASE_GROUP  + '/' + groupId + '/transactions?after=' + lastTransactionDate)
         .set('Authorization', '0 ' + user.token)
-        .then(function(res) {
+        .then(res => {
           expect(res).to.have.status(200);
           expect(res).to.be.json;
           expect(res.body).to.be.an('object');
@@ -566,7 +566,7 @@ describe('Groups-Controller: Transactions:', () => {
         return chai.request(HOST)
         .get(URL.BASE_GROUP  + '/' + groupId + '/transactions?after=' + lastTransactionDate)
         .set('Authorization', '0 ' + user.token)
-        .then(function(res) {
+        .then(res => {
           expect(res).to.have.status(200);
           expect(res).to.be.json;
           expect(res.body).to.be.an('object');
@@ -587,7 +587,7 @@ describe('Groups-Controller: Transactions:', () => {
         .post(URL.BASE_GROUP  + '/' + groupId + '/transactions')
         .set('Authorization', '0 ' + user.token)
         .send(transaction))
-        .then(function(res) {
+        .then(res => {
           expect(res).to.have.status(201);
           expect(res).to.be.json;
           expect(res.body).to.be.an('object');
@@ -604,7 +604,7 @@ describe('Groups-Controller: Transactions:', () => {
         return chai.request(HOST)
         .get(URL.BASE_GROUP  + '/' + groupId + '/transactions?after=' + lastTransactionDate)
         .set('Authorization', '0 ' + user.token)
-        .then(function(res) {
+        .then(res => {
           expect(res).to.have.status(200);
           expect(res).to.be.json;
           expect(res.body).to.be.an('object');
@@ -622,7 +622,7 @@ describe('Groups-Controller: Transactions:', () => {
         return chai.request(HOST)
         .get(URL.BASE_GROUP  + '/' + groupId + '/transactions?after=' + lastTransactionDate)
         .set('Authorization', '0 ' + user.token)
-        .then(function(res) {
+        .then(res => {
           expect(res).to.have.status(200);
           expect(res).to.be.json;
           expect(res.body).to.be.an('object');
@@ -640,7 +640,7 @@ describe('Groups-Controller: Transactions:', () => {
         .post(URL.BASE_GROUP  + '/' + groupId + '/transactions')
         .set('Authorization', '0 ' + user.token)
         .send(transaction))
-        .then(function(res) {
+        .then(res => {
           expect(res).to.have.status(201);
           expect(res).to.be.json;
           expect(res.body).to.be.an('object');
@@ -656,7 +656,7 @@ describe('Groups-Controller: Transactions:', () => {
         return chai.request(HOST)
         .get(URL.BASE_GROUP  + '/' + groupId + '/transactions?after=' + lastTransactionDate)
         .set('Authorization', '0 ' + user.token)
-        .then(function(res) {
+        .then(res => {
           expect(res).to.have.status(200);
           expect(res).to.be.json;
           expect(res.body).to.be.an('object');
@@ -674,7 +674,7 @@ describe('Groups-Controller: Transactions:', () => {
         return chai.request(HOST)
         .get(URL.BASE_GROUP  + '/' + groupId + '/transactions?after=' + lastTransactionDate)
         .set('Authorization', '0 ' + user.token)
-        .then(function(res) {
+        .then(res => {
           expect(res).to.have.status(200);
           expect(res).to.be.json;
           expect(res.body).to.be.an('object');
@@ -692,7 +692,7 @@ describe('Groups-Controller: Transactions:', () => {
         .post(URL.BASE_GROUP  + '/' + groupId + '/transactions')
         .set('Authorization', '0 ' + user.token)
         .send(transaction))
-        .then(function(res) {
+        .then(res => {
           expect(res).to.have.status(201);
           expect(res).to.be.json;
           expect(res.body).to.be.an('object');
@@ -709,7 +709,7 @@ describe('Groups-Controller: Transactions:', () => {
         return chai.request(HOST)
         .get(URL.BASE_GROUP  + '/' + groupId + '/transactions?after=' + lastTransactionDate)
         .set('Authorization', '0 ' + user.token)
-        .then(function(res) {
+        .then(res => {
           expect(res).to.have.status(200);
           expect(res).to.be.json;
           expect(res.body).to.be.an('object');
@@ -727,7 +727,7 @@ describe('Groups-Controller: Transactions:', () => {
         return chai.request(HOST)
         .get(URL.BASE_GROUP  + '/' + groupId + '/transactions?after=' + lastTransactionDate)
         .set('Authorization', '0 ' + user.token)
-        .then(function(res) {
+        .then(res => {
           expect(res).to.have.status(200);
           expect(res).to.be.json;
           expect(res.body).to.be.an('object');
@@ -744,7 +744,7 @@ describe('Groups-Controller: Transactions:', () => {
         return chai.request(HOST)
         .get(URL.BASE_GROUP  + '/' + groupId + '/transactions?after=' + lastTransactionDate)
         .set('Authorization', '0 ' + user.token)
-        .then(function(res) {
+        .then(res => {
           expect(res).to.have.status(200);
           expect(res).to.be.json;
           expect(res.body).to.be.an('object');
@@ -758,7 +758,7 @@ describe('Groups-Controller: Transactions:', () => {
         return chai.request(HOST)
         .get(URL.BASE_GROUP  + '/' + groupId + '/transactions?after=' + lastTransactionDate)
         .set('Authorization', '0 ' + user.token)
-        .then(function(res) {
+        .then(res => {
           expect(res).to.have.status(200);
           expect(res).to.be.json;
           expect(res.body).to.be.an('object');
@@ -772,7 +772,7 @@ describe('Groups-Controller: Transactions:', () => {
         return chai.request(HOST)
         .get(URL.BASE_GROUP  + '/' + groupId + '/transactions?after=' + lastTransactionDate)
         .set('Authorization', '0 ' + user.token)
-        .then(function(res) {
+        .then(res => {
           expect(res).to.have.status(200);
           expect(res).to.be.json;
           expect(res.body).to.be.an('object');
