@@ -17,12 +17,14 @@ public class Transaction {
     private final String split;
     private final Date dateTime;
     private final double amount;
+    private final long groupId;
 
-    public Transaction(String name, String split, Date dateTime, double amount) {
+    public Transaction(String name, String split, Date dateTime, double amount, long groupId) {
         this.name = name;
         this.split = split;
         this.dateTime = dateTime;
         this.amount = amount;
+        this.groupId = groupId;
     }
 
     public ContentValues toContentValues() {

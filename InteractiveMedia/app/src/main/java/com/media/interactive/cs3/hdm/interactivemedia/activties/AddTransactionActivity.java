@@ -25,11 +25,13 @@ import java.util.Calendar;
 import java.util.Date;
 
 public class AddTransactionActivity extends AppCompatActivity {
+    public static final String GROUP_TO_ADD_TO = "GroupToAddTo";
     private final SimpleDateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyy");
     private final SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm");
     private final SimpleDateFormat dateTimeFormat = new SimpleDateFormat(dateFormat.toPattern() + timeFormat.toPattern());
     private EditText dateEditText;
     private EditText timeEditText;
+    private long groupId;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -37,6 +39,8 @@ public class AddTransactionActivity extends AppCompatActivity {
         setContentView(R.layout.activity_add_transaction);
         dateEditText = findViewById(R.id.et_add_transaction_date);
         timeEditText = findViewById(R.id.et_add_transaction_time);
+
+        groupId = getIntent().getLongExtra(GROUP_TO_ADD_TO, -1);
 
         Button addTransactionButton = findViewById(R.id.bn_add_transaction);
         addTransactionButton.setOnClickListener(new View.OnClickListener() {
@@ -71,6 +75,7 @@ public class AddTransactionActivity extends AppCompatActivity {
     private void saveToLocalDatabase(Transaction transaction) {
         ContentValues transactionContent = transaction.toContentValues();
         Uri id = getContentResolver().insert(DatabaseProvider.CONTENT_TRANSACTION_URI, transactionContent);
+        Log.i(this.getClass().toString(), "saveToLocalDatabase() returned " +  id);
     }
 
     private Transaction buildTransaction(EditText nameText, TextView splitText,
@@ -79,7 +84,7 @@ public class AddTransactionActivity extends AppCompatActivity {
         final String split = splitText.getText().toString();
         final double amount = Double.parseDouble(amountText.getText().toString());
         final Date dateTime = parseDateTime(dateText, timeText);
-        return new Transaction(purpose, split, dateTime, amount);
+        return new Transaction(purpose, split, dateTime, amount, groupId);
     }
 
     private Date parseDateTime(EditText dateText, EditText timeText) {
