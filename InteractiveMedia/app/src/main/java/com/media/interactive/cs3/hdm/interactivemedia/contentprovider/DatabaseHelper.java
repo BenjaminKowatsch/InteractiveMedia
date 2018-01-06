@@ -1,8 +1,11 @@
 package com.media.interactive.cs3.hdm.interactivemedia.contentprovider;
 
 import android.content.Context;
+import android.database.Cursor;
+import android.database.DatabaseUtils;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.util.Log;
 
 import com.media.interactive.cs3.hdm.interactivemedia.contentprovider.tables.DebtTable;
 import com.media.interactive.cs3.hdm.interactivemedia.contentprovider.tables.GroupTable;
@@ -72,6 +75,19 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         final SQLiteDatabase db = this.getWritableDatabase();
         db.delete("users", null, null);
         db.delete("login", null, null);
+    }
+
+    public Cursor getTransactionsForGroup(long groupId) {
+        Log.d(this.getClass().toString(), "Accessing transactions for group " + groupId);
+        final SQLiteDatabase db = this.getWritableDatabase();
+        final String subQuery = "SELECT " + GroupTransactionTable.COLUMN_TRANSACTION_ID + " FROM "
+                + GroupTransactionTable.TABLE_NAME
+                + " WHERE " + GroupTransactionTable.COLUMN_GROUP_ID + " = ?";
+        final String query = "SELECT * FROM " + TransactionTable.TABLE_NAME
+                + " WHERE " + TransactionTable.COLUMN_ID + " IN (" + subQuery + " )";
+        final Cursor cursor = db.rawQuery(query, new String[]{"" + groupId});
+        Log.d(this.getClass().toString(), DatabaseUtils.dumpCursorToString(cursor));
+        return cursor;
     }
     /*
     public Cursor getUsers() {
