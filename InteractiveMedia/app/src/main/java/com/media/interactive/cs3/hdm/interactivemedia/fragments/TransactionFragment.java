@@ -22,6 +22,7 @@ import android.widget.Spinner;
 
 import com.media.interactive.cs3.hdm.interactivemedia.R;
 import com.media.interactive.cs3.hdm.interactivemedia.activties.AddTransactionActivity;
+import com.media.interactive.cs3.hdm.interactivemedia.contentprovider.DatabaseHelper;
 import com.media.interactive.cs3.hdm.interactivemedia.contentprovider.DatabaseProvider;
 import com.media.interactive.cs3.hdm.interactivemedia.contentprovider.tables.GroupTable;
 import com.media.interactive.cs3.hdm.interactivemedia.contentprovider.tables.TransactionTable;
@@ -40,6 +41,7 @@ public class TransactionFragment extends ListFragment implements LoaderManager.L
     private View transactionListFragment;
     private ContentResolver dummyContentResolver;
     private SimpleCursorAdapter groupAdapter;
+    private DatabaseHelper databaseHelper;
 
     /**
      * Mandatory empty constructor for the fragment manager to instantiate the
@@ -66,17 +68,26 @@ public class TransactionFragment extends ListFragment implements LoaderManager.L
 
         groupAdapter = initializeGroupAdapter();
         groupAdapter.getCursor().moveToFirst();
-
+        databaseHelper = new DatabaseHelper(this.getContext());
 
         // Initializing the SimpleCursorAdapter and the CursorLoader
+        initializeTransactionsForCurrentGroup();
+    }
+
+    private void initializeTransactionsForCurrentGroup() {
+        Cursor cursor = databaseHelper.getTransactionsForGroup(getCurrentGroupId());
         String[] projection = new String[] {TransactionTable.COLUMN_INFO_NAME, TransactionTable.COLUMN_INFO_CREATED_AT,
             TransactionTable.COLUMN_AMOUNT, TransactionTable.COLUMN_PAID_BY, TransactionTable.COLUMN_INFO_LOCATION};
         getLoaderManager().initLoader(0, null, this);
-        simpleCursorAdapter = new SimpleCursorAdapter(getActivity(), R.layout.fragment_transaction, null, projection,
+        simpleCursorAdapter = new SimpleCursorAdapter(getActivity(), R.layout.fragment_transaction, cursor, projection,
             new int[] {R.id.transaction_title, R.id.transaction_creation_date,
                 R.id.transaction_amount, R.id.transaction_payed_by, R.id.transaction_location}, 0);
         setListAdapter(simpleCursorAdapter);
+    }
 
+    private void updateTransactionsForCurrentGroup() {
+        Cursor cursor = databaseHelper.getTransactionsForGroup(getCurrentGroupId());
+        simpleCursorAdapter.swapCursor(cursor);
     }
 
     private long getCurrentGroupId() {
@@ -102,7 +113,18 @@ public class TransactionFragment extends ListFragment implements LoaderManager.L
         transactionListFragment = inflater.inflate(R.layout.fragment_transaction_list, container, false);
         groupSelection = transactionListFragment.findViewById(R.id.spinner_group_selection);
         groupSelection.setAdapter(groupAdapter);
+        groupSelection.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+                updateTransactionsForCurrentGroup();
+            }
 
+            @Override
+            public void onNothingSelected(AdapterView<?> adapterView) {
+                updateTransactionsForCurrentGroup();
+            }
+        });
+        updateTransactionsForCurrentGroup();
         return transactionListFragment;
     }
 
@@ -150,11 +172,12 @@ public class TransactionFragment extends ListFragment implements LoaderManager.L
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
         simpleCursorAdapter.swapCursor(data);
+        updateTransactionsForCurrentGroup();
     }
 
     @Override
     public void onLoaderReset(Loader<Cursor> loader) {
-        simpleCursorAdapter.swapCursor(null);
+        updateTransactionsForCurrentGroup();
     }
 
 
