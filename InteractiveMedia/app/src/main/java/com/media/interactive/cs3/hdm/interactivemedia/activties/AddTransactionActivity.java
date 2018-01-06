@@ -17,6 +17,7 @@ import android.widget.TimePicker;
 
 import com.media.interactive.cs3.hdm.interactivemedia.R;
 import com.media.interactive.cs3.hdm.interactivemedia.contentprovider.DatabaseProvider;
+import com.media.interactive.cs3.hdm.interactivemedia.contentprovider.tables.GroupTransactionTable;
 import com.media.interactive.cs3.hdm.interactivemedia.data.Transaction;
 
 import java.text.ParseException;
@@ -75,7 +76,13 @@ public class AddTransactionActivity extends AppCompatActivity {
     private void saveToLocalDatabase(Transaction transaction) {
         ContentValues transactionContent = transaction.toContentValues();
         Uri id = getContentResolver().insert(DatabaseProvider.CONTENT_TRANSACTION_URI, transactionContent);
-        Log.i(this.getClass().toString(), "saveToLocalDatabase() returned " +  id);
+        if (id != null) {
+            ContentValues transactionGroupContent = new ContentValues();
+            final int transactionId = Integer.parseInt(id.getLastPathSegment());
+            transactionGroupContent.put(GroupTransactionTable.COLUMN_TRANSACTION_ID, transactionId);
+            transactionGroupContent.put(GroupTransactionTable.COLUMN_GROUP_ID, transaction.getGroupId());
+            getContentResolver().insert(DatabaseProvider.CONTENT_GROUP_TRANSACTION_URI, transactionGroupContent);
+        }
     }
 
     private Transaction buildTransaction(EditText nameText, TextView splitText,
