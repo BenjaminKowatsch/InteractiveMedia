@@ -2,6 +2,7 @@ package com.media.interactive.cs3.hdm.interactivemedia.fragments;
 
 import android.app.ListFragment;
 import android.app.LoaderManager;
+import android.content.ContentResolver;
 import android.content.Context;
 import android.content.CursorLoader;
 import android.content.Intent;
@@ -17,23 +18,28 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.SimpleCursorAdapter;
+import android.widget.Spinner;
 
 import com.media.interactive.cs3.hdm.interactivemedia.R;
 import com.media.interactive.cs3.hdm.interactivemedia.activties.AddTransactionActivity;
 import com.media.interactive.cs3.hdm.interactivemedia.contentprovider.DatabaseProvider;
+import com.media.interactive.cs3.hdm.interactivemedia.contentprovider.tables.GroupTable;
 import com.media.interactive.cs3.hdm.interactivemedia.contentprovider.tables.TransactionTable;
+
+import static com.media.interactive.cs3.hdm.interactivemedia.activties.AddTransactionActivity.GROUP_TO_ADD_TO;
 
 
 public class TransactionFragment extends ListFragment implements LoaderManager.LoaderCallbacks<Cursor>, IMyFragment {
 
-    public static final String LIST_FRAGMENT_NAME = "transaction";
     private static final String TAG = "TransactionFragment";
-
+    private Spinner groupSelection;
 
     private AdapterView.OnItemSelectedListener onItemSelectedListener;
 
     private SimpleCursorAdapter simpleCursorAdapter;
-    //private ContentResolver dummyContentResolver;
+    private View transactionListFragment;
+    private ContentResolver dummyContentResolver;
+    private SimpleCursorAdapter groupAdapter;
 
     /**
      * Mandatory empty constructor for the fragment manager to instantiate the
@@ -56,7 +62,11 @@ public class TransactionFragment extends ListFragment implements LoaderManager.L
 
         setHasOptionsMenu(true);
 
-        //dummyContentResolver = getActivity().getContentResolver();
+        dummyContentResolver = getActivity().getContentResolver();
+
+        groupAdapter = initializeGroupAdapter();
+        groupAdapter.getCursor().moveToFirst();
+
 
         // Initializing the SimpleCursorAdapter and the CursorLoader
         String[] projection = new String[] {TransactionTable.COLUMN_INFO_NAME, TransactionTable.COLUMN_INFO_CREATED_AT,
@@ -69,12 +79,31 @@ public class TransactionFragment extends ListFragment implements LoaderManager.L
 
     }
 
+    private long getCurrentGroupId() {
+        return groupAdapter.getCursor().getLong(0);
+    }
+
+    private SimpleCursorAdapter initializeGroupAdapter() {
+        final String[] projection = {GroupTable.COLUMN_ID, GroupTable.COLUMN_NAME};
+
+        Cursor query = dummyContentResolver.query(DatabaseProvider.CONTENT_GROUP_URI, projection, null, null, null);
+
+        String[] columns = new String[] { GroupTable.COLUMN_NAME };
+        int[] to = new int[] { android.R.id.text1 };
+
+        SimpleCursorAdapter groupAdapter = new SimpleCursorAdapter(this.getContext(), android.R.layout.simple_spinner_item, query, columns, to, 0);
+        groupAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        return groupAdapter;
+    }
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_transaction_list, container, false);
+        transactionListFragment = inflater.inflate(R.layout.fragment_transaction_list, container, false);
+        groupSelection = transactionListFragment.findViewById(R.id.spinner_group_selection);
+        groupSelection.setAdapter(groupAdapter);
 
-        return view;
+        return transactionListFragment;
     }
 
 
@@ -137,6 +166,7 @@ public class TransactionFragment extends ListFragment implements LoaderManager.L
                 Log.d(TAG, "Hello from " + TAG);
                 final Intent intent = new Intent(view.getContext(), AddTransactionActivity.class);
                 intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+                intent.putExtra(GROUP_TO_ADD_TO, getCurrentGroupId());
                 startActivity(intent);
             }
         };
