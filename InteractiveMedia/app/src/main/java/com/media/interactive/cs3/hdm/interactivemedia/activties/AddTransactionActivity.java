@@ -11,6 +11,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.DatePicker;
+import android.widget.EdgeEffect;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.TimePicker;
@@ -18,14 +19,18 @@ import android.widget.TimePicker;
 import com.media.interactive.cs3.hdm.interactivemedia.R;
 import com.media.interactive.cs3.hdm.interactivemedia.contentprovider.DatabaseProvider;
 import com.media.interactive.cs3.hdm.interactivemedia.contentprovider.tables.GroupTransactionTable;
+import com.media.interactive.cs3.hdm.interactivemedia.data.MoneyTextWatcher;
 import com.media.interactive.cs3.hdm.interactivemedia.data.Transaction;
 
+import java.text.NumberFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.Locale;
 
 public class AddTransactionActivity extends AppCompatActivity {
+    public static final NumberFormat CURRENCY_FORMAT = NumberFormat.getCurrencyInstance(Locale.GERMANY);
     public static final String GROUP_TO_ADD_TO = "GroupToAddTo";
     private final SimpleDateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyy");
     private final SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm");
@@ -40,6 +45,8 @@ public class AddTransactionActivity extends AppCompatActivity {
         setContentView(R.layout.activity_add_transaction);
         dateEditText = findViewById(R.id.et_add_transaction_date);
         timeEditText = findViewById(R.id.et_add_transaction_time);
+        EditText amountEditText = findViewById(R.id.et_add_transaction_amount);
+        amountEditText.addTextChangedListener(new MoneyTextWatcher(amountEditText, CURRENCY_FORMAT));
 
         groupId = getIntent().getLongExtra(GROUP_TO_ADD_TO, -1);
 
@@ -89,9 +96,19 @@ public class AddTransactionActivity extends AppCompatActivity {
                                          EditText dateText, EditText timeText, EditText amountText) {
         final String purpose = nameText.getText().toString();
         final String split = splitText.getText().toString();
-        final double amount = Double.parseDouble(amountText.getText().toString());
+        final double amount = parseAmount(amountText);
         final Date dateTime = parseDateTime(dateText, timeText);
         return new Transaction(purpose, split, dateTime, amount, groupId);
+    }
+
+    private double parseAmount(EditText amountText) {
+        try {
+            final Number parsed = CURRENCY_FORMAT.parse(amountText.getText().toString());
+            return parsed.doubleValue();
+        } catch (ParseException e) {
+            Log.e(this.getClass().getName(), e.getMessage());
+        }
+        return -1d;
     }
 
     private Date parseDateTime(EditText dateText, EditText timeText) {
