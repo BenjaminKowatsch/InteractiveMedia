@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    android:background="@android:color/darker_gray"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    >
+
+        <ImageView
+            android:id="@+id/user_icon"
+            android:layout_width="80dp"
+            android:layout_height="80dp"
+            android:contentDescription="Picture"
+            android:paddingLeft="10dp"
+            android:paddingRight="10dp"
+            android:src="@drawable/anonymoususer"
+            />
+
+        <TextView
+            android:id="@+id/user_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_toRightOf="@+id/user_icon"
+            android:paddingBottom="10dp"
+            android:textSize="16dp" />
+
+        <TextView
+            android:id="@+id/user_email"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/user_name"
+            android:layout_toRightOf="@+id/user_icon"
+            android:paddingLeft="2dp"
+            android:textSize="14dp" />
+
+    <TextView
+        android:id="@+id/user_creation_date"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/user_email"
+        android:layout_toRightOf="@+id/user_icon"
+        android:paddingLeft="2dp"
+        android:textSize="14dp" />
+
+</RelativeLayout>

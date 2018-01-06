@@ -2,6 +2,7 @@
 <resources>
     <string-array name="image_sources">
         <item>Camera</item>
+        <item>Url</item>
         <item>Gallery</item>
     </string-array>
 </resources>
