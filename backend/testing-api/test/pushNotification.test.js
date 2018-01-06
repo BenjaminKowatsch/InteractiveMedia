@@ -21,11 +21,7 @@ const userData = require('./data/user.data');
 
 // ************* Helper ***********//
 
-const registerUser = index => chai.request(HOST).post(URL.REGISTER_USER).send({
-  username: userData.users.valid[index].username,
-  email: userData.users.valid[index].email,
-  password: userData.users.valid[index].password
-});
+const registerUser = index => chai.request(HOST).post(URL.REGISTER_USER).send(userData.users.valid[index]);
 
 describe('PushNotifications', () => {
     let token;
