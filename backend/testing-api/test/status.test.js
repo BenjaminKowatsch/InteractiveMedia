@@ -1,12 +1,14 @@
-/*jshint expr: true*/
+'use strict';
 
-var chai = require('chai');
-var expect = require('chai').expect;
+/*jshint expr: true, node:true, mocha:true*/
+
+const chai = require('chai');
+const expect = require('chai').expect;
 
 chai.use(require('chai-http'));
 
-var host = 'http://backend:8081';
-var baseUrl = '/v1/status';
+const host = 'http://backend:8081';
+const baseUrl = '/v1/status';
 
 describe('Get status', function() {
     it('should get current status', function() {

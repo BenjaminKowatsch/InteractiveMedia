@@ -1,5 +1,7 @@
-var tv4 = require('tv4');
-var winston = require('winston');
+'use strict';
+
+const tv4 = require('tv4');
+const winston = require('winston');
 const ERROR = require('../config.error');
 
 /**
@@ -31,7 +33,7 @@ exports.validateAgainstSchema = function(inputData, jsonSchema) {
     };
   } else {
     // Validate the received json data from the request with the predefined json schema
-    var validationResult = tv4.validate(inputData, jsonSchema);
+    const validationResult = tv4.validate(inputData, jsonSchema);
 
     if (validationResult === true) {
       // validation was successful
@@ -39,7 +41,7 @@ exports.validateAgainstSchema = function(inputData, jsonSchema) {
       returnValue.valid = true;
     } else {
       // validation failed
-      var refinedErrorObj = {
+      const refinedErrorObj = {
         dataPath: tv4.error.dataPath.replace('/', ''),
         message: tv4.error.message
       };
@@ -54,14 +56,14 @@ exports.validateAgainstSchema = function(inputData, jsonSchema) {
 exports.againstSchema = function(inputData, jsonSchema) {
   // Validate the received json data from the request with the predefined json schema
   return new Promise((resolve,reject) => {
-    var validationResult = tv4.validate(inputData, jsonSchema);
+    const validationResult = tv4.validate(inputData, jsonSchema);
     if (validationResult === true) {
       // validation was successful
       winston.debug('Success: json is valid');
       resolve();
     } else {
       // validation failed
-      var refinedErrorObj = {
+      const refinedErrorObj = {
         dataPath: tv4.error.dataPath.replace('/', ''),
         message: tv4.error.message
       };

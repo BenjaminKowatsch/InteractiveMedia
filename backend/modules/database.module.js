@@ -1,16 +1,18 @@
-var database = module.exports = {};
+'use strict';
+
+let database = module.exports = {};
 
 const winston = require('winston');
 
 /* MongoDB Client */
-var MongoClient = require('mongodb').MongoClient;
+const MongoClient = require('mongodb').MongoClient;
 
-var mongoConnectConfig = {
+const mongoConnectConfig = {
   bufferMaxEntries: 0,
   autoReconnect: true
 };
 
-var tryConnectOptions = {
+const tryConnectOptions = {
   maxRetries: 100,
   retryInterval: 500, // in milliseconds
   currentRetryCount: 0,
@@ -67,14 +69,6 @@ function tryToConnectToDatabase() {
 function connect(resolve, reject) {
   /* Connect to mongodb once to reduce the number of connection pools created by our application  */
 
-  var createIndexCallback = function(err, indexname) {
-    if (err === null) {
-      winston.debug('Created index + ' + indexname);
-    } else {
-      winston.debug('Creation of index + ' + indexname + ' failed');
-    }
-  };
-
   MongoClient.connect(tryConnectOptions.url, mongoConnectConfig, function(err, db) {
     if (!err) {
       winston.debug('Database connection established');
@@ -83,41 +77,52 @@ function connect(resolve, reject) {
       database.collections.users = db.collection('users');
       database.collections.groups = db.collection('groups');
 
-      database.collections.users.createIndex({
-        email: 1
-      }, {
-        unique: true
-      }, createIndexCallback);
-
-      database.collections.users.createIndex({
-        username: 1,
-        password: 1
-      }, {
-        unique: true,
-        partialFilterExpression: {
-          username: {
-            '$exists': true
-          },
-          password: {
-            '$exists': true
+      Promise.resolve()
+      .then(() => {
+        winston.debug('create index: user: email unique');
+        const keys = {email: 1};
+        const options = {unique: true};
+        return database.collections.users.createIndex(keys, options);
+      })
+      .then(() => {
+        winston.debug('create index: user: username, password unique');
+        const keys = {
+          username: 1,
+          password: 1
+        };
+        const options = {
+          unique: true,
+          partialFilterExpression: {
+            username: {'$exists': true},
+            password: {'$exists': true}
           }
-        }
-      }, createIndexCallback);
-
-      database.collections.users.createIndex({
-        userId: 1,
-        loginType: 1
-      }, {
-        unique: true
-      }, createIndexCallback);
-
-      database.collections.groups.createIndex({
-        groupId: 1
-      }, {
-        unique: true
-      }, createIndexCallback);
-
-      resolve();
+        };
+        return database.collections.users.createIndex(keys, options);
+      })
+      .then(() => {
+        winston.debug('create index: user: userId, loginType unique');
+        const keys = {
+          userId: 1,
+          loginType: 1
+        };
+        const options = {unique: true};
+        return database.collections.users.createIndex(keys, options);
+      })
+      .then(() => {
+        winston.debug('create index: group: groupId unique');
+        const keys = {
+          groupId: 1
+        };
+        const options = {unique: true};
+        return database.collections.groups.createIndex(keys, options);
+      })
+      .then(() => {
+        winston.info('Indicies created');
+        resolve();
+      }).catch(error => {
+        winston.error('Error while creating indices', JSON.stringify(error));
+        reject();
+      });
     } else {
       winston.error('Database connection failed with error: ' + err);
       database.collections.users = undefined;
@@ -126,5 +131,4 @@ function connect(resolve, reject) {
       reject();
     }
   });
-
 }

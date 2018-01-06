@@ -1,4 +1,6 @@
-/* jshint expr: true */
+'use strict';
+
+/*jshint expr: true, node:true, mocha:true*/
 
 const chai = require('chai');
 const expect = require('chai').expect;
@@ -19,7 +21,7 @@ const groupScenarios = require('./data/groupScenarios');
 
 // ************* Helper ***********//
 
-var registerUser = index => chai.request(HOST).post(URL.BASE_USER  + '/').send({
+const registerUser = index => chai.request(HOST).post(URL.BASE_USER  + '/').send({
   username: userData.users.valid[index].username,
   email: userData.users.valid[index].email,
   password: userData.users.valid[index].password
@@ -27,9 +29,9 @@ var registerUser = index => chai.request(HOST).post(URL.BASE_USER  + '/').send({
 
 describe('Groups-Controller', () => {
   describe('Create new Group', () => {
+    let tokens = {};
+    let groupId = {};
     before('register User 0 and 1', done => {
-      tokens = {};
-      groupId = {};
       databaseHelper.promiseResetDB().then(()=> {
         return registerUser(0);
       }).then(res => {

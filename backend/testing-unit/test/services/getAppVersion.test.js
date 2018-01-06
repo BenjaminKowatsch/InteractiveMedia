@@ -1,13 +1,15 @@
-/*jshint expr: true*/
+'use strict';
 
-var chai = require('chai');
-var expect = chai.expect;
+/*jshint expr: true, node:true, mocha:true*/
 
-var appVersionService = require('../../../services/appVersion.service');
+const chai = require('chai');
+const expect = chai.expect;
+
+const appVersionService = require('../../../services/appVersion.service');
 
 describe('Test service "getAppVersion"', function() {
   it('should get current app version', function() {
-    var result = appVersionService.getAppVersion();
+    const result = appVersionService.getAppVersion();
     expect(result).to.be.an('object');
     expect(result.name).to.equal('Backend');
     expect(result.version).to.have.lengthOf.above(0);

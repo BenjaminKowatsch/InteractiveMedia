@@ -1,16 +1,18 @@
-/*jshint expr: true*/
+'use strict';
 
-var chai = require('chai');
-var assert = chai.assert;
-var expect = chai.expect;
+/*jshint expr: true, node:true, mocha:true*/
 
-var validateJsonService = require('../../../services/validateJson.service');
+const chai = require('chai');
+const assert = chai.assert;
+const expect = chai.expect;
 
-var jsonSchema = {
+const validateJsonService = require('../../../services/validateJson.service');
+
+const jsonSchema = {
     userData: require('../../../JSONSchema/userData.json')
   };
 
-var testData = {
+const testData = {
   'userData': {
       'validInput': {
         'username': 'barack',
@@ -25,25 +27,25 @@ var testData = {
 
 describe('Test service "validateJson"', function() {
   it('should return true for valid input', function() {
-    var result = validateJsonService.validateAgainstSchema(testData.userData.validInput, jsonSchema.userData);
+    const result = validateJsonService.validateAgainstSchema(testData.userData.validInput, jsonSchema.userData);
     expect(result).to.be.an('object');
     expect(result.valid).to.be.true;
   });
 
   it('should return false for invalid input', function() {
-    var result = validateJsonService.validateAgainstSchema(testData.userData.invalidInput, jsonSchema.userData);
+    const result = validateJsonService.validateAgainstSchema(testData.userData.invalidInput, jsonSchema.userData);
     expect(result).to.be.an('object');
     expect(result.valid).to.be.false;
   });
 
   it('should return false for null input', function() {
-    var result = validateJsonService.validateAgainstSchema(null, jsonSchema.userData);
+    const result = validateJsonService.validateAgainstSchema(null, jsonSchema.userData);
     expect(result).to.be.an('object');
     expect(result.valid).to.be.false;
   });
 
   it('should return false for empty input', function() {
-    var result = validateJsonService.validateAgainstSchema({}, jsonSchema.userData);
+    const result = validateJsonService.validateAgainstSchema({}, jsonSchema.userData);
     expect(result).to.be.an('object');
     expect(result.valid).to.be.false;
   });

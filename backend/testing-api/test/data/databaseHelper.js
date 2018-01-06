@@ -2,21 +2,14 @@
 
 const MongoClient = require('mongodb').MongoClient;
 const winston = require('winston');
+const adminData = require('./admin.data');
 
-var database = {};
+let database = {};
 database.collections = {};
 const mongoConnectConfig = {
   bufferMaxEntries: 0,
   autoReconnect: true
 };
-
-function createIndexCallback(err, indexname) {
-  if (err === null) {
-    winston.debug('Created index + ' + indexname);
-  } else {
-    winston.debug('Creation of index + ' + indexname + ' failed');
-  }
-}
 
 function waitOrOrderForDB() {
   return new Promise((resolve,reject) => {
@@ -64,43 +57,66 @@ function promiseResetDB() {
       database.collections.users = db.collection('users');
       database.collections.groups = db.collection('groups');
 
-      database.collections.users.createIndex({
-        email: 1
-      }, {
-        unique: true
-      }, createIndexCallback);
-
-      database.collections.users.createIndex({
-        username: 1,
-        password: 1
-      }, {
-        unique: true,
-        partialFilterExpression: {
-          username: {
-            '$exists': true
-          },
-          password: {
-            '$exists': true
-          }
-        }
-      }, createIndexCallback);
-
-      database.collections.users.createIndex({
-        userId: 1,
-        loginType: 1
-      }, {
-        unique: true
-      }, createIndexCallback);
-
-      database.collections.groups.createIndex({
-        groupId: 1
-      }, {
-        unique: true
-      }, createIndexCallback);
-
-      winston.info('Database successfully cleaned');
-      mutexResolver();
-      resolve();
+      Promise.resolve()
+        .then(() => {
+          winston.debug('create index: user: email unique');
+          const keys = {email: 1};
+          const options = {unique: true};
+          return database.collections.users.createIndex(keys, options);
+        })
+        .then(() => {
+          winston.debug('create index: user: username, password unique');
+          const keys = {
+            username: 1,
+            password: 1
+          };
+          const options = {
+            unique: true,
+            partialFilterExpression: {
+              username: {'$exists': true},
+              password: {'$exists': true}
+            }
+          };
+          return database.collections.users.createIndex(keys, options);
+        })
+        .then(() => {
+          winston.debug('create index: user: userId, loginType unique');
+          const keys = {
+            userId: 1,
+            loginType: 1
+          };
+          const options = {unique: true};
+          return database.collections.users.createIndex(keys, options);
+        })
+        .then(() => {
+          winston.debug('create index: group: groupId unique');
+          const keys = {
+            groupId: 1
+          };
+          const options = {unique: true};
+          return database.collections.groups.createIndex(keys, options);
+        })
+        .then(() => {
+          winston.debug('create user: admin');
+          const adminUser = {
+            'expiryDate': new Date(new Date().getTime() + 3600000),
+            'password': adminData.password,
+            'username': adminData.username,
+            'email': adminData.email,
+            'role': adminData.role,
+            'userId': adminData.userId,
+            'authType': adminData.authType
+          };
+          return database.collections.users.insertOne(adminUser);
+        })
+        .then(() => {
+          winston.info('Database cleaned successfully');
+          mutexResolver();
+          resolve();
+        }).catch(error => {
+          winston.error('Error while resetting database', JSON.stringify(error));
+          reject();
+        });
     });
   });
 }
