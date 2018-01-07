@@ -46,6 +46,12 @@
       </div>
 
       <br/>
+      
+      <pie-count></pie-count>
+      <div id="chart">
+        <div v-if="showChart">
+        </div>
+      </div>
 
       <div v-if="version">
         <p>Debts² admin panel version informations: 
@@ -53,8 +59,10 @@
         </p>
       </div>
 
+
        </f7-list form>  
     <f7-list>
+      <f7-list-button title="Show Chart" v-on:click="toggleState(showChart)"></f7-list-button>    
       <f7-list-button title="CreateDummyGroup" v-on:click="createDummyGroup()"></f7-list-button>
       <f7-list-button title="Logout" v-on:click="logout()"></f7-list-button>
     </f7-list>
@@ -67,11 +75,14 @@ import Mixins from "../mixins.js";
 import axios from "axios";
 import Cookie from "../js/Cookie.js";
 import Config from "../js/Config.js";
+import PieCount from "@/components/PieCount";
 
 export default {
   name: "overview",
   mixins: [Mixins],
-  components: {},
+  components: {
+    PieCount
+  },
   data() {
     return {
       version: [],
@@ -82,7 +93,8 @@ export default {
       groupId: "",
       userId: "",
       groupCount: "",
-      userCount: ""
+      userCount: "",
+      showChart: false
     };
   },
 
@@ -91,7 +103,6 @@ export default {
     // console.log(groupCountLoaded);
     this.authToken = Cookie.getJSONCookie("accessToken").accessToken;
     console.log("The cookie authToken is: " + this.authToken);
-
     this.groups = [];
     this.users = [];
     this.groupId = "9a7fb2f3-8b39-4849-ac81-48c1835220d0";
@@ -232,12 +243,23 @@ export default {
       return count;
     },
 
+    toggleState: function(state) {
+      console.log("Toggle state: " + state);
+      let newState = state;
+      if (newState) {
+        newState = false;
+      } else {
+        newState = true;
+      }
+      console.log("New state: " + newState);
+      return newState;
+    },
+
     logout: function() {
       let accessToken = this.authToken;
 
       //Check for existing accessToken
       this.checkAccessToken(accessToken => {
-        
         console.log("AuthToken in checkAccess fct: " + this.authToken);
         // Post data to the backend to successfully logout the user and redirect to login page
         axios
