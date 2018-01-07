@@ -3,11 +3,13 @@
 const winston = require('winston');
 
 const group = require('../modules/group.module');
+const user = require('../modules/user.module');
 const database = require('../modules/database.module');
 const ERROR = require('../config.error');
 
 const validateJsonService = require('../services/validateJson.service');
 const httpResponseService = require('../services/httpResponse.service');
+const pushNotificationService = require('../services/pushNotification.service');
 
 const jsonSchema = {
   groupPayloadData: require('../JSONSchema/groupPayloadData.json'),
@@ -70,11 +72,14 @@ module.exports.getGroupById = function(req, res) {
 
 module.exports.createNewTransaction = function(req, res) {
   winston.debug('Creating a new transaction');
+  const groupId = req.params.groupId;
+  const userIdCreator = res.locals.userId;
   // validate data in request body
   validateJsonService.againstSchema(req.body, jsonSchema.transactionPayloadData).then(() => {
-    return group.createNewTransaction(req.params.groupId, req.body);
+    return group.createNewTransaction(groupId, req.body);
   }).then(transactionResult =>  {
     httpResponseService.send(res, 201, transactionResult);
+    sendNotificationCreateTransaction(groupId, userIdCreator);
   }).catch(errorResult => {
     winston.debug(errorResult);
     let statusCode = 418;
@@ -93,6 +98,66 @@ module.exports.createNewTransaction = function(req, res) {
     httpResponseService.send(res, statusCode, errorResult.responseData);
   });
 };
+
+function sendNotificationCreateTransaction(groupId, userIdCreator) {
+  let transactionGroup;
+  // load group to get users and group meta data
+  // TODO: do not load transaction to reduce load
+  group.getGroupById(groupId)
+  .then(groupResult => {
+    transactionGroup = groupResult.payload;
+    let userIds = transactionGroup.users.map(user => {return user.userId;});
+    const indexCreatorTransaction = userIds.indexOf(userIdCreator);
+
+    if (indexCreatorTransaction != -1) {
+      // remove userId of creator
+      userIds.splice(indexCreatorTransaction, 1);
+    } else {
+      const responseData = {
+        success: false,
+        payload: {
+          dataPath: 'notification',
+          message: 'userId of creator was not found in userIds of group'
+        }
+      };
+      const errorCode = ERROR.UNKNOWN_USER;
+      Promise.reject({errorCode: errorCode, responseData: responseData});
+    }
+
+    if (userIds.length > 0) {
+      // get fcm tokens of users
+      return user.getFcmTokensByUserIds(userIds);
+    } else {
+      const responseData = {
+        success: false,
+        payload: {
+          dataPath: 'notification',
+          message: 'there are no users left to send a notification to'
+        }
+      };
+      const errorCode = ERROR.UNKNOWN_USER;
+      Promise.reject({errorCode: errorCode, responseData: responseData});
+    }
+  })
+  .then(fcmTokenResult => {
+    // compose message
+    const tokens = fcmTokenResult.payload;
+    const dryRun = false;
+    const data = {};
+    const notification = {
+      title: 'New transaction in group "' + transactionGroup.name + '"',
+      icon: 'ic_launcher',
+      body: 'Click to see the newest transactions. // Debug: sent at ' + new Date()
+    };
+    return pushNotificationService.sendfcm(tokens, data, notification, dryRun);
+  })
+  .then(() => {
+    winston.debug('Sent notification');
+  })
+  .catch(errorResult => {
+    winston.error(errorResult);
+  });
+}
 
 module.exports.getTransactionAfterDate = function(req, res) {
   const date = req.query.after;
