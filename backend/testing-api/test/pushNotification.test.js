@@ -23,7 +23,7 @@ const userData = require('./data/user.data');
 
 const registerUser = index => chai.request(HOST).post(URL.REGISTER_USER).send(userData.users.valid[index]);
 
-describe('PushNotifications', () => {
+describe.skip('PushNotifications', () => {
     let token;
     let fcmToken = 'cUKrLfXhKSU:APA91bFfh3KX44JYptYsslEVtsAv4VwppWlDXJofsaEiwRiMF48' +
       '_OtBftNydOnDnV4WSEVqqz-3D2twflIFRIePuiTr_2Tn75ZSZRbgOnLeY_lCkkHvvjZ6i-GzJxvkdtf-n0no701Do';
