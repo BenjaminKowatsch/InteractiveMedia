@@ -56,28 +56,22 @@
        </f7-list form>  
     <f7-list>
       <f7-list-button title="CreateDummyGroup" v-on:click="createDummyGroup()"></f7-list-button>
-<!--       <f7-list-button title="logout" v-on:click="createDummyGroup()"></f7-list-button>
- -->
+      <f7-list-button title="Logout" v-on:click="logout()"></f7-list-button>
     </f7-list>
   </f7-page>
     <!-- END of Template Elements -->
 </template>
 
 <script>
-/*
-  * START JScript Elements for establishing the view according to the template elements
-  * imports Moodslider (to be found in component folder), Axios
-  */
-/*   import Moodslider from '@/components/moodslider'
- */
-
+import Mixins from "../mixins.js";
 import axios from "axios";
 import Cookie from "../js/Cookie.js";
 import Config from "../js/Config.js";
 
 export default {
   name: "overview",
-
+  mixins: [Mixins],
+  components: {},
   data() {
     return {
       version: [],
@@ -226,15 +220,6 @@ export default {
           console.log("Errors in Version: " + e);
         });
     },
-       //Deprecated?
-/*     checkResponse: function(response, onValid, failure) {
-      if (response.data.success === true) {
-        onValid(response.data.payload);
-      } else {
-        console.log("An error occured...");
-        failure(response.data);
-      }
-    }, */
 
     //Counts the elements of an object
     countProperties: function(obj) {
@@ -245,6 +230,31 @@ export default {
         }
       }
       return count;
+    },
+
+    logout: function() {
+      let accessToken = this.authToken;
+
+      //Check for existing accessToken
+      this.checkAccessToken(accessToken => {
+        
+        console.log("AuthToken in checkAccess fct: " + this.authToken);
+        // Post data to the backend to successfully logout the user and redirect to login page
+        axios
+          .post(Config.webServiceURL + `/v1/users/logout`, this.authToken, {
+            headers: {
+              Authorization: "0 " + this.authToken
+            }
+          })
+          .then(response => {
+            console.log(JSON.stringify(response.data));
+            Cookie.deleteCookie("accessToken");
+            this.redirect("/", false, false, true);
+          })
+          .catch(e => {
+            console.log(JSON.stringify(e));
+          });
+      });
     }
   }
 };

@@ -88,7 +88,7 @@ export default {
       console.log("Error: " + JSON.stringify(error)); // logs an error to the console
       //If logindata doenst match a db entry, show error and reload page
       this.$f7.alert("Login failed", "Debts² Admin Panel", () => {
-        this.redirect("/", false, true, true);
+        this.redirect("/", false, false, false);
       });
     },
     /**
@@ -96,7 +96,6 @@ export default {
          * @param  {JSONObject} response Containing the valid accessToken for the session and an authentication type to be stored into a cookie
          */
     loginResponseHandler: function(response) {
-      //console.log("loginResponseHandler");
       //read authToken for getUser request
       var authToken = response.data.payload.accessToken;
       var userDataRole = "";
