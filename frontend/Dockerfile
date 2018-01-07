@@ -14,6 +14,10 @@ RUN npm set progress=false
 # install only 'devDependencies'
 RUN npm install --only=dev
 
+# import build arguments as env vars during build
+ARG WEB_SERVICE_URL
+ARG JWT_SIMPLE_SECRET
+
 # copy app sources
 COPY . .
 
