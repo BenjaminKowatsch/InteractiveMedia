@@ -1,6 +1,5 @@
 var settings = {
-    "jwtSimpleSecret": "${JWT_SIMPLE_SECRET}",
-    "webServiceURL": "${WEB_SERVICE_URL}",
-    "origin": "${ORIGIN_URL}"
+    "jwtSimpleSecret": process.env.JWT_SIMPLE_SECRET,
+    "webServiceURL": process.env.WEB_SERVICE_URL,
 };
 module.exports = settings;
