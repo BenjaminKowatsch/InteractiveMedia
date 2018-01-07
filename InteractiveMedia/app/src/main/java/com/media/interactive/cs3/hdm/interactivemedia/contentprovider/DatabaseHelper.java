@@ -1,6 +1,7 @@
 package com.media.interactive.cs3.hdm.interactivemedia.contentprovider;
 
 import android.content.Context;
+import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
@@ -72,6 +73,17 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         final SQLiteDatabase db = this.getWritableDatabase();
         db.delete("users", null, null);
         db.delete("login", null, null);
+    }
+
+    public Cursor getTransactionsForGroup(long groupId) {
+        final SQLiteDatabase db = this.getWritableDatabase();
+        final String subQuery = "SELECT " + GroupTransactionTable.COLUMN_TRANSACTION_ID + " FROM "
+                + GroupTransactionTable.TABLE_NAME
+                + " WHERE " + GroupTransactionTable.COLUMN_GROUP_ID + " = ?";
+        final String query = "SELECT * FROM " + TransactionTable.TABLE_NAME
+                + " WHERE " + TransactionTable.COLUMN_ID + " IN (" + subQuery + " )";
+        final Cursor cursor = db.rawQuery(query, new String[]{"" + groupId});
+        return cursor;
     }
     /*
     public Cursor getUsers() {
