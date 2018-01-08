@@ -80,7 +80,6 @@ export default {
   mixins: [Mixins],
   components: {
     PieCount
- 
   },
   data() {
     return {
@@ -93,7 +92,7 @@ export default {
       userId: "",
       groupCount: "",
       userCount: "",
-      showChart: false,
+      showChart: false
     };
   },
 
@@ -242,25 +241,25 @@ export default {
       return count;
     },
 
+    //Toggles state of boolean variables
     toggleState: function(state) {
-      console.log("State of showChart before toggle")
-      console.log(state)
+      console.log("State of showChart before toggle");
+      console.log(state);
       if (state) {
-        return state = false;
+        return (state = false);
       } else {
-        return state = true
+        return (state = true);
       }
-      console.log("State of showChart before toggle")
-      console.log(this.showChart)
     },
 
+    //Logout the current user
     logout: function() {
       let accessToken = this.authToken;
 
       //Check for existing accessToken
       this.checkAccessToken(accessToken => {
         console.log("AuthToken in checkAccess fct: " + this.authToken);
-        // Post data to the backend to successfully logout the user and redirect to login page
+        //Post data to the backend to successfully logout the user and redirect to login page
         axios
           .post(Config.webServiceURL + `/v1/users/logout`, this.authToken, {
             headers: {
