@@ -136,12 +136,11 @@ function sendNotificationCreateTransaction(groupId, userIdCreator) {
   .then(fcmTokenResult => {
     const tokens = fcmTokenResult.payload;
 
+    // resolve gracefully if there no fcm tokens
     if (!tokens || tokens.length === 0) {
-      responseData.success = false;
-      responseData.payload.dataPath = 'notification';
+      responseData.success = true;
       responseData.payload.message = 'there are no users left to send a notification to';
-      const errorCode = ERROR.NO_USERS;
-      return Promise.reject({errorCode: errorCode, responseData: responseData});
+      return Promise.resolve(responseData);
     }
 
     // compose message
@@ -154,8 +153,8 @@ function sendNotificationCreateTransaction(groupId, userIdCreator) {
     };
     return pushNotificationService.sendfcm(tokens, data, notification, dryRun);
   })
-  .then(() => {
-    winston.debug('Sent notification');
+  .then((notificationResult) => {
+    winston.info(notificationResult.payload.message);
   })
   .catch(errorResult => {
     winston.error(errorResult);
