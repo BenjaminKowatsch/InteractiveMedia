@@ -324,11 +324,13 @@ exports.googleOrFacebookLogin = function(userId, expiryDate, authType, accessTok
       'email': email,
       'authType': authType
     }, {
-      'userId': userId,
-      'email': email,
-      'authType': authType,
-      'expiryDate': expiryDate,
-      'role': ROLES.USER
+      '$set': {
+        'userId': userId,
+        'email': email,
+        'authType': authType,
+        'expiryDate': expiryDate,
+        'role': ROLES.USER
+      }
     }, {
       upsert: true
     },
