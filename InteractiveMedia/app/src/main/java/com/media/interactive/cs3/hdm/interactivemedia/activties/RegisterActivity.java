@@ -146,7 +146,7 @@ public class RegisterActivity extends ImagePickerActivity
             }
         });
 
-        initImagePickerActivity(R.id.register_profile_picture);
+        initImagePickerActivity(R.id.register_profile_picture,"profile_picture.png");
     }
 
     private boolean isRegisterEnabled() {
@@ -171,6 +171,12 @@ public class RegisterActivity extends ImagePickerActivity
         return false;
     }
 
+    private void navigateToHome(){
+        final Intent toHome = new Intent(RegisterActivity.this, HomeActivity.class);
+        toHome.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+        startActivity(toHome);
+        finish();
+    }
 
     @Override
     public void onClick(View v) {
@@ -188,12 +194,32 @@ public class RegisterActivity extends ImagePickerActivity
                             "Success fully logged in",
                             Toast.LENGTH_SHORT).show();
 
-                        uploadImage();
+                        uploadImage(new CallbackListener<JSONObject, Exception>() {
+                            @Override
+                            public void onSuccess(JSONObject response) {
+                                makeToast("Uploading image succeeded. ");
+                                JSONObject payload = null;
+                                String imageName = null;
+                                try {
+                                    payload = response.getJSONObject("payload");
+                                    imageName = payload.getString("path");
+                                    Log.d(TAG, "Path returned: " + payload.getString("path"));
+                                } catch (JSONException e) {
+                                    e.printStackTrace();
+                                }
+                                final String newImageUrl = getResources().getString(R.string.web_service_url)
+                                    .concat("/v1/object-store/download?filename=").concat(imageName);
+                                Login.getInstance().getUser().setImageUrl(newImageUrl);
+                                navigateToHome();
+                            }
 
-                        final Intent toHome = new Intent(RegisterActivity.this, HomeActivity.class);
-                        toHome.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
-                        startActivity(toHome);
-                        finish();
+                            @Override
+                            public void onFailure(Exception error) {
+                                makeToast("Uploading image failed. ");
+                                navigateToHome();
+                            }
+                        });
+
                     }
 
                     @Override
