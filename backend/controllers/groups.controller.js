@@ -134,8 +134,17 @@ function sendNotificationCreateTransaction(groupId, userIdCreator) {
     }
   })
   .then(fcmTokenResult => {
-    // compose message
     const tokens = fcmTokenResult.payload;
+
+    if (!tokens || tokens.length === 0) {
+      responseData.success = false;
+      responseData.payload.dataPath = 'notification';
+      responseData.payload.message = 'there are no users left to send a notification to';
+      const errorCode = ERROR.UNKNOWN_USER;
+      return Promise.reject({errorCode: errorCode, responseData: responseData});
+    }
+
+    // compose message
     const dryRun = false;
     const data = {};
     const notification = {
