@@ -46,10 +46,10 @@
       </div>
 
       <br/>
-      
-      <pie-count></pie-count>
+
       <div id="chart">
         <div v-if="showChart">
+                <pie-count></pie-count>
         </div>
       </div>
 
@@ -58,11 +58,9 @@
           {{version.name}}  {{version.version}}
         </p>
       </div>
-
-
-       </f7-list form>  
+        </f7-list form>  
     <f7-list>
-      <f7-list-button title="Show Chart" v-on:click="toggleState(showChart)"></f7-list-button>    
+      <f7-list-button title="Show Chart" v-on:click="showChart = toggleState(showChart)"></f7-list-button>    
       <f7-list-button title="CreateDummyGroup" v-on:click="createDummyGroup()"></f7-list-button>
       <f7-list-button title="Logout" v-on:click="logout()"></f7-list-button>
     </f7-list>
@@ -75,13 +73,14 @@ import Mixins from "../mixins.js";
 import axios from "axios";
 import Cookie from "../js/Cookie.js";
 import Config from "../js/Config.js";
-import PieCount from "@/components/PieCount";
+import PieCount from "@/components/PieCount.js";
 
 export default {
   name: "overview",
   mixins: [Mixins],
   components: {
     PieCount
+ 
   },
   data() {
     return {
@@ -94,7 +93,7 @@ export default {
       userId: "",
       groupCount: "",
       userCount: "",
-      showChart: false
+      showChart: false,
     };
   },
 
@@ -163,11 +162,11 @@ export default {
           this.groupCount = this.countProperties(this.groups);
           // this.groupCountLoaded = true;
           console.log("Anzahl Gruppen: " + this.groupCount);
-          console.log("Existing Groups: " + JSON.stringify(this.groups));
+          // console.log("Existing Groups: " + JSON.stringify(this.groups));
         })
         .catch(e => {
           this.errors.push(e);
-          console.log("Errors in GET admin/groups: " + error);
+          console.log("Errors in GET admin/groups: " + e);
         });
     },
 
@@ -196,7 +195,7 @@ export default {
           this.users = response.data.payload;
           this.userCount = this.countProperties(this.users);
           console.log("Count Users: " + this.userCount);
-          console.log("Existing Users: " + JSON.stringify(this.users));
+          // console.log("Existing Users: " + JSON.stringify(this.users));
         })
         .catch(e => {
           this.errors.push(e);
@@ -244,15 +243,15 @@ export default {
     },
 
     toggleState: function(state) {
-      console.log("Toggle state: " + state);
-      let newState = state;
-      if (newState) {
-        newState = false;
+      console.log("State of showChart before toggle")
+      console.log(state)
+      if (state) {
+        return state = false;
       } else {
-        newState = true;
+        return state = true
       }
-      console.log("New state: " + newState);
-      return newState;
+      console.log("State of showChart before toggle")
+      console.log(this.showChart)
     },
 
     logout: function() {

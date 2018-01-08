@@ -5,93 +5,11 @@ import Config from "../js/Config.js";
 
 export default Pie.extend({
     name: "PieCount",
-    props: ['userCount', 'groupCount'],
-    /* data() {
-        return {
-            users: [],
-            groups: [],
-            userCount: "",
-            groupCount: ""
-        }
-    }, */
-    watch: {
-        /* 'data': {
-            handler: function(newData, oldData) {
-                let chart = this._chart
-
-                let newDataLabels = newData.datasets.map((dataset) => {
-                    return dataset.label
-                })
-
-                let oldDataLabels = oldData.datasets.map((dataset) => {
-                    return dataset.label
-                })
-                if (JSON.stringify(newDataLabels) === JSON.stringify(oldDataLabels)) {
-                    newData.datasets.forEach(function(dataset, i) {
-                            chart.data.datasets[i].data = dataset.data
-                        })
-                        //chart.data.labels = newData.labels
-                    chart.update()
-                } else {
-                    this.renderChart(this.data, this.options)
-                }
-            },
-            deep: true
-        }
-    }, */
-        'userCount': {
-            handler: function(val) {
-
-                console.log("Usercount has changed: " + this.userCount)
-                this._chart.data.datasets[0].data = [this.userCount, this.groupCount]
-                this._chart.update();
-                /*                this.renderChart({
-                                       labels: ['Count'],
-                                       datasets: [{
-                                           label: 'Users',
-                                           backgroundColor: '#FC2525',
-                                           data: [this.userCount]
-                                       }, {
-                                           label: 'Groups',
-                                           backgroundColor: '#05CBE1',
-                                           data: [this.groupCount]
-                                       }]
-                                   }, { responsive: false, maintainAspectRatio: false }) */
-                // console.log("Usercount in Datasets after change: " + JSON.stringify(this._chart.data.datasets[0].data))
-            },
-            deep: true
-        },
-        'groupCount': {
-            handler: function(val) {
-
-                console.log("Groupcount has changed: " + this.groupCount)
-                this._chart.data.datasets[0].data = [this.userCount, this.groupCount]
-                this._chart.update();
-                /* this.renderChart({
-                        labels: ['Count'],
-                        datasets: [{
-                            label: 'Users',
-                            backgroundColor: '#FC2525',
-                            data: [this.userCount]
-                        }, {
-                            label: 'Groups',
-                            backgroundColor: '#05CBE1',
-                            data: [this.groupCount]
-                        }]
-                    }, { responsive: false, maintainAspectRatio: false }) */
-                //console.log("Groupcount in Datasets after change: " + JSON.stringify(this._chart.data.datasets[1].data))
-            },
-            deep: true
-        }
-
-    },
 
     data() {
         return {
-            userCount: "",
-            groupCount: "",
             options: {
-                /* my specific data */
+                //ToDo: Add some specific chart options
             }
         }
     },
@@ -99,109 +17,69 @@ export default Pie.extend({
     mounted: function() {
 
         this.authToken = Cookie.getJSONCookie("accessToken").accessToken;
-        /*         this.getGroups();
-                this.getUsers(); */
 
-        axios
-            .get(Config.webServiceURL + "/v1/admin/groups", {
-                headers: { Authorization: "0 " + this.authToken }
-            })
-            .then(response => {
-                this.groups = response.data.payload;
-                this.groupCount = this.countProperties(this.groups);
-                // this.groupCountLoaded = true;
-                console.log("Anzahl Gruppen in PieChart: " + this.groupCount);
-                console.log("Existing Groups in PieCharts: " + JSON.stringify(this.groups));
-            })
-            .catch(e => {
-                this.errors.push(e);
-                console.log("Errors in GET admin/groups: " + error);
-            });
+        //Resolve promise to render chart with desired counts
+        Promise.all([this.getUsers(), this.getGroups()]).then(promisData => {
+            let usersData = promisData[0];
+            let groupData = promisData[1];
+            console.log(groupData);
+            console.log(usersData);
 
-
-
-        axios
-            .get(Config.webServiceURL + "/v1/admin/users", {
-                headers: { Authorization: "0 " + this.authToken }
-            })
-            .then(response => {
-                this.users = response.data.payload;
-                this.userCount = this.countProperties(this.users);
-                console.log("Count Users in PieChart: " + this.userCount);
-                console.log("Existing Users in PieChart: " + JSON.stringify(this.users));
-            })
-            .catch(e => {
-                this.errors.push(e);
-                console.log("Errors in GET admin/users: " + e);
-            });
-
-
-        this.renderChart({
-            labels: ['Users', "Groups"],
-            datasets: [{
-                    //label: 'Count',
+            this.renderChart({
+                labels: ['Users', "Groups"],
+                datasets: [{
                     backgroundColor: ['#FC2525', '#05CBE1'],
-                    data: [this.userCount, this.groupCount]
-                },
-                /*                 {
-                                    //label: 'Groups',
-                                    backgroundColor: '#05CBE1',
-                                    data: [this.groupCount]
-                                } */
-            ],
-        }, { responsive: true, maintainAspectRatio: false })
-        console.log("Userscount in PieCount: " + this.userCount)
-        console.log("Groupscount in PieCount: " + this.groupCount)
+                    data: [usersData, groupData]
+                }, ],
+            }, { responsive: true, maintainAspectRatio: false }, )
+        });
     },
-
     methods: {
 
-        //Counts the elements of an object
-        countProperties: function(obj) {
-            var count = 0;
-            for (var property in obj) {
-                if (Object.prototype.hasOwnProperty.call(obj, property)) {
-                    count++;
-                }
-            }
-            return count;
-        },
-
+        //Request all groups within an asyc. call to get number of groups
         getGroups: function() {
-            axios
-                .get(Config.webServiceURL + "/v1/admin/groups", {
-                    headers: { Authorization: "0 " + this.authToken }
-                })
-                .then(response => {
-                    this.groups = response.data.payload;
-                    this.groupCount = this.countProperties(this.groups);
-                    // this.groupCountLoaded = true;
-                    console.log("Anzahl Gruppen in PieChart: " + this.groupCount);
-                    console.log("Existing Groups in PieCharts: " + JSON.stringify(this.groups));
-                })
-                .catch(e => {
-                    this.errors.push(e);
-                    console.log("Errors in GET admin/groups: " + error);
-                });
+            return new Promise((resolve, reject) => {
+                axios
+                    .get(Config.webServiceURL + "/v1/admin/groups", {
+                        headers: { Authorization: "0 " + this.authToken }
+                    })
+                    .then(response => {
+                        let groups = response.data.payload;
+                        let count = groups.length;
+                        console.log("COUNT Groups: " + count)
+                        console.log("Gruppen in PieCjjarts: ");
+                        console.log(groups);
+                        resolve(count)
+                    })
+                    .catch(e => {
+                        console.log("Errors in GET admin/groups: ");
+                        console.log(e);
+                        reject(e);
+                    });
+            })
         },
 
+        //Request all users within an asyc. call to get number of users
         getUsers: function() {
-            axios
-                .get(Config.webServiceURL + "/v1/admin/users", {
-                    headers: { Authorization: "0 " + this.authToken }
-                })
-                .then(response => {
-                    this.users = response.data.payload;
-                    this.userCount = this.countProperties(this.users);
-                    console.log("Count Users in PieChart: " + this.userCount);
-                    console.log("Existing Users in PieChart: " + JSON.stringify(this.users));
-                })
-                .catch(e => {
-                    this.errors.push(e);
-                    console.log("Errors in GET admin/users: " + e);
-                });
+            return new Promise((resolve, reject) => {
+                axios
+                    .get(Config.webServiceURL + "/v1/admin/users", {
+                        headers: { Authorization: "0 " + this.authToken }
+                    })
+                    .then(response => {
+                        let users = response.data.payload;
+                        let count = users.length;
+                        console.log("COUNT Users: " + count)
+                        console.log("Users in PieChart: ");
+                        console.log(users);
+                        resolve(count);
+                    })
+                    .catch(e => {
+                        console.log("Errors in GET admin/users: ");
+                        console.log(e);
+                        reject(e);
+                    });
+            })
         },
     }
-
-
 })
