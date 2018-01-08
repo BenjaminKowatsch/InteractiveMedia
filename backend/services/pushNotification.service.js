@@ -44,6 +44,7 @@ module.exports.sendfcm = function(tokens, data, notification, dryRun) {
         } else {
           winston.debug('send fcm message was successful', JSON.stringify(res));
           responseData.success = true;
+          responseData.payload.message = 'notification sent successfully';
           resolve(responseData);
         }
       });
