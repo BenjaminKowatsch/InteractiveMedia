@@ -119,7 +119,7 @@ function sendNotificationCreateTransaction(groupId, userIdCreator) {
       responseData.payload.dataPath = 'notification';
       responseData.payload.message = 'userId of creator was not found in userIds of group';
       const errorCode = ERROR.UNKNOWN_USER;
-      Promise.reject({errorCode: errorCode, responseData: responseData});
+      return Promise.reject({errorCode: errorCode, responseData: responseData});
     }
 
     if (userIds.length > 0) {
@@ -130,7 +130,7 @@ function sendNotificationCreateTransaction(groupId, userIdCreator) {
       responseData.payload.dataPath = 'notification';
       responseData.payload.message = 'there are no users left to send a notification to';
       const errorCode = ERROR.UNKNOWN_USER;
-      Promise.reject({errorCode: errorCode, responseData: responseData});
+      return Promise.reject({errorCode: errorCode, responseData: responseData});
     }
   })
   .then(fcmTokenResult => {
