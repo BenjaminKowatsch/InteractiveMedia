@@ -123,9 +123,9 @@ export default {
         .post(
           Config.webServiceURL + "/v1/groups",
           {
-            name: "Testgroup3",
+            name: "Testgroup0",
             imageUrl: null,
-            users: ["alex1@alex.de", "admin@example.com", "benny1@alex.de"]
+            users: ["admin@example.com"]
           },
           {
             headers: { Authorization: `0 ${this.authToken}` }

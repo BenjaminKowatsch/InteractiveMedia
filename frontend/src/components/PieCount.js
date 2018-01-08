@@ -5,7 +5,7 @@ import Config from "../js/Config.js";
 
 export default Pie.extend({
     name: "PieCount",
-    props: ['data'],
+    props: ['userCount', 'groupCount'],
     /* data() {
         return {
             users: [],
@@ -15,7 +15,7 @@ export default Pie.extend({
         }
     }, */
     watch: {
-        'data': {
+        /* 'data': {
             handler: function(newData, oldData) {
                 let chart = this._chart
 
@@ -38,10 +38,58 @@ export default Pie.extend({
             },
             deep: true
         }
+    }, */
+        'userCount': {
+            handler: function(val) {
+
+                console.log("Usercount has changed: " + this.userCount)
+                this._chart.data.datasets[0].data = [this.userCount, this.groupCount]
+                this._chart.update();
+                /*                this.renderChart({
+                                       labels: ['Count'],
+                                       datasets: [{
+                                           label: 'Users',
+                                           backgroundColor: '#FC2525',
+                                           data: [this.userCount]
+                                       }, {
+                                           label: 'Groups',
+                                           backgroundColor: '#05CBE1',
+                                           data: [this.groupCount]
+                                       }]
+                                   }, { responsive: false, maintainAspectRatio: false }) */
+                // console.log("Usercount in Datasets after change: " + JSON.stringify(this._chart.data.datasets[0].data))
+            },
+            deep: true
+        },
+        'groupCount': {
+            handler: function(val) {
+
+                console.log("Groupcount has changed: " + this.groupCount)
+                this._chart.data.datasets[0].data = [this.userCount, this.groupCount]
+                this._chart.update();
+                /* this.renderChart({
+                        labels: ['Count'],
+                        datasets: [{
+                            label: 'Users',
+                            backgroundColor: '#FC2525',
+                            data: [this.userCount]
+                        }, {
+                            label: 'Groups',
+                            backgroundColor: '#05CBE1',
+                            data: [this.groupCount]
+                        }]
+                    }, { responsive: false, maintainAspectRatio: false }) */
+                //console.log("Groupcount in Datasets after change: " + JSON.stringify(this._chart.data.datasets[1].data))
+            },
+            deep: true
+        }
+
     },
 
     data() {
         return {
+            userCount: "",
+            groupCount: "",
             options: {
                 /* my specific data */
             }
@@ -49,13 +97,10 @@ export default Pie.extend({
     },
 
     mounted: function() {
-        this.userCount = -1
-        this.groupCount = -1
+
         this.authToken = Cookie.getJSONCookie("accessToken").accessToken;
         /*         this.getGroups();
                 this.getUsers(); */
-
-
 
         axios
             .get(Config.webServiceURL + "/v1/admin/groups", {
@@ -91,22 +136,22 @@ export default Pie.extend({
             });
 
 
-        /* this.renderChart({
-            labels: ['Users', 'Groups'],
+        this.renderChart({
+            labels: ['Users', "Groups"],
             datasets: [{
-                label: 'Users',
-                backgroundColor: '#FC2525',
-                data: [this.userCount]
-            }, {
-                label: 'Groups',
-                backgroundColor: '#05CBE1',
-                data: [this.groupCount]
-            }]
-        }, { responsive: true, maintainAspectRatio: false }) */
-        this.renderChart(this.data, this.options)
+                    //label: 'Count',
+                    backgroundColor: ['#FC2525', '#05CBE1'],
+                    data: [this.userCount, this.groupCount]
+                },
+                /*                 {
+                                    //label: 'Groups',
+                                    backgroundColor: '#05CBE1',
+                                    data: [this.groupCount]
+                                } */
+            ],
+        }, { responsive: true, maintainAspectRatio: false })
         console.log("Userscount in PieCount: " + this.userCount)
         console.log("Groupscount in PieCount: " + this.groupCount)
-
     },
 
     methods: {
