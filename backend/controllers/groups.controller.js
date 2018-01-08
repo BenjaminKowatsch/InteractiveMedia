@@ -101,6 +101,8 @@ module.exports.createNewTransaction = function(req, res) {
 
 function sendNotificationCreateTransaction(groupId, userIdCreator) {
   let transactionGroup;
+  let responseData = {payload: {}};
+
   // load group to get users and group meta data
   // TODO: do not load transaction to reduce load
   group.getGroupById(groupId)
@@ -113,13 +115,9 @@ function sendNotificationCreateTransaction(groupId, userIdCreator) {
       // remove userId of creator
       userIds.splice(indexCreatorTransaction, 1);
     } else {
-      const responseData = {
-        success: false,
-        payload: {
-          dataPath: 'notification',
-          message: 'userId of creator was not found in userIds of group'
-        }
-      };
+      responseData.success = false;
+      responseData.payload.dataPath = 'notification';
+      responseData.payload.message = 'userId of creator was not found in userIds of group';
       const errorCode = ERROR.UNKNOWN_USER;
       Promise.reject({errorCode: errorCode, responseData: responseData});
     }
@@ -128,13 +126,9 @@ function sendNotificationCreateTransaction(groupId, userIdCreator) {
       // get fcm tokens of users
       return user.getFcmTokensByUserIds(userIds);
     } else {
-      const responseData = {
-        success: false,
-        payload: {
-          dataPath: 'notification',
-          message: 'there are no users left to send a notification to'
-        }
-      };
+      responseData.success = false;
+      responseData.payload.dataPath = 'notification';
+      responseData.payload.message = 'there are no users left to send a notification to';
       const errorCode = ERROR.UNKNOWN_USER;
       Promise.reject({errorCode: errorCode, responseData: responseData});
     }
