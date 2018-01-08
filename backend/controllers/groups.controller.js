@@ -118,7 +118,7 @@ function sendNotificationCreateTransaction(groupId, userIdCreator) {
       responseData.success = false;
       responseData.payload.dataPath = 'notification';
       responseData.payload.message = 'userId of creator was not found in userIds of group';
-      const errorCode = ERROR.UNKNOWN_USER;
+      const errorCode = ERROR.NO_USERS;
       return Promise.reject({errorCode: errorCode, responseData: responseData});
     }
 
@@ -129,7 +129,7 @@ function sendNotificationCreateTransaction(groupId, userIdCreator) {
       responseData.success = false;
       responseData.payload.dataPath = 'notification';
       responseData.payload.message = 'there are no users left to send a notification to';
-      const errorCode = ERROR.UNKNOWN_USER;
+      const errorCode = ERROR.NO_USERS;
       return Promise.reject({errorCode: errorCode, responseData: responseData});
     }
   })
@@ -140,7 +140,7 @@ function sendNotificationCreateTransaction(groupId, userIdCreator) {
       responseData.success = false;
       responseData.payload.dataPath = 'notification';
       responseData.payload.message = 'there are no users left to send a notification to';
-      const errorCode = ERROR.UNKNOWN_USER;
+      const errorCode = ERROR.NO_USERS;
       return Promise.reject({errorCode: errorCode, responseData: responseData});
     }
 
