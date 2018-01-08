@@ -82,7 +82,7 @@ public class RegisterActivity extends AppCompatActivity
         registerPassword = (EditText) findViewById(R.id.et_register_password);
         register.setOnClickListener(this);
         profilePicture.setOnClickListener(this);
-        readExternalStoragePermissionGranted = isStoragePermissionGranted();
+        //readExternalStoragePermissionGranted = isStoragePermissionGranted();
     }
 
     @Override
@@ -100,7 +100,7 @@ public class RegisterActivity extends AppCompatActivity
                         Toast.makeText(getApplicationContext(),
                             "Success fully logged in",
                             Toast.LENGTH_SHORT).show();
-                        uploadImage(currentPhotoPath);
+                        //uploadImage(currentPhotoPath);
                         /*
                         final Intent toHome = new Intent(RegisterActivity.this, HomeActivity.class);
                         toHome.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
@@ -116,8 +116,8 @@ public class RegisterActivity extends AppCompatActivity
 
                 break;
             case R.id.register_profile_picture:
-                final Dialog dialog = createDialog();
-                dialog.show();
+                //final Dialog dialog = createDialog();
+                //dialog.show();
                 break;
             default:
                 Log.e(TAG, "OnClick error occurred");

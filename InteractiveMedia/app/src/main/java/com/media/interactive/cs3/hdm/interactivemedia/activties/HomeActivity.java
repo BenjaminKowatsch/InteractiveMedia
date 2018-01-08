@@ -73,7 +73,7 @@ public class HomeActivity extends AppCompatActivity
     }
 
     private void loadProfilePicture(NavigationView navigationView){
-        final String imageName = Login.getInstance().getProfilePicture();
+        final String imageName = Login.getInstance().getUser().getImageUrl();
         if(imageName != null) {
             final ImageView profilePicture = (ImageView) navigationView.getHeaderView(0).findViewById(R.id.imageView);
 

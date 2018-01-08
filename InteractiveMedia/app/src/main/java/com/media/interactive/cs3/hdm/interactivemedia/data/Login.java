@@ -268,8 +268,6 @@ public class Login {
         RestRequestQueue.getInstance(context).addToRequestQueue(jsonObjectRequest);
     }
 
-    public void login(Context context, CallbackListener<JSONObject,Exception> callbackListener) {
-
     public void login(Context context, CallbackListener<JSONObject, Exception> callbackListener) {
 
         contentResolver = context.getContentResolver();
@@ -517,11 +515,4 @@ public class Login {
         RestRequestQueue.getInstance(activity).addToRequestQueue(jsonObjectRequest);
     }
 
-    public String getProfilePicture() {
-        return profilePicture;
-    }
-
-    public void setProfilePicture(String profilePicture) {
-        this.profilePicture = profilePicture;
-    }
 }
