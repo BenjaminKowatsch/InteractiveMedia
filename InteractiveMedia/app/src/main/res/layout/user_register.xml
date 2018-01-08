@@ -50,6 +50,17 @@
             android:inputType="text" />
 
         <TextView
+            android:id="@+id/et_register_username_error"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginRight="30dp"
+            android:layout_marginLeft="30dp"
+            android:text="Invalid username. At least 5 characters are required."
+            android:visibility="gone"
+            android:textColor="@android:color/holo_red_dark"/>
+
+        <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
@@ -68,6 +79,17 @@
             android:inputType="textEmailAddress" />
 
         <TextView
+            android:id="@+id/et_register_email_error"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginRight="30dp"
+            android:layout_marginLeft="30dp"
+            android:text="Invalid email."
+            android:visibility="gone"
+            android:textColor="@android:color/holo_red_dark"/>
+
+        <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
@@ -84,6 +106,17 @@
             android:layout_marginBottom="10dp"
             android:hint="Password"
             android:inputType="textPassword" />
+
+        <TextView
+            android:id="@+id/et_register_password_error"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginRight="30dp"
+            android:layout_marginLeft="30dp"
+            android:text="Invalid password. At least 3 characters are required."
+            android:visibility="gone"
+            android:textColor="@android:color/holo_red_dark"/>
 
         <Button
             android:id="@+id/bn_register"

@@ -67,6 +67,7 @@ public class ImagePickerActivity extends AppCompatActivity {
     private static final int PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE = 1;
     protected ImageView imageView;
     private boolean readExternalStoragePermissionGranted = false;
+
     private String imageFilename;
 
     private String currentPhotoPath = null;
@@ -185,7 +186,6 @@ public class ImagePickerActivity extends AppCompatActivity {
                     callbackListener.onFailure(new Exception("Image upload failed"));
                 }
             }) {
-
                 @Override
                 public Map<String, String> getHeaders() throws AuthFailureError {
                     final Map<String, String> params = new HashMap<String, String>();
@@ -314,7 +314,6 @@ public class ImagePickerActivity extends AppCompatActivity {
         return builder.create();
     }
 
-
     private void startUrlDialog() {
         final AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(this);
         final LayoutInflater inflater = this.getLayoutInflater();
@@ -350,10 +349,12 @@ public class ImagePickerActivity extends AppCompatActivity {
                             } catch (IOException e) {
                                 e.printStackTrace();
                             }
+
                         }
 
                         @Override
                         public void onLoadFailed(Exception e, Drawable errorDrawable) {
+
                             currentPhotoPath = null;
                             makeToast("Image could not be loaded.");
                         }
@@ -383,6 +384,7 @@ public class ImagePickerActivity extends AppCompatActivity {
 
             @Override
             public void afterTextChanged(Editable editable) {
+
                 if (Helper.IsUrlValid(editable.toString())) {
                     errorMessage.setVisibility(View.GONE);
                     positiveButton.setEnabled(true);

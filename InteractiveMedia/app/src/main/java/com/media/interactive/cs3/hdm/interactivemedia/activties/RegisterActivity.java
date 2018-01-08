@@ -19,11 +19,16 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.content.FileProvider;
 import android.support.v7.app.AppCompatActivity;
+import android.text.Editable;
+import android.text.InputType;
+import android.text.TextWatcher;
 import android.util.Log;
+import android.util.Patterns;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 
@@ -53,37 +58,119 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
-public class RegisterActivity extends AppCompatActivity
+public class RegisterActivity extends ImagePickerActivity
     implements View.OnClickListener {
 
-    private static final String TAG = "RegisterActivity";
-
-    private static final String PROFILE_PICTURE_FILE_NAME = "profile_picture.jpg";
-    private static final int REQUEST_TAKE_PHOTO = 1;
-    private static final int RESULT_LOAD_IMAGE = 2;
-    private static final int MY_PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE = 1;
-    private boolean readExternalStoragePermissionGranted = false;
-    private String currentPhotoPath = null;
-    private ImageView profilePicture;
+    private static final String TAG = RegisterActivity.class.getSimpleName();
 
     private Button register;
     private EditText registerUsername;
+    private TextView registerUsernameError;
     private EditText registerEmail;
+    private TextView registerEmailError;
     private EditText registerPassword;
+    private TextView registerPasswordError;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.user_register);
-        profilePicture = (ImageView) findViewById(R.id.register_profile_picture);
+
         register = (Button) findViewById(R.id.bn_register);
         registerUsername = (EditText) findViewById(R.id.et_register_username);
+        registerUsernameError = (TextView) findViewById(R.id.et_register_username_error);
         registerEmail = (EditText) findViewById(R.id.et_register_email);
+        registerEmailError = (TextView) findViewById(R.id.et_register_email_error);
         registerPassword = (EditText) findViewById(R.id.et_register_password);
+        registerPasswordError = (TextView) findViewById(R.id.et_register_password_error);
         register.setOnClickListener(this);
-        profilePicture.setOnClickListener(this);
-        //readExternalStoragePermissionGranted = isStoragePermissionGranted();
+        
+        register.setEnabled(false);
+
+        registerEmail.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_EMAIL_ADDRESS);
+
+        registerUsername.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {}
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {}
+
+            @Override
+            public void afterTextChanged(Editable editable) {
+                if(isNameValid(editable.toString())){
+                    registerUsernameError.setVisibility(View.GONE);
+                    register.setEnabled(isRegisterEnabled());
+                } else {
+                    registerUsernameError.setVisibility(View.VISIBLE);
+                    register.setEnabled(false);
+                }
+            }
+        });
+
+        registerEmail.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {}
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {}
+
+            @Override
+            public void afterTextChanged(Editable editable) {
+                if(isEmailValid(editable.toString())){
+                    registerEmailError.setVisibility(View.GONE);
+                    register.setEnabled(isRegisterEnabled());
+                } else {
+                    registerEmailError.setVisibility(View.VISIBLE);
+                    register.setEnabled(false);
+                }
+            }
+        });
+
+        registerPassword.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {}
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {}
+
+            @Override
+            public void afterTextChanged(Editable editable) {
+                if(isPasswordValid(editable.toString())){
+                    registerPasswordError.setVisibility(View.GONE);
+                    register.setEnabled(isRegisterEnabled());
+                } else {
+                    registerPasswordError.setVisibility(View.VISIBLE);
+                    register.setEnabled(false);
+                }
+            }
+        });
+
+        initImagePickerActivity(R.id.register_profile_picture);
     }
+
+    private boolean isRegisterEnabled() {
+        boolean isNameValid = isNameValid(registerUsername.getText().toString());
+        boolean isPasswordValid = isPasswordValid(registerPassword.getText().toString());
+        boolean isEmailValid = isEmailValid(registerEmail.getText().toString());
+        return isEmailValid && isNameValid && isPasswordValid;
+    }
+
+    private boolean isNameValid(String name) {
+        return name != null && name.length() > 4;
+    }
+
+    private boolean isPasswordValid(String password) {
+        return password != null && password.length() > 3;
+    }
+
+    private boolean isEmailValid(String email){
+        if(Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
+            return true;
+        }
+        return false;
+    }
+
 
     @Override
     public void onClick(View v) {
@@ -100,25 +187,24 @@ public class RegisterActivity extends AppCompatActivity
                         Toast.makeText(getApplicationContext(),
                             "Success fully logged in",
                             Toast.LENGTH_SHORT).show();
-                        //uploadImage(currentPhotoPath);
-                        /*
+
+                        uploadImage();
+
                         final Intent toHome = new Intent(RegisterActivity.this, HomeActivity.class);
                         toHome.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
                         startActivity(toHome);
-                        finish();*/
+                        finish();
                     }
 
                     @Override
                     public void onFailure(Exception error) {
                         Log.e(TAG, "error: " + error.getMessage());
+                        makeToast("Registration failed, please try again.");
                     }
                 });
 
                 break;
-            case R.id.register_profile_picture:
-                //final Dialog dialog = createDialog();
-                //dialog.show();
-                break;
+
             default:
                 Log.e(TAG, "OnClick error occurred");
                 break;
