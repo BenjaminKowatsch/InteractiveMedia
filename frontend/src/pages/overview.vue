@@ -47,14 +47,20 @@
 
       <br/>
 
+      <div id="chart">
+        <div v-if="showChart">
+                <pie-count></pie-count>
+        </div>
+      </div>
+
       <div v-if="version">
         <p>Debts² admin panel version informations: 
           {{version.name}}  {{version.version}}
         </p>
       </div>
-
-       </f7-list form>  
+        </f7-list form>  
     <f7-list>
+      <f7-list-button title="Show Chart" v-on:click="showChart = toggleState(showChart)"></f7-list-button>    
       <f7-list-button title="CreateDummyGroup" v-on:click="createDummyGroup()"></f7-list-button>
       <f7-list-button title="Logout" v-on:click="logout()"></f7-list-button>
     </f7-list>
@@ -67,11 +73,14 @@ import Mixins from "../mixins.js";
 import axios from "axios";
 import Cookie from "../js/Cookie.js";
 import Config from "../js/Config.js";
+import PieCount from "@/components/PieCount.js";
 
 export default {
   name: "overview",
   mixins: [Mixins],
-  components: {},
+  components: {
+    PieCount
+  },
   data() {
     return {
       version: [],
@@ -82,7 +91,8 @@ export default {
       groupId: "",
       userId: "",
       groupCount: "",
-      userCount: ""
+      userCount: "",
+      showChart: false
     };
   },
 
@@ -91,7 +101,6 @@ export default {
     // console.log(groupCountLoaded);
     this.authToken = Cookie.getJSONCookie("accessToken").accessToken;
     console.log("The cookie authToken is: " + this.authToken);
-
     this.groups = [];
     this.users = [];
     this.groupId = "9a7fb2f3-8b39-4849-ac81-48c1835220d0";
@@ -112,9 +121,9 @@ export default {
         .post(
           Config.webServiceURL + "/v1/groups",
           {
-            name: "Testgroup3",
+            name: "Testgroup0",
             imageUrl: null,
-            users: ["alex1@alex.de", "admin@example.com", "benny1@alex.de"]
+            users: ["admin@example.com"]
           },
           {
             headers: { Authorization: `0 ${this.authToken}` }
@@ -152,11 +161,11 @@ export default {
           this.groupCount = this.countProperties(this.groups);
           // this.groupCountLoaded = true;
           console.log("Anzahl Gruppen: " + this.groupCount);
-          console.log("Existing Groups: " + JSON.stringify(this.groups));
+          // console.log("Existing Groups: " + JSON.stringify(this.groups));
         })
         .catch(e => {
           this.errors.push(e);
-          console.log("Errors in GET admin/groups: " + error);
+          console.log("Errors in GET admin/groups: " + e);
         });
     },
 
@@ -185,7 +194,7 @@ export default {
           this.users = response.data.payload;
           this.userCount = this.countProperties(this.users);
           console.log("Count Users: " + this.userCount);
-          console.log("Existing Users: " + JSON.stringify(this.users));
+          // console.log("Existing Users: " + JSON.stringify(this.users));
         })
         .catch(e => {
           this.errors.push(e);
@@ -232,14 +241,25 @@ export default {
       return count;
     },
 
+    //Toggles state of boolean variables
+    toggleState: function(state) {
+      console.log("State of showChart before toggle");
+      console.log(state);
+      if (state) {
+        return (state = false);
+      } else {
+        return (state = true);
+      }
+    },
+
+    //Logout the current user
     logout: function() {
       let accessToken = this.authToken;
 
       //Check for existing accessToken
       this.checkAccessToken(accessToken => {
-        
         console.log("AuthToken in checkAccess fct: " + this.authToken);
-        // Post data to the backend to successfully logout the user and redirect to login page
+        //Post data to the backend to successfully logout the user and redirect to login page
         axios
           .post(Config.webServiceURL + `/v1/users/logout`, this.authToken, {
             headers: {
