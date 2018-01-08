@@ -1,6 +1,10 @@
+'use strict';
+
 const jwt = require('jwt-simple');
+const winston = require('winston');
 
 const config = require('../modules/config');
+const ERROR = require('../config.error');
 
 /**
  * Function to calculate a new expiry date for tokens.
@@ -24,5 +28,18 @@ exports.generateAccessToken = function(toEncode) {
   };
 
 exports.decodeToken = function(token) {
-  return jwt.decode(token, config.jwtSimpleSecret);
+  let responseData = {payload: {}};
+  try {
+    const decodeResult = jwt.decode(token, config.jwtSimpleSecret);
+    responseData.success = true;
+    responseData.payload.userId = decodeResult.userId;
+    return Promise.resolve(responseData);
+  } catch (error) {
+    responseData.success = false;
+    responseData.payload.dataPath = 'authentication';
+    responseData.payload.message = 'invalid authToken';
+    let errorCode = ERROR.INVALID_AUTH_TOKEN;
+    winston.error('errorCode', errorCode);
+    return Promise.reject({errorCode: errorCode, responseData: responseData});
+  }
 };

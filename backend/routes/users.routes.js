@@ -1,10 +1,12 @@
+'use strict';
+
 // jscs:disable jsDoc
 
-var express = require('express');
-var router = express.Router();
+const express = require('express');
+const router = express.Router();
 
-var usersController = require('../controllers/users.controller');
-var authenticationService = require('../services/authentication.service');
+const usersController = require('../controllers/users.controller');
+const authenticationService = require('../services/authentication.service');
 
 /**
  * @api {POST} /v1/users Register
@@ -69,21 +71,79 @@ router.post('/login', usersController.login);
  * @apiGroup user
  * @apiVersion 0.1.0
  *
- * @apiUse paramAccessToken
- * @apiUse paramAuthtype
+ * @apiUse headerAuthorization
+ * @apiUse headerExampleAuthorization
  *
  * @apiUse successBodySuccess
  * @apiSuccess (SuccessCode) {200} Success Logout successful
  *
  * @apiUse errorBodyCommonStructure
  * @apiUse error400BadRequest
- * @apiUse error401AccessTokenInvalid
+ * @apiUse error401Unauthorized
  *
- * @apiUse paramExampleAuthtoken
  * @apiUse successExampleSuccess
  *
  * @apiUse errorExampleCommon
  */
 router.post('/logout', authenticationService.isAuthenticated, usersController.logout);
+
+/**
+ * @api {GET} /v1/users/user Get User
+ * @apiName getUser
+ * @apiGroup user
+ * @apiVersion 0.1.0
+ * @apiDescription Get information about the user identified by the provided auth token.
+ *
+ * @apiUse headerAuthorization
+ * @apiUse headerExampleAuthorization
+ *
+ * @apiUse successBodySuccess
+ * @apiUse successBodyUserUsername
+ * @apiUse successBodyUserEmail
+ * @apiUse successBodyUserUserId
+ * @apiUse successBodyUserRole
+ * @apiUse successBodyUserGroupIds
+ * @apiSuccess (SuccessCode) {200} Success Get User
+ *
+ * @apiUse successExampleUser
+ *
+ * @apiUse error401Unauthorized
+ * @apiUse error418UncaughtError
+ * @apiUse error500DatabaseError
+ * @apiUse error500UnknownUser
+ * @apiUse errorBodyCommonStructure
+ *
+ * @apiUse errorExampleCommon
+ */
+router.get('/user', authenticationService.isAuthenticated, usersController.getUserData);
+
+/**
+ * @api {PUT} /v1/users/user/fcmtoken Update FCM token
+ * @apiName putFcmToken
+ * @apiGroup user
+ * @apiVersion 0.1.0
+ * @apiDescription Update token for Firebase Cloud Messaging. FCM token is used for push notifications on Android.
+ *  User is identified by auth token.
+ *
+ * @apiUse headerAuthorization
+ * @apiUse headerExampleAuthorization
+ *
+ * @apiUse paramExampleUserUpdateFcmToken
+ *
+ * @apiUse successBodySuccess
+ * @apiSuccess (SuccessCode) {200} Success Update successful
+ *
+ * @apiUse successExampleSuccess
+ *
+ * @apiUse error400InvalidBody
+ * @apiUse error401Unauthorized
+ * @apiUse error418UncaughtError
+ * @apiUse error500InternalServerError
+ * @apiUse error500DatabaseError
+ * @apiUse errorBodyCommonStructure
+ *
+ * @apiUse errorExampleCommon
+ */
+router.put('/user/fcmtoken', authenticationService.isAuthenticated, usersController.updateFcmToken);
 
 module.exports = router;

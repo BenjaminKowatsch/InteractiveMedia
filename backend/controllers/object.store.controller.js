@@ -1,77 +1,102 @@
-var winston = require('winston');
-var config = require('../modules/config');
-var Minio = require('minio');
-const httpResonseService = require('../services/httpResonse.service');
+'use strict';
+
+const winston = require('winston');
+const config = require('../modules/config');
+const httpResponseService = require('../services/httpResponse.service');
 const uuidService = require('../services/uuid.service');
+const objectStore = require('../modules/objectstore.module');
+const ERROR = require('../config.error');
 
-var minioClient = new Minio.Client({
-  endPoint: config.minioEndpoint,
-  port: config.minioEndpointPort,
-  secure: false,
-  accessKey: config.minioAccessKey,
-  secretKey: config.minioSecretKey
-});
-
-winston.debug('minioclient: ' + (undefined === minioClient));
-
-minioClient.bucketExists(config.minioBucketName, function(err) {
-  if (err) {
-    if (err.code === 'NoSuchBucket') {
-      winston.debug('Minio bucket ' + config.minioBucketName + ' will be created.');
-      minioClient.makeBucket(config.minioBucketName, 'us-east-1', function(err) {
-        if (err) {
-          return winston.error(err);
-        }
-        winston.debug('Bucket created successfully in "us-east-1".');
-      });
-    } else {
-      winston.debug('An error occured');
+function parseRequestUploadFile(req) {
+  let responseData = {payload: {}};
+  return new Promise((resolve, reject) => {
+    if (!('file' in req)) {
+      responseData.success = false;
+      responseData.payload.dataPath = 'objectstore';
+      responseData.payload.message = 'invalid or missing file';
+      let errorCode = ERROR.INVALID_OR_MISSING_FILE_IN_REQUEST;
+      reject({errorCode: errorCode, responseData: responseData});
     }
-  } else {
-    winston.debug('Minio bucket ' + config.minioBucketName + ' already exists.');
-  }
-});
+    const filenameRaw = req.file.originalname;
+    winston.debug('filenameRaw', filenameRaw);
+
+    if (filenameRaw == null || filenameRaw == undefined) {
+      responseData.success = false;
+      responseData.payload.dataPath = 'objectstore';
+      responseData.payload.message = 'invalid or missing file';
+      let errorCode = ERROR.INVALID_OR_MISSING_FILE_IN_REQUEST;
+      reject({errorCode: errorCode, responseData: responseData});
+    }
+
+    const filename = uuidService.generateUUID() + '.' + filenameRaw;
+    winston.debug('filename', filename);
+    responseData.success = true;
+    responseData.payload.filename = filename;
+    responseData.payload.filenameRaw = filenameRaw;
+    resolve(responseData);
+  });
+}
 
 module.exports.upload = function(req, res) {
-  const filename = uuidService.generateUUID() + '.' + req.file.originalname;
-  winston.debug('storing file: ' + filename + ' at bucket: ' + config.minioBucketName);
-  minioClient.putObject(config.minioBucketName, filename, req.file.buffer, function(error, etag) {
-    if (error) {
-      const errorResponse = {
-        'success': false,
-        'payload': {
-          'dataPath': 'storeObject',
-          'message': 'store object failed'
-        }
-      };
-      httpResonseService.sendHttpResponse(res, 500, errorResponse);
-    } else {
-      successReponse = {
-        'success': true,
-        'payload': {
-          'path': filename
-        }
-      };
-      httpResonseService.sendHttpResponse(res, 201, successReponse);
+  let responseData = {payload: {}};
+  let filename;
+  parseRequestUploadFile(req).then(fileMeta => {
+    filename = fileMeta.payload.filename;
+    return objectStore.putObject(config.minioBucketName, filename, req.file.buffer);
+  }).then(promiseData => {
+    responseData.success = true;
+    responseData.payload.path = filename;
+    httpResponseService.send(res, 201, responseData);
+  }).catch(errorResult => {
+    winston.error('errorCode', errorResult.errorCode);
+    let statusCode = 418;
+    switch (errorResult.errorCode) {
+      case ERROR.INVALID_OR_MISSING_FILE_IN_REQUEST:
+        statusCode = 400;
+        break;
+      case ERROR.MINIO_ERROR:
+        statusCode = 500;
+        break;
     }
+    httpResponseService.send(res, statusCode, errorResult.responseData);
   });
 };
 
-module.exports.download = function(req, res) {
-  winston.debug('download file: ' + req.query.filename + ' at bucket: ' + config.minioBucketName);
+function parseRequestDownloadFile(req) {
+  let responseData = {payload: {}};
+  if (req.query.filename == null || req.query.filename == undefined) {
+    responseData.success = false;
+    responseData.payload.dataPath = 'objectstore';
+    responseData.payload.message = 'invalid or missing filename in request';
+    let errorCode = ERROR.INVALID_OR_MISSING_FILENAME_IN_REQUEST;
+    return Promise.reject({errorCode: errorCode, responseData: responseData});
+  }
+  const filename = req.query.filename;
+  winston.debug('filename', filename);
+  responseData.success = true;
+  responseData.payload.filename = filename;
+  return Promise.resolve(responseData);
+}
 
-  minioClient.getObject(config.minioBucketName, req.query.filename, function(error, stream) {
-    if (error) {
-      const errorResponse = {
-        'success': false,
-        'payload': {
-          'dataPath': 'getObject',
-          'message': 'failed to get object'
-        }
-      };
-      httpResonseService.sendHttpResponse(res, 500, errorResponse);
-    } else {
-      stream.pipe(res);
+module.exports.download = function(req, res) {
+  let responseData = {payload: {}};
+  let filename;
+  parseRequestDownloadFile(req).then(fileMeta => {
+    filename = fileMeta.payload.filename;
+    return objectStore.getObject(config.minioBucketName, filename);
+  }).then(promiseData => {
+    promiseData.payload.stream.pipe(res);
+  }).catch(errorResult => {
+    winston.error('errorCode', errorResult.errorCode);
+    let statusCode = 418;
+    switch (errorResult.errorCode) {
+      case ERROR.INVALID_OR_MISSING_FILENAME_IN_REQUEST:
+        statusCode = 400;
+        break;
+      case ERROR.MINIO_ERROR:
+        statusCode = 500;
+        break;
     }
+    httpResponseService.send(res, statusCode, errorResult.responseData);
   });
 };

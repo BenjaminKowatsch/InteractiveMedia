@@ -84,6 +84,7 @@ public class RegisterActivity extends ImagePickerActivity
         registerPassword = (EditText) findViewById(R.id.et_register_password);
         registerPasswordError = (TextView) findViewById(R.id.et_register_password_error);
         register.setOnClickListener(this);
+        
         register.setEnabled(false);
 
         registerEmail.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_EMAIL_ADDRESS);
@@ -170,14 +171,15 @@ public class RegisterActivity extends ImagePickerActivity
         return false;
     }
 
+
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.bn_register:
                 final Login login = Login.getInstance();
-                login.setUsername(registerUsername.getText().toString());
+                login.getUser().setUsername(registerUsername.getText().toString());
                 login.setUserType(UserType.DEFAULT);
-                login.setEmail(registerEmail.getText().toString());
+                login.getUser().setEmail(registerEmail.getText().toString());
                 login.setHashedPassword(Hash.hashStringSha256(registerPassword.getText().toString()));
                 login.register(RegisterActivity.this, new CallbackListener<JSONObject, Exception>() {
                     @Override
@@ -185,6 +187,7 @@ public class RegisterActivity extends ImagePickerActivity
                         Toast.makeText(getApplicationContext(),
                             "Success fully logged in",
                             Toast.LENGTH_SHORT).show();
+
                         uploadImage();
 
                         final Intent toHome = new Intent(RegisterActivity.this, HomeActivity.class);
@@ -201,6 +204,7 @@ public class RegisterActivity extends ImagePickerActivity
                 });
 
                 break;
+
             default:
                 Log.e(TAG, "OnClick error occurred");
                 break;

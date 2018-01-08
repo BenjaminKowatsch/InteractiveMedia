@@ -21,7 +21,6 @@ import android.text.Editable;
 import android.text.InputType;
 import android.text.TextWatcher;
 import android.util.Log;
-import android.util.Patterns;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
@@ -36,17 +35,22 @@ import com.android.volley.error.AuthFailureError;
 import com.android.volley.error.VolleyError;
 import com.android.volley.request.SimpleMultiPartRequest;
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.request.animation.GlideAnimation;
 import com.bumptech.glide.request.target.SimpleTarget;
+import com.media.interactive.cs3.hdm.interactivemedia.CallbackListener;
 import com.media.interactive.cs3.hdm.interactivemedia.R;
 import com.media.interactive.cs3.hdm.interactivemedia.RestRequestQueue;
 import com.media.interactive.cs3.hdm.interactivemedia.data.Login;
+import com.media.interactive.cs3.hdm.interactivemedia.util.Helper;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -58,17 +62,24 @@ public class ImagePickerActivity extends AppCompatActivity {
 
     private static final String TAG = ImagePickerActivity.class.getSimpleName();
 
-    private static final String PROFILE_IMAGE_FILE_NAME = "image.jpg";
     private static final int REQUEST_TAKE_IMAGE = 1;
     private static final int RESULT_LOAD_IMAGE = 2;
     private static final int PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE = 1;
     protected ImageView imageView;
     private boolean readExternalStoragePermissionGranted = false;
 
-    private String currentPhotoPath = null;
-    private boolean isUrl = false;
+    private String imageFilename;
 
-    protected void initImagePickerActivity(final int viewId) {
+    private String currentPhotoPath = null;
+
+    /**
+     * Initializes the activity parameters.
+     *
+     * @param viewId        Reference to the ImageView where the picked image shall be displayed
+     * @param imageFilename if null a default imageFilename 'image.png' will be used
+     */
+    protected void initImagePickerActivity(final int viewId, String imageFilename) {
+        this.imageFilename = imageFilename != null ? imageFilename : "image.png";
         imageView = (ImageView) findViewById(viewId);
         imageView.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -111,11 +122,11 @@ public class ImagePickerActivity extends AppCompatActivity {
 
     private File createImageFile() throws IOException {
         final File storageDir = getExternalFilesDir(Environment.DIRECTORY_PICTURES);
-        final File image = new File(storageDir, PROFILE_IMAGE_FILE_NAME);
+        final File image = new File(storageDir, imageFilename);
 
         // Save a file: path for use with ACTION_VIEW intents
         currentPhotoPath = image.getAbsolutePath();
-        isUrl = false;
+
         Log.d(TAG, "Created Image with file path: " + currentPhotoPath);
         return image;
     }
@@ -147,11 +158,11 @@ public class ImagePickerActivity extends AppCompatActivity {
         imageView.setImageBitmap(bitmap);
     }
 
-    protected void uploadImage() {
-        uploadImage(currentPhotoPath);
+    protected void uploadImage(final CallbackListener<JSONObject, Exception> callbackListener) {
+        uploadImage(currentPhotoPath, callbackListener);
     }
 
-    private void uploadImage(String imageFilePath) {
+    private void uploadImage(String imageFilePath, final CallbackListener<JSONObject, Exception> callbackListener) {
         if (imageFilePath != null && imageFilePath.length() > 0) {
             final String url = getResources().getString(R.string.web_service_url) + "/v1/object-store/upload?filename=image.png";
             final SimpleMultiPartRequest simpleMultiPartRequest = new SimpleMultiPartRequest(Request.Method.POST, url, new Response.Listener<String>() {
@@ -160,28 +171,19 @@ public class ImagePickerActivity extends AppCompatActivity {
                     try {
                         final JSONObject object = new JSONObject(response);
                         if (object.getBoolean("success") == false) {
-                            makeToast("Image upload failed");
+                            callbackListener.onFailure(new Exception("Image upload failed"));
                         } else {
-                            final JSONObject payload = object.getJSONObject("payload");
-                            Log.d(TAG, "Path returned: " + payload.getString("path"));
-                            Login.getInstance().setProfilePicture(payload.getString("path"));
-
-                            final Intent toHome = new Intent(ImagePickerActivity.this, HomeActivity.class);
-                            toHome.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
-                            startActivity(toHome);
-                            finish();
+                            callbackListener.onSuccess(object);
                         }
                         Log.d(TAG, response);
                     } catch (JSONException e) {
-                        e.printStackTrace();
-                        makeToast("Image upload failed");
+                        callbackListener.onFailure(new Exception("Image upload failed"));
                     }
                 }
             }, new Response.ErrorListener() {
                 @Override
                 public void onErrorResponse(VolleyError error) {
-                    makeToast("Image upload failed");
-                    Log.e(TAG, error.toString());
+                    callbackListener.onFailure(new Exception("Image upload failed"));
                 }
             }) {
                 @Override
@@ -192,16 +194,12 @@ public class ImagePickerActivity extends AppCompatActivity {
                     return params;
                 }
             };
-            ;
 
             simpleMultiPartRequest.addFile("uploadField", imageFilePath);
+
             RestRequestQueue.getInstance(this).addToRequestQueue(simpleMultiPartRequest);
         } else {
-            Log.d(TAG, "No image to upload selected");
-            final Intent toHome = new Intent(ImagePickerActivity.this, HomeActivity.class);
-            toHome.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
-            startActivity(toHome);
-            finish();
+            callbackListener.onFailure(new Exception("No image to upload selected"));
         }
     }
 
@@ -224,7 +222,7 @@ public class ImagePickerActivity extends AppCompatActivity {
             int columnIndex = cursor.getColumnIndex(filePathColumn[0]);
 
             currentPhotoPath = cursor.getString(columnIndex);
-            isUrl = false;
+
             cursor.close();
 
             setPic();
@@ -316,14 +314,6 @@ public class ImagePickerActivity extends AppCompatActivity {
         return builder.create();
     }
 
-    private boolean isUrlValid(String url) {
-
-        if (Patterns.WEB_URL.matcher(url).matches()) {
-            return true;
-        }
-        return false;
-    }
-
     private void startUrlDialog() {
         final AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(this);
         final LayoutInflater inflater = this.getLayoutInflater();
@@ -341,24 +331,32 @@ public class ImagePickerActivity extends AppCompatActivity {
             public void onClick(DialogInterface dialog, int whichButton) {
 
                 final String url = editText.getText().toString();
-                Glide.with(ImagePickerActivity.this).load(url)
+                Glide.with(ImagePickerActivity.this)
+                    .load(url)
                     .asBitmap()
-                    .error(ContextCompat.getDrawable(ImagePickerActivity.this, R.drawable.anonymoususer))
+                    .diskCacheStrategy(DiskCacheStrategy.SOURCE)
+                    .placeholder(ContextCompat.getDrawable(ImagePickerActivity.this, R.drawable.anonymoususer))
                     .into(new SimpleTarget<Bitmap>() {
 
                         @Override
                         public void onResourceReady(Bitmap resource, GlideAnimation<? super Bitmap> glideAnimation) {
                             imageView.setImageBitmap(resource);
-                            currentPhotoPath = url;
-                            isUrl = true;
+                            try {
+                                final File created = createImageFile();
+                                final OutputStream outputStream = new FileOutputStream(created);
+                                resource.compress(Bitmap.CompressFormat.PNG, 85, outputStream);
+                                outputStream.close();
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            }
+
                         }
 
                         @Override
                         public void onLoadFailed(Exception e, Drawable errorDrawable) {
-                            imageView.setImageDrawable(errorDrawable);
+
                             currentPhotoPath = null;
-                            isUrl = false;
-                            Toast.makeText(ImagePickerActivity.this, "Image could not be loaded.", Toast.LENGTH_SHORT).show();
+                            makeToast("Image could not be loaded.");
                         }
                     });
             }
@@ -386,7 +384,8 @@ public class ImagePickerActivity extends AppCompatActivity {
 
             @Override
             public void afterTextChanged(Editable editable) {
-                if (isUrlValid(editable.toString())) {
+
+                if (Helper.IsUrlValid(editable.toString())) {
                     errorMessage.setVisibility(View.GONE);
                     positiveButton.setEnabled(true);
                 } else {
@@ -398,11 +397,15 @@ public class ImagePickerActivity extends AppCompatActivity {
 
     }
 
-    protected boolean isUrl() {
-        return isUrl;
-    }
-
     protected String getCurrentPhotoPath() {
         return currentPhotoPath;
+    }
+
+    public String getImageFilename() {
+        return imageFilename;
+    }
+
+    public void setImageFilename(String imageFilename) {
+        this.imageFilename = imageFilename;
     }
 }

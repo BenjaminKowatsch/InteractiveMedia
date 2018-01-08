@@ -2,41 +2,58 @@
   "$schema": "http://json-schema.org/draft-04/schema#",
   "type": "object",
   "properties": {
-    "updates": {
-      "oneOf": [
-        {
-          "type": "null"
-        },
-        {
-          "type": "string",
-          "minLength": 4
-        }
-      ]
-    },
     "amount": {
       "type": "number"
     },
     "infoName": {
       "type": "string",
-      "minLength": 4
+      "minLength": 1
     },
     "infoLocation": {
-      "type": "object",
-      "properties": {
-        "longitude": {
-          "type": "number"
+      "oneOf": [
+        {
+          "type": "object",
+          "properties": {
+            "longitude": {
+              "type": "null"
+            },
+            "latitude": {
+              "type": "null"
+            }
+          },
+          "required": [
+            "longitude",
+            "latitude"
+          ],
+          "additionalProperties": false
         },
-        "latitude": {
-          "type": "number"
+        {
+          "type": "object",
+          "properties": {
+            "longitude": {
+              "type": "number",
+              "minimum": -180,
+              "maximum": 180
+            },
+            "latitude": {
+              "type": "number",
+              "minimum": -90,
+              "maximum": 90
+            }            
+          },
+          "required": [
+            "longitude",
+            "latitude"
+          ],
+          "additionalProperties": false
         }
-      },
-      "required": [
-        "longitude",
-        "latitude"
-      ],
-      "additionalProperties": false
+      ]
     },
     "infoCreatedAt": {
+      "type": "string",
+      "minLength": 24      
+    },
+    "infoImageUrl": {
       "oneOf": [
         {
           "type": "null"
@@ -49,60 +66,21 @@
     },
     "paidBy": {
       "type": "string",
-      "minLength": 4
+      "minLength": 36
     },
     "split": {
       "type": "string",
       "minLength": 4
-    },
-    "debts": {
-      "type": "array",
-      "items": {
-        "type": "object",
-        "properties": {
-          "objectId": {
-            "oneOf": [
-              {
-                "type": "null"
-              },
-              {
-                "type": "string",
-                "minLength": 4
-              }
-            ]
-          },
-          "amount": {
-            "type": "number"
-          },
-          "fromUser": {
-            "type": "string",
-            "minLength": 4
-          },
-          "toUser": {
-            "type": "string",
-            "minLength": 4
-          }
-        },
-        "required": [
-          "objectId",
-          "amount",
-          "fromUser",
-          "toUser"
-        ],
-        "additionalProperties": false
-      }
     }
   },
   "required": [
-    "objectId",
-    "updates",
     "amount",
     "infoName",
     "infoLocation",
     "infoCreatedAt",
+    "infoImageUrl",
     "paidBy",
-    "split",
-    "debts"
+    "split"
   ],
   "additionalProperties": false
 }

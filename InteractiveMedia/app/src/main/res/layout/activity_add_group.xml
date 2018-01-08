@@ -9,7 +9,26 @@
     <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:id="@+id/linearLayout"
         android:orientation="vertical">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:text="Image:"
+            android:textSize="18dp" />
+
+        <ImageView
+            android:id="@+id/et_group_image"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:maxHeight="270dp"
+            android:layout_marginLeft="30dp"
+            android:layout_marginRight="30dp"
+            android:adjustViewBounds="true"
+            android:src="@drawable/anonymoususer" />
 
         <TextView
             android:layout_width="wrap_content"
@@ -17,6 +36,7 @@
             android:layout_gravity="center"
             android:text="Name:"
             android:textSize="18dp" />
+
 
         <EditText
             android:id="@+id/et_group_name"
@@ -28,20 +48,15 @@
             android:inputType="text" />
 
         <TextView
+            android:id="@+id/et_group_name_error"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:text="Image:"
-            android:textSize="18dp" />
-
-        <EditText
-            android:id="@+id/et_group_image_url"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
             android:layout_marginRight="30dp"
             android:layout_marginLeft="30dp"
-            android:hint="image url"
-            android:inputType="textEmailAddress" />
+            android:text="Invalid group name. A valid name has at least 4 characters."
+            android:visibility="gone"
+            android:textColor="@android:color/holo_red_dark"/>
 
         <TextView
             android:layout_width="wrap_content"
@@ -56,8 +71,17 @@
             android:layout_marginRight="30dp"
             android:layout_marginLeft="30dp"
             android:layout_gravity="center"
-            android:id="@+id/bn_group_user_add"
-            android:text="Add user" />
+            android:id="@+id/bn_group_add_user"
+            android:text="Add new user" />
+
+        <com.media.interactive.cs3.hdm.interactivemedia.recyclerview.NonScrollRecyclerView
+            android:id="@+id/recycler_view"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginRight="30dp"
+            android:layout_marginLeft="30dp"
+            android:scrollbars="vertical" />
+
 
         <RelativeLayout
             android:layout_width="fill_parent"

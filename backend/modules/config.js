@@ -1,5 +1,7 @@
+'use strict';
+
 // Define configuration options in separate node module
-var settings = {
+const settings = {
   'port': process.env.PORT,
   'mongodbURL': process.env.MONGODB_URL,
   'origin': process.env.ORIGIN,
@@ -12,6 +14,10 @@ var settings = {
   'minioObjectPrefix': process.env.MINIO_OBJECT_PREFIX,
   'minioEndpoint': process.env.MINIO_ENDPOINT,
   'minioEndpointPort': Number(process.env.MINIO_ENDPOINT_PORT),
-  'logLevel': process.env.LOGLEVEL || 'info'
+  'logLevel': process.env.LOGLEVEL || 'info',
+  'adminUsername': process.env.ADMIN_USERNAME || 'admin',
+  'adminPassword': process.env.ADMIN_PASSWORD || 'inter@kt!veMedien',
+  'adminEmail': process.env.ADMIN_EMAIL || 'admin@example.com',
+  'fcmServerKey': process.env.FCM_SERVER_KEY
 };
 module.exports = settings;

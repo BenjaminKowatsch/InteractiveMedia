@@ -29,6 +29,21 @@ services:
     environment: 
       - ORIGIN=http://localhost:8088
       - LOGLEVEL=debug
+      - ADMIN_USERNAME=admin
+      - ADMIN_PASSWORD=inter@kt!veMedien
+      - ADMIN_EMAIL=admin@example.com
+      - FCM_SERVER_KEY=AAAA03Mtpdk:APA91bGy9qAosK5suZI3ctH2mhYbtyS1f7pXajkaPePTuZ58IiZcYy_2PUlpwfXnuqck9KZIXDZvDzvJyfgg7uJS5YJsy5uIYjOXTTxhapMhbtjBfimnbDYA3nJAN76-XVU--g0KVoLM
+      - PORT=8081
+      - MONGODB_URL=mongodb://mongo/debtsquared
+      - GOOGLE_OAUTH_CLIENT_ID=908170470873-8151s7cvldroebdl7mcpg2houdgljgfg.apps.googleusercontent.com
+      - FACEBOOK_URL_APP_TOKEN=1971379956470536%7ChIQ5dRDon3DJq2YzH1NU41byB-w
+      - JWT_SIMPLE_SECRET=A3xFr93Yl2qTn5
+      - MINIO_ENDPOINT=object-storage
+      - MINIO_ENDPOINT_PORT=9000
+      - MINIO_ACCESS_KEY=AKIAIOSFODNN7EXAMPLE
+      - MINIO_SECRET_KEY=wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY
+      - MINIO_BUCKET_NAME=bucket
+      - MINIO_OBJECT_PREFIX=public
     image: localhost:5000/backend
     ports:
       - "8081:8081"
@@ -46,9 +61,9 @@ services:
   web:
     build: 
       context: ./frontend
-      args:
+      args: 
         - WEB_SERVICE_URL=http://localhost:8081
-        - ORIGIN_URL=http://localhost:8088
+        - JWT_SIMPLE_SECRET=A3xFr93Yl2qTn5
     image: localhost:5000/frontend
     ports:
       - 8088:80

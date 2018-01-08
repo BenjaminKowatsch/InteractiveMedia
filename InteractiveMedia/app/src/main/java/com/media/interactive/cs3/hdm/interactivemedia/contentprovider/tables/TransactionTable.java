@@ -26,7 +26,7 @@ public class TransactionTable {
      */
     public static final String COLUMN_INFO_NAME = "info_name";
     /**
-     * Fifth attribute, type TEXT NOT NULL.
+     * Fifth attribute, type TEXT.
      */
     public static final String COLUMN_INFO_LOCATION = "info_location";
     /**
@@ -46,7 +46,7 @@ public class TransactionTable {
            + COLUMN_PAID_BY + " INTEGER references " + UserTable.TABLE_NAME
            + " (" + UserTable.COLUMN_ID + ") on delete cascade on update cascade,"
            + COLUMN_INFO_NAME + " TEXT NOT NULL,"
-           + COLUMN_INFO_LOCATION + " TEXT NOT NULL,"
+           + COLUMN_INFO_LOCATION + " TEXT,"
            + COLUMN_INFO_IMAGE_URL + " TEXT,"
            + COLUMN_INFO_CREATED_AT + " TIMESTAMP DEFAULT CURRENT_TIMESTAMP)";
 

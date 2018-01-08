@@ -1,7 +1,9 @@
-var express = require('express');
-var router = express.Router();
+'use strict';
 
-var statusController = require('../controllers/status.controller');
+const express = require('express');
+const router = express.Router();
+
+const statusController = require('../controllers/status.controller');
 
 /**
  * @api {GET} /v1/status/ Get status
@@ -11,7 +13,7 @@ var statusController = require('../controllers/status.controller');
  *
  * @apiSuccess (SuccessCode) {200} Success Status is healthy
  * @apiUse successBodySuccess
- * @apiSuccess (Success) {String} payload.status Current status
+ * @apiSuccess (Success) {String} payload[status] Current status
  *
  * @apiSuccessExample {json} Success-Response:
    {

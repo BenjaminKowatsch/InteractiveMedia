@@ -1,24 +1,33 @@
+'use strict';
+
 /**
  * imports
  * ===================
  */
-var express = require('express');
-var bodyParser = require('body-parser');
-var winston = require('winston');
+const express = require('express');
+const bodyParser = require('body-parser');
+const winston = require('winston');
 const expressWinston = require('express-winston');
 
-var usersRoutes = require('./routes/users.routes');
-var objectStoreRoutes = require('./routes/object.store.routes');
-var versionRoutes = require('./routes/version.routes');
-var groupRoutes = require('./routes/groups.routes');
-var statusRoutes = require('./routes/status.routes');
-var testRoutes = require('./routes/test.routes');
+const usersRoutes = require('./routes/users.routes');
+const objectStoreRoutes = require('./routes/object.store.routes');
+const versionRoutes = require('./routes/version.routes');
+const groupRoutes = require('./routes/groups.routes');
+const statusRoutes = require('./routes/status.routes');
+const testRoutes = require('./routes/test.routes');
+const adminRoutes = require('./routes/admin.routes');
 
-var config = require('./modules/config');
-var user = require('./modules/user');
-var database = require('./modules/database');
+const config = require('./modules/config');
+const user = require('./modules/user.module');
+const database = require('./modules/database.module');
+const objectstore = require('./modules/objectstore.module');
 
-var MONGO_DB_CONNECTION_ERROR_CODE = 10;
+const pushNotificationService = require('./services/pushNotification.service');
+
+const ERROR = require('./config.error');
+const ROLES = require('./config.roles');
+
+const MONGO_DB_CONNECTION_ERROR_CODE = 10;
 
 /**
  * Configure logger
@@ -31,8 +40,8 @@ winston.info('logLevel', winston.level);
  * Initialize express instance
  * ===========================
  */
-var app = express();
-var server;
+const app = express();
+let server;
 
 // initialize logger
 app.use(expressWinston.logger({
@@ -58,7 +67,7 @@ app.use(function(req, res, next) {
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, PATCH, DELETE');
 
   // Request headers you wish to allow
-  res.setHeader('Access-Control-Allow-Headers', 'X-Requested-With,content-type');
+  res.setHeader('Access-Control-Allow-Headers', 'X-Requested-With,content-type,Authorization');
 
   // Set to true if you need the website to include cookies in the requests sent
   // to the API (e.g. in case you use sessions)
@@ -74,11 +83,12 @@ app.use('/v1/version', versionRoutes);
 app.use('/v1/groups', groupRoutes);
 app.use('/v1/status', statusRoutes);
 app.use('/v1/test', testRoutes);
+app.use('/v1/admin', adminRoutes);
 
 // error handling: unknown routes
 // this has to be last route to be added, otherwise it will not work
 app.all('*', function(req, res, next) {
-  var err = new Error();
+  let err = new Error();
   err.status = 404;
   next(err);
 });
@@ -102,8 +112,8 @@ app.use(function(err, req, res, next) {
 function startServer() {
   // Starts the http server and prints out the host and the port
   server = app.listen(config.port, function() {
-    var host = server.address().address;
-    var port = server.address().port;
+    const host = server.address().address;
+    const port = server.address().port;
     winston.info('Server listening on http://%s:%s', host, port);
   });
 }
@@ -113,9 +123,28 @@ function startServer() {
  * ===================
  */
 database.tryConnect(config.mongodbURL, function() {
-
-  startServer();
-
+  pushNotificationService.initFcm()
+  .then(() => objectstore.makeBucket(config.minioBucketName))
+  .then(() => user.register(config.adminUsername, config.adminPassword, config.adminEmail, ROLES.ADMIN))
+  .then(registerResult => {
+    winston.info('register admin successful');
+    startServer();
+  }).catch(errorResult => {
+    winston.error(JSON.stringify(errorResult));
+    switch (errorResult.errorCode) {
+      case ERROR.DUPLICATED_USER:
+        // admin already exists, start server anyway
+        startServer();
+        break;
+      case ERROR.DB_ERROR:
+      case ERROR.MINIO_ERROR:
+        let statusCode = 500;
+        process.exit(1);
+        break;
+      default:
+        process.exit(1);
+    }
+  });
 }, function() {
   winston.error('Not connected to database after maxRetries reached.');
 });

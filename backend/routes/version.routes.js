@@ -1,7 +1,9 @@
-var express = require('express');
-var router = express.Router();
+'use strict';
 
-var versionController = require('../controllers/version.controller');
+const express = require('express');
+const router = express.Router();
+
+const versionController = require('../controllers/version.controller');
 
 /**
  * @api {GET} /v1/version/ Get version

@@ -19,7 +19,22 @@ services:
   backend:
     environment:
       - ORIGIN=http://localhost:8088
-      - LOGLEVEL=info
+      - LOGLEVEL=error
+      - ADMIN_USERNAME=admin
+      - ADMIN_PASSWORD=inter@kt!veMedien
+      - ADMIN_EMAIL=admin@example.com
+      - FCM_SERVER_KEY=AAAA03Mtpdk:APA91bGy9qAosK5suZI3ctH2mhYbtyS1f7pXajkaPePTuZ58IiZcYy_2PUlpwfXnuqck9KZIXDZvDzvJyfgg7uJS5YJsy5uIYjOXTTxhapMhbtjBfimnbDYA3nJAN76-XVU--g0KVoLM
+      - PORT=8081
+      - MONGODB_URL=mongodb://mongo/debtsquared
+      - GOOGLE_OAUTH_CLIENT_ID=908170470873-8151s7cvldroebdl7mcpg2houdgljgfg.apps.googleusercontent.com
+      - FACEBOOK_URL_APP_TOKEN=1971379956470536%7ChIQ5dRDon3DJq2YzH1NU41byB-w
+      - JWT_SIMPLE_SECRET=A3xFr93Yl2qTn5
+      - MINIO_ENDPOINT=object-storage
+      - MINIO_ENDPOINT_PORT=9000
+      - MINIO_ACCESS_KEY=AKIAIOSFODNN7EXAMPLE
+      - MINIO_SECRET_KEY=wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY
+      - MINIO_BUCKET_NAME=bucket
+      - MINIO_OBJECT_PREFIX=public
     image: localhost:5000/backend
     depends_on:
       mongo:
@@ -34,6 +49,12 @@ services:
 
   backend-testing:
     build: ./backend/testing-api
+    environment:
+      - ADMIN_USERNAME=admin
+      - ADMIN_PASSWORD=inter@kt!veMedien
+      - ADMIN_EMAIL=admin@example.com
+      - FACEBOOK_URL_APP_TOKEN=1971379956470536%7ChIQ5dRDon3DJq2YzH1NU41byB-w
+      - FACEBOOK_APP_ID=1971379956470536
     depends_on:
       backend:
         condition: service_healthy

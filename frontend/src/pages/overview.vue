@@ -8,181 +8,254 @@
 <template>
 <!-- START Framework 7 Template Elements for establishing the view -->
   <f7-page toolbar-fixed>
-  <!-- navigation -->
     <f7-navbar>
-      <f7-nav-center sliding>Wie ist deine Stimmung heute?</f7-nav-center>
-      <!-- label which asks for the actual feeling -->
+      <f7-nav-center sliding>Dashboard</f7-nav-center>
     </f7-navbar>
-
-    <f7-popup>
-      Bitte etwas eintragen
-      <!-- popup which apears if one doesn't enter anything -->
-    </f7-popup>
-
-    <v-touch class="outerMoodslider" v-on:panstart="start($event)" v-on:panmove="move($event)" v-on:panend="end($event)" v-bind:pan-options="{ direction: 'vertical' }">
-      <moodslider></moodslider>
-    </v-touch>
-    <!-- area for import of the moodslider component -->
     <f7-list form>
-      <f7-button id="launeButton" v-on:click="navigate()">...</f7-button>
-      <!-- Emotion button -->
+
+      <h2>Groups overview</h2> 
+      <div v-if="groupCount > 0">
+        <li v-for="group in groups">
+          <p><b>Group name:</b> {{group.name}}, <b>Group id:</b> {{group.groupId}}</p>
+          <p><b>User count:</b> {{group.countUsers}}, <b>Transaction count:</b> {{group.countTransactions}}</p>
+        </li>
+      </div>
+      <div v-else>
+        <h2>NO GROUPS FOUND</h2>
+      </div>
+
+      <div id="groupcount">
+         <h3>Number of groups: {{groupCount}}</h3>
+      </div>
+
+       <br/>
+
+      <h2>Users overview</h2> 
+      <div v-if="userCount > 0">
+        <li v-for="user in users">
+          <p><b>User name:</b> {{user.username}}, <b>User id:</b> {{user.userId}}, <b>User email:</b> {{user.email}}</p>
+          <p><b>User role:</b> {{user.role}}, <b>Group Count:</b> {{user.countGroupIds}}</p>
+        </li>
+      </div>
+      <div v-else>
+        <h2>NO USERS FOUND</h2>
+      </div>
+
+      <div id="usercount">
+         <h3>Number of users: {{userCount}}</h3>
+      </div>
+
+      <br/>
+
+      <div v-if="version">
+        <p>Debts² admin panel version informations: 
+          {{version.name}}  {{version.version}}
+        </p>
+      </div>
+
+       </f7-list form>  
+    <f7-list>
+      <f7-list-button title="CreateDummyGroup" v-on:click="createDummyGroup()"></f7-list-button>
+      <f7-list-button title="Logout" v-on:click="logout()"></f7-list-button>
     </f7-list>
   </f7-page>
     <!-- END of Template Elements -->
 </template>
 
 <script>
- /*
-  * START JScript Elements for establishing the view according to the template elements
-  * imports Moodslider (to be found in component folder), Axios
-  */
-  import Moodslider from '@/components/moodslider'
-  import Axios from 'axios'
+import Mixins from "../mixins.js";
+import axios from "axios";
+import Cookie from "../js/Cookie.js";
+import Config from "../js/Config.js";
 
+export default {
+  name: "overview",
+  mixins: [Mixins],
+  components: {},
+  data() {
+    return {
+      version: [],
+      groups: [],
+      users: [],
+      errors: [],
+      authToken: "",
+      groupId: "",
+      userId: "",
+      groupCount: "",
+      userCount: ""
+    };
+  },
 
-  export default {
-    name: 'overview',
-    components: {
-      Moodslider
-      //adds the moodslider as component
-    },
+  mounted: function() {
+    // var groupCountLoaded = false;
+    // console.log(groupCountLoaded);
+    this.authToken = Cookie.getJSONCookie("accessToken").accessToken;
+    console.log("The cookie authToken is: " + this.authToken);
 
-    data() {
-      return {
-        moodbarHeight: 0,
-        topOffset: 0,
-        progressbar: {},
-        laune: 0,
-        // sets the variables and defines them
-      }
-    },
-    mounted: function() {
-      // loads the moodslider as moodbar and gets template elements by their classes
-      var moodbar = document.getElementsByClassName('outerMoodslider')[0];
-      this.moodbarHeight = moodbar.clientHeight;
-      this.topOffset = moodbar.getBoundingClientRect().top;
-      this.progressbar = document.getElementsByClassName('inner')[0];
-    },
-    methods: {
+    this.groups = [];
+    this.users = [];
+    this.groupId = "9a7fb2f3-8b39-4849-ac81-48c1835220d0";
+    this.userId = "facad137-28e7-49a2-a39c-6ecc0c1a7e85";
 
-      /**
-       * Handles Touch Event when starting touch
-       * All these events set the height of the progressbar
-       * according to the touch position
-       */
+    this.authorizeAdmin();
+    this.getGroups();
+    this.getGroupById(this.groupId);
+    this.getUsers();
+    this.getUserById(this.userId);
+    this.getVersionInfos();
+  },
 
-      start: function(event) {
-
-        this.progressbar.setAttribute("style", "height:" +
-          this.getProgressBarHeightInPercent(event.center.y) + "%;");
-        // raises the height when starting to slide the moodbar via percentage
-      },
-
-      /**
-       * Triggered when moving finger
-       *
-       * @param  event  event   The event
-       */
-      move: function(event) {
-        this.progressbar.setAttribute("style", "height:" +
-          this.getProgressBarHeightInPercent(event.center.y) + "%;");
-        // raises the height while sliding the moodbar via percentage
-      },
-
-      /**
-       * Triggered when touch gesture ended
-       *
-       * @param      {<type>}  event   The event
-       */
-      end: function(event) {
-        this.progressbar.setAttribute("style", "height:" +
-        this.getProgressBarHeightInPercent(event.center.y) + "%;");
-        this.laune = this.getProgressBarHeightInPercent(event.center.y);
-        /* 
-        *  raises the height until stopping to slide the moodbar 
-        *  via percentage and gets the actual level as variable
-        */
-      },
-
-      /**
-       * Gets the progress bar height in percent.
-       * This way the moodbar height can be calculated
-       *
-       * @param      {number}  yCoordinate  The y coordinate used to calculate the
-       * percentage
-       * @return     {number}  The progress bar height in percent.
-       */
-      getProgressBarHeightInPercent: function(yCoordinate) {
-        var absoluteCoordinate = yCoordinate - this.topOffset;
-        var percentage = 100 * (1 - (absoluteCoordinate / this.moodbarHeight));
-        // computes the percentage via moodbar height
-        this.setButtonLabel(percentage);
-        // sets the percentage of the height as label of the button
-        return percentage;
-      },
-
-      /**
-       * Sets the button label for each mood according to height.
-       *
-       * @param      {number}  percentage  The percentage
-       */
-
-      setButtonLabel: function(percentage) {
-        // sets the label of the mood button
-        var moods = ['Miserabel', 'Schlecht', 'Heiter bis wolkig', 'Gut', 'Überragend'];
-        var button = document.getElementById('launeButton');
-        /* 
-        *  sets an array of possible moods and sets the template element 
-        *  emotion button as button variable
-        */
-
-        if (percentage >= 0 && percentage <= 20) {
-          button.innerHTML = moods[0];
-        } else if (percentage >= 20 && percentage <= 40) {
-          button.innerHTML = moods[1];
-        } else if (percentage >= 40 && percentage <= 60) {
-          button.innerHTML = moods[2];
-        } else if (percentage >= 60 && percentage <= 80) {
-          button.innerHTML = moods[3];
-        } else if (percentage >= 80 && percentage <= 100) {
-          button.innerHTML = moods[4];
-        }
-        /*
-        *  selects a mood out of the array according to the percentage 
-        *  of the chosen emotion level
-        */
-      },
-
-      /**
-       * Checks if a mood has been selected
-       * then navigates the user to the emotions view.
-       *
-       * @return the correct view String.
-       */
-      navigate: function() {
-
-        var framework7 = new Framework7();
-        var button = document.getElementById('launeButton');
-        // gets the emotion button by its id out of the template area and sets it to variable button
-        if (button != null) {
-          var buttonText = button.innerHTML;
-          if (buttonText !== '...') {
-
-            console.log(this.laune);
-            // logs the mood to the console
-
-            this.$f7.mainView.router.loadPage('/emotion?mood=' +
-              this.laune);
-            // loads next view and hands over the mood variable
-
-          } else {
-            framework7.alert('Bitte trage etwas ein...');
-            // sends an alert to the user when nothing is chosen on the slider
+  methods: {
+    /*     Create a dummy group for testpurpose. After creating, page has to be reloaded to see group*/
+    createDummyGroup: function() {
+      axios
+        .post(
+          Config.webServiceURL + "/v1/groups",
+          {
+            name: "Testgroup3",
+            imageUrl: null,
+            users: ["alex1@alex.de", "admin@example.com", "benny1@alex.de"]
+          },
+          {
+            headers: { Authorization: `0 ${this.authToken}` }
           }
+        )
+        .then(function(response) {
+          console.log(response);
+        })
+        .catch(function(error) {
+          console.log(error);
+        });
+    },
+
+    authorizeAdmin: function() {
+      axios
+        .get(Config.webServiceURL + "/v1/test/authorization/admin", {
+          headers: { Authorization: "0 " + this.authToken }
+        })
+        .then(function(response) {
+          console.log("Authorization as admin: " + response.data.payload.hello);
+        })
+        .catch(e => {
+          this.errors.push(e);
+          console.log("Errors in admin authorization: " + e);
+        });
+    },
+
+    getGroups: function() {
+      axios
+        .get(Config.webServiceURL + "/v1/admin/groups", {
+          headers: { Authorization: "0 " + this.authToken }
+        })
+        .then(response => {
+          this.groups = response.data.payload;
+          this.groupCount = this.countProperties(this.groups);
+          // this.groupCountLoaded = true;
+          console.log("Anzahl Gruppen: " + this.groupCount);
+          console.log("Existing Groups: " + JSON.stringify(this.groups));
+        })
+        .catch(e => {
+          this.errors.push(e);
+          console.log("Errors in GET admin/groups: " + error);
+        });
+    },
+
+    getGroupById: function(id) {
+      axios
+        .get(Config.webServiceURL + "/v1/admin/groups/" + id, {
+          headers: { Authorization: "0 " + this.authToken }
+        })
+        .then(function(response) {
+          console.log(
+            "Desired Group: " + JSON.stringify(response.data.payload)
+          );
+        })
+        .catch(e => {
+          this.errors.push(e);
+          console.log("Errors in GET admin/groups/:groupID: " + e);
+        });
+    },
+
+    getUsers: function() {
+      axios
+        .get(Config.webServiceURL + "/v1/admin/users", {
+          headers: { Authorization: "0 " + this.authToken }
+        })
+        .then(response => {
+          this.users = response.data.payload;
+          this.userCount = this.countProperties(this.users);
+          console.log("Count Users: " + this.userCount);
+          console.log("Existing Users: " + JSON.stringify(this.users));
+        })
+        .catch(e => {
+          this.errors.push(e);
+          console.log("Errors in GET admin/users: " + e);
+        });
+    },
+
+    getUserById: function(id) {
+      axios
+        .get(Config.webServiceURL + "/v1/admin/users/" + id, {
+          headers: { Authorization: "0 " + this.authToken }
+        })
+        .then(response => {
+          console.log("Desired User: " + JSON.stringify(response.data.payload));
+        })
+        .catch(e => {
+          this.errors.push(e);
+          console.log("Errors in GET admin/users/:userID : " + e);
+        });
+    },
+
+    getVersionInfos: function() {
+      axios
+        .get(Config.webServiceURL + "/v1/version")
+        .then(response => {
+          // JSON responses are automatically parsed.
+          this.version = response.data;
+          console.log("Version: " + response.statusText);
+        })
+        .catch(e => {
+          this.errors.push(e);
+          console.log("Errors in Version: " + e);
+        });
+    },
+
+    //Counts the elements of an object
+    countProperties: function(obj) {
+      var count = 0;
+      for (var property in obj) {
+        if (Object.prototype.hasOwnProperty.call(obj, property)) {
+          count++;
         }
-
       }
+      return count;
+    },
 
+    logout: function() {
+      let accessToken = this.authToken;
+
+      //Check for existing accessToken
+      this.checkAccessToken(accessToken => {
+        
+        console.log("AuthToken in checkAccess fct: " + this.authToken);
+        // Post data to the backend to successfully logout the user and redirect to login page
+        axios
+          .post(Config.webServiceURL + `/v1/users/logout`, this.authToken, {
+            headers: {
+              Authorization: "0 " + this.authToken
+            }
+          })
+          .then(response => {
+            console.log(JSON.stringify(response.data));
+            Cookie.deleteCookie("accessToken");
+            this.redirect("/", false, false, true);
+          })
+          .catch(e => {
+            console.log(JSON.stringify(e));
+          });
+      });
     }
   }
+};
 </script>

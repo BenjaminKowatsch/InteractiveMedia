@@ -45,23 +45,8 @@ Vue.use(VueCharts)
 
 
 var startApp = function(onLoadingFinished){
-
-  // Load Google API asynchronously
-  window.gapi.load('auth2', () => {
-    // Init Google API with
-    const auth2 = window.gapi.auth2.init(Config.googleParams);
-    console.log("Google API initialized");
-
-    FB.init({
-      appId: Config.facebookParams.appId,
-      cookie: true, // enable cookies to allow the server to access the session
-      xfbml: true, // parse social plugins on this page
-      version: Config.facebookParams.version // use graph api version
-    });
-    console.log("Facebook API initialized");
-    onLoadingFinished();
-  });
-};
+  onLoadingFinished();
+}
 
 var onLoadingFinished = function(){
 
@@ -73,7 +58,7 @@ var onLoadingFinished = function(){
     // Init Framework7 by passing parameters here
     framework7: {
       root: '#app',
-      modalTitle: 'Launometer',
+      modalTitle: 'Debts² Admin Panel',
       /* Uncomment to enable Material theme: */
       material: false,
       /* Enable browser hash navigation */
@@ -123,7 +108,8 @@ var onLoadingFinished = function(){
          var accessToken = Cookie.getJSONCookie('accessToken')
          if (accessToken !== '') {
            //var authOptions = ["Launometer","Google","Facebook"];
-           var authOptions = "Launometer";
+           //Hint: if auth doesnt work after removing mocking, maybe authOptions has to be modified again
+           var authOptions = "Debts² Admin Panel";
 
            console.log(authOptions[accessToken.authType]+" Cookie exists. Redirecting ...");
            this.loginStatus = true;

@@ -1,5 +1,7 @@
+'use strict';
+
 const winston = require('winston');
-const httpResonseService = require('../services/httpResonse.service');
+const httpResponseService = require('../services/httpResponse.service');
 
 exports.getStatus = function(req, res) {
     const responseData = {
@@ -8,5 +10,5 @@ exports.getStatus = function(req, res) {
         'status': 'healthy'
       }
     };
-    httpResonseService.sendHttpResponse(res, 200, responseData);
+    httpResponseService.send(res, 200, responseData);
   };

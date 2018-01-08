@@ -25,8 +25,15 @@ var webpackConfig = merge(baseWebpackConfig, {
   },
   plugins: [
     // http://vuejs.github.io/vue-loader/en/workflow/production.html
+    // new webpack.DefinePlugin({
+    //   'process.env': env
+    // }),
     new webpack.DefinePlugin({
-      'process.env': env
+      'process.env': {
+        'NODE_ENV': '"production"',
+        'WEB_SERVICE_URL': JSON.stringify(process.env.WEB_SERVICE_URL),
+        'JWT_SIMPLE_SECRET': JSON.stringify(process.env.JWT_SIMPLE_SECRET)
+      }
     }),
     /*
     new webpack.optimize.UglifyJsPlugin({
@@ -63,14 +70,6 @@ var webpackConfig = merge(baseWebpackConfig, {
       },
       // necessary to consistently work with multiple chunks via CommonsChunkPlugin
       chunksSortMode: 'dependency'
-    }),
-    // Create second html file for redirecting to spotify
-    new HtmlWebpackPlugin({
-      filename: path.resolve(__dirname, '../dist/spotifyRedirect.html'),
-      template: 'spotifyRedirect.html',
-      favicon: path.join(__dirname, '../src/assets/favicon.png'),
-      // Set different chunk to prevent including js files from the main app
-      chunks: ['spotify']
     }),
     // split vendor js into its own file
     new webpack.optimize.CommonsChunkPlugin({

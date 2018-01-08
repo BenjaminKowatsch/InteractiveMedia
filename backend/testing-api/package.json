@@ -3,7 +3,7 @@
   "version": "0.0.1",
   "description": "",
   "scripts": {
-    "test": "./node_modules/mocha/bin/mocha -t 5000 --reporter mochawesome ./test/**/*.js"
+    "test": "./node_modules/mocha/bin/mocha -t 5000 --reporter mochawesome ./test/*.js"
   },
   "author": "",
   "license": "ISC",
