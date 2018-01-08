@@ -30,6 +30,7 @@ import com.media.interactive.cs3.hdm.interactivemedia.authorizedrequests.Authori
 import com.media.interactive.cs3.hdm.interactivemedia.contentprovider.DatabaseProvider;
 import com.media.interactive.cs3.hdm.interactivemedia.contentprovider.tables.LoginTable;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -48,6 +49,7 @@ public class Login {
     private UserType userType = null;
     private String accessToken = null;
 
+    private DatabaseProviderHelper helper;
     private ContentResolver contentResolver = null;
 
     private Login() {
@@ -107,8 +109,29 @@ public class Login {
                     if(success){
                         final JSONObject payload = response.getJSONObject("payload");
                         user.setEmail(payload.getString("email"));
-                        user.setUsername(payload.getString("email"));
+                        try {
+                            final String username = payload.getString("username");
+                            user.setUsername(username);
+                        } catch(JSONException e){
+                            Log.d(TAG, "Username is not set.");
+                        }
                         user.setUserId(payload.getString("userId"));
+
+                        JSONArray groupIds = null;
+                        try {
+                            payload.getJSONArray("groupIds");
+                        } catch (JSONException e){
+                            Log.d(TAG,"No groups exist for this user");
+                        }
+                        if(groupIds != null) {
+                            Log.d(TAG, "Before Removal: " + groupIds.toString());
+                            helper.removeExistingGroupIds(groupIds);
+                            Log.d(TAG, "After Removal: " + groupIds.toString());
+                            requestNewGroups(groupIds);
+                        }
+                        user.setSync(true);
+                        helper.upsertUser(user);
+                        Log.d(TAG, "Upserted User: "+ user);
                     }else {
                         Log.e(TAG,"Error while setting user data.");
                     }
@@ -124,6 +147,10 @@ public class Login {
         });
         jsonObjectRequest.setShouldCache(false);
         RestRequestQueue.getInstance(context).addToRequestQueue(jsonObjectRequest);
+    }
+
+    private void requestNewGroups(JSONArray groupIds){
+
     }
 
     public boolean loginResponseHandler(JSONObject response) {
@@ -174,26 +201,6 @@ public class Login {
         return false;
     }
 
-    private boolean checkForCachedCredentials(Login login) {
-        if (contentResolver != null) {
-            boolean result = false;
-            final Cursor cursor = contentResolver.query(DatabaseProvider.CONTENT_LOGIN_URI,
-                null, null, null,
-                LoginTable.COLUMN_CREATED_AT + " DESC LIMIT 1");
-            result = cursor.getCount() > 0;
-            while (cursor.moveToNext()) {
-                login.setId(cursor.getLong(0));
-                login.getUser().setUsername(cursor.getString(1));
-                login.setHashedPassword(cursor.getString(2));
-                login.setUserType(UserType.values()[cursor.getInt(3)]);
-                Log.d(TAG, "Latest Credentials cache: " + cursor.getString(3) + " " + login);
-            }
-            return result;
-        }
-        Log.e(TAG, "Could not find cached credentials, contentResolver is null.");
-        return false;
-    }
-
     private boolean logoutResponseHandler(JSONObject response) {
         Log.d(TAG, "Response: " + response.toString());
         try {
@@ -227,6 +234,7 @@ public class Login {
     public void register(Context context, final CallbackListener<JSONObject,Exception> callbackListener) {
 
         contentResolver = context.getContentResolver();
+        helper = new DatabaseProviderHelper(context.getContentResolver());
 
         final String url = context.getResources().getString(R.string.web_service_url).concat("/v1/users/");
         Log.d(TAG, "url: " + url);
@@ -260,6 +268,7 @@ public class Login {
     public void login(Context context, CallbackListener<JSONObject,Exception> callbackListener) {
 
         contentResolver = context.getContentResolver();
+        helper = new DatabaseProviderHelper(context.getContentResolver());
 
         boolean usernameAndHashedPassword = user.getUsername() == null || user.getUsername().length() <= 0
             || hashedPassword == null || hashedPassword.length() <= 0;
@@ -267,7 +276,7 @@ public class Login {
         Log.d(TAG, "user: " + toString());
 
         if (userType == null) {
-            checkForCachedCredentials(this);
+            helper.checkForCachedCredentials(this);
 
             if (userType == null) {
                 callbackListener.onFailure(new Exception("No cached credentials available."));
