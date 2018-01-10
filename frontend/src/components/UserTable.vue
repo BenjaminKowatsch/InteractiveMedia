@@ -7,7 +7,7 @@
            <table-column show="email" label="Email"></table-column>
            <table-column show="userId" label="User ID"></table-column>
            <table-column show="authType" label="Logintyp"></table-column>
-           <table-column show="countGroupIds" label="Member of Groups"></table-column>
+           <table-column show="countGroupIds" label="Groups"></table-column>
        </table-component>
    </div>
 </template>
@@ -20,9 +20,7 @@ import Config from "../js/Config.js";
 
 //ToDo: implement something to do paging
 export default ({
-    components: {
-        
-    },
+
     props: ['users'],
 
     data() {
@@ -31,9 +29,5 @@ export default ({
 
         }
     },
-    mounted() {
-
-    },
-
 })
 </script>
