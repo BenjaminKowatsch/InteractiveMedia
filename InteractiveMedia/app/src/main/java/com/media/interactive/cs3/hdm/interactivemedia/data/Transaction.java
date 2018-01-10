@@ -2,29 +2,34 @@ package com.media.interactive.cs3.hdm.interactivemedia.data;
 
 
 import android.content.ContentValues;
-import android.os.Build;
-import android.support.annotation.RequiresApi;
+import android.location.Location;
 
 import com.media.interactive.cs3.hdm.interactivemedia.contentprovider.tables.TransactionTable;
 
-import java.time.Instant;
-import java.time.LocalDateTime;
-import java.time.OffsetDateTime;
 import java.util.Date;
 
 public class Transaction {
     private final String name;
+    private final String paidBy;
     private final String split;
     private final Date dateTime;
+    private final Location location;
     private final double amount;
     private final long groupId;
+    private boolean synched;
+    private Date publishedAt;
 
-    public Transaction(String name, String split, Date dateTime, double amount, long groupId) {
+    public Transaction(String name, String paidBy, String split, Date dateTime, Location location,
+                       double amount, long groupId) {
         this.name = name;
+        this.paidBy = paidBy;
         this.split = split;
         this.dateTime = dateTime;
+        this.location = location;
         this.amount = amount;
         this.groupId = groupId;
+        this.synched = false;
+        this.publishedAt = null;
     }
 
     public ContentValues toContentValues() {
@@ -38,5 +43,9 @@ public class Transaction {
 
     public long getGroupId() {
         return groupId;
+    }
+
+    public boolean isSynched() {
+        return synched;
     }
 }
