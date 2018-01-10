@@ -41,7 +41,10 @@
 
        <br/>
  -->
-<user-table v-if="usersLoaded" :users="users"></user-table>
+      <div id="tables">
+        <user-table v-if="usersLoaded" :users="users"></user-table>
+        <group-table v-if="groupsLoaded" :groups="groups"></group-table>
+      </div>
 
       <br> 
       
@@ -85,6 +88,7 @@ import Config from "../js/Config.js";
 import GroupUserChart from "@/components/GroupUserChart.js";
 import LoginTypeChart from "@/components/LoginTypeChart.js";
 import UserTable from "@/components/UserTable.vue";
+import GroupTable from "@/components/GroupTable.vue";
 
 export default {
   name: "overview",
@@ -92,7 +96,8 @@ export default {
   components: {
     GroupUserChart,
     LoginTypeChart,
-    UserTable
+    UserTable,
+    GroupTable
   },
   data() {
     return {
@@ -112,22 +117,19 @@ export default {
       showLoginTypeChart: false,
       groupsLoaded: false,
       usersLoaded: false,
-      URL: "",
-      authString: "",
     };
   },
 
   mounted: function() {
-    // var groupCountLoaded = false;
-    // console.log(groupCountLoaded);
+
+    this.authToken = Cookie.getJSONCookie("accessToken").accessToken;
+    console.log("The cookie authToken is: " + this.authToken);
 
     this.groups = [];
     this.users = [];
     this.groupId = "9a7fb2f3-8b39-4849-ac81-48c1835220d0";
     this.userId = "8b8901fb-4129-4e85-a910-2a1cba922bbf";
 
-    this.createAuthString();
-    this.createURL();
     this.authorizeAdmin();
     this.getGroups();
     this.getGroupById(this.groupId);
@@ -299,16 +301,6 @@ export default {
       } else {
         return (state = true);
       }
-    },
-    
-    createURL: function(){
-      this.url = Config.webServiceURL + "/v1/admin/users"
-    },
-
-    createAuthString: function(){
-      this.authString = "headers: { Authorization: 0 " + this.authToken + " }"
-      this.authToken = Cookie.getJSONCookie("accessToken").accessToken;
-      console.log("The cookie authToken is: " + this.authToken);
     },
 
     //Logout the current user
