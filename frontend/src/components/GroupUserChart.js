@@ -4,7 +4,7 @@ import Cookie from "../js/Cookie.js";
 import Config from "../js/Config.js";
 
 export default Pie.extend({
-    name: "PieCount",
+    name: "GroupUserChart",
     props: ['groupCount', 'userCount'],
 
     data() {

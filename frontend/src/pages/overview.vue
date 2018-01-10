@@ -34,7 +34,7 @@
       <div v-if="userCount > 0">
         <li v-for="user in users">
           <p><b>User name:</b> {{user.username}}, <b>User id:</b> {{user.userId}}, <b>User email:</b> {{user.email}}</p>
-          <p><b>User role:</b> {{user.role}}, <b>Group Count:</b> {{user.countGroupIds}}</p>
+          <p><b>User role:</b> {{user.role}}, <b>Group Count:</b> {{user.countGroupIds}}, <b>AuthType: </b> {{user.authType}}</p>
         </li>
       </div>
       <div v-else>
@@ -47,8 +47,8 @@
       <br/>     
 
       <div id="chart">
-        <div v-if="showChart && groupsLoaded && usersLoaded">
-            <pie-count :groupCount="groupCount" :userCount="userCount"></pie-count>
+        <div v-if="showGroupUserChart && groupsLoaded && usersLoaded">
+            <group-user-chart :groupCount="groupCount" :userCount="userCount"></group-user-chart>
         </div>
       </div>
 
@@ -63,7 +63,7 @@
       </div>
         </f7-list form>  
     <f7-list>
-      <f7-list-button title="Show Chart" v-on:click="showChart = toggleState(showChart)"></f7-list-button>    
+      <f7-list-button title="Show Chart" v-on:click="showGroupUserChart = toggleState(showGroupUserChart)"></f7-list-button>    
       <f7-list-button title="CreateDummyGroup" v-on:click="createDummyGroup()"></f7-list-button>
       <f7-list-button title="Logout" v-on:click="logout()"></f7-list-button>
     </f7-list>
@@ -76,7 +76,7 @@ import Mixins from "../mixins.js";
 import axios from "axios";
 import Cookie from "../js/Cookie.js";
 import Config from "../js/Config.js";
-import PieCount from "@/components/PieCount.js";
+import GroupUserChart from "@/components/GroupUserChart.js";
 import Datacollector from "@/components/Datacollector.vue";
 
 
@@ -84,7 +84,7 @@ export default {
   name: "overview",
   mixins: [Mixins],
   components: {
-    PieCount,
+    GroupUserChart,
     Datacollector
   },
   data() {
@@ -98,7 +98,7 @@ export default {
       userId: "",
       groupCount: "",
       userCount: "",
-      showChart: false,
+      showGroupUserChart: false,
       groupsLoaded: false,
       usersLoaded: false
     };
@@ -253,7 +253,6 @@ export default {
 
     //Toggles state of boolean variables
     toggleState: function(state) {
-      console.log("State of showChart before toggle");
       console.log(state);
       if (state) {
         return (state = false);
