@@ -595,6 +595,7 @@ module.exports.getAllUsers = function() {
         email: 1,
         userId: 1,
         role: 1,
+        authType: 1,
         countGroupIds: {'$size': {'$ifNull': ['$groupIds', []]}}
       }
     };
