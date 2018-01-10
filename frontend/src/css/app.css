@@ -136,14 +136,16 @@ hr {
     position: relative;
 }
 
-.groupUserChartsButton {
+
+/* .groupUserChartsButton {
     float: left;
+    margin-left: 450px
 }
 
 .loginTypeChartsButton {
     float: right;
-    margin: 10px;
-}
+    margin-right: 450px;
+} */
 
 
 /* End Overview.vue chart/tabelles styling

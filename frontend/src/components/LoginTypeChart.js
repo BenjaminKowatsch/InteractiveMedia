@@ -24,7 +24,7 @@ export default Pie.extend({
         this.renderChart({
             labels: ['Password', 'Facebook', 'Google'],
             datasets: [{
-                backgroundColor: ['#FFFF00', '#2E64FE', '#DF0101'],
+                backgroundColor: ['#5FB404', '#2E64FE', '#DF0101'],
                 data: [this.passwordUsers, this.facebookUsers, this.googleUsers]
             }, ],
         }, { responsive: true, maintainAspectRatio: false }, )
