@@ -9,6 +9,7 @@ const GoogleAuth = require('google-auth-library');
 const config = require('./config');
 const uuidService = require('../services/uuid.service');
 const tokenService = require('../services/token.service');
+const emailService = require('../services/email.service');
 const database = require('../modules/database.module');
 const ERROR = require('../config.error');
 const ROLES = require('../config.roles');
@@ -254,7 +255,7 @@ function verifyFacbookTokenAtDatabase(data, verifyDatabase) {
  *                                  catch: {JSONObject} error Containing the following properties:
  *                                                 {String} message String containing the error message or facebook error
  */
-exports.verifyFacebookAccessToken = function(token, verifyDatabase, verifyEmail) {
+exports.verifyFacebookAccessToken = function(token, verifyDatabase, getUserInfo) {
   let responseData = {payload: {}};
   const options = {
     host: 'graph.facebook.com',
@@ -290,16 +291,37 @@ exports.verifyFacebookAccessToken = function(token, verifyDatabase, verifyEmail)
     })
     .then((result) => {
       winston.debug('resolving database promise: ' + JSON.stringify(result));
-      if (verifyEmail === true) {
-        const emailOptions = {
+      if (getUserInfo === true) {
+        const graphOptions = {
           host: 'graph.facebook.com',
           path: ('/v2.9/me?fields=name,email&access_token=' + token)
         };
-        return httpsGetRequest(emailOptions)
-            .then((emailResult) => {
-              winston.debug('resolving email promise: ' + JSON.stringify(emailResult));
-              result.payload.email = emailResult.email;
-              return result;
+        return httpsGetRequest(graphOptions)
+            .then((graphResult) => {
+              let username = graphResult.name;
+              if (username == undefined || username == null) {
+                responseData.success = false;
+                responseData.payload.dataPath = 'authentication';
+                responseData.payload.message = 'unable to query username from facebook';
+                let errorCode = ERROR.INVALID_AUTH_TOKEN;
+                return Promise.reject({errorCode: errorCode, responseData: responseData});
+              } else {
+                let email = graphResult.email;
+                if (email == undefined || email == null) {
+                  // generate own facebook email
+                  email = emailService.generateFacebookEmailFromUsername(result.payload.userId, username);
+                }
+                result.payload.email = email;
+                result.payload.username = username;
+                return result;
+              }
+            })
+            .catch(error => {
+              responseData.success = false;
+              responseData.payload.dataPath = 'authentication';
+              responseData.payload.message = 'unable to query facebook';
+              let errorCode = ERROR.INVALID_AUTH_TOKEN;
+              return Promise.reject({errorCode: errorCode, responseData: responseData});
             });
       } else {
         return result;
