@@ -117,67 +117,37 @@ hr {
 }
 
 
-/*
-*---------------------------
-*BEGIN MOODSLIDER STYLING
-*---------------------------
-*/
+/* Beginn Overview.vue chart/tabelles styling
+ */
 
-.outerMoodslider {
-    /* defines what the outer box of the moodslider should look like */
-    position: absolute;
-    top: 5%;
-    left: 5%;
-    height: 85%;
-    width: 89%;
-    border: 2px solid #ccc;
-    overflow: hidden;
+.groupUserChart {
+    float: left;
     position: relative;
-    -moz-border-radius: 4px;
-    -webkit-border-radius: 4px;
-    border-radius: 4px;
 }
 
-.inner,
-.inner div {
-    width: 100%;
-    overflow: hidden;
-    left: -2px;
-    position: absolute;
+.loginTypeChart {
+    float: right;
+    margin-left: 10px;
+    position: relative;
 }
 
-.inner {
-    border: 2px solid #999;
-    border-top-width: 0;
-    background-image: linear-gradient(to top, red, orange, green);
-    /* defines the color gradient for the slider inside the moodslider and stretches it when the bar is pulled to the top */
-    -webkit-background-size: cover;
-    /* For WebKit*/
-    -moz-background-size: cover;
-    /* Mozilla*/
-    -o-background-size: cover;
-    /* Opera*/
-    background-size: 100% 100%;
-    /* Generic*/
-    bottom: 0;
-    height: 40%;
+.version {
+    float: center;
+    position: relative;
 }
 
-.inner div {
-    border: 2px solid lightgray;
-    border-bottom-width: 0;
-    background-color: lightgray;
-    top: 0;
-    width: 100%;
-    height: 5px;
+.groupUserChartsButton {
+    float: left;
+}
+
+.loginTypeChartsButton {
+    float: right;
+    margin: 10px;
 }
 
 
-/*
-*---------------------------
-*END MOODSLIDER STYLING
-*---------------------------
-*/
+/* End Overview.vue chart/tabelles styling
+ */
 
 
 /* Shared */

@@ -10,9 +10,17 @@
   <f7-page toolbar-fixed>
     <f7-navbar>
       <f7-nav-center sliding>Dashboard</f7-nav-center>
+       <f7-subnavbar sliding>
+          <f7-buttons>
+            <f7-button v-on:click="createDummyGroup()">AddDummyGroup</f7-button>
+            <f7-button v-on:click="logout()">Logout</f7-button>
+         </f7-buttons>
+      </f7-subnavbar>
     </f7-navbar>
+
+    <br>
+
     <f7-list form>
-        
       <h2>Groups overview</h2> 
       <div v-if="groupCount > 0">
         <li v-for="group in groups">
@@ -44,36 +52,42 @@
       <div id="usercount">
          <h3>Number of users: {{userCount}}</h3>
       </div>
-      <br/>     
 
-      <div id="chart">
-        <div v-if="showGroupUserChart && groupsLoaded && usersLoaded">
+      <br> 
+
+      <div class="loginTypeChartsButton">
+        <f7-list>
+            <f7-list-button title="Show Logintype Chart" v-on:click="showLoginTypeChart = toggleState(showLoginTypeChart)"></f7-list-button>
+         </f7-list>
+      </div>
+      <div class="groupUserChartsButton">
+        <f7-list>
+          <f7-list-button title="Show User and Groups Chart" v-on:click="showGroupUserChart = toggleState(showGroupUserChart)"></f7-list-button>
+        </f7-list>
+      </div>
+
+      <div id="charts">
+        <div class="groupUserChart">
+          <div v-if="showGroupUserChart && groupsLoaded && usersLoaded">
             <group-user-chart :groupCount="groupCount" :userCount="userCount"></group-user-chart>
+          </div>
         </div>
-      </div>
-
-      <div v-if="groupsLoaded">
-        <datacollector :groupCount="groupCount"></datacollector>
-      </div>
-
-      <div id="chart2">
-        <div v-if="usersLoaded && showLoginTypeChart">
+        <div class="loginTypeChart">
+          <div v-if="usersLoaded && showLoginTypeChart">
             <login-type-chart :passwordUsers="passwordUsers" :facebookUsers="facebookUsers" :googleUsers="googleUsers"></login-type-chart>
-        </div>
+          </div> 
+        </div>    
       </div>
 
-      <div v-if="version">
+<!--       <div class="version" v-if="version">
         <p>Debts² admin panel version informations: 
           {{version.name}}  {{version.version}}
         </p>
-      </div>
+      </div> -->
         </f7-list form>  
-    <f7-list>
-      <f7-list-button title="Show User and Groups Chart" v-on:click="showGroupUserChart = toggleState(showGroupUserChart)"></f7-list-button>
-      <f7-list-button title="Show Logintype Chart" v-on:click="showLoginTypeChart = toggleState(showLoginTypeChart)"></f7-list-button>    
+<!--     <f7-list>
       <f7-list-button title="CreateDummyGroup" v-on:click="createDummyGroup()"></f7-list-button>
-      <f7-list-button title="Logout" v-on:click="logout()"></f7-list-button>
-    </f7-list>
+    </f7-list> -->
   </f7-page>
     <!-- END of Template Elements -->
 </template>
