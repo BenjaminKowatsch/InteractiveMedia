@@ -13,14 +13,17 @@
        <f7-subnavbar sliding>
           <f7-buttons>
             <f7-button v-on:click="createDummyGroup()">AddDummyGroup</f7-button>
+            <f7-button v-on:click="showGroupUserChart = toggleState(showGroupUserChart)">Show User and Groups Chart</f7-button>
+            <f7-button v-on:click="showLoginTypeChart = toggleState(showLoginTypeChart)">Show Logintype Chart</f7-button>
             <f7-button v-on:click="logout()">Logout</f7-button>
          </f7-buttons>
       </f7-subnavbar>
     </f7-navbar>
 
     <br>
+    <br>
 
-    <f7-list form>
+    <!-- <f7-list form>
       <h2>Groups overview</h2> 
       <div v-if="groupCount > 0">
         <li v-for="group in groups">
@@ -37,47 +40,31 @@
       </div>
 
        <br/>
-
-      <h2>Users overview</h2> 
-      <div v-if="userCount > 0">
-        <li v-for="user in users">
-          <p><b>User name:</b> {{user.username}}, <b>User id:</b> {{user.userId}}, <b>User email:</b> {{user.email}}</p>
-          <p><b>User role:</b> {{user.role}}, <b>Group Count:</b> {{user.countGroupIds}}, <b>AuthType: </b> {{user.authType}}</p>
-        </li>
-      </div>
-      <div v-else>
-        <h2>NO USERS FOUND</h2>
-      </div>
-
-      <div id="usercount">
-         <h3>Number of users: {{userCount}}</h3>
-      </div>
+ -->
+<user-table v-if="usersLoaded" :users="users"></user-table>
 
       <br> 
-
-      <div class="loginTypeChartsButton">
-        <f7-list>
-            <f7-list-button title="Show Logintype Chart" v-on:click="showLoginTypeChart = toggleState(showLoginTypeChart)"></f7-list-button>
-         </f7-list>
-      </div>
-      <div class="groupUserChartsButton">
-        <f7-list>
-          <f7-list-button title="Show User and Groups Chart" v-on:click="showGroupUserChart = toggleState(showGroupUserChart)"></f7-list-button>
-        </f7-list>
-      </div>
-
+      
       <div id="charts">
         <div class="groupUserChart">
           <div v-if="showGroupUserChart && groupsLoaded && usersLoaded">
             <group-user-chart :groupCount="groupCount" :userCount="userCount"></group-user-chart>
           </div>
-        </div>
+        </div>                    
         <div class="loginTypeChart">
           <div v-if="usersLoaded && showLoginTypeChart">
             <login-type-chart :passwordUsers="passwordUsers" :facebookUsers="facebookUsers" :googleUsers="googleUsers"></login-type-chart>
           </div> 
-        </div>    
+        </div>              
       </div>
+
+ <!--      <div class="groupUserChartsButton">
+        <f7-button v-on:click="showGroupUserChart = toggleState(showGroupUserChart)">Show User and Groups Chart</f7-button>
+      </div>
+      <div class="loginTypeChartsButton">
+       <f7-button v-on:click="showLoginTypeChart = toggleState(showLoginTypeChart)">Show Logintype Chart</f7-button>
+      </div>     -->
+ 
 
 <!--       <div class="version" v-if="version">
         <p>Debts² admin panel version informations: 
@@ -85,9 +72,7 @@
         </p>
       </div> -->
         </f7-list form>  
-<!--     <f7-list>
-      <f7-list-button title="CreateDummyGroup" v-on:click="createDummyGroup()"></f7-list-button>
-    </f7-list> -->
+
   </f7-page>
     <!-- END of Template Elements -->
 </template>
@@ -98,16 +83,16 @@ import axios from "axios";
 import Cookie from "../js/Cookie.js";
 import Config from "../js/Config.js";
 import GroupUserChart from "@/components/GroupUserChart.js";
-import Datacollector from "@/components/Datacollector.vue";
 import LoginTypeChart from "@/components/LoginTypeChart.js";
+import UserTable from "@/components/UserTable.vue";
 
 export default {
   name: "overview",
   mixins: [Mixins],
   components: {
     GroupUserChart,
-    Datacollector,
-    LoginTypeChart
+    LoginTypeChart,
+    UserTable
   },
   data() {
     return {
@@ -126,20 +111,23 @@ export default {
       showGroupUserChart: false,
       showLoginTypeChart: false,
       groupsLoaded: false,
-      usersLoaded: false
+      usersLoaded: false,
+      URL: "",
+      authString: "",
     };
   },
 
   mounted: function() {
     // var groupCountLoaded = false;
     // console.log(groupCountLoaded);
-    this.authToken = Cookie.getJSONCookie("accessToken").accessToken;
-    console.log("The cookie authToken is: " + this.authToken);
+
     this.groups = [];
     this.users = [];
     this.groupId = "9a7fb2f3-8b39-4849-ac81-48c1835220d0";
     this.userId = "8b8901fb-4129-4e85-a910-2a1cba922bbf";
 
+    this.createAuthString();
+    this.createURL();
     this.authorizeAdmin();
     this.getGroups();
     this.getGroupById(this.groupId);
@@ -311,6 +299,16 @@ export default {
       } else {
         return (state = true);
       }
+    },
+    
+    createURL: function(){
+      this.url = Config.webServiceURL + "/v1/admin/users"
+    },
+
+    createAuthString: function(){
+      this.authString = "headers: { Authorization: 0 " + this.authToken + " }"
+      this.authToken = Cookie.getJSONCookie("accessToken").accessToken;
+      console.log("The cookie authToken is: " + this.authToken);
     },
 
     //Logout the current user

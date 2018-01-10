@@ -117,6 +117,20 @@ hr {
 }
 
 
+/* Beginn UserTable.vue styling
+ */
+
+.userTable {
+    float: left;
+    margin-top: 10px;
+    margin-left: 30px
+}
+
+
+/* End UserTable.vue styling
+ */
+
+
 /* Beginn Overview.vue chart/tabelles styling
  */
 
@@ -136,14 +150,16 @@ hr {
     position: relative;
 }
 
-.groupUserChartsButton {
+
+/* .groupUserChartsButton {
     float: left;
+    margin-left: 450px
 }
 
 .loginTypeChartsButton {
     float: right;
-    margin: 10px;
-}
+    margin-right: 450px;
+} */
 
 
 /* End Overview.vue chart/tabelles styling
