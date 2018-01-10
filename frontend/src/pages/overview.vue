@@ -41,23 +41,8 @@
 
        <br/>
  -->
-<table-comp v-if="usersLoaded" :users="users"></table-comp>
+<user-table v-if="usersLoaded" :users="users"></user-table>
 
-      <!-- <h2>Users overview</h2> 
-      <div v-if="userCount > 0">
-        <li v-for="user in users">
-          <p><b>User name:</b> {{user.username}}, <b>User id:</b> {{user.userId}}, <b>User email:</b> {{user.email}}</p>
-          <p><b>User role:</b> {{user.role}}, <b>Group Count:</b> {{user.countGroupIds}}, <b>AuthType: </b> {{user.authType}}</p>
-        </li>
-      </div>
-      <div v-else>
-        <h2>NO USERS FOUND</h2>
-      </div>
-
-      <div id="usercount">
-         <h3>Number of users: {{userCount}}</h3>
-      </div>
- -->
       <br> 
       
       <div id="charts">
@@ -72,11 +57,6 @@
           </div> 
         </div>              
       </div>
-<!--       <div v-if="usersLoaded && url">
-        <vue-table :url="url" :authToken="authToken" ></vue-table>
-      </div> -->
-
-      
 
  <!--      <div class="groupUserChartsButton">
         <f7-button v-on:click="showGroupUserChart = toggleState(showGroupUserChart)">Show User and Groups Chart</f7-button>
@@ -103,18 +83,16 @@ import axios from "axios";
 import Cookie from "../js/Cookie.js";
 import Config from "../js/Config.js";
 import GroupUserChart from "@/components/GroupUserChart.js";
-import Datacollector from "@/components/Datacollector.vue";
 import LoginTypeChart from "@/components/LoginTypeChart.js";
-import TableComp from "@/components/TableComp.vue";
+import UserTable from "@/components/UserTable.vue";
 
 export default {
   name: "overview",
   mixins: [Mixins],
   components: {
     GroupUserChart,
-    Datacollector,
     LoginTypeChart,
-    TableComp
+    UserTable
   },
   data() {
     return {

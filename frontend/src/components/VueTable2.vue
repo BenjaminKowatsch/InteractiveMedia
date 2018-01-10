@@ -8,7 +8,8 @@
 </template>
 
 <script>
-
+//An yet not working Example with vuetable-2
+//ToDo: remove if not working
 import Vuetable from 'vuetable-2';
 import Mixins from "../mixins.js";
 import axios from "axios";

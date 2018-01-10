@@ -8,9 +8,6 @@
            <table-column show="userId" label="User ID"></table-column>
            <table-column show="authType" label="Logintyp"></table-column>
            <table-column show="countGroupIds" label="Member of Groups"></table-column>
-
-
-
        </table-component>
    </div>
 </template>
@@ -21,7 +18,7 @@ import axios from "axios";
 import Cookie from "../js/Cookie.js";
 import Config from "../js/Config.js";
 
-
+//ToDo: implement something to do paging
 export default ({
     components: {
         
