@@ -12,7 +12,7 @@
       <f7-nav-center sliding>Dashboard</f7-nav-center>
     </f7-navbar>
     <f7-list form>
-
+        
       <h2>Groups overview</h2> 
       <div v-if="groupCount > 0">
         <li v-for="group in groups">
@@ -44,13 +44,16 @@
       <div id="usercount">
          <h3>Number of users: {{userCount}}</h3>
       </div>
-
-      <br/>
+      <br/>     
 
       <div id="chart">
-        <div v-if="showChart">
-                <pie-count></pie-count>
+        <div v-if="showChart && groupsLoaded && usersLoaded">
+            <pie-count :groupCount="groupCount" :userCount="userCount"></pie-count>
         </div>
+      </div>
+
+      <div v-if="groupsLoaded">
+        <datacollector :groupCount="groupCount"></datacollector>
       </div>
 
       <div v-if="version">
@@ -74,12 +77,15 @@ import axios from "axios";
 import Cookie from "../js/Cookie.js";
 import Config from "../js/Config.js";
 import PieCount from "@/components/PieCount.js";
+import Datacollector from "@/components/Datacollector.vue";
+
 
 export default {
   name: "overview",
   mixins: [Mixins],
   components: {
-    PieCount
+    PieCount,
+    Datacollector
   },
   data() {
     return {
@@ -92,7 +98,9 @@ export default {
       userId: "",
       groupCount: "",
       userCount: "",
-      showChart: false
+      showChart: false,
+      groupsLoaded: false,
+      usersLoaded: false
     };
   },
 
@@ -104,7 +112,7 @@ export default {
     this.groups = [];
     this.users = [];
     this.groupId = "9a7fb2f3-8b39-4849-ac81-48c1835220d0";
-    this.userId = "facad137-28e7-49a2-a39c-6ecc0c1a7e85";
+    this.userId = "8b8901fb-4129-4e85-a910-2a1cba922bbf";
 
     this.authorizeAdmin();
     this.getGroups();
@@ -121,7 +129,7 @@ export default {
         .post(
           Config.webServiceURL + "/v1/groups",
           {
-            name: "Testgroup0",
+            name: "Testgroup3",
             imageUrl: null,
             users: ["admin@example.com"]
           },
@@ -158,9 +166,10 @@ export default {
         })
         .then(response => {
           this.groups = response.data.payload;
-          this.groupCount = this.countProperties(this.groups);
+          this.groupCount = this.groups.length;
           // this.groupCountLoaded = true;
           console.log("Anzahl Gruppen: " + this.groupCount);
+          this.groupsLoaded = true;
           // console.log("Existing Groups: " + JSON.stringify(this.groups));
         })
         .catch(e => {
@@ -192,8 +201,9 @@ export default {
         })
         .then(response => {
           this.users = response.data.payload;
-          this.userCount = this.countProperties(this.users);
+          this.userCount = this.users.length;
           console.log("Count Users: " + this.userCount);
+          this.usersLoaded = true;
           // console.log("Existing Users: " + JSON.stringify(this.users));
         })
         .catch(e => {
