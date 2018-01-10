@@ -75,6 +75,18 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         db.delete("login", null, null);
     }
 
+    public Cursor getUsersForGroup(long groupId) {
+        final SQLiteDatabase db = this.getWritableDatabase();
+        final String subQuery = "SELECT " + GroupUserTable.COLUMN_USER_ID + " FROM "
+                + GroupUserTable.TABLE_NAME
+                + " WHERE " + GroupUserTable.COLUMN_GROUP_ID + " = ?";
+        final String query = "SELECT * FROM " + UserTable.TABLE_NAME
+                + " WHERE " + UserTable.COLUMN_ID + " IN (" + subQuery + " )";
+        final Cursor cursor = db.rawQuery(query, new String[]{"" + groupId});
+        return cursor;
+
+    }
+
     public Cursor getTransactionsForGroup(long groupId) {
         final SQLiteDatabase db = this.getWritableDatabase();
         final String subQuery = "SELECT " + GroupTransactionTable.COLUMN_TRANSACTION_ID + " FROM "

@@ -3,6 +3,8 @@ package com.media.interactive.cs3.hdm.interactivemedia.activties;
 import android.app.DatePickerDialog;
 import android.app.TimePickerDialog;
 import android.content.ContentValues;
+import android.database.Cursor;
+import android.location.Location;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -12,12 +14,16 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
+import android.widget.SimpleCursorAdapter;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.TimePicker;
 
 import com.media.interactive.cs3.hdm.interactivemedia.R;
+import com.media.interactive.cs3.hdm.interactivemedia.contentprovider.DatabaseHelper;
 import com.media.interactive.cs3.hdm.interactivemedia.contentprovider.DatabaseProvider;
 import com.media.interactive.cs3.hdm.interactivemedia.contentprovider.tables.GroupTransactionTable;
+import com.media.interactive.cs3.hdm.interactivemedia.contentprovider.tables.UserTable;
 import com.media.interactive.cs3.hdm.interactivemedia.data.MoneyTextWatcher;
 import com.media.interactive.cs3.hdm.interactivemedia.data.Transaction;
 
@@ -34,9 +40,11 @@ public class AddTransactionActivity extends AppCompatActivity {
     private final SimpleDateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyy");
     private final SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm");
     private final SimpleDateFormat dateTimeFormat = new SimpleDateFormat(dateFormat.toPattern() + timeFormat.toPattern());
+    private Spinner userSelection;
     private EditText dateEditText;
     private EditText timeEditText;
     private long groupId;
+    private SimpleCursorAdapter userAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,6 +52,7 @@ public class AddTransactionActivity extends AppCompatActivity {
         setContentView(R.layout.activity_add_transaction);
         dateEditText = findViewById(R.id.et_add_transaction_date);
         timeEditText = findViewById(R.id.et_add_transaction_time);
+        userSelection = findViewById(R.id.s_add_transaction_user);
         EditText amountEditText = findViewById(R.id.et_add_transaction_amount);
         amountEditText.addTextChangedListener(new MoneyTextWatcher(amountEditText, CURRENCY_FORMAT));
 
@@ -64,6 +73,9 @@ public class AddTransactionActivity extends AppCompatActivity {
             }
         });
         setupDatePicker();
+
+        userAdapter = initializeUserAdapter();
+        userSelection.setAdapter(userAdapter);
     }
 
     private void createAndSaveTransaction(View view) {
@@ -97,7 +109,9 @@ public class AddTransactionActivity extends AppCompatActivity {
         final String split = splitText.getText().toString();
         final double amount = parseAmount(amountText);
         final Date dateTime = parseDateTime(dateText, timeText);
-        return new Transaction(purpose, split, dateTime, amount, groupId);
+        //FIXME: replace this with real location
+        final Location location = new Location("");
+        return new Transaction(purpose, userAdapter.getCursor().getString(1), split, dateTime, location, amount, groupId);
     }
 
     private double parseAmount(EditText amountText) {
@@ -174,6 +188,19 @@ public class AddTransactionActivity extends AppCompatActivity {
         Calendar date = Calendar.getInstance();
         date.set(year, month, day);
         dateEditText.setText(dateFormat.format(date.getTime()));
+    }
+
+    private SimpleCursorAdapter initializeUserAdapter() {
+        DatabaseHelper databaseHelper = new DatabaseHelper(this);
+
+        Cursor query = databaseHelper.getUsersForGroup(groupId);
+
+        String[] columns = new String[] { UserTable.COLUMN_USERNAME };
+        int[] to = new int[] { android.R.id.text1 };
+
+        SimpleCursorAdapter userAdapter = new SimpleCursorAdapter(this, android.R.layout.simple_spinner_item, query, columns, to, 0);
+        userAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        return userAdapter;
     }
 
 }

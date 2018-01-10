@@ -20,6 +20,12 @@
             android:hint="Transaction Name"
             android:inputType="textShortMessage" />
 
+        <Spinner
+            android:id="@+id/s_add_transaction_user"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:spinnerMode="dropdown"/>
+
         <EditText
             android:id="@+id/et_add_transaction_amount"
             android:layout_width="wrap_content"
