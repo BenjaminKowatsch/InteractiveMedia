@@ -117,6 +117,20 @@ hr {
 }
 
 
+/* Beginn UserTable.vue styling
+ */
+
+.userTable {
+    float: left;
+    margin-top: 10px;
+    margin-left: 30px
+}
+
+
+/* End UserTable.vue styling
+ */
+
+
 /* Beginn Overview.vue chart/tabelles styling
  */
 

@@ -21,8 +21,9 @@
     </f7-navbar>
 
     <br>
+    <br>
 
-    <f7-list form>
+    <!-- <f7-list form>
       <h2>Groups overview</h2> 
       <div v-if="groupCount > 0">
         <li v-for="group in groups">
@@ -39,8 +40,10 @@
       </div>
 
        <br/>
+ -->
+<table-comp v-if="usersLoaded" :users="users"></table-comp>
 
-      <h2>Users overview</h2> 
+      <!-- <h2>Users overview</h2> 
       <div v-if="userCount > 0">
         <li v-for="user in users">
           <p><b>User name:</b> {{user.username}}, <b>User id:</b> {{user.userId}}, <b>User email:</b> {{user.email}}</p>
@@ -54,7 +57,7 @@
       <div id="usercount">
          <h3>Number of users: {{userCount}}</h3>
       </div>
-
+ -->
       <br> 
       
       <div id="charts">
@@ -69,6 +72,11 @@
           </div> 
         </div>              
       </div>
+<!--       <div v-if="usersLoaded && url">
+        <vue-table :url="url" :authToken="authToken" ></vue-table>
+      </div> -->
+
+      
 
  <!--      <div class="groupUserChartsButton">
         <f7-button v-on:click="showGroupUserChart = toggleState(showGroupUserChart)">Show User and Groups Chart</f7-button>
@@ -97,6 +105,7 @@ import Config from "../js/Config.js";
 import GroupUserChart from "@/components/GroupUserChart.js";
 import Datacollector from "@/components/Datacollector.vue";
 import LoginTypeChart from "@/components/LoginTypeChart.js";
+import TableComp from "@/components/TableComp.vue";
 
 export default {
   name: "overview",
@@ -104,7 +113,8 @@ export default {
   components: {
     GroupUserChart,
     Datacollector,
-    LoginTypeChart
+    LoginTypeChart,
+    TableComp
   },
   data() {
     return {
@@ -123,20 +133,23 @@ export default {
       showGroupUserChart: false,
       showLoginTypeChart: false,
       groupsLoaded: false,
-      usersLoaded: false
+      usersLoaded: false,
+      URL: "",
+      authString: "",
     };
   },
 
   mounted: function() {
     // var groupCountLoaded = false;
     // console.log(groupCountLoaded);
-    this.authToken = Cookie.getJSONCookie("accessToken").accessToken;
-    console.log("The cookie authToken is: " + this.authToken);
+
     this.groups = [];
     this.users = [];
     this.groupId = "9a7fb2f3-8b39-4849-ac81-48c1835220d0";
     this.userId = "8b8901fb-4129-4e85-a910-2a1cba922bbf";
 
+    this.createAuthString();
+    this.createURL();
     this.authorizeAdmin();
     this.getGroups();
     this.getGroupById(this.groupId);
@@ -308,6 +321,16 @@ export default {
       } else {
         return (state = true);
       }
+    },
+    
+    createURL: function(){
+      this.url = Config.webServiceURL + "/v1/admin/users"
+    },
+
+    createAuthString: function(){
+      this.authString = "headers: { Authorization: 0 " + this.authToken + " }"
+      this.authToken = Cookie.getJSONCookie("accessToken").accessToken;
+      console.log("The cookie authToken is: " + this.authToken);
     },
 
     //Logout the current user
