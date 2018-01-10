@@ -34,7 +34,7 @@
       <div v-if="userCount > 0">
         <li v-for="user in users">
           <p><b>User name:</b> {{user.username}}, <b>User id:</b> {{user.userId}}, <b>User email:</b> {{user.email}}</p>
-          <p><b>User role:</b> {{user.role}}, <b>Group Count:</b> {{user.countGroupIds}}</p>
+          <p><b>User role:</b> {{user.role}}, <b>Group Count:</b> {{user.countGroupIds}}, <b>AuthType: </b> {{user.authType}}</p>
         </li>
       </div>
       <div v-else>
@@ -47,13 +47,19 @@
       <br/>     
 
       <div id="chart">
-        <div v-if="showChart && groupsLoaded && usersLoaded">
-            <pie-count :groupCount="groupCount" :userCount="userCount"></pie-count>
+        <div v-if="showGroupUserChart && groupsLoaded && usersLoaded">
+            <group-user-chart :groupCount="groupCount" :userCount="userCount"></group-user-chart>
         </div>
       </div>
 
       <div v-if="groupsLoaded">
         <datacollector :groupCount="groupCount"></datacollector>
+      </div>
+
+      <div id="chart2">
+        <div v-if="usersLoaded && showLoginTypeChart">
+            <login-type-chart :passwordUsers="passwordUsers" :facebookUsers="facebookUsers" :googleUsers="googleUsers"></login-type-chart>
+        </div>
       </div>
 
       <div v-if="version">
@@ -63,7 +69,8 @@
       </div>
         </f7-list form>  
     <f7-list>
-      <f7-list-button title="Show Chart" v-on:click="showChart = toggleState(showChart)"></f7-list-button>    
+      <f7-list-button title="Show User and Groups Chart" v-on:click="showGroupUserChart = toggleState(showGroupUserChart)"></f7-list-button>
+      <f7-list-button title="Show Logintype Chart" v-on:click="showLoginTypeChart = toggleState(showLoginTypeChart)"></f7-list-button>    
       <f7-list-button title="CreateDummyGroup" v-on:click="createDummyGroup()"></f7-list-button>
       <f7-list-button title="Logout" v-on:click="logout()"></f7-list-button>
     </f7-list>
@@ -76,16 +83,17 @@ import Mixins from "../mixins.js";
 import axios from "axios";
 import Cookie from "../js/Cookie.js";
 import Config from "../js/Config.js";
-import PieCount from "@/components/PieCount.js";
+import GroupUserChart from "@/components/GroupUserChart.js";
 import Datacollector from "@/components/Datacollector.vue";
-
+import LoginTypeChart from "@/components/LoginTypeChart.js";
 
 export default {
   name: "overview",
   mixins: [Mixins],
   components: {
-    PieCount,
-    Datacollector
+    GroupUserChart,
+    Datacollector,
+    LoginTypeChart
   },
   data() {
     return {
@@ -98,7 +106,11 @@ export default {
       userId: "",
       groupCount: "",
       userCount: "",
-      showChart: false,
+      passwordUsers: "",
+      facebookUsers: "",
+      googleUsers: "",
+      showGroupUserChart: false,
+      showLoginTypeChart: false,
       groupsLoaded: false,
       usersLoaded: false
     };
@@ -200,9 +212,19 @@ export default {
           headers: { Authorization: "0 " + this.authToken }
         })
         .then(response => {
+
           this.users = response.data.payload;
           this.userCount = this.users.length;
+
+          this.passwordUsers = this.users.filter(this.filter_loginPassword).length
+          this.facebookUsers = this.users.filter(this.filter_loginFacebook).length
+          this.googleUsers = this.users.filter(this.filter_loginGoogle).length
+
           console.log("Count Users: " + this.userCount);
+          console.log("Count PasswordUsers: " + this.passwordUsers);
+          console.log("Count FacebookUsers: " + this.facebookUsers);
+          console.log("Count GoogleUsers: " + this.googleUsers);
+
           this.usersLoaded = true;
           // console.log("Existing Users: " + JSON.stringify(this.users));
         })
@@ -240,7 +262,8 @@ export default {
         });
     },
 
-    //Counts the elements of an object
+    //Counts the elements of an object4
+    //ToDo: Delete Fct if not used
     countProperties: function(obj) {
       var count = 0;
       for (var property in obj) {
@@ -251,9 +274,23 @@ export default {
       return count;
     },
 
+    //filters users object for loginType = Password
+    filter_loginPassword: function(users) {
+      return users.authType == 0;
+    },
+
+    //filters users object for loginType = Facebook
+    filter_loginFacebook: function(users) {
+      return users.authType == 1;
+    },
+
+    //filters users object for loginType = Google
+    filter_loginGoogle: function(users) {
+      return users.authType == 2;
+    },
+
     //Toggles state of boolean variables
     toggleState: function(state) {
-      console.log("State of showChart before toggle");
       console.log(state);
       if (state) {
         return (state = false);
