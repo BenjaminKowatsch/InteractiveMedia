@@ -298,12 +298,14 @@
             "email" : "harry.potter@hogwarts.edu",
             "userId" : "d9gh1hs7-e8lk-495f-br48-2f4ds92260418",
             "role" : "user",
+            "authType" : 0,
             "countGroupIds" : 3,
         },{
             "username" : "Ron Weasly",
             "email" : "ron.weasly@hogwarts.edu",
             "userId" : "4js8fg66-f4g8-ay98-ql04-f212343jf5ui",
             "role" : "user",
+            "authType" : 0,
             "countGroupIds" : 5,
         }]
     }
@@ -323,6 +325,10 @@
 /**
  * @apiDefine successBodyUserRole
     @apiSuccess (Success) {string} payload[role] Role of user. Supported roles: user, admin
+ */
+/**
+ * @apiDefine successBodyUserAuthType
+    @apiSuccess (Success) {int} payload[authType] Authentication type of user. Supported types (0: Password, 1:Google, 2: Facebook)
  */
 /**
  * @apiDefine successBodyUserGroupIds
