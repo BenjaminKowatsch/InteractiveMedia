@@ -29,15 +29,25 @@ public class UserTable {
      * Fiths attribute, type TIMESTAMP DEFAULT CURRENT_TIMESTAMP.
      */
     public static final String COLUMN_CREATED_AT = "created_at";
+    /**
+     * Sixth attribute, type STRING
+     */
+    public static final String COLUMN_USER_ID = "user_id";
+    /**
+     * Sixth attribute, type INTEGER representing an boolean 0/1 not synced/synched
+     */
+    public static final String COLUMN_SYNCHRONIZED = "synchronized";
 
     public static final String DATABASE_CREATE =
 
         "create table if not exists " + TABLE_NAME + "("
            + COLUMN_ID + " integer unique primary key AUTOINCREMENT,"
-           + COLUMN_USERNAME + " TEXT NOT NULL,"
+           + COLUMN_USERNAME + " TEXT,"
            + COLUMN_IMAGE_URL + " TEXT,"
            + COLUMN_EMAIL + " TEXT NOT NULL,"
-           + COLUMN_CREATED_AT + " TIMESTAMP DEFAULT CURRENT_TIMESTAMP)";
+           + COLUMN_CREATED_AT + " TIMESTAMP DEFAULT CURRENT_TIMESTAMP,"
+           + COLUMN_USER_ID + " TEXT,"
+           + COLUMN_SYNCHRONIZED + " INTEGER NOT NULL)";
     public static final String DATABASE_DROP = "drop table if exists " + TABLE_NAME;
 
 
