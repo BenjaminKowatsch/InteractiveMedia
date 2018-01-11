@@ -85,18 +85,20 @@ public class GroupAdapter extends CursorAdapter {
             viewHolder.syncedIcon.setVisibility(View.VISIBLE);
         }
         final String imageUrl = group.getImageUrl();
-        LazyHeaders.Builder builder = new LazyHeaders.Builder();
+        if (imageUrl != null) {
+            LazyHeaders.Builder builder = new LazyHeaders.Builder();
 
-        if (imageUrl.startsWith(context.getResources().getString(R.string.web_service_url))) {
-            builder = builder.addHeader("Authorization", Login.getInstance().getUserType().getValue()+" "+ Login.getInstance().getAccessToken());
+            if (imageUrl.startsWith(context.getResources().getString(R.string.web_service_url))) {
+                builder = builder.addHeader("Authorization", Login.getInstance().getUserType().getValue()+" "+ Login.getInstance().getAccessToken());
+
+                final GlideUrl glideUrl = new GlideUrl(imageUrl, builder.build());
+
+                Glide.with(context).load(glideUrl)
+                    .diskCacheStrategy(DiskCacheStrategy.SOURCE)
+                    .placeholder(ContextCompat.getDrawable(context, R.drawable.anonymoususer))
+                    .into(viewHolder.groupIcon);
+            }
         }
-        final GlideUrl glideUrl = new GlideUrl(imageUrl, builder.build());
-
-        Glide.with(context).load(glideUrl)
-            .diskCacheStrategy(DiskCacheStrategy.SOURCE)
-            .placeholder(ContextCompat.getDrawable(context, R.drawable.anonymoususer))
-            .into(viewHolder.groupIcon);
-
     }
 
 }
