@@ -147,9 +147,9 @@ function sendNotificationCreateTransaction(groupId, userIdCreator) {
     const dryRun = false;
     const data = {};
     const notification = {
-      title: 'New transaction in group "' + transactionGroup.name + '"',
+      title: 'New transaction available',
       icon: 'ic_launcher',
-      body: 'Click to see the newest transactions. // Debug: sent at ' + new Date()
+      body: 'Click to catch up with your group ' + transactionGroup.name + '.'
     };
     return pushNotificationService.sendfcm(tokens, data, notification, dryRun);
   })
