@@ -14,7 +14,7 @@ const jsonSchema = {
   registerUserPayload: require('../JSONSchema/registerUserPayload.json'),
   loginUserExternalPayload: require('../JSONSchema/loginUserExternalPayload.json'),
   loginUserPasswordPayload: require('../JSONSchema/loginUserPasswordPayload.json'),
-  updateFcmTokenPayload: require('../JSONSchema/userUpdateFcmTokenPayloadData.json')
+  updateFcmTokenPayload: require('../JSONSchema/userUpdateFcmTokenPayload.json')
 };
 
 exports.registerNewUser = function(req, res) {
