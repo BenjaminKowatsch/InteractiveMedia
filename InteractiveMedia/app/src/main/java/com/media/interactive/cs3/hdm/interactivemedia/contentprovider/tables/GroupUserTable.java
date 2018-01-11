@@ -12,11 +12,11 @@ public class GroupUserTable {
     /**
      * First attribute, type integer references.
      */
-    public static final String COLUMN_GROUP_ID = "group_id";
+    public static final String COLUMN_GROUP_ID = "fk_group_id";
     /**
      * Second attribute, type integer references.
      */
-    public static final String COLUMN_USER_ID = "user_id";
+    public static final String COLUMN_USER_ID = "fk_user_id";
 
     public static final String DATABASE_CREATE =
         "create table if not exists " + TABLE_NAME + "("
