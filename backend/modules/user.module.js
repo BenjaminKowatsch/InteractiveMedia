@@ -324,11 +324,13 @@ exports.googleOrFacebookLogin = function(userId, expiryDate, authType, accessTok
       'email': email,
       'authType': authType
     }, {
-      'userId': userId,
-      'email': email,
-      'authType': authType,
-      'expiryDate': expiryDate,
-      'role': ROLES.USER
+      '$set': {
+        'userId': userId,
+        'email': email,
+        'authType': authType,
+        'expiryDate': expiryDate,
+        'role': ROLES.USER
+      }
     }, {
       upsert: true
     },
@@ -593,6 +595,7 @@ module.exports.getAllUsers = function() {
         email: 1,
         userId: 1,
         role: 1,
+        authType: 1,
         countGroupIds: {'$size': {'$ifNull': ['$groupIds', []]}}
       }
     };
