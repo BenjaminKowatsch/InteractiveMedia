@@ -275,7 +275,6 @@ describe('User-Controller', () => {
         return chai.request(HOST)
         .post(URL.BASE_USER + '/login?type=0')
         .send({username: testData.users.valid[1].username,
-          email: testData.users.valid[1].email,
           password: testData.users.valid[1].password})
         .then(res => {
           expect(res).to.have.status(200);
@@ -292,7 +291,6 @@ describe('User-Controller', () => {
         return chai.request(HOST)
         .post(URL.BASE_USER + '/login?type=0')
         .send({username: testData.users.valid[1].username,
-          email: testData.users.valid[1].email,
           password: 'XXXXX'})
         .then(res => {
           expect(res).to.have.status(401);
@@ -309,7 +307,6 @@ describe('User-Controller', () => {
         return chai.request(HOST)
         .post(URL.BASE_USER + '/login?type=0')
         .send({username: testData.users.valid[1].username,
-          email: testData.users.valid[1].email,
           password: ''})
         .then(res => {
           expect(res).to.have.status(400);
@@ -317,39 +314,38 @@ describe('User-Controller', () => {
           expect(res.body).to.be.an('object');
           expect(res.body.success).to.be.false;
           expect(res.body.payload).to.be.an('object');
-          expect(res.body.payload.dataPath).to.equal('password');
+          expect(res.body.payload.dataPath).to.equal('login');
+          expect(res.body.payload.message).to.equal('invalid request body');
         });
       });
 
       it('should fail to login with no password', function() {
         return chai.request(HOST)
         .post(URL.BASE_USER + '/login?type=0')
-        .send({username: testData.users.valid[1].username,
-          email: testData.users.valid[1].email})
+        .send({username: testData.users.valid[1].username})
         .then(res => {
-          expect(res).to.have.status(401);
+          expect(res).to.have.status(400);
           expect(res).to.be.json;
           expect(res.body).to.be.an('object');
           expect(res.body.success).to.be.false;
           expect(res.body.payload).to.be.an('object');
           expect(res.body.payload.dataPath).to.equal('login');
-          expect(res.body.payload.message).to.equal('login failed');
+          expect(res.body.payload.message).to.equal('invalid request body');
         });
       });
 
       it('should fail to login with no username', function() {
         return chai.request(HOST)
         .post(URL.BASE_USER + '/login?type=0')
-        .send({email: testData.users.valid[1].email,
-          password: testData.users.valid[2].password})
+        .send({password: testData.users.valid[2].password})
         .then(res => {
-          expect(res).to.have.status(401);
+          expect(res).to.have.status(400);
           expect(res).to.be.json;
           expect(res.body).to.be.an('object');
           expect(res.body.success).to.be.false;
           expect(res.body.payload).to.be.an('object');
           expect(res.body.payload.dataPath).to.equal('login');
-          expect(res.body.payload.message).to.equal('login failed');
+          expect(res.body.payload.message).to.equal('invalid request body');
         });
       });
 
@@ -357,7 +353,6 @@ describe('User-Controller', () => {
         return chai.request(HOST)
         .post(URL.BASE_USER + '/login?type=0')
         .send({username: 'unknownUsername',
-          email: 'unknownEmail@example.de',
           password: 'passwordX'})
         .then(res => {
           expect(res).to.have.status(401);
@@ -380,7 +375,7 @@ describe('User-Controller', () => {
           expect(res.body).to.be.an('object');
           expect(res.body.success).to.be.false;
           expect(res.body.payload).to.be.an('object');
-          expect(res.body.payload.message).to.be.equal('empty input');
+          expect(res.body.payload.message).to.be.equal('invalid request body');
         });
       });
 
@@ -436,7 +431,6 @@ describe('User-Controller', () => {
         return chai.request(HOST)
         .post(URL.BASE_USER + '/login?type=0')
         .send({username: testData.users.valid[4].username,
-          email: testData.users.valid[4].email,
           password: testData.users.valid[4].password})
         .then(res => {
           expect(res).to.have.status(200);
