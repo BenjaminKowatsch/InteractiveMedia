@@ -51,9 +51,11 @@ public class Login {
     private String hashedPassword = null;
     private UserType userType = null;
     private String accessToken = null;
+    private CallbackListener<JSONObject,Exception> onUserDataSet = null;
 
     private DatabaseProviderHelper helper;
     private ContentResolver contentResolver = null;
+
 
     private Login() {
     }
@@ -89,7 +91,6 @@ public class Login {
     public void setId(long id) {
         this.id = id;
     }
-
 
     public UserType getUserType() {
         return userType;
@@ -141,11 +142,17 @@ public class Login {
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
+                if(onUserDataSet != null){
+                    onUserDataSet.onSuccess(response);
+                }
             }
         }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
                 Log.e(TAG,"Error while setting user data.");
+                if(onUserDataSet != null){
+                    onUserDataSet.onFailure(error);
+                }
             }
         });
         jsonObjectRequest.setShouldCache(false);
@@ -515,4 +522,7 @@ public class Login {
         RestRequestQueue.getInstance(activity).addToRequestQueue(jsonObjectRequest);
     }
 
+    public void setOnUserDataSet(CallbackListener<JSONObject, Exception> onUserDataSet) {
+        this.onUserDataSet = onUserDataSet;
+    }
 }
