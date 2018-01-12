@@ -5,19 +5,10 @@
     "accessToken": {
       "type": "string",
       "minLength": 1
-    },
-    "authType": {
-      "type": "integer",
-    	"minimum": 0,
-      "maximum": 2
-    },
-    "payload":{
-      "type": "object"
     }
   },
   "required": [
-    "accessToken",
-    "authType"
+    "accessToken"
   ],
   "additionalProperties": false
 }
