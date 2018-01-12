@@ -1,6 +1,8 @@
 // Import Vue
 import Vue from 'vue'
 
+import VueRouter from 'vue-router'
+
 // Import F7
 
 import VueTouch from 'vue-touch'
@@ -18,6 +20,9 @@ import Routes from './routes.js'
 // Import App Component
 import App from './app'
 
+import login from './pages/login.vue'
+import overview from './pages/overview.vue'
+
 // Import Cookie JS
 import Cookie from './js/Cookie.js'
 
@@ -29,7 +34,9 @@ import { TableComponent, TableColumn } from 'vue-table-component';
 
 Vue.component('table-component', TableComponent);
 Vue.component('table-column', TableColumn);
-Vue.use(VueTouch, { name: 'v-touch' })
+Vue.use(VueTouch, { name: 'v-touch' });
+Vue.use(VueRouter)
+
 
 // Init F7 Vue Plugin
 
@@ -41,11 +48,31 @@ var startApp = function(onLoadingFinished) {
 
 var onLoadingFinished = function() {
 
+
+    //ToDO: Try to do the routes into routes.js
+    const routes = [{
+            path: '/',
+            name: "login",
+            component: login
+        },
+        {
+            path: '/overview/',
+            name: "overview",
+            component: overview
+        },
+    ]
+
+
+    const router = new VueRouter({
+        routes
+    })
+
     // Init App
     var vm = new Vue({
         el: '#app',
         mixins: [Mixins],
         template: '<app ref="app" ><app/>',
+        router,
         // Init Framework7 by passing parameters here
         /*         framework7: {
                     root: '#app',

@@ -1,14 +1,18 @@
-export default [
-  {
-      path: '/',
-      component: require('./pages/login.vue')
-  },
-  {
-      path: '/overview/',
-      component: require('./pages/overview.vue')
-  },
-  {
-      path: '/register/',
-      component: require('./pages/register.vue')
-  }
-]
+import Router from 'vue-router'
+import login from './pages/login.vue'
+import overview from './pages/overview.vue'
+
+export default {
+    routes: [{
+            path: '/',
+            name: "login",
+            component: login
+        },
+        {
+            path: '/overview/',
+            name: "overview",
+            component: overview
+        },
+    ]
+
+}

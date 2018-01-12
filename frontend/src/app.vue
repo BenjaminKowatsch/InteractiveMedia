@@ -12,9 +12,10 @@
         </f7-navbar> -->
         <!-- Pages -->
        <!--  <f7-pages> -->
+             <router-view/>
 
-          <login ref="loginForm"></login>
-
+<!--           <login ref="loginForm"></login>
+ -->
      <!--    </f7-pages>
       </f7-view>
     </f7-views> -->
@@ -49,16 +50,16 @@ import Cookie from './js/Cookie.js'
 import Config from './js/Config.js'
 
 export default {
-  name: 'overview',
+  name: 'app',
   mixins: [ Mixins ],
   components: {
     Login
   },
    methods: {
-    reload: function () {
-      location.reload();
-    },
-    /**
+    // reload: function () {
+    //   location.reload();
+/*     }
+ */    /**
      * This function logs out the user by sending a POST request to the backend,
      * if the cookie containing the access token and the authentication type exists
      * Also depending on the authentication type the user will be logged out of google or facebook.
