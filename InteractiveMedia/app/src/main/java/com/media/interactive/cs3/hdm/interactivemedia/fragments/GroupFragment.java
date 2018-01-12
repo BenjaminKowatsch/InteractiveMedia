@@ -110,6 +110,7 @@ public class GroupFragment extends ListFragment implements LoaderManager.LoaderC
     public void onResume() {
         super.onResume();
         getLoaderManager().restartLoader(0, null, GroupFragment.this);
+        getLoaderManager().getLoader(0).onContentChanged();
     }
 
     @Override
@@ -130,7 +131,10 @@ public class GroupFragment extends ListFragment implements LoaderManager.LoaderC
                 Log.d(TAG, "OnSuccess: TestUserId: " + userId);
                 Activity activity = getActivity();
                 if (isAdded() && activity != null) {
-                    getLoaderManager().restartLoader(0, null, GroupFragment.this);
+                    Log.d(TAG, "Restart Loader!! ");
+                    //getLoaderManager().restartLoader(0, null, GroupFragment.this);
+                    getLoaderManager().getLoader(0).commitContentChanged();//.onContentChanged();
+
                 }
             }
 
