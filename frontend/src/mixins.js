@@ -18,9 +18,9 @@ export default {
             if (accessToken !== '') {
                 onValid(accessToken)
             } else {
-                this.$f7.alert('Sie sind nicht eingeloggt, bitte loggen Sie sich ein', 'Debts² Admin Panel', () => {
-                    this.redirect('/', false, true, true)
-                })
+                /* this.$f7.alert('Sie sind nicht eingeloggt, bitte loggen Sie sich ein', 'Debts² Admin Panel', () => { */
+                this.redirect('/', false, true, true)
+                    /* }) */
             }
         },
         /**
@@ -43,10 +43,10 @@ export default {
          * @param  {Boolean} reload       Flag to indicate if after the route change the page should be reloaded
          */
         redirect: function(url, animatePages, pushState, reload) {
-            this.$f7.mainView.router.load({ 'url': url, 'animatePages': animatePages, 'pushState': pushState })
-            if (reload) {
-                location.reload()
-            }
+            /*  this.$f7.mainView.router.load({ 'url': url, 'animatePages': animatePages, 'pushState': pushState })
+             if (reload) {
+                 location.reload()
+             } */
         },
 
         /**

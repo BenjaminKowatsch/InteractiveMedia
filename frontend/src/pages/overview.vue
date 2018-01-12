@@ -7,18 +7,18 @@
 
 <template>
 <!-- START Framework 7 Template Elements for establishing the view -->
-  <f7-page toolbar-fixed>
+<!--   <f7-page toolbar-fixed>
     <f7-navbar>
       <f7-nav-center sliding>Dashboard</f7-nav-center>
        <f7-subnavbar sliding>
-          <f7-buttons>
-            <f7-button v-on:click="createDummyGroup()">AddDummyGroup</f7-button>
-            <f7-button v-on:click="showGroupUserChart = toggleState(showGroupUserChart)">Show User and Groups Chart</f7-button>
-            <f7-button v-on:click="showLoginTypeChart = toggleState(showLoginTypeChart)">Show Logintype Chart</f7-button>
-            <f7-button v-on:click="logout()">Logout</f7-button>
-         </f7-buttons>
+          <f7-buttons> -->
+            <button type="button" v-on:click="createDummyGroup()">AddDummyGroup</fbutton>
+            <button type="button" v-on:click="showGroupUserChart = toggleState(showGroupUserChart)">Show User and Groups Chart</button>
+            <button type="button" v-on:click="showLoginTypeChart = toggleState(showLoginTypeChart)">Show Logintype Chart</button>
+            <button type="button" v-on:click="logout()">Logout</button>
+<!--          </f7-buttons>
       </f7-subnavbar>
-    </f7-navbar>
+    </f7-navbar> -->
 
     <br>
     <br>
@@ -74,9 +74,9 @@
           {{version.name}}  {{version.version}}
         </p>
       </div> -->
-        </f7-list form>  
+ <!--        </f7-list form>  
 
-  </f7-page>
+  </f7-page> -->
     <!-- END of Template Elements -->
 </template>
 

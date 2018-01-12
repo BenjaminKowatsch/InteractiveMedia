@@ -2,22 +2,12 @@
 import Vue from 'vue'
 
 // Import F7
-import Framework7 from 'framework7'
 
 import VueTouch from 'vue-touch'
 
 import VueCharts from 'vue-chartjs'
 
 // Import F7 Vue Plugin
-import Framework7Vue from 'framework7-vue'
-
-// Import F7 iOS Theme Styles
-import Framework7Theme from 'framework7/dist/css/framework7.ios.min.css'
-import Framework7ThemeColors from 'framework7/dist/css/framework7.ios.colors.min.css'
-/* OR for Material Theme:
-import Framework7Theme from 'framework7/dist/css/framework7.material.min.css'
-import Framework7ThemeColors from 'framework7/dist/css/framework7.material.colors.min.css'
-*/
 
 // Import App Custom Styles
 import AppStyles from './css/app.css'
@@ -42,7 +32,6 @@ Vue.component('table-column', TableColumn);
 Vue.use(VueTouch, { name: 'v-touch' })
 
 // Init F7 Vue Plugin
-Vue.use(Framework7Vue)
 
 Vue.use(VueCharts)
 
@@ -58,19 +47,19 @@ var onLoadingFinished = function() {
         mixins: [Mixins],
         template: '<app ref="app" ><app/>',
         // Init Framework7 by passing parameters here
-        framework7: {
-            root: '#app',
-            modalTitle: 'Debts² Admin Panel',
-            /* Uncomment to enable Material theme: */
-            material: false,
-            /* Enable browser hash navigation */
-            pushState: true,
-            /* Set oparator for browser hash navigation */
-            pushStateSeparator: '#',
-            pushStateOnLoad: false,
-            //animatePages : false,
-            routes: Routes,
-        },
+        /*         framework7: {
+                    root: '#app',
+                    modalTitle: 'Debts² Admin Panel',
+                    //Uncomment to enable Material theme: 
+                    material: false,
+                   //  Enable browser hash navigation 
+                    pushState: true,
+                   // Set oparator for browser hash navigation 
+                    pushStateSeparator: '#',
+                    pushStateOnLoad: false,
+                    //animatePages : false,
+                    routes: Routes,
+                }, */
         // Register App Component
         components: {
             app: App
@@ -90,18 +79,19 @@ var onLoadingFinished = function() {
             if (true === this.loginStatus) {
                 this.redirect("/overview", false, false, false);
             }
-            this.addPushStatePanel();
+            /*             this.addPushStatePanel();
+             */
         },
         methods: {
             /**
              * Function adds an event listener to framework7 so if on any page the back button will be clicked the side panel will be closed
              */
-            addPushStatePanel: function() {
-                var framework7 = this.$f7;
-                framework7.onPageBack("*", function(page) {
-                    framework7.closePanel();
-                });
-            },
+            /*   addPushStatePanel: function() {
+                  var framework7 = this.$f7;
+                  framework7.onPageBack("*", function(page) {
+                      framework7.closePanel();
+                  });
+              }, */
             updateLoginStatus: function() {
                 // Check if cookies exist
                 // If a cookie exists, set the loginStatus to true
@@ -120,10 +110,10 @@ var onLoadingFinished = function() {
         }
     });
     // Delete all entries after logout
-    document.getElementById("logoutButton").onclick = function() {
-        vm.$children[0].$refs.loginForm.reset();
-    };
-
+    /*     document.getElementById("logoutButton").onclick = function() {
+            vm.$children[0].$refs.loginForm.reset();
+        };
+     */
 };
 
 startApp(onLoadingFinished);

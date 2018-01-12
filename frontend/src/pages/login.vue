@@ -7,35 +7,35 @@
 
 <template>
 <!-- START Framework 7 Template Elements for establishing the view -->
-  <f7-page login-screen>
+  <div login-screen>
     <!-- Page Content -->
-    <f7-login-screen-title>Login</f7-login-screen-title>
+    <div>Login</div>
     <!-- title of the login view -->
-    <f7-list form>
-      <f7-list-item>
-        <f7-label>Username</f7-label>
+    <div>
+      <div>
+        <p>Username</p>
         <!-- label for username entry textfield -->
-        <f7-input name="username" placeholder="Username" type="text" v-model="username" @keyup.enter="checkLogin()"></f7-input>
+        <input name="username" placeholder="Username" type="text" v-model="username" @keyup.enter="checkLogin()"></input>
         <!-- input field for username -->
-      </f7-list-item>
-      <f7-list-item>
-        <f7-label>Password</f7-label>
+      </div>
+      <div>
+        <div>Password</div>
         <!-- label for password entry textfield -->
-        <f7-input name="password" type="password" placeholder="Password" v-model="password" @keyup.enter="checkLogin()"></f7-input>
+        <input name="password" type="password" placeholder="Password" v-model="password" @keyup.enter="checkLogin()"></input>
         <!-- input field for password -->
-      </f7-list-item>
-    </f7-list>
+      </div>
+    </div>
 
-    <f7-list>
-      <f7-list-button title="Login" v-on:click="checkLogin()">
+    <div>
+      <button type="button" v-on:click="checkLogin()">Login
       <!-- Login Button which triggers the login function (see below in jscript area) -->
 
-      </f7-list-button>
+      </button>
 <!--               <f7-list-button title="RegDummyUser" v-on:click="registerDummyUser()">
- -->    </f7-list>
+ -->    </div>
    
 
-  </f7-page>
+  </div>
   <!-- END of Template Elements -->
 </template>
 
@@ -87,9 +87,9 @@ export default {
     defaultErrorHandler: function(error) {
       console.log("Error: " + JSON.stringify(error)); // logs an error to the console
       //If logindata doenst match a db entry, show error and reload page
-      this.$f7.alert("Login failed", "Debts² Admin Panel", () => {
+     /*  this.$f7.alert("Login failed", "Debts² Admin Panel", () => { */
         this.redirect("/", false, false, false);
-      });
+      /* }); */
     },
     /**
          * Callback function for handling the non error response of the login POST requests
@@ -116,14 +116,14 @@ export default {
             });
             //handling other roles
           } else if (this.userDataRole === "user") {
-            this.$f7.alert("Access denied", "Debts² Admin Panel", () => {
+            /* this.$f7.alert("Access denied", "Debts² Admin Panel", () => { */
               this.redirect("/", false, true, true);
-            });
+            /* }); */
           } else {
-            this.$f7.alert("Unkown user role", "Debts² Admin Panel", () => {
-              this.redirect("/", false, true, true);
-            });
-          }
+/*             this.$f7.alert("Unkown user role", "Debts² Admin Panel", () => {
+ */              this.redirect("/", false, true, true);
+/*             });
+ */          }
         })
         .catch(e => {
           this.errors.push(e);
@@ -158,12 +158,12 @@ export default {
           .post(Config.webServiceURL + "/v1/users/login?type=0", credentials)
           .then(this.loginResponseHandler)
           .catch(this.defaultErrorHandler);
-      } else {
+      } /* else {
         this.$f7.alert(
           "Username oder Passwort darf nicht leer sein",
           "Debts² Admin Panel"
         );
-      }
+      } */
     },
     reset: function() {
       this.username = "";
