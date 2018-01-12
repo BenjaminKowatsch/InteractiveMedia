@@ -23,6 +23,10 @@ public class GroupCursorLoader extends CursorLoader {
         this.searchString = searchString;
     }
 
+    public GroupCursorLoader(Context context, DatabaseHelper databaseHelper, String userId) {
+        this(context, databaseHelper, userId, "");
+    }
+
     @Override
     public Cursor loadInBackground() {
         return databaseHelper.getAllGroupsByUserId(userId, searchString);
