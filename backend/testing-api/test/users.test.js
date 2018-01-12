@@ -234,7 +234,8 @@ describe('User-Controller', () => {
           expect(res.body).to.be.an('object');
           expect(res.body.success).to.be.false;
           expect(res.body.payload).to.be.an('object');
-          expect(res.body.payload.dataPath).to.equal('username');
+          expect(res.body.payload.dataPath).to.equal('login');
+          expect(res.body.payload.message).to.equal('invalid request body');
         });
       });
 
@@ -250,7 +251,53 @@ describe('User-Controller', () => {
           expect(res.body).to.be.an('object');
           expect(res.body.success).to.be.false;
           expect(res.body.payload).to.be.an('object');
-          expect(res.body.payload.dataPath).to.equal('password');
+          expect(res.body.payload.dataPath).to.equal('login');
+          expect(res.body.payload.message).to.equal('invalid request body');
+        });
+      });
+
+      it('should fail to register user with missing username', function() {
+        return chai.request(HOST)
+        .post(URL.BASE_USER + '/')
+        .send(testData.users.invalid.missingUsername)
+        .then(function(res) {
+          expect(res).to.have.status(400);
+          expect(res).to.be.json;
+          expect(res.body).to.be.an('object');
+          expect(res.body.success).to.be.false;
+          expect(res.body.payload).to.be.an('object');
+          expect(res.body.payload.dataPath).to.equal('login');
+          expect(res.body.payload.message).to.equal('invalid request body');
+        });
+      });
+
+      it('should fail to register user with missing email', function() {
+        return chai.request(HOST)
+        .post(URL.BASE_USER + '/')
+        .send(testData.users.invalid.missingEmail)
+        .then(function(res) {
+          expect(res).to.have.status(400);
+          expect(res).to.be.json;
+          expect(res.body).to.be.an('object');
+          expect(res.body.success).to.be.false;
+          expect(res.body.payload).to.be.an('object');
+          expect(res.body.payload.dataPath).to.equal('login');
+          expect(res.body.payload.message).to.equal('invalid request body');
+        });
+      });
+
+      it('should fail to register user with missing password', function() {
+        return chai.request(HOST)
+        .post(URL.BASE_USER + '/')
+        .send(testData.users.invalid.missingPassword)
+        .then(function(res) {
+          expect(res).to.have.status(400);
+          expect(res).to.be.json;
+          expect(res.body).to.be.an('object');
+          expect(res.body.success).to.be.false;
+          expect(res.body.payload).to.be.an('object');
+          expect(res.body.payload.dataPath).to.equal('login');
+          expect(res.body.payload.message).to.equal('invalid request body');
         });
       });
     });

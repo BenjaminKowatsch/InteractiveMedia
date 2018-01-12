@@ -40,7 +40,7 @@ exports.registerNewUser = function(req, res) {
       });
   } else {
     // request body is invalid
-    const resBody = {'success': false, 'payload': validationResult.error};
+    const resBody = {'success': false, 'payload': {dataPath: 'login', message: 'invalid request body'}};
     httpResponseService.send(res, 400, resBody);
   }
 };
