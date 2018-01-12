@@ -42,6 +42,18 @@
         "username": "alex12",
         "email": "alex12@alex.de",
         "password": "p"
+      },
+      "missingUsername": {
+        "email": "alex12@alex.de",
+        "password": "alexpassword"
+      },
+      "missingEmail": {
+        "username": "alex12",
+        "password": "alexpassword"
+      },
+      "missingPassword": {
+        "username": "alex12",
+        "email": "alex12@alex.de"
       }
     }
   }

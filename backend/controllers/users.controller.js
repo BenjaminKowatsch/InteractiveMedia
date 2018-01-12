@@ -11,16 +11,17 @@ const validateJsonService = require('../services/validateJson.service');
 const httpResponseService = require('../services/httpResponse.service');
 
 const jsonSchema = {
-  userData: require('../JSONSchema/userData.json'),
-  googleFacebookLogin: require('../JSONSchema/googleFacebookLogin.json'),
-  updateFcmTokenPayload: require('../JSONSchema/userUpdateFcmTokenPayloadData.json')
+  registerUserPayload: require('../JSONSchema/registerUserPayload.json'),
+  loginUserExternalPayload: require('../JSONSchema/loginUserExternalPayload.json'),
+  loginUserPasswordPayload: require('../JSONSchema/loginUserPasswordPayload.json'),
+  updateFcmTokenPayload: require('../JSONSchema/userUpdateFcmTokenPayload.json')
 };
 
 exports.registerNewUser = function(req, res) {
   winston.debug('req.body', req.body);
 
   // validate data in request body
-  const validationResult = validateJsonService.validateAgainstSchema(req.body, jsonSchema.userData);
+  const validationResult = validateJsonService.validateAgainstSchema(req.body, jsonSchema.registerUserPayload);
 
   if (validationResult.valid === true) {
     // request body is valid
@@ -39,7 +40,7 @@ exports.registerNewUser = function(req, res) {
       });
   } else {
     // request body is invalid
-    const resBody = {'success': false, 'payload': validationResult.error};
+    const resBody = {'success': false, 'payload': {dataPath: 'login', message: 'invalid request body'}};
     httpResponseService.send(res, 400, resBody);
   }
 };
@@ -55,7 +56,7 @@ exports.login = function(req, res) {
     case AUTH_TYPE.PASSWORD: {
       winston.debug('loginType: Password');
       // validate data in request body
-      let validationResult = validateJsonService.validateAgainstSchema(req.body, jsonSchema.userData);
+      let validationResult = validateJsonService.validateAgainstSchema(req.body, jsonSchema.loginUserPasswordPayload);
 
       if (validationResult.valid === true) {
         // request body is valid
@@ -72,7 +73,7 @@ exports.login = function(req, res) {
         });
       } else {
         // request body is invalid
-        resBody = {'success': false, 'payload': validationResult.error};
+        resBody = {'success': false, 'payload': {dataPath: 'login', message: 'invalid request body'}};
         httpResponseService.send(res, 400, resBody);
       }
       break;
@@ -80,7 +81,7 @@ exports.login = function(req, res) {
     case AUTH_TYPE.GOOGLE: {
       winston.debug('loginType: GOOGLE');
       // validate data in request body
-      let validationResult = validateJsonService.validateAgainstSchema(req.body, jsonSchema.googleFacebookLogin);
+      let validationResult = validateJsonService.validateAgainstSchema(req.body, jsonSchema.loginUserExternalPayload);
 
       if (validationResult.valid === true) {
         user.verifyGoogleAccessToken(req.body.accessToken, false)
@@ -88,7 +89,7 @@ exports.login = function(req, res) {
               winston.debug('GoogleAccessToken: is valid');
               return user.googleOrFacebookLogin(tokenValidationResult.payload.userId,
                 tokenValidationResult.payload.expiryDate, AUTH_TYPE.GOOGLE, req.body.accessToken,
-                tokenValidationResult.payload.email);
+                tokenValidationResult.payload.email, tokenValidationResult.payload.username);
             })
           .then(function(loginResult) {
               // mongo update was successful
@@ -110,7 +111,7 @@ exports.login = function(req, res) {
     case AUTH_TYPE.FACEBOOK: {
       winston.debug('loginType: FACEBOOK');
       // validate data in request body
-      let validationResult = validateJsonService.validateAgainstSchema(req.body, jsonSchema.googleFacebookLogin);
+      let validationResult = validateJsonService.validateAgainstSchema(req.body, jsonSchema.loginUserExternalPayload);
 
       if (validationResult.valid === true) {
         user.verifyFacebookAccessToken(req.body.accessToken, false, true)
@@ -119,7 +120,7 @@ exports.login = function(req, res) {
               winston.debug('tokenValidationResult', JSON.stringify(tokenValidationResult));
               return user.googleOrFacebookLogin(tokenValidationResult.payload.userId,
                 tokenValidationResult.payload.expiryDate, AUTH_TYPE.FACEBOOK, req.body.accessToken,
-                tokenValidationResult.payload.email);
+                tokenValidationResult.payload.email, tokenValidationResult.payload.username);
             })
           .then(function(loginResult) {
               // mongo update was successful

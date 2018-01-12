@@ -50,6 +50,19 @@ public class DatabaseProviderHelper {
 
     }
 
+
+    public long getGroupsByUserId(String userId){
+        final String[] projection = {UserTable.COLUMN_ID};
+        final String selection = UserTable.COLUMN_USER_ID.concat(" = ?");
+        final String[] selectionArgs = {Login.getInstance().getUser().getUserId()};
+        final Cursor userCursor = contentResolver.query(DatabaseProvider.CONTENT_USER_URI,projection,selection,selectionArgs,null);
+        if(1 == userCursor.getCount()){
+            userCursor.moveToNext();
+            return userCursor.getLong(0);
+        }
+        return -1;
+    }
+
     public boolean checkForCachedCredentials(Login login) {
         if (contentResolver != null) {
             boolean result = false;

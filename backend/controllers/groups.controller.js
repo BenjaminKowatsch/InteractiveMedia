@@ -12,14 +12,14 @@ const httpResponseService = require('../services/httpResponse.service');
 const pushNotificationService = require('../services/pushNotification.service');
 
 const jsonSchema = {
-  groupPayloadData: require('../JSONSchema/groupPayloadData.json'),
-  transactionPayloadData: require('../JSONSchema/transactionPayloadData.json')
+  groupPayload: require('../JSONSchema/groupPayload.json'),
+  transactionPayload: require('../JSONSchema/transactionPayload.json')
 };
 
 module.exports.createNewGroup = function(req, res) {
   winston.debug('Creating a new group');
   // validate data in request body
-  validateJsonService.againstSchema(req.body, jsonSchema.groupPayloadData).then(() => {
+  validateJsonService.againstSchema(req.body, jsonSchema.groupPayload).then(() => {
     return group.createNewGroup(res.locals.userId, req.body);
   }).then(registerResult =>  {
     httpResponseService.send(res, 201, registerResult);
@@ -75,7 +75,7 @@ module.exports.createNewTransaction = function(req, res) {
   const groupId = req.params.groupId;
   const userIdCreator = res.locals.userId;
   // validate data in request body
-  validateJsonService.againstSchema(req.body, jsonSchema.transactionPayloadData).then(() => {
+  validateJsonService.againstSchema(req.body, jsonSchema.transactionPayload).then(() => {
     return group.createNewTransaction(groupId, req.body);
   }).then(transactionResult =>  {
     httpResponseService.send(res, 201, transactionResult);
@@ -147,9 +147,9 @@ function sendNotificationCreateTransaction(groupId, userIdCreator) {
     const dryRun = false;
     const data = {};
     const notification = {
-      title: 'New transaction in group "' + transactionGroup.name + '"',
+      title: 'New transaction available',
       icon: 'ic_launcher',
-      body: 'Click to see the newest transactions. // Debug: sent at ' + new Date()
+      body: 'Click to catch up with your group ' + transactionGroup.name + '.'
     };
     return pushNotificationService.sendfcm(tokens, data, notification, dryRun);
   })

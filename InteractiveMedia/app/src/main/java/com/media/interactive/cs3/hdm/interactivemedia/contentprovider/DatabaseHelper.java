@@ -98,6 +98,25 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     }
 
+    public Cursor getAllGroupsByUserId(String userId, String searchString){
+        final SQLiteDatabase db = this.getWritableDatabase();
+        final String query = "SELECT g.*"
+            +" FROM "
+            + GroupTable.TABLE_NAME + " g, "
+            + UserTable.TABLE_NAME + " u, "
+            + GroupUserTable.TABLE_NAME + " gu"
+            + " WHERE u."+UserTable.COLUMN_ID+" = gu." + GroupUserTable.COLUMN_USER_ID
+            + " AND g."+GroupTable.COLUMN_ID+" = gu." + GroupUserTable.COLUMN_GROUP_ID
+            + " AND u."+UserTable.COLUMN_USER_ID+" = ? "
+            + " AND ( g."+ GroupTable.COLUMN_NAME + " like ? OR g." + GroupTable.COLUMN_CREATED_AT + " like ? )";
+        if(userId == null){
+            userId = "";
+        }
+        final String search = "%"+searchString+"%";
+        final Cursor data = db.rawQuery(query, new String[]{ userId, search, search });
+        return data;
+    }
+
     public Cursor getTransactionsForGroup(long groupId) {
         final SQLiteDatabase db = this.getWritableDatabase();
         final String subQuery = "SELECT " + GroupTransactionTable.COLUMN_TRANSACTION_ID + " FROM "

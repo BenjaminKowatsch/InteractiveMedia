@@ -2,10 +2,13 @@
   "$schema": "http://json-schema.org/draft-04/schema#",
   "type": "object",
   "properties": {
-    "accessToken": {
+    "fcmToken": {
       "type": "string",
-      "minLength": 1
+      "minLength": 4
     }
   },
+  "required": [
+    "fcmToken"
+  ],
   "additionalProperties": false
 }

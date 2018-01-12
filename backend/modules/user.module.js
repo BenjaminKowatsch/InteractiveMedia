@@ -9,6 +9,7 @@ const GoogleAuth = require('google-auth-library');
 const config = require('./config');
 const uuidService = require('../services/uuid.service');
 const tokenService = require('../services/token.service');
+const emailService = require('../services/email.service');
 const database = require('../modules/database.module');
 const ERROR = require('../config.error');
 const ROLES = require('../config.roles');
@@ -47,6 +48,7 @@ exports.verifyGoogleAccessToken = function(token, verifyDatabase) {
         const payload = login.getPayload();
         const userId = payload.sub;
         const email = payload.email;
+        const username = payload.name;
         const expiryDate = new Date(payload.exp * 1000);
         // if verifyDatabase flag is set also check if expiryDate is valid
         if (verifyDatabase === true) {
@@ -60,13 +62,14 @@ exports.verifyGoogleAccessToken = function(token, verifyDatabase) {
             }
           };
           winston.debug('query:', query);
-          const options = {fields: {userId: 1, authType: 1, email: 1, expiryDate: 1}};
+          const options = {fields: {userId: 1, authType: 1, email: 1, expiryDate: 1, username: 1}};
           database.collections.users.findOne(query, options, function(error, result) {
             if (error === null && result !== null) {
               responseData.success = true;
               responseData.payload.expiryDate = result.expiryDate;
               responseData.payload.userId = result.userId;
               responseData.payload.email = result.email;
+              responseData.payload.username = result.username;
               resolve(responseData);
             } else if (error === null && result === null) {
               let errorCode;
@@ -92,6 +95,7 @@ exports.verifyGoogleAccessToken = function(token, verifyDatabase) {
           responseData.payload.expiryDate = expiryDate;
           responseData.payload.userId = userId;
           responseData.payload.email = email;
+          responseData.payload.username = username;
           resolve(responseData);
         }
       } else {
@@ -251,7 +255,7 @@ function verifyFacbookTokenAtDatabase(data, verifyDatabase) {
  *                                  catch: {JSONObject} error Containing the following properties:
  *                                                 {String} message String containing the error message or facebook error
  */
-exports.verifyFacebookAccessToken = function(token, verifyDatabase, verifyEmail) {
+exports.verifyFacebookAccessToken = function(token, verifyDatabase, getUserInfo) {
   let responseData = {payload: {}};
   const options = {
     host: 'graph.facebook.com',
@@ -287,16 +291,37 @@ exports.verifyFacebookAccessToken = function(token, verifyDatabase, verifyEmail)
     })
     .then((result) => {
       winston.debug('resolving database promise: ' + JSON.stringify(result));
-      if (verifyEmail === true) {
-        const emailOptions = {
+      if (getUserInfo === true) {
+        const graphOptions = {
           host: 'graph.facebook.com',
           path: ('/v2.9/me?fields=name,email&access_token=' + token)
         };
-        return httpsGetRequest(emailOptions)
-            .then((emailResult) => {
-              winston.debug('resolving email promise: ' + JSON.stringify(emailResult));
-              result.payload.email = emailResult.email;
-              return result;
+        return httpsGetRequest(graphOptions)
+            .then((graphResult) => {
+              let username = graphResult.name;
+              if (username == undefined || username == null) {
+                responseData.success = false;
+                responseData.payload.dataPath = 'authentication';
+                responseData.payload.message = 'unable to query username from facebook';
+                let errorCode = ERROR.INVALID_AUTH_TOKEN;
+                return Promise.reject({errorCode: errorCode, responseData: responseData});
+              } else {
+                let email = graphResult.email;
+                if (email == undefined || email == null) {
+                  // generate own facebook email
+                  email = emailService.generateFacebookEmailFromUsername(result.payload.userId, username);
+                }
+                result.payload.email = email;
+                result.payload.username = username;
+                return result;
+              }
+            })
+            .catch(error => {
+              responseData.success = false;
+              responseData.payload.dataPath = 'authentication';
+              responseData.payload.message = 'unable to query facebook';
+              let errorCode = ERROR.INVALID_AUTH_TOKEN;
+              return Promise.reject({errorCode: errorCode, responseData: responseData});
             });
       } else {
         return result;
@@ -312,10 +337,12 @@ exports.verifyFacebookAccessToken = function(token, verifyDatabase, verifyEmail)
  * @param  {AUTH_TYPE} authType An enumeration value, which specifies the current type of authentication,
  *                                   to be stored into the responseData, so the client will received it and store it into a cookie
  * @param  {String} accessToken    AccessToken to be stored into the responseData, so the client will received it and store it into a cookie
+ * @param  {String} email
+ * @param  {String} username
  * @return {Promise}                then:  {JSONObject} object containing access token and auth type
  *                                  catch:  {JSONObject} object containing an error message
  */
-exports.googleOrFacebookLogin = function(userId, expiryDate, authType, accessToken, email) {
+exports.googleOrFacebookLogin = function(userId, expiryDate, authType, accessToken, email, username) {
   return new Promise((resolve, reject) => {
     let responseData = {};
     // Upsert entry at db
@@ -329,7 +356,8 @@ exports.googleOrFacebookLogin = function(userId, expiryDate, authType, accessTok
         'email': email,
         'authType': authType,
         'expiryDate': expiryDate,
-        'role': ROLES.USER
+        'role': ROLES.USER,
+        'username': username
       }
     }, {
       upsert: true
