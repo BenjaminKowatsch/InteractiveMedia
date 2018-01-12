@@ -13,18 +13,20 @@ public class Transaction {
     private final String paidBy;
     private final String split;
     private final Date dateTime;
+    private final String imageUrl;
     private final Location location;
     private final double amount;
     private final long groupId;
     private boolean synched;
     private Date publishedAt;
 
-    public Transaction(String name, String paidBy, String split, Date dateTime, Location location,
-                       double amount, long groupId) {
+    public Transaction(String name, String paidBy, String split, Date dateTime, String imageUrl,
+                       Location location, double amount, long groupId) {
         this.name = name;
         this.paidBy = paidBy;
         this.split = split;
         this.dateTime = dateTime;
+        this.imageUrl = imageUrl;
         this.location = location;
         this.amount = amount;
         this.groupId = groupId;
