@@ -288,6 +288,21 @@ describe('User-Controller', () => {
           expect(res.body.payload.message).to.equal('invalid request body');
         });
       });
+
+      it('should fail to register user with missing imageUrl', function() {
+        return chai.request(HOST)
+        .post(URL.BASE_USER + '/')
+        .send(testData.users.invalid.missingImageUrl)
+        .then(function(res) {
+          expect(res).to.have.status(400);
+          expect(res).to.be.json;
+          expect(res.body).to.be.an('object');
+          expect(res.body.success).to.be.false;
+          expect(res.body.payload).to.be.an('object');
+          expect(res.body.payload.dataPath).to.equal('login');
+          expect(res.body.payload.message).to.equal('invalid request body');
+        });
+      });
     });
 
     describe('Login', function() {
@@ -480,6 +495,8 @@ describe('User-Controller', () => {
       return chai.request(HOST)
       .post(URL.BASE_USER + '/login?type=99')
       .send({username: testData.users.valid[1].username,
+        //warum wird hier eine Email mitgeschickt?
+        //warum gibt das nach neuem schema kein fehler?
         email: testData.users.valid[1].email,
         password: testData.users.valid[1].password})
       .then(res => {
@@ -497,6 +514,7 @@ describe('User-Controller', () => {
       return chai.request(HOST)
       .post(URL.BASE_USER + '/login')
       .send({username: testData.users.valid[1].username,
+        //same here
         email: testData.users.valid[1].email,
         password: testData.users.valid[1].password})
       .then(res => {
