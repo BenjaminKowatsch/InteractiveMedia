@@ -26,11 +26,7 @@ const testData = require('./data/user.data');
 
 // ************* Helper ***********//
 
-const registerUser = index => chai.request(HOST).post(URL.BASE_USER).send({
-  username: testData.users.valid[index].username,
-  email: testData.users.valid[index].email,
-  password: testData.users.valid[index].password
-});
+const registerUser = index => chai.request(HOST).post(URL.BASE_USER).send(testData.users.valid[index]);
 
 function getFacebookTestAccessToken() {
   return new Promise((resolve, reject) => {
@@ -191,9 +187,7 @@ describe('User-Controller', () => {
       it('should register new user', function() {
         return chai.request(HOST)
         .post(URL.BASE_USER + '/')
-        .send({username: testData.users.valid[0].username,
-          email: testData.users.valid[0].email,
-          password: testData.users.valid[0].password})
+        .send(testData.users.valid[0])
         .then(function(res) {
           expect(res).to.have.status(201);
           expect(res).to.be.json;
@@ -208,9 +202,7 @@ describe('User-Controller', () => {
       it('should fail to register existing user', function() {
         return chai.request(HOST)
         .post(URL.BASE_USER + '/')
-        .send({username: testData.users.valid[0].username,
-          email: testData.users.valid[0].email,
-          password: testData.users.valid[0].password})
+        .send(testData.users.valid[0])
         .then(function(res) {
           expect(res).to.have.status(400);
           expect(res).to.be.json;
@@ -225,9 +217,7 @@ describe('User-Controller', () => {
       it('should fail to register user with invalid username', function() {
         return chai.request(HOST)
         .post(URL.BASE_USER + '/')
-        .send({username: testData.users.invalid.invalidUsername.username,
-          email: testData.users.invalid.invalidUsername.email,
-          password: testData.users.invalid.invalidUsername.password})
+        .send(testData.users.invalid.invalidUsername)
         .then(function(res) {
           expect(res).to.have.status(400);
           expect(res).to.be.json;
@@ -242,9 +232,7 @@ describe('User-Controller', () => {
       it('should fail to register user with invalid password', function() {
         return chai.request(HOST)
         .post(URL.BASE_USER + '/')
-        .send({username: testData.users.invalid.invalidPassword.username,
-          email: testData.users.invalid.invalidPassword.email,
-          password: testData.users.invalid.invalidPassword.password})
+        .send(testData.users.invalid.invalidPassword)
         .then(function(res) {
           expect(res).to.have.status(400);
           expect(res).to.be.json;
@@ -309,9 +297,7 @@ describe('User-Controller', () => {
       before(function(done) {
         chai.request(HOST)
         .post(URL.BASE_USER + '/')
-        .send({username: testData.users.valid[1].username,
-          email: testData.users.valid[1].email,
-          password: testData.users.valid[1].password})
+        .send(testData.users.valid[1])
         .then((res) => {
           defaultToken = res.body.payload.accessToken;
           done();
@@ -435,9 +421,7 @@ describe('User-Controller', () => {
       before(function(done) {
         chai.request(HOST)
         .post(URL.BASE_USER + '/')
-        .send({username: testData.users.valid[4].username,
-          email: testData.users.valid[4].email,
-          password: testData.users.valid[4].password})
+        .send(testData.users.valid[4])
         .then((res) => {
           defaultToken = res.body.payload.accessToken;
           done();
