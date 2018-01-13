@@ -82,7 +82,7 @@ describe('Admin', () => {
         expect(res.body.payload.groupIds).to.be.undefined;
         expect(res.body.payload.userId).to.have.lengthOf(36).and.to.be.a('string');
         expect(res.body.payload.role).to.equal('admin');
-        expect(res.body.payload.imageUrl).to.be.null;
+        expect(res.body.payload.imageUrl).to.equal(adminData.imageUrl);
       });
     });
   });
@@ -417,7 +417,7 @@ describe('Admin', () => {
           expect(res.body.payload.groupIds[0]).to.equal(groupId);
           expect(res.body.payload.userId).to.equal(userIds[0]);
           expect(res.body.payload.role).to.equal('user');
-          expect(res.body.payload.imageUrl).to.equal('10896cb8-d2a4-4bb6-b4d7-c3063553fee9.image.jpg');
+          expect(res.body.payload.imageUrl).to.equal(userData.users.valid[0].imageUrl);
         });
       });
 

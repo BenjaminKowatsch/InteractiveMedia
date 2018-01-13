@@ -597,7 +597,7 @@ describe('User-Controller', () => {
         expect(res.body.payload.groupIds).to.be.undefined;
         expect(res.body.payload.userId).to.have.lengthOf(36).and.to.be.a('string');
         expect(res.body.payload.role).to.equal('user');
-        expect(res.body.payload.imageUrl).to.equal('10896cb8-d2a4-4bb6-b4d7-c3063553fee9.image.jpg');
+        expect(res.body.payload.imageUrl).to.equal(testData.users.valid[0].imageUrl);
       });
     });
 
