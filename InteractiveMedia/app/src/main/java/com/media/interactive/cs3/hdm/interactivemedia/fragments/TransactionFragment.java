@@ -20,12 +20,14 @@ import android.widget.ListView;
 import android.widget.SimpleCursorAdapter;
 import android.widget.Spinner;
 
+import com.media.interactive.cs3.hdm.interactivemedia.GroupCursorLoader;
 import com.media.interactive.cs3.hdm.interactivemedia.R;
 import com.media.interactive.cs3.hdm.interactivemedia.activties.AddTransactionActivity;
 import com.media.interactive.cs3.hdm.interactivemedia.contentprovider.DatabaseHelper;
 import com.media.interactive.cs3.hdm.interactivemedia.contentprovider.DatabaseProvider;
 import com.media.interactive.cs3.hdm.interactivemedia.contentprovider.tables.GroupTable;
 import com.media.interactive.cs3.hdm.interactivemedia.contentprovider.tables.TransactionTable;
+import com.media.interactive.cs3.hdm.interactivemedia.data.Login;
 
 import static com.media.interactive.cs3.hdm.interactivemedia.activties.AddTransactionActivity.GROUP_TO_ADD_TO;
 
@@ -65,10 +67,10 @@ public class TransactionFragment extends ListFragment implements LoaderManager.L
         setHasOptionsMenu(true);
 
         dummyContentResolver = getActivity().getContentResolver();
+        databaseHelper = new DatabaseHelper(this.getContext());
 
         groupAdapter = initializeGroupAdapter();
         groupAdapter.getCursor().moveToFirst();
-        databaseHelper = new DatabaseHelper(this.getContext());
 
         // Initializing the SimpleCursorAdapter and the CursorLoader
         initializeTransactionsForCurrentGroup();
@@ -95,9 +97,8 @@ public class TransactionFragment extends ListFragment implements LoaderManager.L
     }
 
     private SimpleCursorAdapter initializeGroupAdapter() {
-        final String[] projection = {GroupTable.COLUMN_ID, GroupTable.COLUMN_NAME};
-
-        Cursor query = dummyContentResolver.query(DatabaseProvider.CONTENT_GROUP_URI, projection, null, null, null);
+        GroupCursorLoader loader = new GroupCursorLoader(this.getContext(), databaseHelper,  Login.getInstance().getUser().getUserId());
+        Cursor query = loader.loadInBackground();
 
         String[] columns = new String[] { GroupTable.COLUMN_NAME };
         int[] to = new int[] { android.R.id.text1 };
