@@ -40,6 +40,11 @@ public class Transaction {
         Date now = new Date(System.currentTimeMillis());
         out.put(TransactionTable.COLUMN_INFO_CREATED_AT, now.toString());
         out.put(TransactionTable.COLUMN_AMOUNT, amount);
+        out.put(TransactionTable.COLUMN_PAID_BY, paidBy);
+        out.put(TransactionTable.COLUMN_INFO_IMAGE_URL, imageUrl);
+        out.put(TransactionTable.COLUMN_INFO_LOCATION_LONG, location.getLongitude());
+        out.put(TransactionTable.COLUMN_INFO_LOCATION_LAT, location.getLatitude());
+        out.put(TransactionTable.COLUMN_SYNCHRONIZED, synched);
         return out;
     }
 
