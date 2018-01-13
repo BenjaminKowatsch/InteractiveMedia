@@ -28,7 +28,9 @@ public class TransactionTable {
     /**
      * Fifth attribute, type TEXT.
      */
-    public static final String COLUMN_INFO_LOCATION = "info_location";
+    public static final String COLUMN_INFO_LOCATION_LONG = "info_location_long";
+
+    public static final String COLUMN_INFO_LOCATION_LAT = "info_location_lat";
     /**
      * Sixth attribute, type TEXT.
      */
@@ -37,18 +39,30 @@ public class TransactionTable {
      * Seventh attribute, type TIMESTAMP DEFAULT CURRENT_TIMESTAMP.
      */
     public static final String COLUMN_INFO_CREATED_AT = "info_created_at";
+    /**
+     * Indicates if transaction was already sent to server
+     */
+    public static final String COLUMN_SYNCHRONIZED = "synchronized";
+    /**
+     * The time at which the transaction was published, also used to pull transactions
+     */
+    public static final String COLUMN_PUBLISHED_AT = "published_at";
 
 
     public static final String DATABASE_CREATE =
-        "create table if not exists " + TABLE_NAME + "("
-           + COLUMN_ID + " integer unique primary key AUTOINCREMENT,"
-           + COLUMN_AMOUNT + " REAL NOT NULL,"
-           + COLUMN_PAID_BY + " INTEGER references " + UserTable.TABLE_NAME
-           + " (" + UserTable.COLUMN_ID + ") on delete cascade on update cascade,"
-           + COLUMN_INFO_NAME + " TEXT NOT NULL,"
-           + COLUMN_INFO_LOCATION + " TEXT,"
-           + COLUMN_INFO_IMAGE_URL + " TEXT,"
-           + COLUMN_INFO_CREATED_AT + " TIMESTAMP DEFAULT CURRENT_TIMESTAMP)";
+            "create table if not exists " + TABLE_NAME + "("
+                    + COLUMN_ID + " integer unique primary key AUTOINCREMENT,"
+                    + COLUMN_AMOUNT + " REAL NOT NULL,"
+                    + COLUMN_PAID_BY + " INTEGER references " + UserTable.TABLE_NAME
+                    + " (" + UserTable.COLUMN_ID + ") on delete cascade on update cascade,"
+                    + COLUMN_INFO_NAME + " TEXT NOT NULL,"
+                    + COLUMN_INFO_LOCATION_LONG + " REAL,"
+                    + COLUMN_INFO_LOCATION_LAT + " REAL,"
+                    + COLUMN_INFO_IMAGE_URL + " TEXT,"
+                    + COLUMN_INFO_CREATED_AT + " TIMESTAMP DEFAULT CURRENT_TIMESTAMP,"
+                    + COLUMN_SYNCHRONIZED + " INTEGER NOT NULL,"
+                    + COLUMN_PUBLISHED_AT + " TIMESTAMP"
+                    + ")";
 
     public static final String DATABASE_DROP = "drop table if exists " + TABLE_NAME;
 
