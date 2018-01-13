@@ -125,7 +125,7 @@ function startServer() {
 database.tryConnect(config.mongodbURL, function() {
   pushNotificationService.initFcm()
   .then(() => objectstore.makeBucket(config.minioBucketName))
-  .then(() => user.register(config.adminUsername, config.adminPassword, config.adminEmail, ROLES.ADMIN))
+  .then(() => user.register(config.adminUsername, config.adminPassword, config.adminEmail, ROLES.ADMIN, null))
   .then(registerResult => {
     winston.info('register admin successful');
     startServer();

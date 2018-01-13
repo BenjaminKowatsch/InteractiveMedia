@@ -130,6 +130,7 @@ router.get('/users', authenticationService.isAuthenticated, authorizationService
  * @apiUse successBodyUserUserId
  * @apiUse successBodyUserRole
  * @apiUse successBodyUserGroupIds
+ * @apiUse successBodyUserImageUrl
  *
  * @apiSuccess (SuccessCode) {200} Success User
  * @apiUse successExampleUser

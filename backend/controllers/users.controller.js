@@ -27,7 +27,7 @@ exports.registerNewUser = function(req, res) {
     // request body is valid
 
     // store user in mongo
-    user.register(req.body.username, req.body.password, req.body.email, ROLES.USER)
+    user.register(req.body.username, req.body.password, req.body.email, ROLES.USER, req.body.imageUrl)
       .then(function(registerResult) {
         // mongo update was successful
         const resBody = {'success': true, 'payload': registerResult.payload};
@@ -89,7 +89,8 @@ exports.login = function(req, res) {
               winston.debug('GoogleAccessToken: is valid');
               return user.googleOrFacebookLogin(tokenValidationResult.payload.userId,
                 tokenValidationResult.payload.expiryDate, AUTH_TYPE.GOOGLE, req.body.accessToken,
-                tokenValidationResult.payload.email, tokenValidationResult.payload.username);
+                tokenValidationResult.payload.email, tokenValidationResult.payload.username,
+                tokenValidationResult.payload.imageUrl);
             })
           .then(function(loginResult) {
               // mongo update was successful
@@ -120,7 +121,8 @@ exports.login = function(req, res) {
               winston.debug('tokenValidationResult', JSON.stringify(tokenValidationResult));
               return user.googleOrFacebookLogin(tokenValidationResult.payload.userId,
                 tokenValidationResult.payload.expiryDate, AUTH_TYPE.FACEBOOK, req.body.accessToken,
-                tokenValidationResult.payload.email, tokenValidationResult.payload.username);
+                tokenValidationResult.payload.email, tokenValidationResult.payload.username,
+                tokenValidationResult.payload.imageUrl);
             })
           .then(function(loginResult) {
               // mongo update was successful

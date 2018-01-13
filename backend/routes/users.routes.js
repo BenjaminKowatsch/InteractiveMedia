@@ -16,8 +16,10 @@ const authenticationService = require('../services/authentication.service');
  *
  * @apiUse paramUsername
  * @apiUse paramHashedPassword
+ * @apiUse paramEmail
+ * @apiUse paramImageUrlOptional
  *
- * @apiUse paramExamplePassword
+ * @apiUse paramExampleRegister
  *
  * @apiSuccess (SuccessCode) {201} Created Resource created
  * @apiUse successBodySuccess
@@ -103,6 +105,7 @@ router.post('/logout', authenticationService.isAuthenticated, usersController.lo
  * @apiUse successBodyUserUserId
  * @apiUse successBodyUserRole
  * @apiUse successBodyUserGroupIds
+ * @apiUse successBodyUserImageUrl
  * @apiSuccess (SuccessCode) {200} Success Get User
  *
  * @apiUse successExampleUser

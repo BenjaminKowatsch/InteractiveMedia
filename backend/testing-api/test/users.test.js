@@ -26,11 +26,7 @@ const testData = require('./data/user.data');
 
 // ************* Helper ***********//
 
-const registerUser = index => chai.request(HOST).post(URL.BASE_USER).send({
-  username: testData.users.valid[index].username,
-  email: testData.users.valid[index].email,
-  password: testData.users.valid[index].password
-});
+const registerUser = index => chai.request(HOST).post(URL.BASE_USER).send(testData.users.valid[index]);
 
 function getFacebookTestAccessToken() {
   return new Promise((resolve, reject) => {
@@ -191,9 +187,7 @@ describe('User-Controller', () => {
       it('should register new user', function() {
         return chai.request(HOST)
         .post(URL.BASE_USER + '/')
-        .send({username: testData.users.valid[0].username,
-          email: testData.users.valid[0].email,
-          password: testData.users.valid[0].password})
+        .send(testData.users.valid[0])
         .then(function(res) {
           expect(res).to.have.status(201);
           expect(res).to.be.json;
@@ -208,9 +202,7 @@ describe('User-Controller', () => {
       it('should fail to register existing user', function() {
         return chai.request(HOST)
         .post(URL.BASE_USER + '/')
-        .send({username: testData.users.valid[0].username,
-          email: testData.users.valid[0].email,
-          password: testData.users.valid[0].password})
+        .send(testData.users.valid[0])
         .then(function(res) {
           expect(res).to.have.status(400);
           expect(res).to.be.json;
@@ -225,9 +217,7 @@ describe('User-Controller', () => {
       it('should fail to register user with invalid username', function() {
         return chai.request(HOST)
         .post(URL.BASE_USER + '/')
-        .send({username: testData.users.invalid.invalidUsername.username,
-          email: testData.users.invalid.invalidUsername.email,
-          password: testData.users.invalid.invalidUsername.password})
+        .send(testData.users.invalid.invalidUsername)
         .then(function(res) {
           expect(res).to.have.status(400);
           expect(res).to.be.json;
@@ -242,9 +232,7 @@ describe('User-Controller', () => {
       it('should fail to register user with invalid password', function() {
         return chai.request(HOST)
         .post(URL.BASE_USER + '/')
-        .send({username: testData.users.invalid.invalidPassword.username,
-          email: testData.users.invalid.invalidPassword.email,
-          password: testData.users.invalid.invalidPassword.password})
+        .send(testData.users.invalid.invalidPassword)
         .then(function(res) {
           expect(res).to.have.status(400);
           expect(res).to.be.json;
@@ -300,6 +288,21 @@ describe('User-Controller', () => {
           expect(res.body.payload.message).to.equal('invalid request body');
         });
       });
+
+      it('should fail to register user with missing imageUrl', function() {
+        return chai.request(HOST)
+        .post(URL.BASE_USER + '/')
+        .send(testData.users.invalid.missingImageUrl)
+        .then(function(res) {
+          expect(res).to.have.status(400);
+          expect(res).to.be.json;
+          expect(res.body).to.be.an('object');
+          expect(res.body.success).to.be.false;
+          expect(res.body.payload).to.be.an('object');
+          expect(res.body.payload.dataPath).to.equal('login');
+          expect(res.body.payload.message).to.equal('invalid request body');
+        });
+      });
     });
 
     describe('Login', function() {
@@ -309,9 +312,7 @@ describe('User-Controller', () => {
       before(function(done) {
         chai.request(HOST)
         .post(URL.BASE_USER + '/')
-        .send({username: testData.users.valid[1].username,
-          email: testData.users.valid[1].email,
-          password: testData.users.valid[1].password})
+        .send(testData.users.valid[1])
         .then((res) => {
           defaultToken = res.body.payload.accessToken;
           done();
@@ -435,9 +436,7 @@ describe('User-Controller', () => {
       before(function(done) {
         chai.request(HOST)
         .post(URL.BASE_USER + '/')
-        .send({username: testData.users.valid[4].username,
-          email: testData.users.valid[4].email,
-          password: testData.users.valid[4].password})
+        .send(testData.users.valid[4])
         .then((res) => {
           defaultToken = res.body.payload.accessToken;
           done();
@@ -496,7 +495,6 @@ describe('User-Controller', () => {
       return chai.request(HOST)
       .post(URL.BASE_USER + '/login?type=99')
       .send({username: testData.users.valid[1].username,
-        email: testData.users.valid[1].email,
         password: testData.users.valid[1].password})
       .then(res => {
         expect(res).to.have.status(400);
@@ -513,7 +511,6 @@ describe('User-Controller', () => {
       return chai.request(HOST)
       .post(URL.BASE_USER + '/login')
       .send({username: testData.users.valid[1].username,
-        email: testData.users.valid[1].email,
         password: testData.users.valid[1].password})
       .then(res => {
         expect(res).to.have.status(400);
@@ -579,6 +576,8 @@ describe('User-Controller', () => {
         expect(res.body.payload.groupIds).to.be.undefined;
         expect(res.body.payload.userId).to.equal('110340223090296');
         expect(res.body.payload.role).to.equal('user');
+        expect(res.body.payload.imageUrl).to.equal('https://scontent.xx.fbcdn.net/v/t1.0-1/c15.0.50.50' +
+        '/p50x50/10354686_10150004552801856_220367501106153455_n.jpg?oh=baf3745408876788393e9ca2b7e1dc94&oe=5AEBF02F');
       });
     });
 
@@ -598,6 +597,7 @@ describe('User-Controller', () => {
         expect(res.body.payload.groupIds).to.be.undefined;
         expect(res.body.payload.userId).to.have.lengthOf(36).and.to.be.a('string');
         expect(res.body.payload.role).to.equal('user');
+        expect(res.body.payload.imageUrl).to.equal(testData.users.valid[0].imageUrl);
       });
     });
 
@@ -617,6 +617,7 @@ describe('User-Controller', () => {
         expect(res.body.payload.groupIds).to.be.undefined;
         expect(res.body.payload.userId).to.have.lengthOf(36).and.to.be.a('string');
         expect(res.body.payload.role).to.equal('user');
+        expect(res.body.payload.imageUrl).to.be.null;
       });
     });
 

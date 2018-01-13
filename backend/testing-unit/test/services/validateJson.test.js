@@ -17,12 +17,14 @@ const testData = {
       'validInput': {
         'username': 'barack',
         'password': 'obama',
-        'email': 'barack.obama@usa.gov'
+        'email': 'barack.obama@usa.gov',
+        'imageUrl': null
       },
       'invalidInput': {
         'username': 'too',
         'password': 'short',
-        'email': 'barack.obama@usa.gov'
+        'email': 'barack.obama@usa.gov',
+        'imageUrl': null
       }
     }
 };

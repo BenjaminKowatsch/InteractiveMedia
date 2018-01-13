@@ -16,12 +16,24 @@
       "type": "string",
       "minLength": 5,
       "maxLength": 255
+    },
+    "imageUrl": {
+      "oneOf": [
+        {
+          "type": "null"
+        },
+        {
+          "type": "string",
+          "minLength": 5
+        }
+      ]
     }
   },
   "required": [
     "username",
     "email",
-    "password"
+    "password",
+    "imageUrl"
   ],
   "additionalProperties": false
 }

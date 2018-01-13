@@ -25,11 +25,7 @@ const groupScenarios = require('./data/groupScenarios');
 
 // ************* Helper ***********//
 
-const registerUser = index => chai.request(HOST).post(URL.BASE_USER).send({
-  username: userData.users.valid[index].username,
-  email: userData.users.valid[index].email,
-  password: userData.users.valid[index].password
-});
+const registerUser = index => chai.request(HOST).post(URL.BASE_USER).send(userData.users.valid[index]);
 
 describe('Admin', () => {
   describe('Login', () => {
@@ -86,6 +82,7 @@ describe('Admin', () => {
         expect(res.body.payload.groupIds).to.be.undefined;
         expect(res.body.payload.userId).to.have.lengthOf(36).and.to.be.a('string');
         expect(res.body.payload.role).to.equal('admin');
+        expect(res.body.payload.imageUrl).to.equal(adminData.imageUrl);
       });
     });
   });
@@ -420,6 +417,7 @@ describe('Admin', () => {
           expect(res.body.payload.groupIds[0]).to.equal(groupId);
           expect(res.body.payload.userId).to.equal(userIds[0]);
           expect(res.body.payload.role).to.equal('user');
+          expect(res.body.payload.imageUrl).to.equal(userData.users.valid[0].imageUrl);
         });
       });
 

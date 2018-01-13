@@ -4,55 +4,71 @@
       {
         "username": "alex1",
         "email": "alex1@alex.de",
-        "password": "alexpassword"
+        "password": "alexpassword",
+        "imageUrl": "10896cb8-d2a4-4bb6-b4d7-c3063553fee9.image.jpg"
       },
       {
         "username": "benny1",
         "email": "benny1@alex.de",
-        "password": "benny1password"
+        "password": "benny1password",
+        "imageUrl": null
       },
       {
         "username": "maxi1",
         "email": "maxi1@alex.de",
-        "password": "maxi1password"
+        "password": "maxi1password",
+        "imageUrl": null
       },
       {
         "username": "maxi2",
         "email": "maxi2@alex.de",
-        "password": "maxi2password"
+        "password": "maxi2password",
+        "imageUrl": null
       },
       {
         "username": "alex2",
         "email": "alex2@alex.de",
-        "password": "alex2password"
+        "password": "alex2password",
+        "imageUrl": null
       }
     ],
     "invalid": {
       "notExistingUser": {
         "username": "alexinvalid",
         "email": "alexinvalid@alex.de",
-        "password": "pwdpwd"
+        "password": "pwdpwd",
+        "imageUrl": null
       },
       "invalidUsername": {
         "username": "s",
         "email": "s@alex.de",
-        "password": "pwdpwd"
+        "password": "pwdpwd",
+        "imageUrl": null
       },
       "invalidPassword": {
         "username": "alex12",
         "email": "alex12@alex.de",
-        "password": "p"
+        "password": "p",
+        "imageUrl": null
       },
       "missingUsername": {
         "email": "alex12@alex.de",
-        "password": "alexpassword"
+        "password": "alexpassword",
+        "imageUrl": null
       },
       "missingEmail": {
         "username": "alex12",
-        "password": "alexpassword"
+        "password": "alexpassword",
+        "imageUrl": null
       },
       "missingPassword": {
         "username": "alex12",
+        "email": "alex12@alex.de",
+        "imageUrl": null
+      },
+      "missingImageUrl": {
+        "username": "alex12",
+        "password": "alexpassword",        
         "email": "alex12@alex.de"
       }
     }
