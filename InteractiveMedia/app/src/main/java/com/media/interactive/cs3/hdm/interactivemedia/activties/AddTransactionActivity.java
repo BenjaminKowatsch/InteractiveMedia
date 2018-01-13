@@ -3,33 +3,23 @@ package com.media.interactive.cs3.hdm.interactivemedia.activties;
 import android.app.DatePickerDialog;
 import android.app.TimePickerDialog;
 import android.content.ContentValues;
-import android.database.Cursor;
-import android.location.Location;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.text.InputType;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
-import android.widget.SimpleCursorAdapter;
-import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.TimePicker;
-import android.widget.Toast;
 
-import com.media.interactive.cs3.hdm.interactivemedia.CallbackListener;
 import com.media.interactive.cs3.hdm.interactivemedia.R;
-import com.media.interactive.cs3.hdm.interactivemedia.contentprovider.DatabaseHelper;
 import com.media.interactive.cs3.hdm.interactivemedia.contentprovider.DatabaseProvider;
 import com.media.interactive.cs3.hdm.interactivemedia.contentprovider.tables.GroupTransactionTable;
-import com.media.interactive.cs3.hdm.interactivemedia.contentprovider.tables.UserTable;
 import com.media.interactive.cs3.hdm.interactivemedia.data.MoneyTextWatcher;
 import com.media.interactive.cs3.hdm.interactivemedia.data.Transaction;
-
-import org.json.JSONException;
-import org.json.JSONObject;
 
 import java.text.NumberFormat;
 import java.text.ParseException;
@@ -37,20 +27,16 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
-import java.util.concurrent.atomic.AtomicInteger;
 
-public class AddTransactionActivity extends ImagePickerActivity {
+public class AddTransactionActivity extends AppCompatActivity {
     public static final NumberFormat CURRENCY_FORMAT = NumberFormat.getCurrencyInstance(Locale.GERMANY);
     public static final String GROUP_TO_ADD_TO = "GroupToAddTo";
     private final SimpleDateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyy");
     private final SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm");
     private final SimpleDateFormat dateTimeFormat = new SimpleDateFormat(dateFormat.toPattern() + timeFormat.toPattern());
-    private Spinner userSelection;
     private EditText dateEditText;
     private EditText timeEditText;
     private long groupId;
-    private SimpleCursorAdapter userAdapter;
-    private AtomicInteger placePickerId = new AtomicInteger(0);
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,7 +44,6 @@ public class AddTransactionActivity extends ImagePickerActivity {
         setContentView(R.layout.activity_add_transaction);
         dateEditText = findViewById(R.id.et_add_transaction_date);
         timeEditText = findViewById(R.id.et_add_transaction_time);
-        userSelection = findViewById(R.id.s_add_transaction_user);
         EditText amountEditText = findViewById(R.id.et_add_transaction_amount);
         amountEditText.addTextChangedListener(new MoneyTextWatcher(amountEditText, CURRENCY_FORMAT));
 
@@ -78,26 +63,11 @@ public class AddTransactionActivity extends ImagePickerActivity {
                 finish();
             }
         });
-
-        Button locationButton = findViewById(R.id.transaction_location);
-
-        locationButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Toast.makeText(AddTransactionActivity.this, "Soon implemented", Toast.LENGTH_SHORT).show();
-            }
-        });
-
         setupDatePicker();
-
-        userAdapter = initializeUserAdapter();
-        userSelection.setAdapter(userAdapter);
-
-        initImagePickerActivity(R.id.iv_transaction_image, null);
     }
 
     private void createAndSaveTransaction(View view) {
-        final Transaction toSave = buildFromCurrentView();
+        Transaction toSave = buildFromCurrentView();
         saveToLocalDatabase(toSave);
         finish();
     }
@@ -127,12 +97,7 @@ public class AddTransactionActivity extends ImagePickerActivity {
         final String split = splitText.getText().toString();
         final double amount = parseAmount(amountText);
         final Date dateTime = parseDateTime(dateText, timeText);
-        final ImageUploadCallbackListener imageUploadCallbackListener = new ImageUploadCallbackListener();
-        uploadImage(imageUploadCallbackListener);
-        //FIXME: replace this with real location
-        final Location location = new Location("");
-        return new Transaction(purpose, userAdapter.getCursor().getString(1), split, dateTime,
-                imageUploadCallbackListener.imageUrl, location, amount, groupId);
+        return new Transaction(purpose, split, dateTime, amount, groupId);
     }
 
     private double parseAmount(EditText amountText) {
@@ -211,42 +176,4 @@ public class AddTransactionActivity extends ImagePickerActivity {
         dateEditText.setText(dateFormat.format(date.getTime()));
     }
 
-    private SimpleCursorAdapter initializeUserAdapter() {
-        DatabaseHelper databaseHelper = new DatabaseHelper(this);
-
-        Cursor query = databaseHelper.getUsersForGroup(groupId);
-
-        String[] columns = new String[] { UserTable.COLUMN_USERNAME };
-        int[] to = new int[] { android.R.id.text1 };
-
-        SimpleCursorAdapter userAdapter = new SimpleCursorAdapter(this, android.R.layout.simple_spinner_item, query, columns, to, 0);
-        userAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        return userAdapter;
-    }
-
-    private class ImageUploadCallbackListener extends CallbackListener<JSONObject, Exception> {
-        private String imageUrl;
-
-        @Override
-        public void onSuccess(JSONObject response) {
-            JSONObject payload;
-            String imageName = null;
-            try {
-                payload = response.getJSONObject("payload");
-                imageName = payload.getString("path");
-                Log.d(this.getClass().getName(), "Path returned: " + payload.getString("path"));
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
-            final String newImageUrl = getResources().getString(R.string.web_service_url)
-                    .concat("/v1/object-store/download?filename=").concat(imageName);
-            imageUrl = newImageUrl;
-        }
-
-        @Override
-        public void onFailure(Exception error) {
-            imageUrl = null;
-            makeToast(error.getMessage());
-        }
-    }
 }
