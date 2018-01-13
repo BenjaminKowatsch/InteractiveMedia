@@ -495,9 +495,6 @@ describe('User-Controller', () => {
       return chai.request(HOST)
       .post(URL.BASE_USER + '/login?type=99')
       .send({username: testData.users.valid[1].username,
-        //warum wird hier eine Email mitgeschickt?
-        //warum gibt das nach neuem schema kein fehler?
-        email: testData.users.valid[1].email,
         password: testData.users.valid[1].password})
       .then(res => {
         expect(res).to.have.status(400);
@@ -514,8 +511,6 @@ describe('User-Controller', () => {
       return chai.request(HOST)
       .post(URL.BASE_USER + '/login')
       .send({username: testData.users.valid[1].username,
-        //same here
-        email: testData.users.valid[1].email,
         password: testData.users.valid[1].password})
       .then(res => {
         expect(res).to.have.status(400);
