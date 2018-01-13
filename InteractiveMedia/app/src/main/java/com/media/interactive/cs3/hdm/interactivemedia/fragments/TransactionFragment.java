@@ -79,11 +79,11 @@ public class TransactionFragment extends ListFragment implements LoaderManager.L
     private void initializeTransactionsForCurrentGroup() {
         Cursor cursor = databaseHelper.getTransactionsForGroup(getCurrentGroupId());
         String[] projection = new String[] {TransactionTable.COLUMN_INFO_NAME, TransactionTable.COLUMN_INFO_CREATED_AT,
-            TransactionTable.COLUMN_AMOUNT, TransactionTable.COLUMN_PAID_BY, TransactionTable.COLUMN_INFO_LOCATION};
+            TransactionTable.COLUMN_AMOUNT, TransactionTable.COLUMN_PAID_BY};
         getLoaderManager().initLoader(0, null, this);
         simpleCursorAdapter = new SimpleCursorAdapter(getActivity(), R.layout.fragment_transaction, cursor, projection,
             new int[] {R.id.transaction_title, R.id.transaction_creation_date,
-                R.id.transaction_amount, R.id.transaction_payed_by, R.id.transaction_location}, 0);
+                R.id.transaction_amount, R.id.transaction_payed_by}, 0);
         setListAdapter(simpleCursorAdapter);
     }
 
@@ -162,8 +162,7 @@ public class TransactionFragment extends ListFragment implements LoaderManager.L
             TransactionTable.COLUMN_INFO_NAME,
             TransactionTable.COLUMN_INFO_CREATED_AT,
             TransactionTable.COLUMN_AMOUNT,
-            TransactionTable.COLUMN_PAID_BY,
-            TransactionTable.COLUMN_INFO_LOCATION};
+            TransactionTable.COLUMN_PAID_BY};
         final CursorLoader cursorLoader = new CursorLoader(getActivity(),
             DatabaseProvider.CONTENT_TRANSACTION_URI, projection,
             null, null, null);

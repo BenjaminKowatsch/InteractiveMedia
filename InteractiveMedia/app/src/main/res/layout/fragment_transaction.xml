@@ -1,9 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="fill_parent"
-    android:layout_height="wrap_content"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    >
+    android:layout_height="wrap_content">
 
     <ImageView
         android:id="@+id/transaction_icon"
@@ -30,15 +28,6 @@
         android:layout_below="@+id/transaction_title"
         android:layout_toRightOf="@+id/transaction_icon"
         android:paddingLeft="2dp"
-        android:textSize="14dp" />
-
-    <TextView
-        android:id="@+id/transaction_location"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/transaction_title"
-        android:layout_toEndOf="@+id/transaction_creation_date"
-        android:paddingLeft="100dp"
         android:textSize="14dp" />
 
     <TextView
