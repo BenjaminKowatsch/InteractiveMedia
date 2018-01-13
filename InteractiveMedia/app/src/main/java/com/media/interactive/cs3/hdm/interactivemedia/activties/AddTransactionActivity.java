@@ -20,14 +20,26 @@ import android.widget.TimePicker;
 import android.widget.Toast;
 
 import com.media.interactive.cs3.hdm.interactivemedia.CallbackListener;
+import com.android.volley.Request;
+import com.android.volley.Response;
+import com.android.volley.error.VolleyError;
 import com.media.interactive.cs3.hdm.interactivemedia.R;
 import com.media.interactive.cs3.hdm.interactivemedia.contentprovider.DatabaseHelper;
+import com.media.interactive.cs3.hdm.interactivemedia.RestRequestQueue;
+import com.media.interactive.cs3.hdm.interactivemedia.authorizedrequests.AuthorizedJsonObjectRequest;
 import com.media.interactive.cs3.hdm.interactivemedia.contentprovider.DatabaseProvider;
+import com.media.interactive.cs3.hdm.interactivemedia.contentprovider.tables.GroupTable;
 import com.media.interactive.cs3.hdm.interactivemedia.contentprovider.tables.GroupTransactionTable;
 import com.media.interactive.cs3.hdm.interactivemedia.contentprovider.tables.UserTable;
+import com.media.interactive.cs3.hdm.interactivemedia.contentprovider.tables.UserTable;
+import com.media.interactive.cs3.hdm.interactivemedia.data.DatabaseProviderHelper;
 import com.media.interactive.cs3.hdm.interactivemedia.data.MoneyTextWatcher;
 import com.media.interactive.cs3.hdm.interactivemedia.data.Transaction;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -40,6 +52,7 @@ import java.util.Locale;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class AddTransactionActivity extends ImagePickerActivity {
+    private static final String TAG = AddTransactionActivity.class.getSimpleName();
     public static final NumberFormat CURRENCY_FORMAT = NumberFormat.getCurrencyInstance(Locale.GERMANY);
     public static final String GROUP_TO_ADD_TO = "GroupToAddTo";
     private final SimpleDateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyy");
@@ -48,7 +61,8 @@ public class AddTransactionActivity extends ImagePickerActivity {
     private Spinner userSelection;
     private EditText dateEditText;
     private EditText timeEditText;
-    private long groupId;
+    private String groupId;
+    private DatabaseProviderHelper helper;
     private SimpleCursorAdapter userAdapter;
     private AtomicInteger placePickerId = new AtomicInteger(0);
 
@@ -62,7 +76,9 @@ public class AddTransactionActivity extends ImagePickerActivity {
         EditText amountEditText = findViewById(R.id.et_add_transaction_amount);
         amountEditText.addTextChangedListener(new MoneyTextWatcher(amountEditText, CURRENCY_FORMAT));
 
-        groupId = getIntent().getLongExtra(GROUP_TO_ADD_TO, -1);
+        helper = new DatabaseProviderHelper(getContentResolver());
+
+        groupId = getIntent().getStringExtra(GROUP_TO_ADD_TO);
 
         Button addTransactionButton = findViewById(R.id.bn_add_transaction);
         addTransactionButton.setOnClickListener(new View.OnClickListener() {
@@ -98,9 +114,30 @@ public class AddTransactionActivity extends ImagePickerActivity {
 
     private void createAndSaveTransaction(View view) {
         final Transaction toSave = buildFromCurrentView();
-        saveToLocalDatabase(toSave);
+        helper.saveTransaction(toSave);
         finish();
     }
+
+    private void sendToBackend(Transaction toSave) throws JSONException {
+        final String url = getResources().getString(R.string.web_service_url).concat("/v1/groups/").concat(toSave.getGroupId()).concat("/transactions");
+        Log.d(TAG, "url: " + url);
+        final AuthorizedJsonObjectRequest jsonObjectRequest = new AuthorizedJsonObjectRequest(
+            Request.Method.POST, url, toSave.toJson(), new Response.Listener<JSONObject>() {
+            @Override
+            public void onResponse(JSONObject response) {
+
+                Log.d(TAG, response.toString());
+
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                makeToast("Error while sending the group to backend.");
+            }
+        });
+        RestRequestQueue.getInstance(getApplicationContext()).addToRequestQueue(jsonObjectRequest);
+    }
+
 
     private Transaction buildFromCurrentView() {
         final EditText name = findViewById(R.id.et_add_transaction_purpose);
@@ -109,17 +146,7 @@ public class AddTransactionActivity extends ImagePickerActivity {
         return buildTransaction(name, split, dateEditText, timeEditText, amount);
     }
 
-    private void saveToLocalDatabase(Transaction transaction) {
-        ContentValues transactionContent = transaction.toContentValues();
-        Uri id = getContentResolver().insert(DatabaseProvider.CONTENT_TRANSACTION_URI, transactionContent);
-        if (id != null) {
-            ContentValues transactionGroupContent = new ContentValues();
-            final int transactionId = Integer.parseInt(id.getLastPathSegment());
-            transactionGroupContent.put(GroupTransactionTable.COLUMN_TRANSACTION_ID, transactionId);
-            transactionGroupContent.put(GroupTransactionTable.COLUMN_GROUP_ID, transaction.getGroupId());
-            getContentResolver().insert(DatabaseProvider.CONTENT_GROUP_TRANSACTION_URI, transactionGroupContent);
-        }
-    }
+
 
     private Transaction buildTransaction(EditText nameText, TextView splitText,
                                          EditText dateText, EditText timeText, EditText amountText) {
@@ -212,9 +239,11 @@ public class AddTransactionActivity extends ImagePickerActivity {
     }
 
     private SimpleCursorAdapter initializeUserAdapter() {
-        DatabaseHelper databaseHelper = new DatabaseHelper(this);
 
-        Cursor query = databaseHelper.getUsersForGroup(groupId);
+        final String[] projection = { UserTable.TABLE_NAME+".*"};
+        final String selection = GroupTable.TABLE_NAME + "." + GroupTable.COLUMN_GROUP_ID + " = ?";
+        final String[] selectionArgs = {groupId};
+        Cursor query = getContentResolver().query(DatabaseProvider.CONTENT_GROUP_USER_JOIN_URI, projection,selection,selectionArgs,null);
 
         String[] columns = new String[] { UserTable.COLUMN_USERNAME };
         int[] to = new int[] { android.R.id.text1 };

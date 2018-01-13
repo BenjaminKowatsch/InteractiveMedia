@@ -126,7 +126,7 @@ public class DatabaseProvider extends android.content.ContentProvider {
                     + " INNER JOIN "
                     + GroupTransactionTable.TABLE_NAME + " ON "+ GroupTransactionTable.TABLE_NAME + "."+ GroupTransactionTable.COLUMN_TRANSACTION_ID +" = " + TransactionTable.TABLE_NAME + "."+ TransactionTable.COLUMN_ID
                     + " INNER JOIN "
-                    + GroupTable.TABLE_NAME + " ON "+ GroupTransactionTable.TABLE_NAME + "."+ GroupTransactionTable.COLUMN_GROUP_ID +" = " + GroupTable.TABLE_NAME + "."+ GroupTable.COLUMN_ID);
+                    + GroupTable.TABLE_NAME + " ON "+ GroupTransactionTable.TABLE_NAME + "."+ GroupTransactionTable.COLUMN_GROUP_ID +" = " + GroupTable.TABLE_NAME + "."+ GroupTable.COLUMN_GROUP_ID);
                 break;
             default:
                 Log.e(TAG, "Error: Calling query method at DatabaseProvider with invalid uri.");

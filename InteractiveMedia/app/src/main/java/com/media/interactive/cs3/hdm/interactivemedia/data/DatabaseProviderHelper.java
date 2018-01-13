@@ -8,6 +8,7 @@ import android.util.Log;
 
 import com.media.interactive.cs3.hdm.interactivemedia.contentprovider.DatabaseProvider;
 import com.media.interactive.cs3.hdm.interactivemedia.contentprovider.tables.GroupTable;
+import com.media.interactive.cs3.hdm.interactivemedia.contentprovider.tables.GroupTransactionTable;
 import com.media.interactive.cs3.hdm.interactivemedia.contentprovider.tables.GroupUserTable;
 import com.media.interactive.cs3.hdm.interactivemedia.contentprovider.tables.LoginTable;
 import com.media.interactive.cs3.hdm.interactivemedia.contentprovider.tables.UserTable;
@@ -101,6 +102,19 @@ public class DatabaseProviderHelper {
                 user.setId(foundId);
             }
         }
+    }
+
+    public void saveTransaction(Transaction transaction) {
+        final ContentValues transactionContent = transaction.toContentValues();
+        final Uri id = contentResolver.insert(DatabaseProvider.CONTENT_TRANSACTION_URI, transactionContent);
+        if (id != null) {
+            ContentValues transactionGroupContent = new ContentValues();
+            final int transactionId = Integer.parseInt(id.getLastPathSegment());
+            transactionGroupContent.put(GroupTransactionTable.COLUMN_TRANSACTION_ID, transactionId);
+            transactionGroupContent.put(GroupTransactionTable.COLUMN_GROUP_ID, transaction.getGroupId());
+            contentResolver.insert(DatabaseProvider.CONTENT_GROUP_TRANSACTION_URI, transactionGroupContent);
+        }
+        contentResolver.notifyChange(DatabaseProvider.CONTENT_GROUP_TRANSACTION_JOIN_URI,null);
     }
 
     public long getGroupsByUserId(String userId){

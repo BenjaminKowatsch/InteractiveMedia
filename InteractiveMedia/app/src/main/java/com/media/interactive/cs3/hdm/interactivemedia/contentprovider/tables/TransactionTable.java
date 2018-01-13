@@ -31,12 +31,13 @@ public class TransactionTable {
     public static final String COLUMN_INFO_LOCATION_LONG = "info_location_long";
 
     public static final String COLUMN_INFO_LOCATION_LAT = "info_location_lat";
+
     /**
-     * Sixth attribute, type TEXT.
+     * Seventh attribute, type TEXT.
      */
     public static final String COLUMN_INFO_IMAGE_URL = "info_image_url";
     /**
-     * Seventh attribute, type TIMESTAMP DEFAULT CURRENT_TIMESTAMP.
+     * Eighth attribute, type TIMESTAMP DEFAULT CURRENT_TIMESTAMP.
      */
     public static final String COLUMN_INFO_CREATED_AT = "info_created_at";
     /**

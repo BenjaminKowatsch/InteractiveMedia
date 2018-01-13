@@ -20,30 +20,34 @@ import android.widget.ListView;
 import android.widget.SimpleCursorAdapter;
 import android.widget.Spinner;
 
-import com.media.interactive.cs3.hdm.interactivemedia.GroupCursorLoader;
+import com.media.interactive.cs3.hdm.interactivemedia.GroupAdapter;
 import com.media.interactive.cs3.hdm.interactivemedia.R;
+import com.media.interactive.cs3.hdm.interactivemedia.TransactionAdapter;
 import com.media.interactive.cs3.hdm.interactivemedia.activties.AddTransactionActivity;
 import com.media.interactive.cs3.hdm.interactivemedia.contentprovider.DatabaseHelper;
 import com.media.interactive.cs3.hdm.interactivemedia.contentprovider.DatabaseProvider;
 import com.media.interactive.cs3.hdm.interactivemedia.contentprovider.tables.GroupTable;
 import com.media.interactive.cs3.hdm.interactivemedia.contentprovider.tables.TransactionTable;
+import com.media.interactive.cs3.hdm.interactivemedia.contentprovider.tables.UserTable;
 import com.media.interactive.cs3.hdm.interactivemedia.data.Login;
+import com.media.interactive.cs3.hdm.interactivemedia.data.Transaction;
 
 import static com.media.interactive.cs3.hdm.interactivemedia.activties.AddTransactionActivity.GROUP_TO_ADD_TO;
 
 
 public class TransactionFragment extends ListFragment implements LoaderManager.LoaderCallbacks<Cursor>, IMyFragment {
 
-    private static final String TAG = "TransactionFragment";
+    private static final String TAG = TransactionFragment.class.getSimpleName();
     private Spinner groupSelection;
 
     private AdapterView.OnItemSelectedListener onItemSelectedListener;
 
-    private SimpleCursorAdapter simpleCursorAdapter;
+    private TransactionAdapter transactionAdapter;
     private View transactionListFragment;
-    private ContentResolver dummyContentResolver;
+    private ContentResolver contentResolver;
     private SimpleCursorAdapter groupAdapter;
-    private DatabaseHelper databaseHelper;
+    private static final String GROUP_ID_FILTER = "groupId";
+    private static final int CURSOR_LOADER_GROUP_ID = 0;
 
     /**
      * Mandatory empty constructor for the fragment manager to instantiate the
@@ -66,44 +70,46 @@ public class TransactionFragment extends ListFragment implements LoaderManager.L
 
         setHasOptionsMenu(true);
 
-        dummyContentResolver = getActivity().getContentResolver();
-        databaseHelper = new DatabaseHelper(this.getContext());
+        contentResolver = getActivity().getContentResolver();
 
         groupAdapter = initializeGroupAdapter();
         groupAdapter.getCursor().moveToFirst();
 
-        // Initializing the SimpleCursorAdapter and the CursorLoader
-        initializeTransactionsForCurrentGroup();
+        initOrRestartLoaderWithGroupId();
     }
 
-    private void initializeTransactionsForCurrentGroup() {
-        Cursor cursor = databaseHelper.getTransactionsForGroup(getCurrentGroupId());
-        String[] projection = new String[] {TransactionTable.COLUMN_INFO_NAME, TransactionTable.COLUMN_INFO_CREATED_AT,
-            TransactionTable.COLUMN_AMOUNT, TransactionTable.COLUMN_PAID_BY};
-        getLoaderManager().initLoader(0, null, this);
-        simpleCursorAdapter = new SimpleCursorAdapter(getActivity(), R.layout.fragment_transaction, cursor, projection,
-            new int[] {R.id.transaction_title, R.id.transaction_creation_date,
-                R.id.transaction_amount, R.id.transaction_payed_by}, 0);
-        setListAdapter(simpleCursorAdapter);
+    private void initOrRestartLoaderWithGroupId() {
+        final Bundle bundle = new Bundle();
+        bundle.putString(GROUP_ID_FILTER, getCurrentGroupId());
+        if (getLoaderManager().getLoader(CURSOR_LOADER_GROUP_ID) == null || getLoaderManager().getLoader(CURSOR_LOADER_GROUP_ID).isStarted() == false) {
+            getLoaderManager().initLoader(CURSOR_LOADER_GROUP_ID, bundle, TransactionFragment.this);
+        } else {
+            getLoaderManager().restartLoader(CURSOR_LOADER_GROUP_ID, bundle, TransactionFragment.this);
+        }
     }
 
-    private void updateTransactionsForCurrentGroup() {
-        Cursor cursor = databaseHelper.getTransactionsForGroup(getCurrentGroupId());
-        simpleCursorAdapter.swapCursor(cursor);
+    @Override
+    public void onResume() {
+        super.onResume();
+        initOrRestartLoaderWithGroupId();
     }
 
-    private long getCurrentGroupId() {
-        return groupAdapter.getCursor().getLong(0);
+    private String getCurrentGroupId() {
+        return groupAdapter.getCursor().getString(groupAdapter.getCursor().getColumnIndex(GroupTable.COLUMN_GROUP_ID));
     }
 
     private SimpleCursorAdapter initializeGroupAdapter() {
-        GroupCursorLoader loader = new GroupCursorLoader(this.getContext(), databaseHelper,  Login.getInstance().getUser().getUserId());
-        Cursor query = loader.loadInBackground();
 
-        String[] columns = new String[] { GroupTable.COLUMN_NAME };
-        int[] to = new int[] { android.R.id.text1 };
+        final String[] projection = { GroupTable.TABLE_NAME + ".*"};
+        final String sortOrder = GroupTable.TABLE_NAME + "." + GroupTable.COLUMN_CREATED_AT + " DESC";
+        final String selection = UserTable.TABLE_NAME + "." + UserTable.COLUMN_USER_ID + " = ?";
+        final String[] selectionArgs = {Login.getInstance().getUser().getUserId()};
+        final Cursor query = contentResolver.query(DatabaseProvider.CONTENT_GROUP_USER_JOIN_URI, projection, selection, selectionArgs, sortOrder);
 
-        SimpleCursorAdapter groupAdapter = new SimpleCursorAdapter(this.getContext(), android.R.layout.simple_spinner_item, query, columns, to, 0);
+        final String[] columns = new String[] { GroupTable.COLUMN_NAME };
+        final int[] to = new int[] { android.R.id.text1 };
+
+        final SimpleCursorAdapter groupAdapter = new SimpleCursorAdapter(this.getContext(), android.R.layout.simple_spinner_item, query, columns, to, 0);
         groupAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         return groupAdapter;
     }
@@ -117,15 +123,16 @@ public class TransactionFragment extends ListFragment implements LoaderManager.L
         groupSelection.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
-                updateTransactionsForCurrentGroup();
+                initOrRestartLoaderWithGroupId();
             }
 
             @Override
             public void onNothingSelected(AdapterView<?> adapterView) {
-                updateTransactionsForCurrentGroup();
+
+                initOrRestartLoaderWithGroupId();
             }
         });
-        updateTransactionsForCurrentGroup();
+        initOrRestartLoaderWithGroupId();
         return transactionListFragment;
     }
 
@@ -157,27 +164,28 @@ public class TransactionFragment extends ListFragment implements LoaderManager.L
 
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-        String[] projection = new String[] {
-            TransactionTable.COLUMN_ID,
-            TransactionTable.COLUMN_INFO_NAME,
-            TransactionTable.COLUMN_INFO_CREATED_AT,
-            TransactionTable.COLUMN_AMOUNT,
-            TransactionTable.COLUMN_PAID_BY};
-        final CursorLoader cursorLoader = new CursorLoader(getActivity(),
-            DatabaseProvider.CONTENT_TRANSACTION_URI, projection,
-            null, null, null);
-        return cursorLoader;
+        final String[] projection = { TransactionTable.TABLE_NAME + ".*"};
+        final String sortOrder = TransactionTable.TABLE_NAME + "." + TransactionTable.COLUMN_INFO_CREATED_AT + " DESC";
+        final String selection = GroupTable.TABLE_NAME + "." + GroupTable.COLUMN_GROUP_ID + " = ?";
+        final String[] selectionArgs = {getCurrentGroupId()};
+        return new CursorLoader(getActivity(),DatabaseProvider.CONTENT_GROUP_TRANSACTION_JOIN_URI, projection, selection, selectionArgs, sortOrder);
     }
 
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
-        simpleCursorAdapter.swapCursor(data);
-        updateTransactionsForCurrentGroup();
+        data.moveToFirst();
+        Log.d(TAG, "Data: " + data.getCount());
+        if (transactionAdapter == null) {
+            transactionAdapter = new TransactionAdapter(getContext(), R.layout.fragment_transaction, data);
+        } else {
+            transactionAdapter.swapCursor(data);
+        }
+        setListAdapter(transactionAdapter);
     }
 
     @Override
     public void onLoaderReset(Loader<Cursor> loader) {
-        updateTransactionsForCurrentGroup();
+        transactionAdapter.swapCursor(null);
     }
 
 
