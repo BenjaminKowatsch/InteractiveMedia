@@ -32,25 +32,8 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         databaseHelper = new DatabaseHelper(this);
 
-        //databaseHelper.deleteAllUsers();
-/*        databaseHelper.resetDatabase();
+        //databaseHelper.resetDatabase();
 
-        final Login testUser = Login.getInstance();
-        testUser.getUser().setUsername("Test User");
-        testUser.getUser().setEmail("user.test@gmail.com");
-        testUser.setHashedPassword(Hash.hashStringSha256("Passwort1234"));
-        //databaseHelper.deleteAllUsers();
-
-        DummyDataAdder dummyDataAdder = new DummyDataAdder(this);
-        dummyDataAdder.addAllDummyData();
-
-
-        Cursor c = databaseHelper.getAllGroupAndUsersByGroup(1);
-        while (c.moveToNext()) {
-            for(int i = 0; i<  c.getColumnCount();i++) {
-                Log.d(TAG, i+"  " + c.getColumnName(i));
-            }
-        }*/
         Login.getInstance().clear();
 
         appTag = getResources().getString(R.string.app_tag);
