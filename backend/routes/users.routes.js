@@ -16,8 +16,10 @@ const authenticationService = require('../services/authentication.service');
  *
  * @apiUse paramUsername
  * @apiUse paramHashedPassword
+ * @apiUse paramEmail
+ * @apiUse paramImageUrlOptional
  *
- * @apiUse paramExamplePassword
+ * @apiUse paramExampleRegister
  *
  * @apiSuccess (SuccessCode) {201} Created Resource created
  * @apiUse successBodySuccess

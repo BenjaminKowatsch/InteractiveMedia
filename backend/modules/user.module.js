@@ -473,7 +473,7 @@ exports.logout = function(userId, authType) {
   });
 };
 
-exports.register = function(username, password, email, role) {
+exports.register = function(username, password, email, role, imageUrl) {
   return new Promise((resolve, reject) => {
     const userToRegister = {
       'expiryDate': tokenService.getNewExpiryDate(validTimeOfTokenInMs),
@@ -482,7 +482,8 @@ exports.register = function(username, password, email, role) {
       'email': email,
       'role': role,
       'userId': uuidService.generateUUID(),
-      'authType': AUTH_TYPE.PASSWORD
+      'authType': AUTH_TYPE.PASSWORD,
+      'imageUrl': imageUrl
     };
 
     database.collections.users.insertOne(userToRegister, function(err, result) {

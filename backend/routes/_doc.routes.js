@@ -19,6 +19,14 @@
     @apiParam (Parameter) {int} authType Login type with authType=(0: Password, 1:Google, 2: Facebook)
  */
 /**
+ * @apiDefine paramEmail
+    @apiParam (Parameter) {string} email Email of user
+ */
+/**
+ * @apiDefine paramImageUrlOptional
+    @apiParam (Parameter) {string} imageUrl Url of user's profile image. "null" is allowed.
+ */
+/**
  * @apiDefine paramUrlGroupId
     @apiParam (URL-Parameter) {string} groupId Id of the requested group
  */
@@ -119,6 +127,23 @@
     @apiError (ErrorCode) {500} FcmError Firebase Cloud Messaging error
  */
 
+/**
+ * @apiDefine paramExampleRegister
+    @apiParamExample {type} Register User
+    {
+        "username" : "alex",
+        "password" : "XHDGETFHFJCHF",
+        "email" : "alex@example.com"
+        "imageUrl" : "http://example.com/bild.png"
+    }
+    @apiParamExample {type} Register User without optional values
+    {
+        "username" : "alex",
+        "password" : "XHDGETFHFJCHF",
+        "email" : "alex@example.com"
+        "imageUrl" : null
+    }
+ */
 /**
  * @apiDefine paramExamplePassword
     @apiParamExample {type} Password

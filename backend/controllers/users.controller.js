@@ -27,7 +27,7 @@ exports.registerNewUser = function(req, res) {
     // request body is valid
 
     // store user in mongo
-    user.register(req.body.username, req.body.password, req.body.email, ROLES.USER)
+    user.register(req.body.username, req.body.password, req.body.email, ROLES.USER, req.body.imageUrl)
       .then(function(registerResult) {
         // mongo update was successful
         const resBody = {'success': true, 'payload': registerResult.payload};
