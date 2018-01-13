@@ -30,6 +30,7 @@ import com.media.interactive.cs3.hdm.interactivemedia.RestRequestQueue;
 import com.media.interactive.cs3.hdm.interactivemedia.authorizedrequests.AuthorizedJsonObjectRequest;
 import com.media.interactive.cs3.hdm.interactivemedia.contentprovider.DatabaseProvider;
 import com.media.interactive.cs3.hdm.interactivemedia.contentprovider.tables.LoginTable;
+import com.media.interactive.cs3.hdm.interactivemedia.contentprovider.tables.UserTable;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -37,6 +38,7 @@ import org.json.JSONObject;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
 
 
 /**
@@ -58,6 +60,7 @@ public class Login {
 
 
     private Login() {
+        clear();
     }
 
     public static Login getInstance() {
@@ -100,7 +103,7 @@ public class Login {
         this.userType = userType;
     }
 
-    public void initUserData(Context context){
+    public void initUserData(final Context context){
         final String url = context.getResources().getString(R.string.web_service_url).concat("/v1/users/user");
         Log.d(TAG,"Get: "+ url);
         final AuthorizedJsonObjectRequest jsonObjectRequest = new AuthorizedJsonObjectRequest(
@@ -123,7 +126,7 @@ public class Login {
 
                         JSONArray groupIds = null;
                         try {
-                            payload.getJSONArray("groupIds");
+                            groupIds = payload.getJSONArray("groupIds");
                         } catch (JSONException e){
                             Log.d(TAG,"No groups exist for this user");
                         }
@@ -131,7 +134,7 @@ public class Login {
                             Log.d(TAG, "Before Removal: " + groupIds.toString());
                             helper.removeExistingGroupIds(groupIds);
                             Log.d(TAG, "After Removal: " + groupIds.toString());
-                            requestNewGroups(groupIds);
+                            requestNewGroups(context, groupIds);
                         }
                         user.setSync(true);
                         helper.upsertUser(user);
@@ -141,9 +144,6 @@ public class Login {
                     }
                 } catch (JSONException e) {
                     e.printStackTrace();
-                }
-                if(onUserDataSet != null){
-                    onUserDataSet.onSuccess(response);
                 }
             }
         }, new Response.ErrorListener() {
@@ -159,8 +159,64 @@ public class Login {
         RestRequestQueue.getInstance(context).addToRequestQueue(jsonObjectRequest);
     }
 
-    private void requestNewGroups(JSONArray groupIds){
-
+    private void requestNewGroups(Context context, final JSONArray groupIds){
+        final AtomicInteger atomicInteger = new AtomicInteger();
+        for(int i = 0; i< groupIds.length() ;i++){
+        if(groupIds.length() > 0)
+            try {
+                final String groupId = (String) groupIds.get(i);
+                final String url = context.getResources().getString(R.string.web_service_url).concat("/v1/groups/").concat(groupId);
+                Log.d(TAG,"Get: "+ url);
+                final AuthorizedJsonObjectRequest jsonObjectRequest = new AuthorizedJsonObjectRequest(
+                    Request.Method.GET, url, null, new Response.Listener<JSONObject>() {
+                    @Override
+                    public void onResponse(final JSONObject response) {
+                        try {
+                            final boolean success = response.getBoolean("success");
+                            Log.d(TAG,"group: "+ response);
+                            if(success){
+                                final JSONObject payload = response.getJSONObject("payload");
+                                final Group newGroup = new Group();
+                                newGroup.setName(payload.getString("name"));
+                                newGroup.setImageUrl(payload.getString("imageUrl"));
+                                newGroup.setGroupId(payload.getString("groupId"));
+                                newGroup.setCreatedAt(payload.getString("createdAt"));
+                                newGroup.setSync(true);
+                                // Set Users
+                                final JSONArray users = payload.getJSONArray("users");
+                                for (int j = 0; j < users.length(); j++) {
+                                    final JSONObject jsonObject = (JSONObject) users.get(j);
+                                    final User user = new User();
+                                    user.setEmail(jsonObject.getString("email"));
+                                    user.setUserId(jsonObject.getString("userId"));
+                                    user.setUsername(jsonObject.getString("username"));
+                                    user.setSync(true);
+                                    newGroup.getUsers().add(user);
+                                }
+                                helper.insertGroupAtDatabase(newGroup);
+                                //TODO: Set/Add Transactions
+                                if(onUserDataSet != null && groupIds.length() - 1 == atomicInteger.incrementAndGet()){
+                                    onUserDataSet.onSuccess(response);
+                                }
+                            }else {
+                                Log.e(TAG,"Error while setting user data.");
+                            }
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }, new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        Log.e(TAG,"Error while setting user data.");
+                    }
+                });
+                jsonObjectRequest.setShouldCache(false);
+                RestRequestQueue.getInstance(context).addToRequestQueue(jsonObjectRequest);
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+       }
     }
 
     public boolean loginResponseHandler(JSONObject response) {

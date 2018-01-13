@@ -56,7 +56,7 @@ public class GroupAdapter extends CursorAdapter {
         // Populate fields with extracted properties
         Log.d(Group.class.getSimpleName(), "ImageUrl: " + group.getImageUrl());
         viewHolder.groupTitle.setText(group.getName());
-        viewHolder.grouCreationDate.setText(group.getCreatedAt());
+        viewHolder.groupCreationDate.setText(group.getCreatedAt());
         if (group.getSync()) {
             viewHolder.syncedIcon.setVisibility(View.GONE);
         } else {
@@ -82,14 +82,14 @@ public class GroupAdapter extends CursorAdapter {
     public class ViewHolder {
         ImageView groupIcon;
         TextView groupTitle;
-        TextView grouCreationDate;
+        TextView groupCreationDate;
         ImageView syncedIcon;
         private Group group;
 
         ViewHolder(View view) {
             groupIcon = (ImageView) view.findViewById(R.id.group_icon);
             groupTitle = (TextView) view.findViewById(R.id.group_title);
-            grouCreationDate = (TextView) view.findViewById(R.id.group_creation_date);
+            groupCreationDate = (TextView) view.findViewById(R.id.group_creation_date);
             syncedIcon = (ImageView) view.findViewById(R.id.synced_icon);
             group = new Group();
         }

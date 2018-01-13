@@ -14,6 +14,8 @@ import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.load.model.GlideUrl;
 import com.bumptech.glide.load.model.LazyHeaders;
+import com.media.interactive.cs3.hdm.interactivemedia.contentprovider.tables.GroupTable;
+import com.media.interactive.cs3.hdm.interactivemedia.contentprovider.tables.UserTable;
 import com.media.interactive.cs3.hdm.interactivemedia.data.Group;
 import com.media.interactive.cs3.hdm.interactivemedia.data.Login;
 import com.media.interactive.cs3.hdm.interactivemedia.data.User;
@@ -46,12 +48,12 @@ public class UserAdapter extends CursorAdapter {
         // Extract properties from cursor
         final ViewHolder viewHolder = (ViewHolder) view.getTag();
         final User user = viewHolder.getUser();
-        user.setId(cursor.getLong(0));
-        user.setUsername(cursor.getString(1));
-        user.setImageUrl(cursor.getString(2));
-        user.setEmail(cursor.getString(3));
-        user.setCreatedAt(cursor.getString(4));
-        user.setUserId(cursor.getString(5));
+        user.setId(cursor.getLong(cursor.getColumnIndexOrThrow(UserTable.COLUMN_ID)));
+        user.setUsername(cursor.getString(cursor.getColumnIndexOrThrow(UserTable.COLUMN_USERNAME)));
+        user.setImageUrl(cursor.getString(cursor.getColumnIndexOrThrow(UserTable.COLUMN_IMAGE_URL)));
+        user.setEmail(cursor.getString(cursor.getColumnIndexOrThrow(UserTable.COLUMN_EMAIL)));
+        user.setCreatedAt(cursor.getString(cursor.getColumnIndexOrThrow(UserTable.COLUMN_CREATED_AT)));
+        user.setUserId(cursor.getString(cursor.getColumnIndexOrThrow(UserTable.COLUMN_USER_ID)));
 
         Log.d(Group.class.getSimpleName(), user.toString());
         // Populate fields with extracted properties
