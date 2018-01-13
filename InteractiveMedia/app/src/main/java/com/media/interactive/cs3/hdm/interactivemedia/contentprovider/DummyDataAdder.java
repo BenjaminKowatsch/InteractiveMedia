@@ -51,7 +51,6 @@ public class DummyDataAdder {
         dummyContentValues.put(TransactionTable.COLUMN_PAID_BY,  String.valueOf(1));
 
         dummyContentValues.put(TransactionTable.COLUMN_INFO_NAME, "Transaction " + counter);
-        dummyContentValues.put(TransactionTable.COLUMN_INFO_LOCATION, "Ghetto Netto");
         Uri id = dummyContentResolver.insert(DatabaseProvider.CONTENT_TRANSACTION_URI, dummyContentValues);
         Log.i(TAG,"URI of new created transaction: "+id.toString());
 
