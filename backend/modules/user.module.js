@@ -572,7 +572,7 @@ function checkIfUserIdIsGiven(userId) {
 
 function findUserById(userId) {
   let query = {userId: userId};
-  let options = {fields: {username: true, groupIds: true, email: true, userId: true, role: true}};
+  let options = {fields: {username: true, groupIds: true, email: true, userId: true, role: true, imageUrl: true}};
   return database.collections.users.findOne(query, options);
 }
 

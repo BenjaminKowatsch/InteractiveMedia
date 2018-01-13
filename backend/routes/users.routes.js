@@ -105,6 +105,7 @@ router.post('/logout', authenticationService.isAuthenticated, usersController.lo
  * @apiUse successBodyUserUserId
  * @apiUse successBodyUserRole
  * @apiUse successBodyUserGroupIds
+ * @apiUse successBodyUserImageUrl
  * @apiSuccess (SuccessCode) {200} Success Get User
  *
  * @apiUse successExampleUser

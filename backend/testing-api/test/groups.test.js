@@ -87,6 +87,7 @@ describe('Groups-Controller: Groups:', () => {
           expect(res.body.payload.groupIds).to.have.lengthOf(1);
           expect(res.body.payload.groupIds).to.include(groupId);
           expect(res.body.payload.userId).to.have.lengthOf(36).and.to.be.a('string');
+          expect(res.body.payload.imageUrl).to.equal('10896cb8-d2a4-4bb6-b4d7-c3063553fee9.image.jpg');
         });
       });
     });

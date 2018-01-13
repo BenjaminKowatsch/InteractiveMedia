@@ -576,6 +576,8 @@ describe('User-Controller', () => {
         expect(res.body.payload.groupIds).to.be.undefined;
         expect(res.body.payload.userId).to.equal('110340223090296');
         expect(res.body.payload.role).to.equal('user');
+        expect(res.body.payload.imageUrl).to.equal('https://scontent.xx.fbcdn.net/v/t1.0-1/c15.0.50.50' +
+        '/p50x50/10354686_10150004552801856_220367501106153455_n.jpg?oh=baf3745408876788393e9ca2b7e1dc94&oe=5AEBF02F');
       });
     });
 
@@ -595,6 +597,7 @@ describe('User-Controller', () => {
         expect(res.body.payload.groupIds).to.be.undefined;
         expect(res.body.payload.userId).to.have.lengthOf(36).and.to.be.a('string');
         expect(res.body.payload.role).to.equal('user');
+        expect(res.body.payload.imageUrl).to.equal('10896cb8-d2a4-4bb6-b4d7-c3063553fee9.image.jpg');
       });
     });
 
@@ -614,6 +617,7 @@ describe('User-Controller', () => {
         expect(res.body.payload.groupIds).to.be.undefined;
         expect(res.body.payload.userId).to.have.lengthOf(36).and.to.be.a('string');
         expect(res.body.payload.role).to.equal('user');
+        expect(res.body.payload.imageUrl).to.be.null;
       });
     });
 
