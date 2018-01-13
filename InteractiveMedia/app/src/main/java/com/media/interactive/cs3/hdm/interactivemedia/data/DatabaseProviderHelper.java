@@ -37,15 +37,20 @@ public class DatabaseProviderHelper {
         if (search.moveToNext()) {
             foundId = search.getLong(0);
         }
+        final ContentValues userValues = new ContentValues();
+        userValues.put(UserTable.COLUMN_USERNAME, user.getUsername());
+        userValues.put(UserTable.COLUMN_IMAGE_URL, user.getImageUrl());
+        userValues.put(UserTable.COLUMN_USER_ID, user.getUserId());
+        userValues.put(UserTable.COLUMN_EMAIL, user.getEmail());
+        userValues.put(UserTable.COLUMN_SYNCHRONIZED, user.getSync());
         if (foundId < 0) {
-            final ContentValues userValues = new ContentValues();
-            userValues.put(UserTable.COLUMN_USERNAME, user.getUsername());
-            userValues.put(UserTable.COLUMN_IMAGE_URL, user.getImageUrl());
-            userValues.put(UserTable.COLUMN_EMAIL, user.getEmail());
-            userValues.put(UserTable.COLUMN_SYNCHRONIZED, user.getSync());
             final Uri result = contentResolver.insert(DatabaseProvider.CONTENT_USER_URI, userValues);
             user.setId(Long.parseLong(result.getLastPathSegment()));
         } else {
+            final int update = contentResolver.update(DatabaseProvider.CONTENT_USER_URI, userValues, selection, selectionArgs);
+            if(update > 0){
+                Log.d(TAG,"Updated user entry.");
+            }
             user.setId(foundId);
         }
 
@@ -55,6 +60,7 @@ public class DatabaseProviderHelper {
         final ContentValues groupValues = new ContentValues();
         groupValues.put(GroupTable.COLUMN_NAME, group.getName());
         groupValues.put(GroupTable.COLUMN_IMAGE_URL, group.getImageUrl());
+        groupValues.put(GroupTable.COLUMN_GROUP_ID, group.getGroupId());
         groupValues.put(GroupTable.COLUMN_CREATED_AT, group.getCreatedAt());
         groupValues.put(GroupTable.COLUMN_SYNCHRONIZED, group.getSync());
         final Uri result = contentResolver.insert(DatabaseProvider.CONTENT_GROUP_URI, groupValues);
@@ -69,6 +75,7 @@ public class DatabaseProviderHelper {
             groupUserValues.put(GroupUserTable.COLUMN_USER_ID, user.getId());
             contentResolver.insert(DatabaseProvider.CONTENT_GROUP_USER_URI, groupUserValues);
         }
+        contentResolver.notifyChange(DatabaseProvider.CONTENT_GROUP_USER_JOIN_URI,null);
     }
 
     public void findInsertUsersAtDatabase(Group group) {
@@ -86,7 +93,8 @@ public class DatabaseProviderHelper {
                 userValues.put(UserTable.COLUMN_USERNAME, user.getUsername());
                 userValues.put(UserTable.COLUMN_IMAGE_URL, user.getImageUrl());
                 userValues.put(UserTable.COLUMN_EMAIL, user.getEmail());
-                userValues.put(UserTable.COLUMN_SYNCHRONIZED, false);
+                userValues.put(UserTable.COLUMN_USER_ID, user.getUserId());
+                userValues.put(UserTable.COLUMN_SYNCHRONIZED, user.getSync());
                 final Uri result = contentResolver.insert(DatabaseProvider.CONTENT_USER_URI, userValues);
                 user.setId(Long.parseLong(result.getLastPathSegment()));
             } else {
@@ -140,7 +148,7 @@ public class DatabaseProviderHelper {
             final String[] selectionArgs = {groupId};
             final Cursor search = contentResolver.query(DatabaseProvider.CONTENT_GROUP_URI, projection, selection, selectionArgs, null);
             long foundId = -1;
-            if (search.moveToNext()) {
+            if( search.moveToFirst()) {
                 foundId = search.getLong(0);
             }
             if(foundId != -1){

@@ -1,7 +1,6 @@
 package com.media.interactive.cs3.hdm.interactivemedia.activties;
 
 import android.app.LoaderManager;
-import android.content.ContentResolver;
 import android.content.CursorLoader;
 import android.content.Loader;
 import android.database.Cursor;
@@ -15,17 +14,13 @@ import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.load.model.GlideUrl;
 import com.bumptech.glide.load.model.LazyHeaders;
-import com.media.interactive.cs3.hdm.interactivemedia.GroupUserCursorLoader;
 import com.media.interactive.cs3.hdm.interactivemedia.NonScrollListView;
 import com.media.interactive.cs3.hdm.interactivemedia.R;
 import com.media.interactive.cs3.hdm.interactivemedia.UserAdapter;
-import com.media.interactive.cs3.hdm.interactivemedia.contentprovider.DatabaseHelper;
 import com.media.interactive.cs3.hdm.interactivemedia.contentprovider.DatabaseProvider;
 import com.media.interactive.cs3.hdm.interactivemedia.contentprovider.tables.GroupTable;
 import com.media.interactive.cs3.hdm.interactivemedia.contentprovider.tables.UserTable;
-import com.media.interactive.cs3.hdm.interactivemedia.data.Group;
 import com.media.interactive.cs3.hdm.interactivemedia.data.Login;
-import com.media.interactive.cs3.hdm.interactivemedia.data.User;
 
 /**
  * Created by benny on 04.01.18.
@@ -41,7 +36,6 @@ public class GroupDetailViewActivity extends AppCompatActivity implements Loader
     private NonScrollListView listView;
 
     private UserAdapter userAdapter;
-    private DatabaseHelper dbHelper;
 
     private long groupId;
 
@@ -77,15 +71,17 @@ public class GroupDetailViewActivity extends AppCompatActivity implements Loader
                 .placeholder(ContextCompat.getDrawable(this, R.drawable.anonymoususer))
                 .into(groupImage);
         }
-        // TODO: list transactions?
+        // TODO: link to transactions
 
         getLoaderManager().initLoader(0, null, this);
     }
 
     @Override
     public Loader<Cursor> onCreateLoader(int i, Bundle bundle) {
-        dbHelper = new DatabaseHelper(GroupDetailViewActivity.this);
-        return new GroupUserCursorLoader(this, dbHelper, groupId);
+        final String[] projection = { UserTable.TABLE_NAME + ".*" };
+        final String selection = GroupTable.TABLE_NAME + "." + GroupTable.COLUMN_ID + " = ? ";
+        final String[] selectionArgs = {String.valueOf(groupId)};
+        return new CursorLoader(GroupDetailViewActivity.this, DatabaseProvider.CONTENT_GROUP_USER_JOIN_URI, projection, selection, selectionArgs,null);
     }
 
     @Override

@@ -38,6 +38,7 @@ import org.json.JSONObject;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
 
 
 /**
@@ -59,6 +60,7 @@ public class Login {
 
 
     private Login() {
+        clear();
     }
 
     public static Login getInstance() {
@@ -157,8 +159,10 @@ public class Login {
         RestRequestQueue.getInstance(context).addToRequestQueue(jsonObjectRequest);
     }
 
-    private void requestNewGroups(Context context, JSONArray groupIds){
+    private void requestNewGroups(Context context, final JSONArray groupIds){
+        final AtomicInteger atomicInteger = new AtomicInteger();
         for(int i = 0; i< groupIds.length() ;i++){
+        if(groupIds.length() > 0)
             try {
                 final String groupId = (String) groupIds.get(i);
                 final String url = context.getResources().getString(R.string.web_service_url).concat("/v1/groups/").concat(groupId);
@@ -166,7 +170,7 @@ public class Login {
                 final AuthorizedJsonObjectRequest jsonObjectRequest = new AuthorizedJsonObjectRequest(
                     Request.Method.GET, url, null, new Response.Listener<JSONObject>() {
                     @Override
-                    public void onResponse(JSONObject response) {
+                    public void onResponse(final JSONObject response) {
                         try {
                             final boolean success = response.getBoolean("success");
                             Log.d(TAG,"group: "+ response);
@@ -191,8 +195,7 @@ public class Login {
                                 }
                                 helper.insertGroupAtDatabase(newGroup);
                                 //TODO: Set/Add Transactions
-
-                                if(onUserDataSet != null){
+                                if(onUserDataSet != null && groupIds.length() - 1 == atomicInteger.incrementAndGet()){
                                     onUserDataSet.onSuccess(response);
                                 }
                             }else {
@@ -213,7 +216,7 @@ public class Login {
             } catch (JSONException e) {
                 e.printStackTrace();
             }
-        }
+       }
     }
 
     public boolean loginResponseHandler(JSONObject response) {
