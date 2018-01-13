@@ -49,6 +49,7 @@ exports.verifyGoogleAccessToken = function(token, verifyDatabase) {
         const userId = payload.sub;
         const email = payload.email;
         const username = payload.name;
+        const imageUrl = payload.picture;
         const expiryDate = new Date(payload.exp * 1000);
         // if verifyDatabase flag is set also check if expiryDate is valid
         if (verifyDatabase === true) {
@@ -70,6 +71,7 @@ exports.verifyGoogleAccessToken = function(token, verifyDatabase) {
               responseData.payload.userId = result.userId;
               responseData.payload.email = result.email;
               responseData.payload.username = result.username;
+              responseData.payload.imageUrl = result.imageUrl;
               resolve(responseData);
             } else if (error === null && result === null) {
               let errorCode;
@@ -96,6 +98,7 @@ exports.verifyGoogleAccessToken = function(token, verifyDatabase) {
           responseData.payload.userId = userId;
           responseData.payload.email = email;
           responseData.payload.username = username;
+          responseData.payload.imageUrl = imageUrl;
           resolve(responseData);
         }
       } else {
@@ -339,10 +342,11 @@ exports.verifyFacebookAccessToken = function(token, verifyDatabase, getUserInfo)
  * @param  {String} accessToken    AccessToken to be stored into the responseData, so the client will received it and store it into a cookie
  * @param  {String} email
  * @param  {String} username
+ * @param  {String} imageUrl
  * @return {Promise}                then:  {JSONObject} object containing access token and auth type
  *                                  catch:  {JSONObject} object containing an error message
  */
-exports.googleOrFacebookLogin = function(userId, expiryDate, authType, accessToken, email, username) {
+exports.googleOrFacebookLogin = function(userId, expiryDate, authType, accessToken, email, username, imageUrl) {
   return new Promise((resolve, reject) => {
     let responseData = {};
     // Upsert entry at db
@@ -357,7 +361,8 @@ exports.googleOrFacebookLogin = function(userId, expiryDate, authType, accessTok
         'authType': authType,
         'expiryDate': expiryDate,
         'role': ROLES.USER,
-        'username': username
+        'username': username,
+        'imageUrl': imageUrl
       }
     }, {
       upsert: true
