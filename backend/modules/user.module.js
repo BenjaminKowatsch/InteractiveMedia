@@ -297,7 +297,7 @@ exports.verifyFacebookAccessToken = function(token, verifyDatabase, getUserInfo)
       if (getUserInfo === true) {
         const graphOptions = {
           host: 'graph.facebook.com',
-          path: ('/v2.9/me?fields=name,email&access_token=' + token)
+          path: ('/v2.9/me?fields=name,email,picture&access_token=' + token)
         };
         return httpsGetRequest(graphOptions)
             .then((graphResult) => {
@@ -316,6 +316,7 @@ exports.verifyFacebookAccessToken = function(token, verifyDatabase, getUserInfo)
                 }
                 result.payload.email = email;
                 result.payload.username = username;
+                result.payload.imageUrl = graphResult.picture.data.url;
                 return result;
               }
             })
