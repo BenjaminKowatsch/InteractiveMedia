@@ -39,7 +39,7 @@ public class Transaction {
         this.dateTime = dateTime;
         this.location = location;
         this.amount = amount;
-        this.groupId = groupId;
+        this.group = group;
         this.synched = false;
         this.publishedAt = null;
     }
@@ -59,7 +59,7 @@ public class Transaction {
     }
 
     public List<Debt> split() {
-        return SplitFactory.getSplitByName(split).split(this);
+        return SplitFactory.getSplitByName(split).split(this, paidBy);
     }
 
     public long getGroupId() {
@@ -129,6 +129,7 @@ public class Transaction {
 
     public String getGroupId() {
         return groupId;
+        return group.getId();
     }
 
     public void setGroupId(String groupId) {
