@@ -6,12 +6,14 @@ import android.location.Location;
 
 import com.media.interactive.cs3.hdm.interactivemedia.contentprovider.tables.TransactionTable;
 import com.media.interactive.cs3.hdm.interactivemedia.util.Helper;
+import com.media.interactive.cs3.hdm.interactivemedia.data.split.SplitFactory;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.List;
 
 public class Transaction {
     private long id;
@@ -56,6 +58,11 @@ public class Transaction {
         return out;
     }
 
+    public List<Debt> split() {
+        return SplitFactory.getSplitByName(split).split(this);
+    }
+
+    public long getGroupId() {
     public long getId() {
         return id;
     }
