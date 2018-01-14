@@ -2,10 +2,8 @@ package com.media.interactive.cs3.hdm.interactivemedia.contentprovider;
 
 import android.content.Context;
 import android.database.Cursor;
-import android.database.DatabaseUtils;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
-import android.util.Log;
 
 import com.media.interactive.cs3.hdm.interactivemedia.contentprovider.tables.DebtTable;
 import com.media.interactive.cs3.hdm.interactivemedia.contentprovider.tables.GroupTable;
@@ -81,16 +79,17 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         db.delete("login", null, null);
     }
 
-    public Group getByIdWithUsers(long id) {
-        final Cursor cur = getAllGroupAndUsersByGroup(id);
-        final boolean containsFirst = cur.moveToFirst();
-        if (containsFirst) {
-            final String s = DatabaseUtils.dumpCursorToString(cur);
-            Log.d(this.getClass().getSimpleName(), s);
-            final Group group = extractGroupFromCurrentPosition(cur);
-            group.getUsers().add(extractUserFromCurrentPosition(cur));
-            while (cur.moveToNext()) {
-                group.getUsers().add(extractUserFromCurrentPosition(cur));
+    public Group getGroupWithUsers(long groupId) {
+        final SQLiteDatabase db = this.getWritableDatabase();
+        final String query = "SELECT *"
+                + " FROM " + GroupTable.TABLE_NAME
+                + " WHERE " + GroupTable.COLUMN_ID + " =  ?";
+        final Cursor groupData = db.rawQuery(query, new String[]{String.valueOf(groupId)});
+        final Cursor userData = getUsersForGroup(groupId);
+        if (groupData.moveToFirst()) {
+            final Group group = extractGroupFromCurrentPosition(groupData);
+            while (userData.moveToNext()) {
+                group.getUsers().add(extractUserFromCurrentPosition(userData));
             }
             return group;
         } else {
