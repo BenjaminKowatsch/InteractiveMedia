@@ -40,6 +40,7 @@ public class HomeActivity extends AppCompatActivity
     private static final String TAG = "HomeActivity";
 
     private FloatingActionButton fab;
+    private CallbackListener<JSONObject,Exception> userDataCompleted;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -61,9 +62,26 @@ public class HomeActivity extends AppCompatActivity
         final NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
-        loadProfilePicture(navigationView);
+        userDataCompleted = new CallbackListener<JSONObject, Exception>() {
+            @Override
+            public void onSuccess(JSONObject response) {
+                loadProfilePicture(navigationView);
+            }
+
+            @Override
+            public void onFailure(Exception error) {
+
+            }
+        };
+        Login.getInstance().addOnUserDataSetListener(userDataCompleted);
 
         displayFragment(R.id.nav_groups);
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        Login.getInstance().removeOnUserDataSetListener(userDataCompleted);
     }
 
     private void loadProfilePicture(NavigationView navigationView) {

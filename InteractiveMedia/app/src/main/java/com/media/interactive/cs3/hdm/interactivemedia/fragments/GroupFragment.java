@@ -47,6 +47,7 @@ public class GroupFragment extends ListFragment implements LoaderManager.LoaderC
     private DatabaseHelper dbHelper;
     private String GROUP_FILTER = "search";
     private String USER_ID_FILTER = "userId";
+    private CallbackListener<JSONObject,Exception> userDataCompleted;
 
     /**
      * Mandatory empty constructor for the fragment manager to instantiate the
@@ -132,7 +133,7 @@ public class GroupFragment extends ListFragment implements LoaderManager.LoaderC
                 context.toString()
                     + " muss OnItemSelectedListener implementieren");
         }
-        Login.getInstance().setOnUserDataSet(new CallbackListener<JSONObject, Exception>() {
+        userDataCompleted = new CallbackListener<JSONObject, Exception>() {
             @Override
             public void onSuccess(JSONObject response) {
                 Activity activity = getActivity();
@@ -145,14 +146,15 @@ public class GroupFragment extends ListFragment implements LoaderManager.LoaderC
             public void onFailure(Exception error) {
 
             }
-        });
+        };
+        Login.getInstance().addOnUserDataSetListener(userDataCompleted);
     }
 
     @Override
     public void onDetach() {
         super.onDetach();
         onItemSelectedListener = null;
-        Login.getInstance().setOnUserDataSet(null);
+        Login.getInstance().removeOnUserDataSetListener(userDataCompleted);
     }
 
     private void startGroupDetailActivity(Group group) {

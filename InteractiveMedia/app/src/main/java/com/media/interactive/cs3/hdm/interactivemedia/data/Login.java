@@ -33,6 +33,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -49,7 +50,7 @@ public class Login {
     private String hashedPassword = null;
     private UserType userType = null;
     private String accessToken = null;
-    private CallbackListener<JSONObject, Exception> onUserDataSet = null;
+    private List<CallbackListener<JSONObject, Exception>> onUserDataSetList = null;
 
     private DatabaseProviderHelper helper;
     private ContentResolver contentResolver = null;
@@ -69,6 +70,7 @@ public class Login {
         hashedPassword = null;
         userType = null;
         accessToken = null;
+        onUserDataSetList = new ArrayList<>();
     }
 
     public String getHashedPassword() {
@@ -119,19 +121,30 @@ public class Login {
                             Log.d(TAG, "Username is not set.");
                         }
                         user.setUserId(payload.getString("userId"));
-
                         JSONArray groupIds = null;
                         try {
+                            user.setImageUrl(payload.getString("imageUrl"));
+                        } catch (JSONException e) {
+                            Log.d(TAG, "No imageUrl exists for this user");
+                        }
+                        try {
+                            user.setImageUrl(payload.getString("imageUrl"));
                             groupIds = payload.getJSONArray("groupIds");
                         } catch (JSONException e) {
                             Log.d(TAG, "No groups exist for this user");
                         }
-                        if (groupIds != null) {
+                        if (groupIds != null && groupIds.length() > 0) {
                             Log.d(TAG, "Before Removal: " + groupIds.length() + " " + groupIds.toString());
                             List<String> existingGroupIds = helper.removeExistingGroupIds(groupIds);
                             Log.d(TAG, "After Removal: " + groupIds.length() + " " + groupIds.toString());
-                            requestTransactionsForGroups(context, existingGroupIds);
+                            for (final String groupId : existingGroupIds) {
+                                requestTransactionsByGroupId(context, groupId);
+                            }
                             requestNewGroups(context, groupIds);
+                        } else {
+                            for (CallbackListener<JSONObject, Exception> onUserDataSet : onUserDataSetList) {
+                                onUserDataSet.onSuccess(response);
+                            }
                         }
                         user.setSync(true);
                         helper.upsertUser(user);
@@ -147,7 +160,7 @@ public class Login {
             @Override
             public void onErrorResponse(VolleyError error) {
                 Log.e(TAG, "Error while setting user data.");
-                if (onUserDataSet != null) {
+                for (CallbackListener<JSONObject, Exception> onUserDataSet : onUserDataSetList) {
                     onUserDataSet.onFailure(error);
                 }
             }
@@ -156,40 +169,38 @@ public class Login {
         RestRequestQueue.getInstance(context).addToRequestQueue(jsonObjectRequest);
     }
 
-    private void requestTransactionsForGroups(Context context, List<String> groupIds) {
-        for (final String groupId : groupIds) {
+    public void requestTransactionsByGroupId(Context context, final String groupId) {
 
-            final String latestPublishedDate = helper.getLatestTransactionPubDateByGroupId(groupId);
-            Log.d(TAG, "latest published date: " + latestPublishedDate);
-            if (latestPublishedDate != null) {
-                final String url = context.getResources().getString(R.string.web_service_url).concat("/v1/groups/").concat(groupId).concat("/transactions?after=").concat(latestPublishedDate);
-                Log.d(TAG, "Get: " + url);
-                final AuthorizedJsonObjectRequest jsonObjectRequest = new AuthorizedJsonObjectRequest(
-                    Request.Method.GET, url, null, new Response.Listener<JSONObject>() {
-                    @Override
-                    public void onResponse(final JSONObject response) {
-                        try {
-                            final boolean success = response.getBoolean("success");
-                            Log.d(TAG, "TransactionsAfter: " + response);
-                            if (success) {
-                                final JSONArray payload = response.getJSONArray("payload");
-                                helper.addTransactions(payload, groupId);
-                            } else {
-                                Log.e(TAG, "Error while setting user data.");
-                            }
-                        } catch (JSONException e) {
-                            e.printStackTrace();
+        final String latestPublishedDate = helper.getLatestTransactionPubDateByGroupId(groupId);
+        Log.d(TAG, "latest published date: " + latestPublishedDate);
+        if (latestPublishedDate != null) {
+            final String url = context.getResources().getString(R.string.web_service_url).concat("/v1/groups/").concat(groupId).concat("/transactions?after=").concat(latestPublishedDate);
+            Log.d(TAG, "Get: " + url);
+            final AuthorizedJsonObjectRequest jsonObjectRequest = new AuthorizedJsonObjectRequest(
+                Request.Method.GET, url, null, new Response.Listener<JSONObject>() {
+                @Override
+                public void onResponse(final JSONObject response) {
+                    try {
+                        final boolean success = response.getBoolean("success");
+                        Log.d(TAG, "TransactionsAfter: " + response);
+                        if (success) {
+                            final JSONArray payload = response.getJSONArray("payload");
+                            helper.addTransactions(payload, groupId);
+                        } else {
+                            Log.e(TAG, "Error while setting user data.");
                         }
+                    } catch (JSONException e) {
+                        e.printStackTrace();
                     }
-                }, new Response.ErrorListener() {
-                    @Override
-                    public void onErrorResponse(VolleyError error) {
-                        Log.e(TAG, "Error while setting user data.");
-                    }
-                });
-                jsonObjectRequest.setShouldCache(false);
-                RestRequestQueue.getInstance(context).addToRequestQueue(jsonObjectRequest);
-            }
+                }
+            }, new Response.ErrorListener() {
+                @Override
+                public void onErrorResponse(VolleyError error) {
+                    Log.e(TAG, "Error while setting user data.");
+                }
+            });
+            jsonObjectRequest.setShouldCache(false);
+            RestRequestQueue.getInstance(context).addToRequestQueue(jsonObjectRequest);
         }
     }
 
@@ -229,8 +240,10 @@ public class Login {
                                 helper.insertGroupAtDatabase(newGroup);
                                 //Add Transactions
                                 helper.addTransactions(payload.getJSONArray("transactions"), newGroup.getGroupId());
-                                if (onUserDataSet != null && groupIds.length() - 1 == atomicInteger.incrementAndGet()) {
-                                    onUserDataSet.onSuccess(response);
+                                if (groupIds.length() - 1 == atomicInteger.incrementAndGet()) {
+                                    for (CallbackListener<JSONObject, Exception> onUserDataSet : onUserDataSetList) {
+                                        onUserDataSet.onSuccess(response);
+                                    }
                                 }
                             } else {
                                 Log.e(TAG, "Error while setting user data.");
@@ -253,8 +266,8 @@ public class Login {
         }
     }
 
-    public boolean loginResponseHandler(JSONObject response) {
-
+    public boolean loginResponseHandler(Context context, JSONObject response) {
+        boolean result = false;
         Log.d("User: ", "loginResponseHandler: Thread Id: "
             + android.os.Process.getThreadPriority(android.os.Process.myTid()));
         Log.d(TAG, "Response: " + response.toString());
@@ -268,16 +281,17 @@ public class Login {
                 if (id == 0) {
                     cacheCredentials(this);
                 }
-
-                return true;
+                result = true;
+            } else {
+                Log.e(TAG, "Received an unsuccessful answer from backend during registration.");
+                result = false;
             }
-
-            Log.e(TAG, "Received an unsuccessful answer from backend during registration.");
-            return false;
         } catch (JSONException e) {
             e.printStackTrace();
+            result = false;
         }
-        return false;
+        initUserData(context);
+        return result;
     }
 
     private boolean cacheCredentials(Login login) {
@@ -331,7 +345,7 @@ public class Login {
         return false;
     }
 
-    public void register(Context context, final CallbackListener<JSONObject, Exception> callbackListener) {
+    public void register(final Context context, final CallbackListener<JSONObject, Exception> callbackListener) {
 
         contentResolver = context.getContentResolver();
         helper = new DatabaseProviderHelper(context.getContentResolver());
@@ -342,7 +356,7 @@ public class Login {
         try {
             data.put("username", user.getUsername());
             data.put("email", user.getEmail());
-            data.put("imageUrl", user.getImageUrl() != null ? user.getImageUrl() : JSONObject.NULL);
+            data.put("imageUrl", JSONObject.NULL);
             data.put("password", hashedPassword);
         } catch (JSONException e) {
             e.printStackTrace();
@@ -353,7 +367,7 @@ public class Login {
             Request.Method.POST, url, data, new Response.Listener<JSONObject>() {
             @Override
             public void onResponse(JSONObject response) {
-                loginResponseHandler(response);
+                loginResponseHandler(context, response);
                 callbackListener.onSuccess(response);
             }
         }, new Response.ErrorListener() {
@@ -444,8 +458,7 @@ public class Login {
             Request.Method.POST, url, data, new Response.Listener<JSONObject>() {
             @Override
             public void onResponse(JSONObject response) {
-                loginResponseHandler(response);
-                initUserData(context);
+                loginResponseHandler(context, response);
                 callbackListener.onSuccess(response);
             }
         }, new Response.ErrorListener() {
@@ -485,7 +498,7 @@ public class Login {
             Request.Method.POST, url, data, new Response.Listener<JSONObject>() {
             @Override
             public void onResponse(JSONObject response) {
-                loginResponseHandler(response);
+                loginResponseHandler(context, response);
                 initUserData(context);
                 callbackListener.onSuccess(response);
             }
@@ -518,7 +531,7 @@ public class Login {
             Request.Method.POST, url, data, new Response.Listener<JSONObject>() {
             @Override
             public void onResponse(JSONObject response) {
-                loginResponseHandler(response);
+                loginResponseHandler(context, response);
                 initUserData(context);
                 callbackListener.onSuccess(response);
             }
@@ -613,7 +626,11 @@ public class Login {
         RestRequestQueue.getInstance(activity).addToRequestQueue(jsonObjectRequest);
     }
 
-    public void setOnUserDataSet(CallbackListener<JSONObject, Exception> onUserDataSet) {
-        this.onUserDataSet = onUserDataSet;
+    public void addOnUserDataSetListener(CallbackListener<JSONObject, Exception> onUserDataSet) {
+        this.onUserDataSetList.add(onUserDataSet);
+    }
+
+    public void removeOnUserDataSetListener(CallbackListener<JSONObject, Exception> onUserDataSet) {
+        this.onUserDataSetList.remove(onUserDataSet);
     }
 }
