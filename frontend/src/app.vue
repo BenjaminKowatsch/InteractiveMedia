@@ -27,7 +27,9 @@
       </v-list>
     </v-navigation-drawer> --> 
     <v-toolbar app fixed clipped-left>
-      <v-toolbar-title>Debts² admin panel</v-toolbar-title>
+      <v-spacer></v-spacer>
+        <v-toolbar-title>Debts² admin panel</v-toolbar-title>
+      <v-spacer></v-spacer>
     </v-toolbar>
     <v-content>
       <v-container fluid fill-height>
