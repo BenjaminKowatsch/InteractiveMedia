@@ -1,33 +1,27 @@
 <template>
 
-   <v-app id="inspire" dark>
-      <!-- <v-navigation-drawer
+   <v-app id="inspire" :dark="isDark">
+       <v-navigation-drawer
       clipped
-      fixed
+      absolute
       v-model="drawer"
+      disable-resize-watcher="true"
       app>
 
        <v-list dense>
-        <v-list-tile @click="theme = dark">
+        <v-list-tile @click="changeTheme">
           <v-list-tile-action>
-            <v-icon>dashboard</v-icon>
+            <v-icon>invert_colors</v-icon>
           </v-list-tile-action>
           <v-list-tile-content>
-            <v-list-tile-title>Dashboard</v-list-tile-title>
+            <v-list-tile-title>Change Theme</v-list-tile-title>
           </v-list-tile-content>
         </v-list-tile>
-        <v-list-tile @click="theme = light">
-          <v-list-tile-action>
-            <v-icon>settings</v-icon>
-          </v-list-tile-action>
-          <v-list-tile-content>
-            <v-list-tile-title>Settings</v-list-tile-title>
-          </v-list-tile-content>
-        </v-list-tile>
+        <v-divider inset></v-divider>
       </v-list>
-    </v-navigation-drawer> --> 
-    <v-toolbar app fixed clipped-left>
-      <v-spacer></v-spacer>
+    </v-navigation-drawer> 
+    <v-toolbar app fixed clipped-left prominent="true">
+ <v-toolbar-side-icon @click="drawer = !drawer"></v-toolbar-side-icon>      <v-spacer></v-spacer>
         <v-toolbar-title>Debts² admin panel</v-toolbar-title>
       <v-spacer></v-spacer>
     </v-toolbar>
@@ -64,13 +58,40 @@ export default {
     Login
   },
   data: () => ({
-      // theme: "dark",
-      drawer: null
+      isDark: true,
+      drawer: false
     }),
     props: {
       source: String
     },
+
    methods: {
+
+     changeTheme: function() {
+
+      if(this.isDark == true)
+      {
+        this.isDark = false
+        console.log(this.isDark)
+      }
+      else if(this.isDark == false)
+      {
+        this.isDark = true
+        console.log(this.isDark)
+      }
+     },
+
+     toogleDrawer: function(){
+
+       if(this.drawer == true)
+       {
+         this.drawer = false
+       }
+       else if(this.drawer == false)
+       {
+         this.drawer = true
+       }
+     }
 /*     reload: function () {
        location.reload();
      } */
