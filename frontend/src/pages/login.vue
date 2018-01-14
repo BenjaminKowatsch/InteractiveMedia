@@ -14,6 +14,7 @@
           label="Username"
           v-model="username"
           :rules="usernameRules"
+          @keyup.enter="checkLogin()"
           required
         ></v-text-field>
         <v-text-field
@@ -21,7 +22,8 @@
           label="Password"
           v-model="password"
           :rules="passwordRules"
-          type="password"         
+          type="password"
+          @keyup.enter="checkLogin()"    
           required
         ></v-text-field>
         <v-btn
