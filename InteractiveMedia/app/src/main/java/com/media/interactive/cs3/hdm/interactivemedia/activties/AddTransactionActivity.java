@@ -114,11 +114,52 @@ public class AddTransactionActivity extends ImagePickerActivity {
 
     private void createAndSaveTransaction(View view) {
         final Transaction toSave = buildFromCurrentView();
-        helper.saveTransaction(toSave);
-        finish();
+        // Upload group image if sending the group data was successfull
+        if (getCurrentPhotoPath() != null) {
+            uploadImage(new CallbackListener<JSONObject, Exception>() {
+                @Override
+                public void onSuccess(JSONObject response) {
+                    JSONObject payload = null;
+                    String imageName = null;
+                    try {
+                        payload = response.getJSONObject("payload");
+                        imageName = payload.getString("path");
+                        Log.d(TAG, "Path returned: " + payload.getString("path"));
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                    final String newImageUrl = getResources().getString(R.string.web_service_url)
+                        .concat("/v1/object-store/download?filename=").concat(imageName);
+                    toSave.setImageUrl(newImageUrl);
+                    try {
+                        sendToBackend(toSave);
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                }
+
+                @Override
+                public void onFailure(Exception error) {
+                    makeToast(error.getMessage());
+                }
+            });
+        } else {
+            try {
+                sendToBackend(toSave);
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
+
+        try {
+            Log.d(TAG, toSave.toJson().toString());
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
     }
 
     private void sendToBackend(Transaction toSave) throws JSONException {
+        helper.saveTransaction(toSave);
         final String url = getResources().getString(R.string.web_service_url).concat("/v1/groups/").concat(toSave.getGroupId()).concat("/transactions");
         Log.d(TAG, "url: " + url);
         final AuthorizedJsonObjectRequest jsonObjectRequest = new AuthorizedJsonObjectRequest(
@@ -127,12 +168,13 @@ public class AddTransactionActivity extends ImagePickerActivity {
             public void onResponse(JSONObject response) {
 
                 Log.d(TAG, response.toString());
-
+                finish();
             }
         }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
                 makeToast("Error while sending the group to backend.");
+                finish();
             }
         });
         RestRequestQueue.getInstance(getApplicationContext()).addToRequestQueue(jsonObjectRequest);
@@ -146,19 +188,17 @@ public class AddTransactionActivity extends ImagePickerActivity {
         return buildTransaction(name, split, dateEditText, timeEditText, amount);
     }
 
-
-
     private Transaction buildTransaction(EditText nameText, TextView splitText,
                                          EditText dateText, EditText timeText, EditText amountText) {
         final String purpose = nameText.getText().toString();
-        final String split = splitText.getText().toString();
+        final String split = "even";
         final double amount = parseAmount(amountText);
         final Date dateTime = parseDateTime(dateText, timeText);
         final ImageUploadCallbackListener imageUploadCallbackListener = new ImageUploadCallbackListener();
         uploadImage(imageUploadCallbackListener);
         //FIXME: replace this with real location
         final Location location = new Location("");
-        return new Transaction(purpose, userAdapter.getCursor().getString(1), split, dateTime,
+        return new Transaction(purpose, userAdapter.getCursor().getString(userAdapter.getCursor().getColumnIndex(UserTable.COLUMN_USER_ID)), split, dateTime,
                 imageUploadCallbackListener.imageUrl, location, amount, groupId);
     }
 

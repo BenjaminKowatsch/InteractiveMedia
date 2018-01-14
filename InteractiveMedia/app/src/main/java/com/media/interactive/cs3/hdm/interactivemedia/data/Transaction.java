@@ -9,6 +9,7 @@ import com.media.interactive.cs3.hdm.interactivemedia.contentprovider.tables.Tra
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.text.SimpleDateFormat;
 import java.util.Date;
 
 public class Transaction {
@@ -154,7 +155,8 @@ public class Transaction {
         result.put("infoLocation", infoLocation);
 
         result.put("infoImageUrl", imageUrl);
-        result.put("infoCreatedAt",dateTime);
+        final SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
+        result.put("infoCreatedAt", sdf.format(dateTime));
         result.put("paidBy", paidBy);
         result.put("split", split);
         return result;

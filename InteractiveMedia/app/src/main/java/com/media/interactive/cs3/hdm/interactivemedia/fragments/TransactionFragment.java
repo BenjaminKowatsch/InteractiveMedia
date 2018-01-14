@@ -13,10 +13,12 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ListView;
+import android.widget.SearchView;
 import android.widget.SimpleCursorAdapter;
 import android.widget.Spinner;
 
@@ -46,8 +48,8 @@ public class TransactionFragment extends ListFragment implements LoaderManager.L
     private View transactionListFragment;
     private ContentResolver contentResolver;
     private SimpleCursorAdapter groupAdapter;
-    private static final String GROUP_ID_FILTER = "groupId";
-    private static final int CURSOR_LOADER_GROUP_ID = 0;
+    private static final int CURSOR_LOADER_TRANSACTIONS_NAME = 0;
+    private static final String TRANSACTION_NAME_FILTER = "transactionName";
 
     /**
      * Mandatory empty constructor for the fragment manager to instantiate the
@@ -61,6 +63,28 @@ public class TransactionFragment extends ListFragment implements LoaderManager.L
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         inflater.inflate(R.menu.fragment_transaction, menu);
+
+        final MenuItem searchItem = menu.findItem(R.id.menu_item_search);
+
+        final SearchView searchView = (SearchView) searchItem.getActionView();
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String s) {
+                final Bundle bundle = new Bundle();
+                bundle.putString(TRANSACTION_NAME_FILTER, s);
+                getLoaderManager().restartLoader(CURSOR_LOADER_TRANSACTIONS_NAME, bundle, TransactionFragment.this);
+                return true;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String s) {
+                final Bundle bundle = new Bundle();
+                bundle.putString(TRANSACTION_NAME_FILTER, s);
+                getLoaderManager().restartLoader(CURSOR_LOADER_TRANSACTIONS_NAME, bundle, TransactionFragment.this);
+                return true;
+            }
+        });
+
         super.onCreateOptionsMenu(menu, inflater);
     }
 
@@ -79,12 +103,10 @@ public class TransactionFragment extends ListFragment implements LoaderManager.L
     }
 
     private void initOrRestartLoaderWithGroupId() {
-        final Bundle bundle = new Bundle();
-        bundle.putString(GROUP_ID_FILTER, getCurrentGroupId());
-        if (getLoaderManager().getLoader(CURSOR_LOADER_GROUP_ID) == null || getLoaderManager().getLoader(CURSOR_LOADER_GROUP_ID).isStarted() == false) {
-            getLoaderManager().initLoader(CURSOR_LOADER_GROUP_ID, bundle, TransactionFragment.this);
+        if (getLoaderManager().getLoader(CURSOR_LOADER_TRANSACTIONS_NAME) == null || getLoaderManager().getLoader(CURSOR_LOADER_TRANSACTIONS_NAME).isStarted() == false) {
+            getLoaderManager().initLoader(CURSOR_LOADER_TRANSACTIONS_NAME, null, TransactionFragment.this);
         } else {
-            getLoaderManager().restartLoader(CURSOR_LOADER_GROUP_ID, bundle, TransactionFragment.this);
+            getLoaderManager().restartLoader(CURSOR_LOADER_TRANSACTIONS_NAME, null, TransactionFragment.this);
         }
     }
 
@@ -164,11 +186,21 @@ public class TransactionFragment extends ListFragment implements LoaderManager.L
 
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
+        String search = "%%";
+        switch (id) {
+            case CURSOR_LOADER_TRANSACTIONS_NAME:
+                if (args != null) {
+                    search = "%" + args.getString(TRANSACTION_NAME_FILTER) + "%";
+                }
+                break;
+            default:
+                break;
+        }
         final String[] projection = { TransactionTable.TABLE_NAME + ".*"};
         final String sortOrder = TransactionTable.TABLE_NAME + "." + TransactionTable.COLUMN_INFO_CREATED_AT + " DESC";
-        final String selection = GroupTable.TABLE_NAME + "." + GroupTable.COLUMN_GROUP_ID + " = ?";
-        final String[] selectionArgs = {getCurrentGroupId()};
-        return new CursorLoader(getActivity(),DatabaseProvider.CONTENT_GROUP_TRANSACTION_JOIN_URI, projection, selection, selectionArgs, sortOrder);
+        final String selection = GroupTable.TABLE_NAME + "." + GroupTable.COLUMN_GROUP_ID + " = ? AND " + GroupTable.TABLE_NAME + "." + GroupTable.COLUMN_NAME + " like ? ";
+        final String[] selectionArgs = {getCurrentGroupId(), search};
+        return new CursorLoader(getActivity(), DatabaseProvider.CONTENT_GROUP_TRANSACTION_JOIN_URI, projection, selection, selectionArgs, sortOrder);
     }
 
     @Override
