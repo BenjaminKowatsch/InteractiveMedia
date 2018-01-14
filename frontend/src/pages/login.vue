@@ -4,9 +4,8 @@
   * Comments:    Alexander Schübl
   * Description: View for logging into the web app
  -->
-
 <template>
-  <v-container  >
+  <v-container fluid fill-height>
     <v-layout  justify-center align-center> 
       <v-form ref="form" lazy-validation > 
         <v-text-field
