@@ -25,11 +25,7 @@ const groupScenarios = require('./data/groupScenarios');
 
 // ************* Helper ***********//
 
-const registerUser = index => chai.request(HOST).post(URL.BASE_USER).send({
-  username: userData.users.valid[index].username,
-  email: userData.users.valid[index].email,
-  password: userData.users.valid[index].password
-});
+const registerUser = index => chai.request(HOST).post(URL.BASE_USER).send(userData.users.valid[index]);
 
 describe('Admin', () => {
   describe('Login', () => {
@@ -86,6 +82,7 @@ describe('Admin', () => {
         expect(res.body.payload.groupIds).to.be.undefined;
         expect(res.body.payload.userId).to.have.lengthOf(36).and.to.be.a('string');
         expect(res.body.payload.role).to.equal('admin');
+        expect(res.body.payload.imageUrl).to.equal(adminData.imageUrl);
       });
     });
   });
@@ -322,16 +319,19 @@ describe('Admin', () => {
           expect(res.body.payload[0].email).to.equal(adminData.email);
           expect(res.body.payload[0].userId).to.have.lengthOf(36).and.to.be.a('string');
           expect(res.body.payload[0].role).to.equal('admin');
+          expect(res.body.payload[0].authType).to.equal(0);
           expect(res.body.payload[0].countGroupIds).to.equal(0);
           expect(res.body.payload[1].username).to.equal(userData.users.valid[0].username);
           expect(res.body.payload[1].email).to.equal(userData.users.valid[0].email);
           expect(res.body.payload[1].userId).to.have.lengthOf(36).and.to.be.a('string');
           expect(res.body.payload[1].role).to.equal('user');
+          expect(res.body.payload[1].authType).to.equal(0);
           expect(res.body.payload[1].countGroupIds).to.equal(1);
           expect(res.body.payload[2].username).to.equal(userData.users.valid[1].username);
           expect(res.body.payload[2].email).to.equal(userData.users.valid[1].email);
           expect(res.body.payload[2].userId).to.have.lengthOf(36).and.to.be.a('string');
           expect(res.body.payload[2].role).to.equal('user');
+          expect(res.body.payload[2].authType).to.equal(0);
           expect(res.body.payload[2].countGroupIds).to.equal(1);
         });
       });
@@ -417,6 +417,7 @@ describe('Admin', () => {
           expect(res.body.payload.groupIds[0]).to.equal(groupId);
           expect(res.body.payload.userId).to.equal(userIds[0]);
           expect(res.body.payload.role).to.equal('user');
+          expect(res.body.payload.imageUrl).to.equal(userData.users.valid[0].imageUrl);
         });
       });
 

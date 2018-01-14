@@ -1,0 +1,86 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "type": "object",
+  "properties": {
+    "amount": {
+      "type": "number"
+    },
+    "infoName": {
+      "type": "string",
+      "minLength": 1
+    },
+    "infoLocation": {
+      "oneOf": [
+        {
+          "type": "object",
+          "properties": {
+            "longitude": {
+              "type": "null"
+            },
+            "latitude": {
+              "type": "null"
+            }
+          },
+          "required": [
+            "longitude",
+            "latitude"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "longitude": {
+              "type": "number",
+              "minimum": -180,
+              "maximum": 180
+            },
+            "latitude": {
+              "type": "number",
+              "minimum": -90,
+              "maximum": 90
+            }            
+          },
+          "required": [
+            "longitude",
+            "latitude"
+          ],
+          "additionalProperties": false
+        }
+      ]
+    },
+    "infoCreatedAt": {
+      "type": "string",
+      "minLength": 24      
+    },
+    "infoImageUrl": {
+      "oneOf": [
+        {
+          "type": "null"
+        },
+        {
+          "type": "string",
+          "minLength": 4
+        }
+      ]
+    },
+    "paidBy": {
+      "type": "string",
+      "minLength": 10
+    },
+    "split": {
+      "type": "string",
+      "minLength": 4
+    }
+  },
+  "required": [
+    "amount",
+    "infoName",
+    "infoLocation",
+    "infoCreatedAt",
+    "infoImageUrl",
+    "paidBy",
+    "split"
+  ],
+  "additionalProperties": false
+}

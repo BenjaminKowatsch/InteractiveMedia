@@ -15,6 +15,7 @@ import com.media.interactive.cs3.hdm.interactivemedia.contentprovider.tables.Gro
 import com.media.interactive.cs3.hdm.interactivemedia.contentprovider.tables.LoginTable;
 import com.media.interactive.cs3.hdm.interactivemedia.contentprovider.tables.TransactionTable;
 import com.media.interactive.cs3.hdm.interactivemedia.contentprovider.tables.UserTable;
+import com.media.interactive.cs3.hdm.interactivemedia.data.Transaction;
 
 /**
  * Created by benny on 20.11.17.
@@ -26,10 +27,27 @@ public class DatabaseProvider extends android.content.ContentProvider {
     // Constants
     private static final String AUTHORITY =
         "com.media.interactive.cs3.hdm.interactivemedia.contentprovider";
+    private static final String GROUP_USER_JOIN_TABLE = GroupTable.TABLE_NAME
+        + "_" + GroupUserTable.TABLE_NAME
+        + "_" + UserTable.TABLE_NAME;
+    private static final String GROUP_TRANSACTION_JOIN_TABLE = GroupTable.TABLE_NAME
+        + "_" + GroupTransactionTable.TABLE_NAME
+        + "_" + TransactionTable.TABLE_NAME;
+    private static final String GROUP_USER_TRANSACTION_JOIN_TABLE = GroupTable.TABLE_NAME
+        + "_" + GroupTransactionTable.TABLE_NAME
+        + "_" + TransactionTable.TABLE_NAME
+        + "_" + UserTable.TABLE_NAME;
+
     public static final Uri CONTENT_DEBT_URI = Uri.parse("content://"
         + AUTHORITY + "/" + DebtTable.TABLE_NAME);
     public static final Uri CONTENT_GROUP_URI = Uri.parse("content://"
         + AUTHORITY + "/" + GroupTable.TABLE_NAME);
+    public static final Uri CONTENT_GROUP_USER_JOIN_URI = Uri.parse("content://"
+        + AUTHORITY + "/" + GROUP_USER_JOIN_TABLE);
+    public static final Uri CONTENT_GROUP_TRANSACTION_JOIN_URI = Uri.parse("content://"
+        + AUTHORITY + "/" + GROUP_TRANSACTION_JOIN_TABLE);
+    public static final Uri CONTENT_GROUP_USER_TRANSACTION_JOIN_URI = Uri.parse("content://"
+        + AUTHORITY + "/" + GROUP_USER_TRANSACTION_JOIN_TABLE);
     public static final Uri CONTENT_LOGIN_URI = Uri.parse("content://"
         + AUTHORITY + "/" + LoginTable.TABLE_NAME);
     public static final Uri CONTENT_TRANSACTION_URI = Uri.parse("content://"
@@ -47,6 +65,9 @@ public class DatabaseProvider extends android.content.ContentProvider {
     private static final int USER_CODE = 4;
     private static final int GROUP_TRANSACTION_CODE = 5;
     private static final int GROUP_USER_CODE = 6;
+    private static final int GROUP_USER_JOIN_CODE = 7;
+    private static final int GROUP_TRANSACTION_JOIN_CODE = 8;
+    private static final int GROUP_USER_TRANSACTION_JOIN_CODE = 9;
     private static final UriMatcher mUriMatcher = new UriMatcher(UriMatcher.NO_MATCH);
 
     static {
@@ -55,6 +76,10 @@ public class DatabaseProvider extends android.content.ContentProvider {
         mUriMatcher.addURI(AUTHORITY, LoginTable.TABLE_NAME, LOGIN_CODE);
         mUriMatcher.addURI(AUTHORITY, TransactionTable.TABLE_NAME, TRANSACTION_CODE);
         mUriMatcher.addURI(AUTHORITY, UserTable.TABLE_NAME, USER_CODE);
+
+        mUriMatcher.addURI(AUTHORITY, GROUP_USER_JOIN_TABLE, GROUP_USER_JOIN_CODE);
+        mUriMatcher.addURI(AUTHORITY, GROUP_TRANSACTION_JOIN_TABLE, GROUP_TRANSACTION_JOIN_CODE);
+        mUriMatcher.addURI(AUTHORITY, GROUP_USER_TRANSACTION_JOIN_TABLE, GROUP_USER_TRANSACTION_JOIN_CODE);
 
         mUriMatcher.addURI(AUTHORITY, GroupTransactionTable.TABLE_NAME, GROUP_TRANSACTION_CODE);
         mUriMatcher.addURI(AUTHORITY, GroupUserTable.TABLE_NAME, GROUP_USER_CODE);
@@ -73,7 +98,7 @@ public class DatabaseProvider extends android.content.ContentProvider {
     @Override
     public Cursor query(Uri uri, String[] projection, String selection, String[] selectionArgs, String sortOrder) {
 
-        SQLiteQueryBuilder sqLiteQueryBuilder = new SQLiteQueryBuilder();
+        final SQLiteQueryBuilder sqLiteQueryBuilder = new SQLiteQueryBuilder();
         //checkColumns(projection);
         switch (mUriMatcher.match(uri)) {
             case DEBT_CODE:
@@ -97,11 +122,34 @@ public class DatabaseProvider extends android.content.ContentProvider {
             case GROUP_USER_CODE:
                 sqLiteQueryBuilder.setTables(GroupUserTable.TABLE_NAME);
                 break;
+            case GROUP_USER_JOIN_CODE:
+                sqLiteQueryBuilder.setTables(UserTable.TABLE_NAME
+                    + " INNER JOIN "
+                    + GroupUserTable.TABLE_NAME + " ON "+ GroupUserTable.TABLE_NAME + "."+ GroupUserTable.COLUMN_USER_ID +" = " + UserTable.TABLE_NAME + "."+ UserTable.COLUMN_ID
+                    + " INNER JOIN "
+                    + GroupTable.TABLE_NAME + " ON "+ GroupUserTable.TABLE_NAME + "."+ GroupUserTable.COLUMN_GROUP_ID +" = " + GroupTable.TABLE_NAME + "."+ GroupTable.COLUMN_ID);
+                break;
+            case GROUP_TRANSACTION_JOIN_CODE:
+                sqLiteQueryBuilder.setTables(TransactionTable.TABLE_NAME
+                    + " INNER JOIN "
+                    + GroupTransactionTable.TABLE_NAME + " ON "+ GroupTransactionTable.TABLE_NAME + "."+ GroupTransactionTable.COLUMN_TRANSACTION_ID +" = " + TransactionTable.TABLE_NAME + "."+ TransactionTable.COLUMN_ID
+                    + " INNER JOIN "
+                    + GroupTable.TABLE_NAME + " ON "+ GroupTransactionTable.TABLE_NAME + "."+ GroupTransactionTable.COLUMN_GROUP_ID +" = " + GroupTable.TABLE_NAME + "."+ GroupTable.COLUMN_GROUP_ID);
+                break;
+            case GROUP_USER_TRANSACTION_JOIN_CODE:
+                sqLiteQueryBuilder.setTables(TransactionTable.TABLE_NAME
+                    + " INNER JOIN "
+                    + GroupTransactionTable.TABLE_NAME + " ON "+ GroupTransactionTable.TABLE_NAME + "."+ GroupTransactionTable.COLUMN_TRANSACTION_ID +" = " + TransactionTable.TABLE_NAME + "."+ TransactionTable.COLUMN_ID
+                    + " INNER JOIN "
+                    + GroupTable.TABLE_NAME + " ON "+ GroupTransactionTable.TABLE_NAME + "."+ GroupTransactionTable.COLUMN_GROUP_ID +" = " + GroupTable.TABLE_NAME + "."+ GroupTable.COLUMN_GROUP_ID
+                    + " INNER JOIN "
+                    + UserTable.TABLE_NAME + " ON "+ UserTable.TABLE_NAME + "."+ UserTable.COLUMN_USER_ID +" = " + TransactionTable.TABLE_NAME + "."+ TransactionTable.COLUMN_PAID_BY);
+                break;
             default:
                 Log.e(TAG, "Error: Calling query method at DatabaseProvider with invalid uri.");
                 break;
         }
-        Cursor cursor = sqLiteQueryBuilder.query(databaseHelper.getWritableDatabase(),
+        final Cursor cursor = sqLiteQueryBuilder.query(databaseHelper.getWritableDatabase(),
             projection,
             selection,
             selectionArgs,
@@ -119,7 +167,7 @@ public class DatabaseProvider extends android.content.ContentProvider {
 
     @Override
     public Uri insert(Uri uri, ContentValues values) {
-        SQLiteDatabase sqLiteDatabase = databaseHelper.getWritableDatabase();
+        final SQLiteDatabase sqLiteDatabase = databaseHelper.getWritableDatabase();
         long id = 0;
         String tablename = "";
         switch (mUriMatcher.match(uri)) {
@@ -189,7 +237,7 @@ public class DatabaseProvider extends android.content.ContentProvider {
 
     @Override
     public int update(Uri uri, ContentValues values, String selection, String[] selectionArgs) {
-        SQLiteDatabase sqLiteDatabase = databaseHelper.getWritableDatabase();
+        final SQLiteDatabase sqLiteDatabase = databaseHelper.getWritableDatabase();
         int rowsUpdated = 0;
         switch (mUriMatcher.match(uri)) {
             case DEBT_CODE:

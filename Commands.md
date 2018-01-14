@@ -8,3 +8,12 @@ build and run local stack
 
 generate api docs
 `docker build -f backend/doc/Dockerfile -t apidoc:latest backend && docker run apidoc:latest && rm -r /vagrant/generated_doc  && docker cp $(docker ps --latest --format "{{.ID}}"):/doc ./generated_doc`
+
+remove all unreachable docker layers
+`docker images -q -f dangling=true | xargs docker rmi`
+
+remove all unreachable docker volumes
+`docker volume ls -qf dangling=true | xargs -r docker volume rm`
+
+cleanup all docker resources (containers, volumes, images, networks)
+`docker system prune`

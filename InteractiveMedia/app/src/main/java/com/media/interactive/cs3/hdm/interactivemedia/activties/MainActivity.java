@@ -2,6 +2,7 @@ package com.media.interactive.cs3.hdm.interactivemedia.activties;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.database.Cursor;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.RequiresApi;
@@ -30,8 +31,6 @@ public class MainActivity extends AppCompatActivity {
     private SharedPreferences sharedPreferences;
     private DatabaseHelper databaseHelper;
 
-
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -43,16 +42,6 @@ public class MainActivity extends AppCompatActivity {
         //databaseHelper.deleteAllUsers();
         databaseHelper.resetDatabase();
 
-        final Login testUser = Login.getInstance();
-        testUser.setUsername("Test User");
-        testUser.setEmail("user.test@gmail.com");
-        testUser.setHashedPassword(Hash.hashStringSha256("Passwort1234"));
-        //databaseHelper.deleteAllUsers();
-
-        DummyDataAdder dummyDataAdder = new DummyDataAdder(this);
-        dummyDataAdder.addAllDummyData();
-
-
         Login.getInstance().clear();
 
         appTag = getResources().getString(R.string.app_tag);
@@ -63,7 +52,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-    @RequiresApi(api = Build.VERSION_CODES.N)
+
     private void launchNextActivity() {
         Login.getInstance().login(MainActivity.this, new CallbackListener<JSONObject, Exception>() {
             @Override
@@ -85,7 +74,7 @@ public class MainActivity extends AppCompatActivity {
                 Log.d(TAG, "Login failed due to " + error.getMessage());
                 Toast.makeText(getApplicationContext(), "Login failed", Toast.LENGTH_SHORT).show();
                 // Do first run stuff
-                Log.d(TAG, "Launching Login Activity"); // TODO: change intent to Login activity
+                Log.d(TAG, "Launching Login Activity");
                 final Intent intent = new Intent(MainActivity.this, LoginActivity.class);
                 intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
                 startActivity(intent);
@@ -98,7 +87,6 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-    @RequiresApi(api = Build.VERSION_CODES.N)
     @Override
     protected void onResume() {
         super.onResume();

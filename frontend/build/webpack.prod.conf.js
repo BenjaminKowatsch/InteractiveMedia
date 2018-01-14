@@ -25,8 +25,15 @@ var webpackConfig = merge(baseWebpackConfig, {
   },
   plugins: [
     // http://vuejs.github.io/vue-loader/en/workflow/production.html
+    // new webpack.DefinePlugin({
+    //   'process.env': env
+    // }),
     new webpack.DefinePlugin({
-      'process.env': env
+      'process.env': {
+        'NODE_ENV': '"production"',
+        'WEB_SERVICE_URL': JSON.stringify(process.env.WEB_SERVICE_URL),
+        'JWT_SIMPLE_SECRET': JSON.stringify(process.env.JWT_SIMPLE_SECRET)
+      }
     }),
     /*
     new webpack.optimize.UglifyJsPlugin({

@@ -1,72 +1,50 @@
 #
-# ---- Base Node ----
-FROM ebiven/vue-cli AS base-build
+# ---- Build ----
+FROM ebiven/vue-cli AS build
 
-# Define working directory
+# define working directory
 WORKDIR /app
 
 # copy project file
 COPY package.json .
 
-
-#
-# ---- Unit tests and linters ----
-FROM base-build AS build
-
-
-#ENV CLIENT_ID "908170470873-8151s7cvldroebdl7mcpg2houdgljgfg.apps.googleusercontent.com"
-#ENV APP_ID "1971379956470536"
-ENV FACEBOOK_API_VERSION "v2.9"
-#ENV ORIGIN_URL "http://localhost:8088"
-ENV JWT_SIMPLE_SECRET "A3xFr93Yl2qTn5"
-
 # disable progress bar to increase speed of npm install
 RUN npm set progress=false
 
-# npm granular control over what you see with recursive commands such as ls
-RUN npm config set depth 0
+# install only 'devDependencies'
+RUN npm install --only=dev
 
-# install ALL node_modules, including 'devDependencies'
-RUN npm install --only=dev --no-bin-links
+# import build arguments as env vars during build
+ARG WEB_SERVICE_URL
+ARG JWT_SIMPLE_SECRET
 
-# add current folder
+# copy app sources
 COPY . .
 
-#add origin_url and web_service_url adress from docker-compose file (prod or local)
-ARG ORIGIN_URL
-ARG WEB_SERVICE_URL
-
-RUN echo $WEB_SERVICE_URL
-RUN echo $ORIGIN_URL
-# Build the static frontend files
+# build the static frontend files
 RUN npm run build
-
-# RUN npm run lint
-# RUN npm run setup
-# RUN npm run unit-test
 
 
 #
 # ---- Release ----
 FROM nginx:stable-alpine AS release
 
+# install tini
 RUN apk add --no-cache tini
 
-# # Remove the default Nginx configuration
+# remove the default nginx configuration
 RUN rm -v /etc/nginx/nginx.conf
 RUN rm -v /etc/nginx/conf.d/*.conf
 
-# Copy configuration files from the current directory
-ADD nginx/nginx.conf /etc/nginx/
-ADD nginx/default.conf /etc/nginx/conf.d/
+# copy configuration files from the current directory
+COPY nginx/nginx.conf /etc/nginx/
+COPY nginx/default.conf /etc/nginx/conf.d/
 
-# Add static sources from build container
+# add static sources from build container
 COPY --from=build /app/dist /var/www/html
 
-# expose port
-EXPOSE 80
-
-# Set tini as entrypoint
+# set tini as entrypoint
 ENTRYPOINT ["/sbin/tini", "--"]
 
+# start nginx on container start
 CMD ["nginx"]

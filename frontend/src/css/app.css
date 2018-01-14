@@ -3,8 +3,8 @@
 * Editor: sublime text;
 */
 
-/* @import url('https://fonts.googleapis.com/css?family=Roboto+Condensed');
- *//* imports the font family Roboto Condensed from google fonts which is the main font family of the app */
+@import url('https://fonts.googleapis.com/css?family=Roboto+Condensed');
+* //* imports the font family Roboto Condensed from google fonts which is the main font family of the app */
 
 /*
 * ---------------------------
@@ -22,6 +22,7 @@
 *---------------------------
 */
 
+
 /*
 *---------------------------
 *END EMOTIONS POPUP
@@ -32,55 +33,73 @@
 *---------------------------------------------
 */
 
-#bar-chart{
+#bar-chart {
     margin-top: 0px;
     max-height: 500px;
     /* sets a final hight to the bar chart */
 }
 
-.list-block .item-title:hover{
+.list-block .item-title:hover {
     cursor: pointer;
     color: #333333;
     /* sets the cursor behavior when hovering the item title */
 }
 
 
-.login-screen-title{ text-transform: uppercase; }
+/* .login-screen-title {
+    text-transform: uppercase;
+} */
 
-body{ font-family: Roboto Condensed; /* sets a default font family for the app */ }
+body {
+    font-family: Roboto Condensed;
+    /* sets a default font family for the app */
+}
 
-hr{
+hr {
     width: 80%;
     border-bottom: none;
 }
 
-.navbar, .subnavbar, .toolbar{
+
+/* .navbar,
+.subnavbar,
+.toolbar {
     background: #00ad4e;
     color: #ffffff;
-}
+} */
 
-.navbar-inner{
+.navbar-inner {
     border-bottom: 2px solid #000000;
 }
 
-.button{
+.button {
     color: #00ad4e;
     border: 1px solid #00ad4e;
     /* defines what buttons should look like */
 }
 
-.list-block .list-button{ color: #00ad4e; }
+.list-block .list-button {
+    color: #00ad4e;
+}
 
-.navbar a, .navbar .icon-back, .navbar .icon-bars{ color: #ffffff; }
+.navbar a,
+.navbar .icon-back,
+.navbar .icon-bars {
+    color: #ffffff;
+}
 
-.buttons { margin-top: 2rem; }
+.buttons {
+    margin-top: 2rem;
+}
 
 .list-block {
     margin-left: 1rem;
     margin-right: 1rem;
 }
 
-.align-top { height: 100%; }
+.align-top {
+    height: 100%;
+}
 
 .item-input textarea {
     width: 100%;
@@ -91,69 +110,69 @@ hr{
     align-items: center;
 }
 
-#launeButton {
-    position: fixed;
-    left: 5%;
-    bottom: 5%;
-    width: 90%;
-    /* defines the behavior of the emotion button */
+
+/* Beginn UserTable.vue styling
+ */
+
+.userTable {
+    float: left;
+    margin-top: 10px;
+    margin-left: 30px
 }
 
-/*
-*---------------------------
-*BEGIN MOODSLIDER STYLING
-*---------------------------
-*/
 
-.outerMoodslider {
-    /* defines what the outer box of the moodslider should look like */
-    position: absolute;
-    top: 5%;
-    left: 5%;
-    height: 85%;
-    width: 89%;
-    border: 2px solid #ccc;
-    overflow: hidden;
+/* End UserTable.vue styling
+ */
+
+
+/* Beginn GroupTable.vue styling
+ */
+
+.groupTable {
+    float: right;
+    margin-top: 10px;
+    margin-right: 30px
+}
+
+
+/* End GroupTable.vue styling
+ */
+
+
+/* Beginn Overview.vue chart/tabelles styling
+ */
+
+.groupUserChart {
+    float: left;
     position: relative;
-    -moz-border-radius: 4px;
-    -webkit-border-radius: 4px;
-    border-radius: 4px;
 }
 
-.inner, .inner div {
-    width: 100%;
-    overflow: hidden;
-    left: -2px;
-    position: absolute;
+.loginTypeChart {
+    float: right;
+    margin-left: 10px;
+    position: relative;
 }
 
-.inner {
-    border: 2px solid #999;
-    border-top-width: 0;
-    background-image: linear-gradient(to top, red, orange, green);
-    /* defines the color gradient for the slider inside the moodslider and stretches it when the bar is pulled to the top */
-    -webkit-background-size: cover; /* For WebKit*/
-    -moz-background-size: cover;    /* Mozilla*/
-    -o-background-size: cover;      /* Opera*/
-    background-size: 100% 100%;         /* Generic*/
-    bottom: 0;
-    height: 40%;
+.version {
+    float: center;
+    position: relative;
 }
 
-.inner div {
-    border: 2px solid lightgray;
-    border-bottom-width: 0;
-    background-color: lightgray;
-    top: 0;
-    width: 100%;
-    height: 5px;
+
+/* .groupUserChartsButton {
+    float: left;
+    margin-left: 450px
 }
 
-/*
-*---------------------------
-*END MOODSLIDER STYLING
-*---------------------------
-*/
+.loginTypeChartsButton {
+    float: right;
+    margin-right: 450px;
+} */
+
+
+/* End Overview.vue chart/tabelles styling
+ */
+
 
 /* Shared */
 
@@ -184,14 +203,21 @@ hr{
     height: 100%;
 }
 
-.loginBtn:focus { outline: none; }
+.loginBtn:focus {
+    outline: none;
+}
 
 .loginBtn:active {
     box-shadow: inset 0 0 0 32px rgba(0, 0, 0, 0.1);
 }
 
-.center{ text-align: center; }
-
-.navbar a.icon-only, .subnavbar a.icon-only, .toolbar a.icon-only{
-    background-color: #ffffff !important;
+.center {
+    text-align: center;
 }
+
+
+/* .navbar a.icon-only,
+.subnavbar a.icon-only,
+.toolbar a.icon-only {
+    background-color: #ffffff !important;
+} */

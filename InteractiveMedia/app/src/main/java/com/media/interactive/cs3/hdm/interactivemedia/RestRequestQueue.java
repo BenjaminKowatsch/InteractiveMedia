@@ -1,6 +1,9 @@
 package com.media.interactive.cs3.hdm.interactivemedia;
 
 import android.content.Context;
+import android.os.Build;
+import android.support.annotation.RequiresApi;
+import android.util.Log;
 
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
@@ -29,6 +32,7 @@ public class RestRequestQueue {
     if (instance == null) {
       instance = new RestRequestQueue(context);
     }
+
     return instance;
   }
 
@@ -44,5 +48,5 @@ public class RestRequestQueue {
   public <T> void addToRequestQueue(Request<T> request) {
     getRequestQueue().add(request);
   }
-
+  
 }

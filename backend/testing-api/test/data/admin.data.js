@@ -6,5 +6,6 @@ module.exports = {
     email: process.env.ADMIN_EMAIL,
     userId: 'AAAAAAAA-AAAA-AAAA-AAAA-AAAAAAAAAAAA',
     role: 'admin',
-    authType: 0
+    authType: 0,
+    imageUrl: null
   };

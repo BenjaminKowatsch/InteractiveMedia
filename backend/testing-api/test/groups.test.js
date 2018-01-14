@@ -21,13 +21,11 @@ const groupScenarios = require('./data/groupScenarios');
 
 // ************* Helper ***********//
 
-const registerUser = index => chai.request(HOST).post(URL.BASE_USER  + '/').send({
-  username: userData.users.valid[index].username,
-  email: userData.users.valid[index].email,
-  password: userData.users.valid[index].password
-});
+const registerUser = index => chai.request(HOST).post(URL.BASE_USER  + '/').send(userData.users.valid[index]);
+const getUserData = token => chai.request(HOST).get(URL.BASE_USER  + '/user').set('Authorization', '0 ' + token);
+const deepCopy = data => JSON.parse(JSON.stringify(data));
 
-describe('Groups-Controller', () => {
+describe('Groups-Controller: Groups:', () => {
   describe('Create new Group', () => {
     let tokens = {};
     let groupId = {};
@@ -65,6 +63,8 @@ describe('Groups-Controller', () => {
           expect(res.body.payload.users).to.have.lengthOf(groupScenarios[0].create.users.length);
           expect(res.body.payload.users.map(val => val.username))
           .to.have.members([userData.users.valid[0].username, userData.users.valid[1].username]);
+          expect(res.body.payload.users.map(val => val.email))
+          .to.have.members([userData.users.valid[0].email, userData.users.valid[1].email]);
           expect(res.body.payload.transactions).to.be.empty;
           expect(res.body.payload.groupId).to.be.an('string').and.not.to.be.empty;
           expect(res.body.payload.createdAt).to.be.an('string').and.not.to.be.empty;
@@ -87,6 +87,7 @@ describe('Groups-Controller', () => {
           expect(res.body.payload.groupIds).to.have.lengthOf(1);
           expect(res.body.payload.groupIds).to.include(groupId);
           expect(res.body.payload.userId).to.have.lengthOf(36).and.to.be.a('string');
+          expect(res.body.payload.imageUrl).to.equal(userData.users.valid[0].imageUrl);
         });
       });
     });
@@ -249,6 +250,8 @@ describe('Groups-Controller', () => {
           expect(res.body.payload.users).to.have.lengthOf(groupScenarios[0].create.users.length);
           expect(res.body.payload.users.map(val => val.username))
           .to.have.members([userData.users.valid[0].username, userData.users.valid[1].username]);
+          expect(res.body.payload.users.map(val => val.email))
+          .to.have.members([userData.users.valid[0].email, userData.users.valid[1].email]);
           expect(res.body.payload.transactions).to.be.empty;
           expect(res.body.payload.groupId).to.equal(groupId);
           expect(res.body.payload.createdAt).to.be.an('string').and.not.to.be.empty;
@@ -270,6 +273,8 @@ describe('Groups-Controller', () => {
           expect(res.body.payload.users).to.have.lengthOf(groupScenarios[0].create.users.length);
           expect(res.body.payload.users.map(val => val.username))
           .to.have.members([userData.users.valid[0].username, userData.users.valid[1].username]);
+          expect(res.body.payload.users.map(val => val.email))
+          .to.have.members([userData.users.valid[0].email, userData.users.valid[1].email]);
           expect(res.body.payload.transactions).to.be.empty;
           expect(res.body.payload.groupId).to.equal(groupId);
           expect(res.body.payload.createdAt).to.be.an('string').and.not.to.be.empty;
@@ -310,49 +315,3 @@ describe('Groups-Controller', () => {
     });
   });
 });
-
-/***************************** Maxis Shizzle *******************************/
-/*   it.skip('should respond with 403 if all groups are accessed as nonAdmin', () => {
-    return chai.request(HOST).
-      get(URL.BASE + '/').
-      send({'accessToken': defaultToken, 'authType': 0}).
-      then(function(res) {
-        expect(res).to.have.status(403);
-        expect(res).to.be.json;
-        expect(res.body).to.be.an('object');
-        expect(res.body.payload).to.equal('Admin access required');
-        expect(res.body.success).to.be.false;
-      });
-  });
- */
-/*
-  it('should respond with 200 if post data is correct',
-      function() {
-        return chai.request(HOST).post(baseUrl + '/group').send({
-          'accessToken': defaultToken,
-          'authType': 0,
-          'payload': {
-            'objectId': null,
-            'createdAt': null,
-            'name': 'Group 1',
-            'imageUrl': 'http://blabla.de/bla.png',
-            'users': [],
-            'transactions': [],
-          },
-        }).then(function(res) {
-          console.log('group-response: ' + JSON.stringify(res));
-          expect(res).to.have.status(201);
-          expect(res).to.be.json;
-          expect(res.body).to.be.an('object');
-        });
-      });
-
-  it.skip('should deny access to users not in group', () => {
-    return chai.request(HOST).
-        get(baseUrl + '/group').
-        send({'accessToken': alternativeToken, 'authType': 0}).
-        then(function(res) {
-          expect(res).to.have.status(403);
-        });
-  });
-*/

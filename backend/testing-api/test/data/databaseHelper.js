@@ -105,12 +105,13 @@ function promiseResetDB() {
             'email': adminData.email,
             'role': adminData.role,
             'userId': adminData.userId,
-            'authType': adminData.authType
+            'authType': adminData.authType,
+            'imageUrl': null
           };
           return database.collections.users.insertOne(adminUser);
         })
         .then(() => {
-          winston.info('Database cleaned successfully');
+          winston.debug('Database cleaned successfully');
           mutexResolver();
           resolve();
         }).catch(error => {

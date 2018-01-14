@@ -32,17 +32,6 @@ module.exports = {
             },
             {
                 test: /\.js$/,
-                loader: 'string-replace-loader',
-                query: {
-                    multiple: [
-                        { search: '${JWT_SIMPLE_SECRET}', replace: process.env.JWT_SIMPLE_SECRET },
-                        { search: '${WEB_SERVICE_URL}', replace: process.env.WEB_SERVICE_URL },
-                        { search: '${ORIGIN_URL}', replace: process.env.ORIGIN_URL },             
-                    ]
-                }
-            },
-            {
-                test: /\.js$/,
                 loader: 'babel-loader',
                 include: [resolve('src'), resolve('test')]
             },

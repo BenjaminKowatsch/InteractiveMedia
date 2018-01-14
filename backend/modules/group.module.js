@@ -73,7 +73,11 @@ module.exports.getGroupById = function(groupId) {
       return findUsersByField('userId', groupResult.users);
     }).then(checkUserResults)
     .then(userResults => {
-      let groupUserObjects = userResults.map(val => ({userId: val.userId, username: val.username}));
+      let groupUserObjects = userResults.map(val => ({
+        userId: val.userId,
+        username: val.username,
+        email: val.email
+      }));
       responseData.payload.users = groupUserObjects;
       responseData.success = true;
       resolve(responseData);
@@ -156,6 +160,74 @@ module.exports.getAllGroups = function() {
   });
 };
 
+module.exports.createNewTransaction = function(groupId, transactionData) {
+  return new Promise((resolve, reject) => {
+    winston.debug('Hello from module createNewTransaction');
+    let responseData = {payload: {}};
+    transactionData.publishedAt = new Date();
+
+    checkIfGroupIdIsGiven(groupId)
+    .then(findGroupById)
+    .then(checkForGroupResult)
+    .then(groupResult => checkIfUserIdIsInGroup(groupResult, transactionData.paidBy))
+    .then(groupResult => checkIfDateIsGtGroupCreateDate(groupResult, transactionData.infoCreatedAt))
+    .then(groupResult => addTransactionToGroup(groupId, transactionData))
+    .then(transactionResult => {
+      winston.debug('Creating a new transaction successful');
+      responseData.payload = transactionData;
+      responseData.success = true;
+      resolve(responseData);
+    }).catch(err => {
+      let errorCode;
+      winston.debug('Creating a new transaction failed');
+      winston.debug(err);
+      responseData.success = false;
+      if (err.isSelfProvided) {
+        responseData.payload.dataPath = err.dataPath;
+        responseData.payload.message = err.message;
+        errorCode = err.errorCode;
+      } else {
+        responseData.payload.dataPath = 'group';
+        responseData.payload.message = 'unknown database error';
+        errorCode = ERROR.DB_ERROR;
+      }
+      reject({errorCode: errorCode, responseData: responseData});
+    });
+  });
+};
+
+module.exports.getTransactionAfterDate = function(groupId, date) {
+  winston.debug('Hello from module getTransactionAfterDate');
+  return new Promise((resolve, reject) => {
+    let responseData = {payload: {}};
+    checkIfDateIsGivenAndValid(date)
+    .then(() => checkIfGroupIdIsGiven(groupId))
+    .then(findGroupById)
+    .then(checkForGroupResult)
+    .then(groupResult => filterTransactionsAfterDate(groupResult.transactions, date))
+    .then(sortTransactionsByPublishedAt)
+    .then(transactionsResult => {
+      responseData.payload = transactionsResult;
+      responseData.success = true;
+      resolve(responseData);
+    }).catch(err => {
+      winston.debug(err);
+      responseData.success = false;
+      responseData.payload.dataPath = 'group';
+      let errorCode;
+      if (err.isSelfProvided) {
+        responseData.payload.message = err.message;
+        errorCode = err.errorCode;
+        responseData.payload.dataPath = err.dataPath || responseData.payload.dataPath;
+      } else {
+        responseData.payload.message = 'unknown database error';
+        errorCode = ERROR.DB_ERROR;
+      }
+      reject({errorCode: errorCode, responseData: responseData});
+    });
+  });
+};
+
 function aggregateGroups(query) {
   return database.collections.groups.aggregate([query]).toArray();
 }
@@ -167,7 +239,11 @@ function checkForInvalidCreateGroupValues(findUsersResult, requestedUserEmails, 
   // return all groupUserIds if object is not null
   let groupUserIds = findUsersResult.map(val => val ? val.userId : null);
   let groupUserEmails = findUsersResult.map(val => val ? val.email : null);
-  let groupUserObjects = findUsersResult.map(val => val ? {userId: val.userId, username: val.username} : null);
+  let groupUserObjects = findUsersResult.map(val => val ? {
+    userId: val.userId,
+    username: val.username,
+    email: val.email
+  } : null);
   // checken if an id is null => unknonw user
   if (groupUserIds.includes(null)) {
     //filter returns true, if email of groupData.users is not in groupUserEmails
@@ -261,5 +337,60 @@ function checkIfUserIdIsInGroup(groupResult, userId) {
     return Promise.reject(errorToReturn);
   } else {
     return groupResult;
+  }
+}
+
+function addTransactionToGroup(groupId, transaction) {
+  const update = {
+    '$push': {
+      'transactions': transaction
+    }
+  };
+  return database.collections.groups.updateOne({groupId: groupId}, update);
+}
+
+function checkIfDateIsGtGroupCreateDate(groupResult, transactionDate) {
+  if (new Date(groupResult.createdAt) > new Date(transactionDate)) {
+    let errorToReturn = {isSelfProvided: true};
+    errorToReturn.dataPath = 'transaction';
+    errorToReturn.message = 'invalid time adjustment: group.createdAt is gt transaction.infoCreatedAt';
+    errorToReturn.errorCode = ERROR.INVALID_CREATE_TRANSACTION_VALUES;
+    return Promise.reject(errorToReturn);
+  } else {
+    return groupResult;
+  }
+}
+
+function filterTransactionsAfterDate(allTransactions, date) {
+  const td = dateSting => new Date(dateSting);
+  if (allTransactions.length) {
+    let transactions = allTransactions.filter((val, i, self) => td(val.publishedAt) > td(date));
+    return transactions;
+  } else {
+    return [];
+  }
+}
+
+function sortTransactionsByPublishedAt(transactions) {
+  const td = dateSting => new Date(dateSting);
+  return transactions  // sort ascending by publishedAt
+  .sort((a,b) => td(a.publishedAt) > td(b.publishedAt) ? 1 : td(a.publishedAt) < td(b.publishedAt) ? -1 : 0);
+}
+
+function checkIfDateIsGivenAndValid(date) {
+  //matches exactly ISO-8601, format: YYYY-MM-DDTHH:mm:ss.sssZ
+  let dateRegExp = /^\d{4}-[01]\d-[0-3]\dT[0-2]\d:[0-5]\d:[0-5]\d\.\d{3}Z$/;
+  let errorToReturn = {isSelfProvided: true};
+  errorToReturn.dataPath = 'urlParamAfter';
+  if (!date) {
+    errorToReturn.message = 'missing param after in URL';
+    errorToReturn.errorCode = ERROR.MISSING_ID_IN_URL;
+    return Promise.reject(errorToReturn);
+  } else if (!dateRegExp.test(date)) {
+    errorToReturn.message = 'invalid date format';
+    errorToReturn.errorCode = ERROR.INVALID_DATE_FORMAT;
+    return Promise.reject(errorToReturn);
+  } else {
+    return Promise.resolve(date); // must resolve -> date is not an object
   }
 }

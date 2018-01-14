@@ -22,6 +22,8 @@ const user = require('./modules/user.module');
 const database = require('./modules/database.module');
 const objectstore = require('./modules/objectstore.module');
 
+const pushNotificationService = require('./services/pushNotification.service');
+
 const ERROR = require('./config.error');
 const ROLES = require('./config.roles');
 
@@ -65,7 +67,7 @@ app.use(function(req, res, next) {
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, PATCH, DELETE');
 
   // Request headers you wish to allow
-  res.setHeader('Access-Control-Allow-Headers', 'X-Requested-With,content-type');
+  res.setHeader('Access-Control-Allow-Headers', 'X-Requested-With,content-type,Authorization');
 
   // Set to true if you need the website to include cookies in the requests sent
   // to the API (e.g. in case you use sessions)
@@ -121,9 +123,10 @@ function startServer() {
  * ===================
  */
 database.tryConnect(config.mongodbURL, function() {
-  objectstore.makeBucket(config.minioBucketName).then(promiseData => {
-    return user.register(config.adminUsername, config.adminPassword, config.adminEmail, ROLES.ADMIN);
-  }).then(registerResult => {
+  pushNotificationService.initFcm()
+  .then(() => objectstore.makeBucket(config.minioBucketName))
+  .then(() => user.register(config.adminUsername, config.adminPassword, config.adminEmail, ROLES.ADMIN, null))
+  .then(registerResult => {
     winston.info('register admin successful');
     startServer();
   }).catch(errorResult => {

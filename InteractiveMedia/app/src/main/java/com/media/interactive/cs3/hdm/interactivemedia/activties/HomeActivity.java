@@ -3,11 +3,10 @@ package com.media.interactive.cs3.hdm.interactivemedia.activties;
 import android.app.Fragment;
 import android.app.FragmentTransaction;
 import android.content.Intent;
-import android.os.Build;
 import android.os.Bundle;
-import android.support.annotation.RequiresApi;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
@@ -18,8 +17,13 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.ImageView;
 import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
+import com.bumptech.glide.load.model.GlideUrl;
+import com.bumptech.glide.load.model.LazyHeaders;
 import com.media.interactive.cs3.hdm.interactivemedia.CallbackListener;
 import com.media.interactive.cs3.hdm.interactivemedia.R;
 import com.media.interactive.cs3.hdm.interactivemedia.data.Login;
@@ -36,13 +40,13 @@ public class HomeActivity extends AppCompatActivity
     private static final String TAG = "HomeActivity";
 
     private FloatingActionButton fab;
+    private CallbackListener<JSONObject,Exception> userDataCompleted;
 
-    @RequiresApi(api = Build.VERSION_CODES.N)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        final Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
         fab = (FloatingActionButton) findViewById(R.id.fab);
@@ -55,11 +59,47 @@ public class HomeActivity extends AppCompatActivity
         drawer.addDrawerListener(toggle);
         toggle.syncState();
 
-        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
+        final NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
-        displayFragment(R.id.nav_groups);
+        userDataCompleted = new CallbackListener<JSONObject, Exception>() {
+            @Override
+            public void onSuccess(JSONObject response) {
+                loadProfilePicture(navigationView);
+            }
 
+            @Override
+            public void onFailure(Exception error) {
+
+            }
+        };
+        Login.getInstance().addOnUserDataSetListener(userDataCompleted);
+
+        displayFragment(R.id.nav_groups);
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        Login.getInstance().removeOnUserDataSetListener(userDataCompleted);
+    }
+
+    private void loadProfilePicture(NavigationView navigationView) {
+        final String imageUrl = Login.getInstance().getUser().getImageUrl();
+        if (imageUrl != null) {
+            final ImageView profilePicture = (ImageView) navigationView.getHeaderView(0).findViewById(R.id.imageView);
+
+            Log.d(TAG, "Try to download URL: " + imageUrl);
+
+            final LazyHeaders.Builder builder = new LazyHeaders.Builder()
+                .addHeader("Authorization", Login.getInstance().getUserType().getValue() + " " + Login.getInstance().getAccessToken());
+
+            final GlideUrl glideUrl = new GlideUrl(imageUrl, builder.build());
+            Glide.with(this).load(glideUrl)
+                .diskCacheStrategy(DiskCacheStrategy.SOURCE)
+                .placeholder(ContextCompat.getDrawable(this, R.drawable.anonymoususer))
+                .into(profilePicture);
+        }
     }
 
     @Override
@@ -88,7 +128,6 @@ public class HomeActivity extends AppCompatActivity
         return super.onOptionsItemSelected(item);
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.N)
     private void displayFragment(int id) {
 
         Fragment fragment = null;
@@ -143,7 +182,6 @@ public class HomeActivity extends AppCompatActivity
         drawer.closeDrawer(GravityCompat.START);
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.N)
     @SuppressWarnings("StatementWithEmptyBody")
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {

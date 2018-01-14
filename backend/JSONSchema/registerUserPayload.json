@@ -1,0 +1,39 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "type": "object",
+  "properties": {
+    "username": {
+      "type": "string",
+      "minLength": 5,
+      "maxLength": 255
+    },
+    "email": {
+      "type": "string",
+      "minLength": 5,
+      "maxLength": 255
+    },
+    "password": {
+      "type": "string",
+      "minLength": 5,
+      "maxLength": 255
+    },
+    "imageUrl": {
+      "oneOf": [
+        {
+          "type": "null"
+        },
+        {
+          "type": "string",
+          "minLength": 5
+        }
+      ]
+    }
+  },
+  "required": [
+    "username",
+    "email",
+    "password",
+    "imageUrl"
+  ],
+  "additionalProperties": false
+}
