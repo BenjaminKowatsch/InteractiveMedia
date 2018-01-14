@@ -19,7 +19,6 @@ import android.widget.TextView;
 import android.widget.TimePicker;
 import android.widget.Toast;
 
-import com.media.interactive.cs3.hdm.interactivemedia.CallbackListener;
 import com.media.interactive.cs3.hdm.interactivemedia.R;
 import com.media.interactive.cs3.hdm.interactivemedia.contentprovider.DatabaseHelper;
 import com.media.interactive.cs3.hdm.interactivemedia.contentprovider.DatabaseProvider;
@@ -27,9 +26,7 @@ import com.media.interactive.cs3.hdm.interactivemedia.contentprovider.tables.Gro
 import com.media.interactive.cs3.hdm.interactivemedia.contentprovider.tables.UserTable;
 import com.media.interactive.cs3.hdm.interactivemedia.data.MoneyTextWatcher;
 import com.media.interactive.cs3.hdm.interactivemedia.data.Transaction;
-
-import org.json.JSONException;
-import org.json.JSONObject;
+import com.media.interactive.cs3.hdm.interactivemedia.util.ImageUploadCallbackListener;
 
 import java.text.NumberFormat;
 import java.text.ParseException;
@@ -127,12 +124,13 @@ public class AddTransactionActivity extends ImagePickerActivity {
         final String split = splitText.getText().toString();
         final double amount = parseAmount(amountText);
         final Date dateTime = parseDateTime(dateText, timeText);
-        final ImageUploadCallbackListener imageUploadCallbackListener = new ImageUploadCallbackListener();
+        final ImageUploadCallbackListener imageUploadCallbackListener =
+                new ImageUploadCallbackListener(getResources().getString(R.string.web_service_url));
         uploadImage(imageUploadCallbackListener);
         //FIXME: replace this with real location
         final Location location = new Location("");
         return new Transaction(purpose, userAdapter.getCursor().getString(1), split, dateTime,
-                imageUploadCallbackListener.imageUrl, location, amount, groupId);
+                imageUploadCallbackListener.getImageUrl(), location, amount, groupId);
     }
 
     private double parseAmount(EditText amountText) {
@@ -224,29 +222,4 @@ public class AddTransactionActivity extends ImagePickerActivity {
         return userAdapter;
     }
 
-    private class ImageUploadCallbackListener extends CallbackListener<JSONObject, Exception> {
-        private String imageUrl;
-
-        @Override
-        public void onSuccess(JSONObject response) {
-            JSONObject payload;
-            String imageName = null;
-            try {
-                payload = response.getJSONObject("payload");
-                imageName = payload.getString("path");
-                Log.d(this.getClass().getName(), "Path returned: " + payload.getString("path"));
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
-            final String newImageUrl = getResources().getString(R.string.web_service_url)
-                    .concat("/v1/object-store/download?filename=").concat(imageName);
-            imageUrl = newImageUrl;
-        }
-
-        @Override
-        public void onFailure(Exception error) {
-            imageUrl = null;
-            makeToast(error.getMessage());
-        }
-    }
 }
