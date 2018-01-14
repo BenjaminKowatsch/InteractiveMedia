@@ -87,7 +87,7 @@ export default {
   mixins: [Mixins],
   components: {},
   data: () => ({
-
+      drawer: false,
       valid: true,
       errors: [],
       username: "",
@@ -96,7 +96,7 @@ export default {
       ],
       password: "",
       passwordRules: [
-        (v) => !!v || 'E-mail is required',
+        (v) => !!v || 'Password is required',
       ],
       email: "",
       login: "",
