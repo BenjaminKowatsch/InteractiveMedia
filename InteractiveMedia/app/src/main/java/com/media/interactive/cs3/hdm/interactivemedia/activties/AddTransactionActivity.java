@@ -33,6 +33,7 @@ import com.media.interactive.cs3.hdm.interactivemedia.authorizedrequests.Authori
 import com.media.interactive.cs3.hdm.interactivemedia.contentprovider.DatabaseProvider;
 import com.media.interactive.cs3.hdm.interactivemedia.contentprovider.tables.GroupTable;
 import com.media.interactive.cs3.hdm.interactivemedia.contentprovider.tables.UserTable;
+import com.media.interactive.cs3.hdm.interactivemedia.data.Group;
 import com.media.interactive.cs3.hdm.interactivemedia.data.DatabaseProviderHelper;
 import com.media.interactive.cs3.hdm.interactivemedia.data.Login;
 import com.media.interactive.cs3.hdm.interactivemedia.data.MoneyTextWatcher;
@@ -66,6 +67,7 @@ public class AddTransactionActivity extends ImagePickerActivity {
     private String groupCreatedAt;
     private TextView locationDisplay;
     private DatabaseProviderHelper helper;
+    private Group group;
     private SimpleCursorAdapter userAdapter;
     private AtomicInteger placePickerId = new AtomicInteger(0);
     private Place selectedPlace = null;
@@ -114,6 +116,7 @@ public class AddTransactionActivity extends ImagePickerActivity {
         EditText amountEditText = findViewById(R.id.et_add_transaction_amount);
         amountEditText.addTextChangedListener(new MoneyTextWatcher(amountEditText, CURRENCY_FORMAT));
 
+        group = loadGroup();
         helper = new DatabaseProviderHelper(getContentResolver());
 
         groupId = getIntent().getStringExtra(GROUP_TO_ADD_TO);
@@ -154,6 +157,16 @@ public class AddTransactionActivity extends ImagePickerActivity {
         userSelection.setAdapter(userAdapter);
 
         initImagePickerActivity(R.id.iv_transaction_image, null);
+    }
+
+    private Group loadGroup() {
+        final long groupId = getIntent().getLongExtra(GROUP_TO_ADD_TO, -1);
+        if (groupId < 0) {
+            Log.e(this.getClass().getSimpleName(), "Intent is missing id of group");
+            return null;
+        } else {
+            return new DatabaseHelper(this).getByIdWithUsers(groupId);
+        }
     }
 
     private void createAndSaveTransaction(View view) {
@@ -263,6 +276,8 @@ public class AddTransactionActivity extends ImagePickerActivity {
         final String paidBy = userAdapter.getCursor().getString(userAdapter.getCursor().getColumnIndex(UserTable.COLUMN_USER_ID));
         Log.d(TAG,"paidBy: "+ paidBy);
         return new Transaction(purpose, paidBy, split, dateTime, location, amount, groupId);
+        return new Transaction(purpose, userAdapter.getCursor().getString(1), split, dateTime,
+                imageUploadCallbackListener.getImageUrl(), location, amount, group);
     }
 
     private double parseAmount(EditText amountText) {
