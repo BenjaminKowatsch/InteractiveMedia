@@ -670,15 +670,13 @@ function checkIfUpdateOneWasSuccessful(resultRaw) {
   });
 }
 
-module.exports.updateFcmToken = function(userId, fcmToken) {
+module.exports.updateUser = function(userId, userData) {
   return new Promise((resolve, reject) => {
     let responseData = {payload: {}};
     checkIfUserIdIsGiven(userId).then(() => {
       const query = {'userId': userId};
       const update = {
-        '$set': {
-          'fcmToken': fcmToken
-        }
+        '$set': userData
       };
       const options = {upsert: false};
       return database.collections.users.updateOne(query, update, options);

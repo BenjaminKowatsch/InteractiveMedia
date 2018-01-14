@@ -59,7 +59,6 @@ describe.skip('PushNotifications create transactions', function() {
         groupId = res.body.payload.groupId;
         userIds[0] = res.body.payload.users[0].userId;
         userIds[1] = res.body.payload.users[1].userId;
-        console.log('userIds', userIds);
         done();
       })
       .catch(error => {
@@ -69,7 +68,7 @@ describe.skip('PushNotifications create transactions', function() {
 
     before('set fcm token of user_0', function(done) {
       chai.request(HOST)
-      .put(URL.BASE_USER  + '/user/fcmtoken')
+      .put(URL.BASE_USER  + '/user')
       .set('Authorization', '0 ' + tokens[0])
       .send({fcmToken: fcmToken})
       .then(res => {done();})
