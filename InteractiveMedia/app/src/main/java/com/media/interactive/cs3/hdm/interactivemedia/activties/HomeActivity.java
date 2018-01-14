@@ -3,9 +3,7 @@ package com.media.interactive.cs3.hdm.interactivemedia.activties;
 import android.app.Fragment;
 import android.app.FragmentTransaction;
 import android.content.Intent;
-import android.os.Build;
 import android.os.Bundle;
-import android.support.annotation.RequiresApi;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
 import android.support.v4.content.ContextCompat;
@@ -26,19 +24,13 @@ import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.load.model.GlideUrl;
 import com.bumptech.glide.load.model.LazyHeaders;
-import com.android.volley.Request;
-import com.android.volley.Response;
-import com.android.volley.error.VolleyError;
 import com.media.interactive.cs3.hdm.interactivemedia.CallbackListener;
 import com.media.interactive.cs3.hdm.interactivemedia.R;
-import com.media.interactive.cs3.hdm.interactivemedia.RestRequestQueue;
-import com.media.interactive.cs3.hdm.interactivemedia.authorizedrequests.AuthorizedJsonObjectRequest;
 import com.media.interactive.cs3.hdm.interactivemedia.data.Login;
 import com.media.interactive.cs3.hdm.interactivemedia.fragments.GroupFragment;
 import com.media.interactive.cs3.hdm.interactivemedia.fragments.IMyFragment;
 import com.media.interactive.cs3.hdm.interactivemedia.fragments.TransactionFragment;
 
-import org.json.JSONException;
 import org.json.JSONObject;
 
 public class HomeActivity extends AppCompatActivity
@@ -48,6 +40,7 @@ public class HomeActivity extends AppCompatActivity
     private static final String TAG = "HomeActivity";
 
     private FloatingActionButton fab;
+    private CallbackListener<JSONObject,Exception> userDataCompleted;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -69,29 +62,43 @@ public class HomeActivity extends AppCompatActivity
         final NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
-        loadProfilePicture(navigationView);
+        userDataCompleted = new CallbackListener<JSONObject, Exception>() {
+            @Override
+            public void onSuccess(JSONObject response) {
+                loadProfilePicture(navigationView);
+            }
+
+            @Override
+            public void onFailure(Exception error) {
+
+            }
+        };
+        Login.getInstance().addOnUserDataSetListener(userDataCompleted);
 
         displayFragment(R.id.nav_groups);
     }
 
-    private void loadProfilePicture(NavigationView navigationView){
-        final String imageName = Login.getInstance().getUser().getImageUrl();
-        if(imageName != null) {
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        Login.getInstance().removeOnUserDataSetListener(userDataCompleted);
+    }
+
+    private void loadProfilePicture(NavigationView navigationView) {
+        final String imageUrl = Login.getInstance().getUser().getImageUrl();
+        if (imageUrl != null) {
             final ImageView profilePicture = (ImageView) navigationView.getHeaderView(0).findViewById(R.id.imageView);
 
-            String imageUrl = Login.getInstance().getUser().getImageUrl();
-            if(imageUrl != null) {
-                Log.d(TAG, "Try to download URL: " + imageUrl);
+            Log.d(TAG, "Try to download URL: " + imageUrl);
 
-                final LazyHeaders.Builder builder = new LazyHeaders.Builder()
-                    .addHeader("Authorization", Login.getInstance().getUserType().getValue() + " " + Login.getInstance().getAccessToken());
+            final LazyHeaders.Builder builder = new LazyHeaders.Builder()
+                .addHeader("Authorization", Login.getInstance().getUserType().getValue() + " " + Login.getInstance().getAccessToken());
 
-                final GlideUrl glideUrl = new GlideUrl(imageUrl, builder.build());
-                Glide.with(this).load(glideUrl)
-                    .diskCacheStrategy(DiskCacheStrategy.SOURCE)
-                    .placeholder(ContextCompat.getDrawable(this, R.drawable.anonymoususer))
-                    .into(profilePicture);
-            }
+            final GlideUrl glideUrl = new GlideUrl(imageUrl, builder.build());
+            Glide.with(this).load(glideUrl)
+                .diskCacheStrategy(DiskCacheStrategy.SOURCE)
+                .placeholder(ContextCompat.getDrawable(this, R.drawable.anonymoususer))
+                .into(profilePicture);
         }
     }
 

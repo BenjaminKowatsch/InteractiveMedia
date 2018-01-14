@@ -31,12 +31,13 @@ public class TransactionTable {
     public static final String COLUMN_INFO_LOCATION_LONG = "info_location_long";
 
     public static final String COLUMN_INFO_LOCATION_LAT = "info_location_lat";
+
     /**
-     * Sixth attribute, type TEXT.
+     * Seventh attribute, type TEXT.
      */
     public static final String COLUMN_INFO_IMAGE_URL = "info_image_url";
     /**
-     * Seventh attribute, type TIMESTAMP DEFAULT CURRENT_TIMESTAMP.
+     * Eighth attribute, type TIMESTAMP DEFAULT CURRENT_TIMESTAMP.
      */
     public static final String COLUMN_INFO_CREATED_AT = "info_created_at";
     /**
@@ -53,8 +54,7 @@ public class TransactionTable {
             "create table if not exists " + TABLE_NAME + "("
                     + COLUMN_ID + " integer unique primary key AUTOINCREMENT,"
                     + COLUMN_AMOUNT + " REAL NOT NULL,"
-                    + COLUMN_PAID_BY + " INTEGER references " + UserTable.TABLE_NAME
-                    + " (" + UserTable.COLUMN_ID + ") on delete cascade on update cascade,"
+                    + COLUMN_PAID_BY + " TEXT_NAME NOT NULL, "
                     + COLUMN_INFO_NAME + " TEXT NOT NULL,"
                     + COLUMN_INFO_LOCATION_LONG + " REAL,"
                     + COLUMN_INFO_LOCATION_LAT + " REAL,"

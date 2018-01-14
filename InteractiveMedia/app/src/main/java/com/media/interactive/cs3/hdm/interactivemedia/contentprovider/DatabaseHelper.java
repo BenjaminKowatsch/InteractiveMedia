@@ -74,48 +74,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         db.delete("users", null, null);
         db.delete("login", null, null);
     }
-    
-    public Cursor getAllGroupAndUsersByGroup(long groupId){
-        final SQLiteDatabase db = this.getWritableDatabase();
-        final String query = "SELECT *"
-            +" FROM "+ UserTable.TABLE_NAME + " u, "
-            + GroupUserTable.TABLE_NAME + " gu"
-            + " WHERE u."+UserTable.COLUMN_ID+" = gu." + GroupUserTable.COLUMN_USER_ID
-            + " AND gu."+GroupUserTable.COLUMN_GROUP_ID+" =  ?";
-        final Cursor data = db.rawQuery(query, new String[]{ String.valueOf(groupId) });
-        return data;
-    }
-
-    public Cursor getUsersForGroup(long groupId) {
-        final SQLiteDatabase db = this.getWritableDatabase();
-        final String subQuery = "SELECT " + GroupUserTable.COLUMN_USER_ID + " FROM "
-                + GroupUserTable.TABLE_NAME
-                + " WHERE " + GroupUserTable.COLUMN_GROUP_ID + " = ?";
-        final String query = "SELECT * FROM " + UserTable.TABLE_NAME
-                + " WHERE " + UserTable.COLUMN_ID + " IN (" + subQuery + " )";
-        final Cursor cursor = db.rawQuery(query, new String[]{"" + groupId});
-        return cursor;
-
-    }
-
-    public Cursor getAllGroupsByUserId(String userId, String searchString){
-        final SQLiteDatabase db = this.getWritableDatabase();
-        final String query = "SELECT g.*"
-            +" FROM "
-            + GroupTable.TABLE_NAME + " g, "
-            + UserTable.TABLE_NAME + " u, "
-            + GroupUserTable.TABLE_NAME + " gu"
-            + " WHERE u."+UserTable.COLUMN_ID+" = gu." + GroupUserTable.COLUMN_USER_ID
-            + " AND g."+GroupTable.COLUMN_ID+" = gu." + GroupUserTable.COLUMN_GROUP_ID
-            + " AND u."+UserTable.COLUMN_USER_ID+" = ? "
-            + " AND ( g."+ GroupTable.COLUMN_NAME + " like ? OR g." + GroupTable.COLUMN_CREATED_AT + " like ? )";
-        if(userId == null){
-            userId = "";
-        }
-        final String search = "%"+searchString+"%";
-        final Cursor data = db.rawQuery(query, new String[]{ userId, search, search });
-        return data;
-    }
 
     public Cursor getTransactionsForGroup(long groupId) {
         final SQLiteDatabase db = this.getWritableDatabase();

@@ -4,14 +4,12 @@ import android.app.Activity;
 import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Context;
-import android.database.Cursor;
 import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.util.Log;
 
 import com.android.volley.Request;
 import com.android.volley.Response;
-import com.android.volley.error.AuthFailureError;
 import com.android.volley.error.VolleyError;
 import com.android.volley.request.JsonObjectRequest;
 import com.facebook.AccessToken;
@@ -30,14 +28,13 @@ import com.media.interactive.cs3.hdm.interactivemedia.RestRequestQueue;
 import com.media.interactive.cs3.hdm.interactivemedia.authorizedrequests.AuthorizedJsonObjectRequest;
 import com.media.interactive.cs3.hdm.interactivemedia.contentprovider.DatabaseProvider;
 import com.media.interactive.cs3.hdm.interactivemedia.contentprovider.tables.LoginTable;
-import com.media.interactive.cs3.hdm.interactivemedia.contentprovider.tables.UserTable;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
 
@@ -53,7 +50,7 @@ public class Login {
     private String hashedPassword = null;
     private UserType userType = null;
     private String accessToken = null;
-    private CallbackListener<JSONObject,Exception> onUserDataSet = null;
+    private List<CallbackListener<JSONObject, Exception>> onUserDataSetList = null;
 
     private DatabaseProviderHelper helper;
     private ContentResolver contentResolver = null;
@@ -73,6 +70,7 @@ public class Login {
         hashedPassword = null;
         userType = null;
         accessToken = null;
+        onUserDataSetList = new ArrayList<>();
     }
 
     public String getHashedPassword() {
@@ -103,44 +101,56 @@ public class Login {
         this.userType = userType;
     }
 
-    public void initUserData(final Context context){
+    public void initUserData(final Context context) {
         final String url = context.getResources().getString(R.string.web_service_url).concat("/v1/users/user");
-        Log.d(TAG,"Get: "+ url);
+        Log.d(TAG, "Get: " + url);
         final AuthorizedJsonObjectRequest jsonObjectRequest = new AuthorizedJsonObjectRequest(
             Request.Method.GET, url, null, new Response.Listener<JSONObject>() {
             @Override
             public void onResponse(JSONObject response) {
                 try {
                     final boolean success = response.getBoolean("success");
-                    Log.d(TAG,"user: "+ response);
-                    if(success){
+                    Log.d(TAG, "user: " + response);
+                    if (success) {
                         final JSONObject payload = response.getJSONObject("payload");
                         user.setEmail(payload.getString("email"));
                         try {
                             final String username = payload.getString("username");
                             user.setUsername(username);
-                        } catch(JSONException e){
+                        } catch (JSONException e) {
                             Log.d(TAG, "Username is not set.");
                         }
                         user.setUserId(payload.getString("userId"));
-
                         JSONArray groupIds = null;
                         try {
-                            groupIds = payload.getJSONArray("groupIds");
-                        } catch (JSONException e){
-                            Log.d(TAG,"No groups exist for this user");
+                            user.setImageUrl(payload.getString("imageUrl"));
+                        } catch (JSONException e) {
+                            Log.d(TAG, "No imageUrl exists for this user");
                         }
-                        if(groupIds != null) {
-                            Log.d(TAG, "Before Removal: " + groupIds.toString());
-                            helper.removeExistingGroupIds(groupIds);
-                            Log.d(TAG, "After Removal: " + groupIds.toString());
+                        try {
+                            user.setImageUrl(payload.getString("imageUrl"));
+                            groupIds = payload.getJSONArray("groupIds");
+                        } catch (JSONException e) {
+                            Log.d(TAG, "No groups exist for this user");
+                        }
+                        if (groupIds != null && groupIds.length() > 0) {
+                            Log.d(TAG, "Before Removal: " + groupIds.length() + " " + groupIds.toString());
+                            List<Group> existingGroups = helper.removeExistingGroupIds(groupIds);
+                            Log.d(TAG, "After Removal: " + groupIds.length() + " " + groupIds.toString());
+                            for (final Group group : existingGroups) {
+                                requestTransactionsByGroupId(context, group.getGroupId(), group.getCreatedAt(), null);
+                            }
                             requestNewGroups(context, groupIds);
+                        } else {
+                            for (CallbackListener<JSONObject, Exception> onUserDataSet : onUserDataSetList) {
+                                onUserDataSet.onSuccess(response);
+                            }
                         }
                         user.setSync(true);
                         helper.upsertUser(user);
-                        Log.d(TAG, "Upserted User: "+ user);
-                    }else {
-                        Log.e(TAG,"Error while setting user data.");
+                        Log.d(TAG, "Upserted User: " + user);
+                    } else {
+                        Log.e(TAG, "Error while setting user data.");
                     }
                 } catch (JSONException e) {
                     e.printStackTrace();
@@ -149,8 +159,8 @@ public class Login {
         }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
-                Log.e(TAG,"Error while setting user data.");
-                if(onUserDataSet != null){
+                Log.e(TAG, "Error while setting user data.");
+                for (CallbackListener<JSONObject, Exception> onUserDataSet : onUserDataSetList) {
                     onUserDataSet.onFailure(error);
                 }
             }
@@ -159,22 +169,70 @@ public class Login {
         RestRequestQueue.getInstance(context).addToRequestQueue(jsonObjectRequest);
     }
 
-    private void requestNewGroups(Context context, final JSONArray groupIds){
+    public void requestTransactionsByGroupId(Context context, final String groupId, String groupCreatedAt, final CallbackListener<JSONObject, Exception> callback) {
+
+        String latestPublishedDate = helper.getLatestTransactionPubDateByGroupId(groupId);
+        Log.d(TAG, "latest published date: " + latestPublishedDate);
+        if (latestPublishedDate == null) {
+            latestPublishedDate = groupCreatedAt;
+        }
+        final String url = context.getResources().getString(R.string.web_service_url).concat("/v1/groups/").concat(groupId).concat("/transactions?after=").concat(latestPublishedDate);
+        Log.d(TAG, "Get: " + url);
+        final AuthorizedJsonObjectRequest jsonObjectRequest = new AuthorizedJsonObjectRequest(
+            Request.Method.GET, url, null, new Response.Listener<JSONObject>() {
+            @Override
+            public void onResponse(final JSONObject response) {
+                try {
+                    final boolean success = response.getBoolean("success");
+                    Log.d(TAG, "TransactionsAfter: " + response);
+                    if (success) {
+                        final JSONArray payload = response.getJSONArray("payload");
+                        helper.addTransactions(payload, groupId);
+                        if (callback != null) {
+                            callback.onSuccess(null);
+                        }
+                    } else {
+                        Log.e(TAG, "Error while requesting transaction data.");
+                        if (callback != null) {
+                            callback.onFailure(null);
+                        }
+                    }
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                    if (callback != null) {
+                        callback.onFailure(null);
+                    }
+                }
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                Log.e(TAG, "Error while setting user data.");
+                if (callback != null) {
+                    callback.onFailure(null);
+                }
+            }
+        });
+        jsonObjectRequest.setShouldCache(false);
+        RestRequestQueue.getInstance(context).addToRequestQueue(jsonObjectRequest);
+
+    }
+
+    private void requestNewGroups(Context context, final JSONArray groupIds) {
         final AtomicInteger atomicInteger = new AtomicInteger();
-        for(int i = 0; i< groupIds.length() ;i++){
-        if(groupIds.length() > 0)
+        for (int i = 0; i < groupIds.length(); i++) {
             try {
                 final String groupId = (String) groupIds.get(i);
                 final String url = context.getResources().getString(R.string.web_service_url).concat("/v1/groups/").concat(groupId);
-                Log.d(TAG,"Get: "+ url);
+                Log.d(TAG, "Get: " + url);
                 final AuthorizedJsonObjectRequest jsonObjectRequest = new AuthorizedJsonObjectRequest(
                     Request.Method.GET, url, null, new Response.Listener<JSONObject>() {
                     @Override
                     public void onResponse(final JSONObject response) {
                         try {
                             final boolean success = response.getBoolean("success");
-                            Log.d(TAG,"group: "+ response);
-                            if(success){
+                            Log.d(TAG, "group: " + response);
+                            if (success) {
                                 final JSONObject payload = response.getJSONObject("payload");
                                 final Group newGroup = new Group();
                                 newGroup.setName(payload.getString("name"));
@@ -194,12 +252,15 @@ public class Login {
                                     newGroup.getUsers().add(user);
                                 }
                                 helper.insertGroupAtDatabase(newGroup);
-                                //TODO: Set/Add Transactions
-                                if(onUserDataSet != null && groupIds.length() - 1 == atomicInteger.incrementAndGet()){
-                                    onUserDataSet.onSuccess(response);
+                                //Add Transactions
+                                helper.addTransactions(payload.getJSONArray("transactions"), newGroup.getGroupId());
+                                if (groupIds.length() - 1 == atomicInteger.incrementAndGet()) {
+                                    for (CallbackListener<JSONObject, Exception> onUserDataSet : onUserDataSetList) {
+                                        onUserDataSet.onSuccess(response);
+                                    }
                                 }
-                            }else {
-                                Log.e(TAG,"Error while setting user data.");
+                            } else {
+                                Log.e(TAG, "Error while setting user data.");
                             }
                         } catch (JSONException e) {
                             e.printStackTrace();
@@ -208,7 +269,7 @@ public class Login {
                 }, new Response.ErrorListener() {
                     @Override
                     public void onErrorResponse(VolleyError error) {
-                        Log.e(TAG,"Error while setting user data.");
+                        Log.e(TAG, "Error while setting user data.");
                     }
                 });
                 jsonObjectRequest.setShouldCache(false);
@@ -216,11 +277,11 @@ public class Login {
             } catch (JSONException e) {
                 e.printStackTrace();
             }
-       }
+        }
     }
 
-    public boolean loginResponseHandler(JSONObject response) {
-
+    public boolean loginResponseHandler(Context context, JSONObject response) {
+        boolean result = false;
         Log.d("User: ", "loginResponseHandler: Thread Id: "
             + android.os.Process.getThreadPriority(android.os.Process.myTid()));
         Log.d(TAG, "Response: " + response.toString());
@@ -234,16 +295,17 @@ public class Login {
                 if (id == 0) {
                     cacheCredentials(this);
                 }
-
-                return true;
+                result = true;
+            } else {
+                Log.e(TAG, "Received an unsuccessful answer from backend during registration.");
+                result = false;
             }
-
-            Log.e(TAG, "Received an unsuccessful answer from backend during registration.");
-            return false;
         } catch (JSONException e) {
             e.printStackTrace();
+            result = false;
         }
-        return false;
+        initUserData(context);
+        return result;
     }
 
     private boolean cacheCredentials(Login login) {
@@ -297,7 +359,7 @@ public class Login {
         return false;
     }
 
-    public void register(Context context, final CallbackListener<JSONObject,Exception> callbackListener) {
+    public void register(final Context context, final CallbackListener<JSONObject, Exception> callbackListener) {
 
         contentResolver = context.getContentResolver();
         helper = new DatabaseProviderHelper(context.getContentResolver());
@@ -308,6 +370,7 @@ public class Login {
         try {
             data.put("username", user.getUsername());
             data.put("email", user.getEmail());
+            data.put("imageUrl", JSONObject.NULL);
             data.put("password", hashedPassword);
         } catch (JSONException e) {
             e.printStackTrace();
@@ -318,7 +381,7 @@ public class Login {
             Request.Method.POST, url, data, new Response.Listener<JSONObject>() {
             @Override
             public void onResponse(JSONObject response) {
-                loginResponseHandler(response);
+                loginResponseHandler(context, response);
                 callbackListener.onSuccess(response);
             }
         }, new Response.ErrorListener() {
@@ -409,8 +472,7 @@ public class Login {
             Request.Method.POST, url, data, new Response.Listener<JSONObject>() {
             @Override
             public void onResponse(JSONObject response) {
-                loginResponseHandler(response);
-                initUserData(context);
+                loginResponseHandler(context, response);
                 callbackListener.onSuccess(response);
             }
         }, new Response.ErrorListener() {
@@ -450,7 +512,7 @@ public class Login {
             Request.Method.POST, url, data, new Response.Listener<JSONObject>() {
             @Override
             public void onResponse(JSONObject response) {
-                loginResponseHandler(response);
+                loginResponseHandler(context, response);
                 initUserData(context);
                 callbackListener.onSuccess(response);
             }
@@ -483,7 +545,7 @@ public class Login {
             Request.Method.POST, url, data, new Response.Listener<JSONObject>() {
             @Override
             public void onResponse(JSONObject response) {
-                loginResponseHandler(response);
+                loginResponseHandler(context, response);
                 initUserData(context);
                 callbackListener.onSuccess(response);
             }
@@ -578,7 +640,11 @@ public class Login {
         RestRequestQueue.getInstance(activity).addToRequestQueue(jsonObjectRequest);
     }
 
-    public void setOnUserDataSet(CallbackListener<JSONObject, Exception> onUserDataSet) {
-        this.onUserDataSet = onUserDataSet;
+    public void addOnUserDataSetListener(CallbackListener<JSONObject, Exception> onUserDataSet) {
+        this.onUserDataSetList.add(onUserDataSet);
+    }
+
+    public void removeOnUserDataSetListener(CallbackListener<JSONObject, Exception> onUserDataSet) {
+        this.onUserDataSetList.remove(onUserDataSet);
     }
 }

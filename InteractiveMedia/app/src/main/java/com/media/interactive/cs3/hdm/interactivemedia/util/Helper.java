@@ -2,6 +2,7 @@ package com.media.interactive.cs3.hdm.interactivemedia.util;
 
 import android.util.Patterns;
 
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
@@ -12,6 +13,7 @@ import java.util.Locale;
 
 public class Helper {
 
+    private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.getDefault());
     public static boolean IsUrlValid(String url) {
         if (Patterns.WEB_URL.matcher(url).matches()) {
             return true;
@@ -34,10 +36,24 @@ public class Helper {
     }
 
     public static String GetDateTime() {
-        final SimpleDateFormat dateFormat = new SimpleDateFormat(
-            "yyyy-MM-dd HH:mm:ss", Locale.getDefault());
-        final Date date = new Date();
-        return dateFormat.format(date);
+        final Date date = new Date(System.currentTimeMillis());
+        return FormatDate(date);
+    }
+
+    public static String FormatDate(Date date){
+        if(date != null){
+            return DATE_FORMAT.format(date);
+        }
+        return null;
+    }
+
+    public static Date ParseDateString(String dateString){
+        try {
+            return DATE_FORMAT.parse(dateString);
+        } catch (ParseException e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 
 }

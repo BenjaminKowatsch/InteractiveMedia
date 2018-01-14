@@ -3,17 +3,26 @@ package com.media.interactive.cs3.hdm.interactivemedia.data;
 import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.database.Cursor;
+import android.location.Location;
 import android.net.Uri;
 import android.util.Log;
 
 import com.media.interactive.cs3.hdm.interactivemedia.contentprovider.DatabaseProvider;
 import com.media.interactive.cs3.hdm.interactivemedia.contentprovider.tables.GroupTable;
+import com.media.interactive.cs3.hdm.interactivemedia.contentprovider.tables.GroupTransactionTable;
 import com.media.interactive.cs3.hdm.interactivemedia.contentprovider.tables.GroupUserTable;
 import com.media.interactive.cs3.hdm.interactivemedia.contentprovider.tables.LoginTable;
+import com.media.interactive.cs3.hdm.interactivemedia.contentprovider.tables.TransactionTable;
 import com.media.interactive.cs3.hdm.interactivemedia.contentprovider.tables.UserTable;
 
 import org.json.JSONArray;
 import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by benny on 08.01.18.
@@ -103,6 +112,47 @@ public class DatabaseProviderHelper {
         }
     }
 
+    public void addTransactions(JSONArray jsonArray, String groupId) throws JSONException {
+        for(int i = 0; i < jsonArray.length() ;i++){
+            final JSONObject transactionObject = (JSONObject) jsonArray.get(i);
+            final Transaction transaction = new Transaction();
+            transaction.setGroupId(groupId);
+            transaction.setAmount(transactionObject.getDouble("amount"));
+            transaction.setInfoName(transactionObject.getString("infoName"));
+
+            final JSONObject infoLocation = (JSONObject) transactionObject.getJSONObject("infoLocation");
+            final Location location = new Location("");
+            location.setLatitude(infoLocation.getDouble("latitude"));
+            location.setLongitude(infoLocation.getDouble("longitude"));
+            transaction.setLocation(location);
+            final SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
+            try {
+                transaction.setDateTime(sdf.parse(transactionObject.getString("infoCreatedAt")));
+                transaction.setPublishedAt(sdf.parse(transactionObject.getString("publishedAt")));
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
+            transaction.setImageUrl(transactionObject.getString("infoImageUrl"));
+            transaction.setPaidBy(transactionObject.getString("paidBy"));
+            transaction.setSplit(transactionObject.getString("split"));
+            Log.d(TAG, "Saving Transaction: "+ transaction.toString());
+            saveTransaction(transaction);
+        }
+    }
+
+    public void saveTransaction(Transaction transaction) {
+        final ContentValues transactionContent = transaction.toContentValues();
+        final Uri id = contentResolver.insert(DatabaseProvider.CONTENT_TRANSACTION_URI, transactionContent);
+        if (id != null) {
+            ContentValues transactionGroupContent = new ContentValues();
+            final int transactionId = Integer.parseInt(id.getLastPathSegment());
+            transactionGroupContent.put(GroupTransactionTable.COLUMN_TRANSACTION_ID, transactionId);
+            transactionGroupContent.put(GroupTransactionTable.COLUMN_GROUP_ID, transaction.getGroupId());
+            contentResolver.insert(DatabaseProvider.CONTENT_GROUP_TRANSACTION_URI, transactionGroupContent);
+        }
+        contentResolver.notifyChange(DatabaseProvider.CONTENT_GROUP_USER_TRANSACTION_JOIN_URI,null);
+    }
+
     public long getGroupsByUserId(String userId){
         final String[] projection = {UserTable.COLUMN_ID};
         final String selection = UserTable.COLUMN_USER_ID.concat(" = ?");
@@ -113,6 +163,17 @@ public class DatabaseProviderHelper {
             return userCursor.getLong(0);
         }
         return -1;
+    }
+
+    public String getUserNameById(String userId){
+        final String[] projection = { UserTable.COLUMN_USERNAME};
+        final String selection = UserTable.COLUMN_USER_ID + " = ?";
+        final String[] selectionArgs = {userId};
+        final Cursor query = contentResolver.query(DatabaseProvider.CONTENT_USER_URI, projection, selection, selectionArgs, null);
+        if(query.getCount() == 1 && query.moveToFirst()){
+            return query.getString(query.getColumnIndex(UserTable.COLUMN_USERNAME));
+        }
+        return null;
     }
 
     public boolean checkForCachedCredentials(Login login) {
@@ -135,28 +196,51 @@ public class DatabaseProviderHelper {
         return false;
     }
 
-    public void removeExistingGroupIds(JSONArray groupIds) {
-        for(int i = 0; i< groupIds.length() ;i++){
-            final String[] projection = {GroupTable.COLUMN_ID};
+    public String getLatestTransactionPubDateByGroupId(String groupId){
+        String result = null;
+        final String[] projection = {TransactionTable.TABLE_NAME+ "." + TransactionTable.COLUMN_PUBLISHED_AT};
+        final String selection = GroupTable.TABLE_NAME+"."+GroupTable.COLUMN_GROUP_ID + " = ?";
+        final String[] selectionArgs = {groupId};
+        final Cursor cursor = contentResolver.query(DatabaseProvider.CONTENT_GROUP_TRANSACTION_JOIN_URI,
+            projection, selection, selectionArgs,
+            TransactionTable.COLUMN_PUBLISHED_AT + " DESC LIMIT 1");
+        Log.d(TAG, "LatestTransaction Count: " + cursor.getCount());
+        if(cursor.moveToFirst()){
+            result = cursor.getString(0);
+        }
+        return result;
+    }
+
+    public List<Group> removeExistingGroupIds(JSONArray groupIds) {
+        List<Group> existingGroups = new ArrayList<>();
+        for(int i = groupIds.length()-1; i>=0 ;i--){
+            final Group group = new Group();
+            final String[] projection = { GroupTable.TABLE_NAME+".*"};
             final String selection = GroupTable.COLUMN_GROUP_ID + " = ?";
             String groupId = null;
             try {
-                groupId = groupIds.getString(i);
+                groupId = (String)groupIds.get(i);
             } catch (JSONException e) {
                 e.printStackTrace();
             }
             final String[] selectionArgs = {groupId};
-            final Cursor search = contentResolver.query(DatabaseProvider.CONTENT_GROUP_URI, projection, selection, selectionArgs, null);
-            long foundId = -1;
-            if( search.moveToFirst()) {
-                foundId = search.getLong(0);
+            final Cursor cursor = contentResolver.query(DatabaseProvider.CONTENT_GROUP_URI, projection, selection, selectionArgs, null);
+            group.setId(-1);
+            if(cursor.moveToFirst()) {
+                group.setId(cursor.getLong(cursor.getColumnIndexOrThrow(GroupTable.COLUMN_ID)));
+                group.setGroupId(cursor.getString(cursor.getColumnIndexOrThrow(GroupTable.COLUMN_GROUP_ID)));
+                group.setName(cursor.getString(cursor.getColumnIndexOrThrow(GroupTable.COLUMN_NAME)));
+                group.setImageUrl(cursor.getString(cursor.getColumnIndexOrThrow(GroupTable.COLUMN_IMAGE_URL)));
+                group.setCreatedAt(cursor.getString(cursor.getColumnIndexOrThrow(GroupTable.COLUMN_CREATED_AT)));
+                int synced = cursor.getInt(cursor.getColumnIndexOrThrow(GroupTable.COLUMN_SYNCHRONIZED));
+                group.setSync(synced > 0);
             }
-            if(foundId != -1){
-                Log.d(TAG, "Removing groupId: "+ groupId);
+            if(group.getId() != -1){
+                Log.d(TAG, "Removing groupId: "+ group);
+                existingGroups.add(group);
                 groupIds.remove(i);
-            } else {
-                Log.d(TAG, "Not Removing groupId: "+ groupId);
             }
         }
+        return existingGroups;
     }
 }

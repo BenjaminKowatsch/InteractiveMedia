@@ -18,7 +18,6 @@ import com.media.interactive.cs3.hdm.interactivemedia.R;
 import com.media.interactive.cs3.hdm.interactivemedia.data.Hash;
 import com.media.interactive.cs3.hdm.interactivemedia.data.Login;
 import com.media.interactive.cs3.hdm.interactivemedia.data.UserType;
-import com.media.interactive.cs3.hdm.interactivemedia.util.ImageUploadCallbackListener;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -158,11 +157,6 @@ public class RegisterActivity extends ImagePickerActivity
                 login.setUserType(UserType.DEFAULT);
                 login.getUser().setEmail(registerEmail.getText().toString());
                 login.setHashedPassword(Hash.hashStringSha256(registerPassword.getText().toString()));
-                ImageUploadCallbackListener callbackListener =
-                        new ImageUploadCallbackListener(getResources().getString(R.string.web_service_url));
-                uploadImage(callbackListener);
-                final String imageUrl = callbackListener.getImageUrl() == null ? "null" : callbackListener.getImageUrl();
-                login.getUser().setImageUrl(imageUrl);
                 login.register(RegisterActivity.this, new CallbackListener<JSONObject, Exception>() {
                     @Override
                     public void onSuccess(JSONObject param) {
@@ -186,6 +180,7 @@ public class RegisterActivity extends ImagePickerActivity
                                 final String newImageUrl = getResources().getString(R.string.web_service_url)
                                         .concat("/v1/object-store/download?filename=").concat(imageName);
                                 Login.getInstance().getUser().setImageUrl(newImageUrl);
+                                //TODO: Update User ImageUrl
                                 navigateToHome();
                             }
 
@@ -195,7 +190,6 @@ public class RegisterActivity extends ImagePickerActivity
                                 navigateToHome();
                             }
                         });
-
                     }
 
                     @Override

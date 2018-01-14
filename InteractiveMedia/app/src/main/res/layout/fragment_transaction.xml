@@ -17,7 +17,9 @@
         android:id="@+id/transaction_title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_toRightOf="@+id/transaction_icon"
+        android:layout_alignParentTop="true"
+        android:layout_toEndOf="@+id/transaction_icon"
+        android:hint="TransactionTitle"
         android:paddingBottom="10dp"
         android:textSize="16dp" />
 
@@ -25,8 +27,9 @@
         android:id="@+id/transaction_creation_date"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/transaction_title"
-        android:layout_toRightOf="@+id/transaction_icon"
+        android:layout_below="@+id/transaction_payed_by"
+        android:layout_toEndOf="@+id/transaction_icon"
+        android:hint="TransactionDate"
         android:paddingLeft="2dp"
         android:textSize="14dp" />
 
@@ -34,9 +37,9 @@
         android:id="@+id/transaction_payed_by"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_above="@+id/transaction_location"
         android:layout_alignParentEnd="true"
-        android:layout_marginEnd="34dp"
+        android:layout_below="@+id/transaction_title"
+        android:hint="Unknown user"
         android:paddingLeft="100dp"
         android:textSize="14dp" />
 
@@ -44,8 +47,9 @@
         android:id="@+id/transaction_amount"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignStart="@+id/transaction_payed_by"
-        android:layout_above="@+id/transaction_location"
+        android:layout_alignParentEnd="true"
+        android:layout_below="@+id/transaction_payed_by"
+        android:hint="Amount"
         android:paddingLeft="2dp"
         android:textSize="14dp" />
 

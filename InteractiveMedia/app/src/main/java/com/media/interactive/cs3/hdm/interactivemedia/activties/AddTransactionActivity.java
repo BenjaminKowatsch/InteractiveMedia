@@ -2,10 +2,8 @@ package com.media.interactive.cs3.hdm.interactivemedia.activties;
 
 import android.app.DatePickerDialog;
 import android.app.TimePickerDialog;
-import android.content.ContentValues;
 import android.database.Cursor;
 import android.location.Location;
-import android.net.Uri;
 import android.os.Bundle;
 import android.text.InputType;
 import android.util.Log;
@@ -19,14 +17,23 @@ import android.widget.TextView;
 import android.widget.TimePicker;
 import android.widget.Toast;
 
+import com.android.volley.Request;
+import com.android.volley.Response;
+import com.android.volley.error.VolleyError;
+import com.media.interactive.cs3.hdm.interactivemedia.CallbackListener;
 import com.media.interactive.cs3.hdm.interactivemedia.R;
-import com.media.interactive.cs3.hdm.interactivemedia.contentprovider.DatabaseHelper;
+import com.media.interactive.cs3.hdm.interactivemedia.RestRequestQueue;
+import com.media.interactive.cs3.hdm.interactivemedia.authorizedrequests.AuthorizedJsonObjectRequest;
 import com.media.interactive.cs3.hdm.interactivemedia.contentprovider.DatabaseProvider;
-import com.media.interactive.cs3.hdm.interactivemedia.contentprovider.tables.GroupTransactionTable;
+import com.media.interactive.cs3.hdm.interactivemedia.contentprovider.tables.GroupTable;
 import com.media.interactive.cs3.hdm.interactivemedia.contentprovider.tables.UserTable;
+import com.media.interactive.cs3.hdm.interactivemedia.data.DatabaseProviderHelper;
+import com.media.interactive.cs3.hdm.interactivemedia.data.Login;
 import com.media.interactive.cs3.hdm.interactivemedia.data.MoneyTextWatcher;
 import com.media.interactive.cs3.hdm.interactivemedia.data.Transaction;
-import com.media.interactive.cs3.hdm.interactivemedia.util.ImageUploadCallbackListener;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.text.NumberFormat;
 import java.text.ParseException;
@@ -39,13 +46,17 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class AddTransactionActivity extends ImagePickerActivity {
     public static final NumberFormat CURRENCY_FORMAT = NumberFormat.getCurrencyInstance(Locale.GERMANY);
     public static final String GROUP_TO_ADD_TO = "GroupToAddTo";
+    public static final String GROUP_CREATED_AT_ADD_TO = "GroupCreatedAtToAddTo";
+    private static final String TAG = AddTransactionActivity.class.getSimpleName();
     private final SimpleDateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyy");
     private final SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm");
     private final SimpleDateFormat dateTimeFormat = new SimpleDateFormat(dateFormat.toPattern() + timeFormat.toPattern());
     private Spinner userSelection;
     private EditText dateEditText;
     private EditText timeEditText;
-    private long groupId;
+    private String groupId;
+    private String groupCreatedAt;
+    private DatabaseProviderHelper helper;
     private SimpleCursorAdapter userAdapter;
     private AtomicInteger placePickerId = new AtomicInteger(0);
 
@@ -59,7 +70,10 @@ public class AddTransactionActivity extends ImagePickerActivity {
         EditText amountEditText = findViewById(R.id.et_add_transaction_amount);
         amountEditText.addTextChangedListener(new MoneyTextWatcher(amountEditText, CURRENCY_FORMAT));
 
-        groupId = getIntent().getLongExtra(GROUP_TO_ADD_TO, -1);
+        helper = new DatabaseProviderHelper(getContentResolver());
+
+        groupId = getIntent().getStringExtra(GROUP_TO_ADD_TO);
+        groupCreatedAt = getIntent().getStringExtra(GROUP_CREATED_AT_ADD_TO);
 
         Button addTransactionButton = findViewById(R.id.bn_add_transaction);
         addTransactionButton.setOnClickListener(new View.OnClickListener() {
@@ -95,9 +109,87 @@ public class AddTransactionActivity extends ImagePickerActivity {
 
     private void createAndSaveTransaction(View view) {
         final Transaction toSave = buildFromCurrentView();
-        saveToLocalDatabase(toSave);
-        finish();
+        // Upload group image if sending the group data was successfull
+        if (getCurrentPhotoPath() != null) {
+            uploadImage(new CallbackListener<JSONObject, Exception>() {
+                @Override
+                public void onSuccess(JSONObject response) {
+                    JSONObject payload = null;
+                    String imageName = null;
+                    try {
+                        payload = response.getJSONObject("payload");
+                        imageName = payload.getString("path");
+                        Log.d(TAG, "Path returned: " + payload.getString("path"));
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                    final String newImageUrl = getResources().getString(R.string.web_service_url)
+                        .concat("/v1/object-store/download?filename=").concat(imageName);
+                    toSave.setImageUrl(newImageUrl);
+                    try {
+                        sendToBackend(toSave);
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                }
+
+                @Override
+                public void onFailure(Exception error) {
+                    makeToast(error.getMessage());
+                }
+            });
+        } else {
+            try {
+                sendToBackend(toSave);
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
+
+        try {
+            Log.d(TAG, toSave.toJson().toString());
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
     }
+
+    private void sendToBackend(final Transaction toSave) throws JSONException {
+        helper.saveTransaction(toSave);
+        Login.getInstance().requestTransactionsByGroupId(this, toSave.getGroupId(), groupCreatedAt, new CallbackListener<JSONObject, Exception>() {
+            @Override
+            public void onSuccess(JSONObject response) {
+                final String url = getResources().getString(R.string.web_service_url).concat("/v1/groups/").concat(toSave.getGroupId()).concat("/transactions");
+                Log.d(TAG, "url: " + url);
+                try {
+                    final AuthorizedJsonObjectRequest jsonObjectRequest = new AuthorizedJsonObjectRequest(
+                        Request.Method.POST, url, toSave.toJson(), new Response.Listener<JSONObject>() {
+                        @Override
+                        public void onResponse(JSONObject response) {
+
+                            Log.d(TAG, response.toString());
+                            finish();
+                        }
+                    }, new Response.ErrorListener() {
+                        @Override
+                        public void onErrorResponse(VolleyError error) {
+                            makeToast("Error while sending the group to backend.");
+                            finish();
+                        }
+                    });
+                    RestRequestQueue.getInstance(getApplicationContext()).addToRequestQueue(jsonObjectRequest);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+
+            @Override
+            public void onFailure(Exception error) {
+                makeToast("Could not pull transactions before pushing.");
+            }
+        });
+
+    }
+
 
     private Transaction buildFromCurrentView() {
         final EditText name = findViewById(R.id.et_add_transaction_purpose);
@@ -106,31 +198,17 @@ public class AddTransactionActivity extends ImagePickerActivity {
         return buildTransaction(name, split, dateEditText, timeEditText, amount);
     }
 
-    private void saveToLocalDatabase(Transaction transaction) {
-        ContentValues transactionContent = transaction.toContentValues();
-        Uri id = getContentResolver().insert(DatabaseProvider.CONTENT_TRANSACTION_URI, transactionContent);
-        if (id != null) {
-            ContentValues transactionGroupContent = new ContentValues();
-            final int transactionId = Integer.parseInt(id.getLastPathSegment());
-            transactionGroupContent.put(GroupTransactionTable.COLUMN_TRANSACTION_ID, transactionId);
-            transactionGroupContent.put(GroupTransactionTable.COLUMN_GROUP_ID, transaction.getGroupId());
-            getContentResolver().insert(DatabaseProvider.CONTENT_GROUP_TRANSACTION_URI, transactionGroupContent);
-        }
-    }
-
     private Transaction buildTransaction(EditText nameText, TextView splitText,
                                          EditText dateText, EditText timeText, EditText amountText) {
         final String purpose = nameText.getText().toString();
-        final String split = splitText.getText().toString();
+        final String split = "even";
         final double amount = parseAmount(amountText);
         final Date dateTime = parseDateTime(dateText, timeText);
-        final ImageUploadCallbackListener imageUploadCallbackListener =
-                new ImageUploadCallbackListener(getResources().getString(R.string.web_service_url));
-        uploadImage(imageUploadCallbackListener);
         //FIXME: replace this with real location
         final Location location = new Location("");
-        return new Transaction(purpose, userAdapter.getCursor().getString(1), split, dateTime,
-                imageUploadCallbackListener.getImageUrl(), location, amount, groupId);
+        final String paidBy = userAdapter.getCursor().getString(userAdapter.getCursor().getColumnIndex(UserTable.COLUMN_USER_ID));
+        Log.d(TAG,"paidBy: "+ paidBy);
+        return new Transaction(purpose, paidBy, split, dateTime, location, amount, groupId);
     }
 
     private double parseAmount(EditText amountText) {
@@ -149,7 +227,7 @@ public class AddTransactionActivity extends ImagePickerActivity {
             return dateTimeFormat.parse(dateTimeText);
         } catch (ParseException e) {
             Log.e(this.getClass().getName(), "Could not parse dateTime from text " + dateTimeText
-                    + " using default of now instead.");
+                + " using default of now instead.");
             Log.d(this.getClass().getName(), e.getMessage());
             return new Date(System.currentTimeMillis());
         }
@@ -165,7 +243,7 @@ public class AddTransactionActivity extends ImagePickerActivity {
                 setDateText(year, month, day, dateEditText);
             }
         }, calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar
-                .DAY_OF_MONTH));
+            .DAY_OF_MONTH));
 
         final TimePickerDialog timePicker = new TimePickerDialog(this, new TimePickerDialog.OnTimeSetListener() {
             @Override
@@ -210,12 +288,14 @@ public class AddTransactionActivity extends ImagePickerActivity {
     }
 
     private SimpleCursorAdapter initializeUserAdapter() {
-        DatabaseHelper databaseHelper = new DatabaseHelper(this);
 
-        Cursor query = databaseHelper.getUsersForGroup(groupId);
+        final String[] projection = {UserTable.TABLE_NAME + ".*"};
+        final String selection = GroupTable.TABLE_NAME + "." + GroupTable.COLUMN_GROUP_ID + " = ?";
+        final String[] selectionArgs = {groupId};
+        Cursor query = getContentResolver().query(DatabaseProvider.CONTENT_GROUP_USER_JOIN_URI, projection, selection, selectionArgs, null);
 
-        String[] columns = new String[] { UserTable.COLUMN_USERNAME };
-        int[] to = new int[] { android.R.id.text1 };
+        String[] columns = new String[] {UserTable.COLUMN_USERNAME};
+        int[] to = new int[] {android.R.id.text1};
 
         SimpleCursorAdapter userAdapter = new SimpleCursorAdapter(this, android.R.layout.simple_spinner_item, query, columns, to, 0);
         userAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
