@@ -3,13 +3,15 @@ import Vue from 'vue'
 
 import VueRouter from 'vue-router'
 
-// Import F7
+// Import Vuetify
+import Vuetify from 'vuetify'
+import ('../node_modules/vuetify/dist/vuetify.min.css')
 
+// Import VueTouch for tables
 import VueTouch from 'vue-touch'
 
+// Import VueCharts for charts
 import VueCharts from 'vue-chartjs'
-
-// Import F7 Vue Plugin
 
 // Import App Custom Styles
 import AppStyles from './css/app.css'
@@ -36,7 +38,7 @@ Vue.component('table-component', TableComponent);
 Vue.component('table-column', TableColumn);
 Vue.use(VueTouch, { name: 'v-touch' });
 Vue.use(VueRouter)
-
+Vue.use(Vuetify)
 
 // Init F7 Vue Plugin
 

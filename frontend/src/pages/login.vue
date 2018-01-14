@@ -1,44 +1,74 @@
 <!-- TEMPLATE for login screen
   * Name:        Login VUE
-  * Author:      Benjamin Kowatsch
-  * Comments:    Isabeau Schmidt-Nunez
+  * Author:      Alexander Schübl
+  * Comments:    Alexander Schübl
   * Description: View for logging into the web app
  -->
 
 <template>
-<!-- START Framework 7 Template Elements for establishing the view -->
-  <div login-screen>
-    <!-- Page Content -->
-    <div>Login</div>
-    <!-- title of the login view -->
-    <div>
-      <div>
-        <p>Username</p>
-        <!-- label for username entry textfield -->
-        <input name="username" placeholder="Username" type="text" v-model="username" @keyup.enter="checkLogin()"></input>
-        <!-- input field for username -->
-      </div>
-      <div>
-        <div>Password</div>
-        <!-- label for password entry textfield -->
-        <input name="password" type="password" placeholder="Password" v-model="password" @keyup.enter="checkLogin()"></input>
-        <!-- input field for password -->
-      </div>
-    </div>
+  <v-container  >
+    <v-layout  justify-center align-center> 
+      <v-form ref="form" lazy-validation > 
+        <v-text-field
+          append-icon="account_circle"
+          label="Username"
+          v-model="username"
+          :rules="usernameRules"
+          required
+        ></v-text-field>
+        <v-text-field
+          append-icon="lock"
+          label="Password"
+          v-model="password"
+          :rules="passwordRules"
+          type="password"         
+          required
+        ></v-text-field>
+        <v-btn
+          @click="checkLogin"
+          :disabled="!valid"
+        >    
+          Login
+        </v-btn>
+        <v-btn @click="reset">Reset</v-btn>
+  
+        <v-snackbar
+          :timeout="3000"
+          :bottom="true"
+          :multi-line="true"
+          class="red"
+          v-model="alertAccessDenied"
+        >
+          Access denied
+          <v-btn dark flat @click.native="alertAccessDenied = false">X</v-btn>
+        </v-snackbar>
 
-    <div>
-      <button type="button" v-on:click="checkLogin()">Login
-      <!-- Login Button which triggers the login function (see below in jscript area) -->
+        <v-snackbar
+          :timeout="3000"
+          :bottom="true"
+          :multi-line="true"
+          class="red"
+          v-model="alertWrongCredentials"
+        >
+          Wrong credentials
+          <v-btn dark flat @click.native="alertWrongCredentials = false">X</v-btn>       
+        </v-snackbar>
 
-      </button>
-<!--               <f7-list-button title="RegDummyUser" v-on:click="registerDummyUser()">
- -->    </div>
-   
-
-  </div>
-  <!-- END of Template Elements -->
+        <v-snackbar
+          :timeout="3000"
+          :bottom="true"
+          :multi-line="true"
+          class="red"
+          v-model="alertUnknownRole"
+        >
+          Unknown role of user
+          <v-btn dark flat @click.native="alertUnknownRole = false">X</v-btn>
+        </v-snackbar>
+      </v-form>
+    </v-layout>
+  </v-container>
 </template>
-
+ 
 <script>
 /*
 * START JScript Elements for establishing the view according to the template elements
@@ -54,16 +84,27 @@ export default {
   name: "login",
   mixins: [Mixins],
   components: {},
-  data() {
-    return {
+  data: () => ({
+
+      valid: true,
       errors: [],
       username: "",
+      usernameRules: [
+        (v) => !!v || 'Username is required',
+        (v) => v && v.length >= 3 || 'Username must at least 3 characters'
+      ],
       password: "",
+      passwordRules: [
+        (v) => !!v || 'E-mail is required',
+        (v) => v && v.length >= 5 || 'Password must at least 5 characters'
+      ],
       email: "",
-      login: ""
+      login: "",
+      alertAccessDenied: false,
+      alertWrongCredentials: false,
+      alertUnknownRole: false,
       // sets the variables and defines them
-    };
-  },
+  }),
   methods: {
     /*     registerDummyUser: function() {
       axios
@@ -88,7 +129,9 @@ export default {
       console.log("Error: " + JSON.stringify(error)); // logs an error to the console
       //If logindata doenst match a db entry, show error and reload page
      /*  this.$f7.alert("Login failed", "Debts² Admin Panel", () => { */
+        this.alertWrongCredentials = true
         this.redirect("/", false, false, false);
+        console.log("redirecting to /")
       /* }); */
     },
     /**
@@ -107,23 +150,19 @@ export default {
         .then(responseAxios => {
           this.userDataRole = responseAxios.data.payload.role;
           //check role for admin and send informations to create a cookie and redirect admin to overview page
+          console.log(this.userDataRole)
           if (this.userDataRole === "admin") {
             console.log("Role: " + this.userDataRole);
             this.checkServerResponse(response, payload => {
               console.log("Correct"); // logs to console when the login data was correct with the database
               this.loginUser(payload);
-              // response to the logged in user
             });
             //handling other roles
           } else if (this.userDataRole === "user") {
-            /* this.$f7.alert("Access denied", "Debts² Admin Panel", () => { */
-              this.redirect("/", false, true, true);
-            /* }); */
+              this.alertAccessDenied = true
           } else {
-/*             this.$f7.alert("Unkown user role", "Debts² Admin Panel", () => {
- */              this.redirect("/", false, true, true);
-/*             });
- */          }
+               this.alertUnknownRole = true
+         }
         })
         .catch(e => {
           this.errors.push(e);
@@ -135,7 +174,8 @@ export default {
          * If a non error response was received the loginResponseHandler will be called and the user will be logged in.
          */
     checkLogin: function() {
-      if (this.username !== "" && this.password !== "") {
+        if (this.$refs.form.validate()){
+      /* if (this.username !== "" && this.password !== "") { */
         // function to check the login data
         var credentials = {
           username: this.username,
@@ -166,8 +206,7 @@ export default {
       } */
     },
     reset: function() {
-      this.username = "";
-      this.password = "";
+        this.$refs.form.reset()
     }
   }
 };
