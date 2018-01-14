@@ -107,8 +107,10 @@ export default {
     UserTable,
     GroupTable
   },
+  
   data() {
     return {
+      drawer: false,
       version: [],
       groups: [],
       users: [],
@@ -132,6 +134,11 @@ export default {
 
     this.authToken = Cookie.getJSONCookie("accessToken").accessToken;
     console.log("The cookie authToken is: " + this.authToken);
+
+    // if no accessToken is set or if something went wrong, redirect user to loginpage
+    if(this.authToken == "undefined" || this.authToken == undefined || this.authToken == null){
+      this.redirect("/");
+    }
 
     this.groups = [];
     this.users = [];

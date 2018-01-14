@@ -1,12 +1,11 @@
 <template>
+    <div>
+        <h1>404 Error</h1>
+        <p>The resource could not be found.</p>
+        <router-link to="/overview" exact>
+            Go to homepage
+        </router-link>
+    </div>
 </template>
- 
-<script>
 
-export default {
 
-    created: function() {
-        // Redirect outside the app using plain old javascript
-        window.location.href = "/my-new-404-page.html";
-    }
-}

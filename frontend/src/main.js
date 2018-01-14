@@ -69,16 +69,22 @@ var onLoadingFinished = function() {
 
 
     const router = new VueRouter({
-        mode: "history",
+
+        linkActiveClass: 'active',
+        transitionOnLoad: true,
         routes: [
-            { path: "/", component: login },
+            { path: "/", name: "login", component: login },
             {
                 path: '/overview',
+                name: "overview",
                 component: overview
             },
+            { path: '*', component: notFound },
+            { path: '/*/', component: notFound },
+
+
             // ... other routes ...
             // and finally the default route, when none of the above matches:
-            { path: "*", component: notFound }
         ]
     })
 

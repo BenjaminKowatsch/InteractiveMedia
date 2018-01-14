@@ -33,7 +33,7 @@ export default {
             // sets a cookie to a logged in user
             var jsonCookie = { 'accessToken': payload.accessToken, '/* authT */ype': payload.authType }
             Cookie.createJSONCookie('accessToken', jsonCookie) // creates the cookie
-            this.redirect('/overview', true, false, false)
+            this.redirect('overview', true, false, false)
         },
         /**
          * This function redirects the user to the specified url.
@@ -47,7 +47,7 @@ export default {
              if (reload) {
                  location.reload()
              } */
-            this.$router.push(url);
+            this.$router.replace(url);
         },
 
         /**
