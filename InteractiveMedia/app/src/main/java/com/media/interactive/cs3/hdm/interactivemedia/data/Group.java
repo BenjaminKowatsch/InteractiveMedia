@@ -23,8 +23,7 @@ public class Group {
     private boolean sync;
 
     public Group(String name, String imageUrl, String groupId, String createdAt, boolean sync) {
-        this.users = createUsers();
-        this.transactions = createTransactions();
+        this();
         this.name = name;
         this.imageUrl = imageUrl;
         this.groupId = groupId;
@@ -33,18 +32,10 @@ public class Group {
     }
 
     public Group(){
-        this.users = createUsers();
-        this.transactions = createTransactions();
+        this.users = new ArrayList<>();
+        this.transactions = new ArrayList<>();
     }
 
-
-    private List<User> createUsers(){
-        return new ArrayList<User>();
-    }
-
-    private List<Transaction> createTransactions(){
-        return new ArrayList<Transaction>();
-    }
 
     public long getId() {
         return id;
