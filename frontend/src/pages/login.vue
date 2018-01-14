@@ -93,12 +93,10 @@ export default {
       username: "",
       usernameRules: [
         (v) => !!v || 'Username is required',
-        (v) => v && v.length >= 3 || 'Username must at least 3 characters'
       ],
       password: "",
       passwordRules: [
         (v) => !!v || 'E-mail is required',
-        (v) => v && v.length >= 5 || 'Password must at least 5 characters'
       ],
       email: "",
       login: "",
