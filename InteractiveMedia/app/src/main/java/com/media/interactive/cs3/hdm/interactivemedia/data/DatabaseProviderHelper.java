@@ -150,7 +150,7 @@ public class DatabaseProviderHelper {
             transactionGroupContent.put(GroupTransactionTable.COLUMN_GROUP_ID, transaction.getGroupId());
             contentResolver.insert(DatabaseProvider.CONTENT_GROUP_TRANSACTION_URI, transactionGroupContent);
         }
-        contentResolver.notifyChange(DatabaseProvider.CONTENT_GROUP_TRANSACTION_JOIN_URI,null);
+        contentResolver.notifyChange(DatabaseProvider.CONTENT_GROUP_USER_TRANSACTION_JOIN_URI,null);
     }
 
     public long getGroupsByUserId(String userId){
@@ -163,6 +163,17 @@ public class DatabaseProviderHelper {
             return userCursor.getLong(0);
         }
         return -1;
+    }
+
+    public String getUserNameById(String userId){
+        final String[] projection = { UserTable.COLUMN_USERNAME};
+        final String selection = UserTable.COLUMN_USER_ID + " = ?";
+        final String[] selectionArgs = {userId};
+        final Cursor query = contentResolver.query(DatabaseProvider.CONTENT_USER_URI, projection, selection, selectionArgs, null);
+        if(query.getCount() == 1 && query.moveToFirst()){
+            return query.getString(query.getColumnIndex(UserTable.COLUMN_USERNAME));
+        }
+        return null;
     }
 
     public boolean checkForCachedCredentials(Login login) {

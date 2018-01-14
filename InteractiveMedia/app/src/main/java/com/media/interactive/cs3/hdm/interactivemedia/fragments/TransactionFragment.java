@@ -200,11 +200,11 @@ public class TransactionFragment extends ListFragment implements LoaderManager.L
             default:
                 break;
         }
-        final String[] projection = { TransactionTable.TABLE_NAME + ".*"};
+        final String[] projection = { TransactionTable.TABLE_NAME + ".*", UserTable.TABLE_NAME + "." + UserTable.COLUMN_USERNAME};
         final String sortOrder = TransactionTable.TABLE_NAME + "." + TransactionTable.COLUMN_INFO_CREATED_AT + " DESC";
         final String selection = GroupTable.TABLE_NAME + "." + GroupTable.COLUMN_GROUP_ID + " = ? AND " + GroupTable.TABLE_NAME + "." + GroupTable.COLUMN_NAME + " like ? ";
         final String[] selectionArgs = {getCurrentGroupId(), search};
-        return new CursorLoader(getActivity(), DatabaseProvider.CONTENT_GROUP_TRANSACTION_JOIN_URI, projection, selection, selectionArgs, sortOrder);
+        return new CursorLoader(getActivity(), DatabaseProvider.CONTENT_GROUP_USER_TRANSACTION_JOIN_URI, projection, selection, selectionArgs, sortOrder);
     }
 
     @Override

@@ -54,8 +54,7 @@ public class TransactionTable {
             "create table if not exists " + TABLE_NAME + "("
                     + COLUMN_ID + " integer unique primary key AUTOINCREMENT,"
                     + COLUMN_AMOUNT + " REAL NOT NULL,"
-                    + COLUMN_PAID_BY + " INTEGER references " + UserTable.TABLE_NAME
-                    + " (" + UserTable.COLUMN_ID + ") on delete cascade on update cascade,"
+                    + COLUMN_PAID_BY + " TEXT_NAME NOT NULL, "
                     + COLUMN_INFO_NAME + " TEXT NOT NULL,"
                     + COLUMN_INFO_LOCATION_LONG + " REAL,"
                     + COLUMN_INFO_LOCATION_LAT + " REAL,"

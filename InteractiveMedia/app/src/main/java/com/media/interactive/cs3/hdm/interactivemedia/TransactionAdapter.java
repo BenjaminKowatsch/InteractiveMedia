@@ -14,10 +14,13 @@ import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.load.model.GlideUrl;
 import com.bumptech.glide.load.model.LazyHeaders;
+import com.media.interactive.cs3.hdm.interactivemedia.contentprovider.DatabaseProvider;
 import com.media.interactive.cs3.hdm.interactivemedia.contentprovider.tables.TransactionTable;
 import com.media.interactive.cs3.hdm.interactivemedia.contentprovider.tables.UserTable;
+import com.media.interactive.cs3.hdm.interactivemedia.data.DatabaseProviderHelper;
 import com.media.interactive.cs3.hdm.interactivemedia.data.Login;
 import com.media.interactive.cs3.hdm.interactivemedia.data.Transaction;
+import com.media.interactive.cs3.hdm.interactivemedia.util.Helper;
 
 import java.sql.Date;
 
@@ -28,12 +31,14 @@ import java.sql.Date;
 public class TransactionAdapter extends CursorAdapter {
 
     private LayoutInflater mLayoutInflater;
+    private DatabaseProviderHelper helper;
     private int layout;
 
     public TransactionAdapter(Context context, int layout, Cursor c) {
         super(context, c, 0);
         this.layout = layout;
         mLayoutInflater = LayoutInflater.from(context);
+        helper = new DatabaseProviderHelper(context.getContentResolver());
     }
 
     @Override
@@ -53,15 +58,15 @@ public class TransactionAdapter extends CursorAdapter {
         transaction.setId(cursor.getLong(cursor.getColumnIndexOrThrow(TransactionTable.COLUMN_ID)));
         transaction.setInfoName(cursor.getString(cursor.getColumnIndexOrThrow(TransactionTable.COLUMN_INFO_NAME)));
         transaction.setImageUrl(cursor.getString(cursor.getColumnIndexOrThrow(TransactionTable.COLUMN_INFO_IMAGE_URL)));
-//        transaction.setDateTime(Date.valueOf(cursor.getString(cursor.getColumnIndexOrThrow(TransactionTable.COLUMN_INFO_CREATED_AT))));
+        transaction.setDateTime(Helper.ParseDateString(cursor.getString(cursor.getColumnIndexOrThrow(TransactionTable.COLUMN_INFO_CREATED_AT))));
         transaction.setPaidBy(cursor.getString(cursor.getColumnIndexOrThrow(TransactionTable.COLUMN_PAID_BY)));
         transaction.setAmount(cursor.getDouble(cursor.getColumnIndexOrThrow(TransactionTable.COLUMN_AMOUNT)));
 
         Log.d(Transaction.class.getSimpleName(), transaction.toString());
         // Populate fields with extracted properties
         viewHolder.transactionTitle.setText(transaction.getInfoName());
-       // viewHolder.transactionCreationDate.setText(transaction.getDateTime().toString());
-        viewHolder.transactionPaidBy.setText(transaction.getPaidBy());
+        viewHolder.transactionCreationDate.setText(Helper.FormatDate(transaction.getDateTime()));
+        viewHolder.transactionPaidBy.setText("Paid by: "+cursor.getString(cursor.getColumnIndexOrThrow(UserTable.COLUMN_USERNAME)));
         viewHolder.transactionAmount.setText(String.valueOf(transaction.getAmount()));
 
         final String imageUrl = transaction.getImageUrl();

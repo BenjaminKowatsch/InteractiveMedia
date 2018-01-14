@@ -206,7 +206,9 @@ public class AddTransactionActivity extends ImagePickerActivity {
         final Date dateTime = parseDateTime(dateText, timeText);
         //FIXME: replace this with real location
         final Location location = new Location("");
-        return new Transaction(purpose, userAdapter.getCursor().getString(userAdapter.getCursor().getColumnIndex(UserTable.COLUMN_USER_ID)), split, dateTime, location, amount, groupId);
+        final String paidBy = userAdapter.getCursor().getString(userAdapter.getCursor().getColumnIndex(UserTable.COLUMN_USER_ID));
+        Log.d(TAG,"paidBy: "+ paidBy);
+        return new Transaction(purpose, paidBy, split, dateTime, location, amount, groupId);
     }
 
     private double parseAmount(EditText amountText) {
