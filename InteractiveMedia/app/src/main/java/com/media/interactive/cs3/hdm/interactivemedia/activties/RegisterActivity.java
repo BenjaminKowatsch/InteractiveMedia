@@ -18,7 +18,6 @@ import com.media.interactive.cs3.hdm.interactivemedia.R;
 import com.media.interactive.cs3.hdm.interactivemedia.data.Hash;
 import com.media.interactive.cs3.hdm.interactivemedia.data.Login;
 import com.media.interactive.cs3.hdm.interactivemedia.data.UserType;
-import com.media.interactive.cs3.hdm.interactivemedia.util.ImageUploadCallbackListener;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -149,62 +148,62 @@ public class RegisterActivity extends ImagePickerActivity
         finish();
     }
 
+    private void sendRegisterRequest(){
+        final Login login = Login.getInstance();
+        login.getUser().setUsername(registerUsername.getText().toString());
+        login.setUserType(UserType.DEFAULT);
+        login.getUser().setEmail(registerEmail.getText().toString());
+        login.setHashedPassword(Hash.hashStringSha256(registerPassword.getText().toString()));
+        login.register(RegisterActivity.this, new CallbackListener<JSONObject, Exception>() {
+            @Override
+            public void onSuccess(JSONObject param) {
+                Toast.makeText(getApplicationContext(),
+                    "Success fully logged in",
+                    Toast.LENGTH_SHORT).show();
+                navigateToHome();
+            }
+
+            @Override
+            public void onFailure(Exception error) {
+                Log.e(TAG, "error: " + error.getMessage());
+                makeToast("Registration failed, please try again.");
+                navigateToHome();
+            }
+        });
+    }
+
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.bn_register:
-                final Login login = Login.getInstance();
-                login.getUser().setUsername(registerUsername.getText().toString());
-                login.setUserType(UserType.DEFAULT);
-                login.getUser().setEmail(registerEmail.getText().toString());
-                login.setHashedPassword(Hash.hashStringSha256(registerPassword.getText().toString()));
-                ImageUploadCallbackListener callbackListener =
-                        new ImageUploadCallbackListener(getResources().getString(R.string.web_service_url));
-                uploadImage(callbackListener);
-                final String imageUrl = callbackListener.getImageUrl() == null ? "null" : callbackListener.getImageUrl();
-                login.getUser().setImageUrl(imageUrl);
-                login.register(RegisterActivity.this, new CallbackListener<JSONObject, Exception>() {
-                    @Override
-                    public void onSuccess(JSONObject param) {
-                        Toast.makeText(getApplicationContext(),
-                                "Success fully logged in",
-                                Toast.LENGTH_SHORT).show();
-
-                        uploadImage(new CallbackListener<JSONObject, Exception>() {
-                            @Override
-                            public void onSuccess(JSONObject response) {
-                                makeToast("Uploading image succeeded. ");
-                                JSONObject payload = null;
-                                String imageName = null;
-                                try {
-                                    payload = response.getJSONObject("payload");
-                                    imageName = payload.getString("path");
-                                    Log.d(TAG, "Path returned: " + payload.getString("path"));
-                                } catch (JSONException e) {
-                                    e.printStackTrace();
-                                }
-                                final String newImageUrl = getResources().getString(R.string.web_service_url)
-                                        .concat("/v1/object-store/download?filename=").concat(imageName);
-                                Login.getInstance().getUser().setImageUrl(newImageUrl);
-                                navigateToHome();
+                if(getCurrentPhotoPath() != null) {
+                    uploadImage(new CallbackListener<JSONObject, Exception>() {
+                        @Override
+                        public void onSuccess(JSONObject response) {
+                            makeToast("Uploading image succeeded. ");
+                            JSONObject payload = null;
+                            String imageName = null;
+                            try {
+                                payload = response.getJSONObject("payload");
+                                imageName = payload.getString("path");
+                                Log.d(TAG, "Path returned: " + payload.getString("path"));
+                            } catch (JSONException e) {
+                                e.printStackTrace();
                             }
+                            final String newImageUrl = getResources().getString(R.string.web_service_url)
+                                .concat("/v1/object-store/download?filename=").concat(imageName);
+                            Login.getInstance().getUser().setImageUrl(newImageUrl);
+                            sendRegisterRequest();
+                        }
 
-                            @Override
-                            public void onFailure(Exception error) {
-                                makeToast("Uploading image failed. ");
-                                navigateToHome();
-                            }
-                        });
-
-                    }
-
-                    @Override
-                    public void onFailure(Exception error) {
-                        Log.e(TAG, "error: " + error.getMessage());
-                        makeToast("Registration failed, please try again.");
-                    }
-                });
-
+                        @Override
+                        public void onFailure(Exception error) {
+                            makeToast("Uploading image failed. ");
+                        }
+                    });
+                }else{
+                    sendRegisterRequest();
+                }
                 break;
 
             default:

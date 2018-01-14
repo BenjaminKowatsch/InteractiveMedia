@@ -29,13 +29,12 @@ public class Transaction {
     public Transaction(){
     }
 
-    public Transaction(String infoName, String paidBy, String split, Date dateTime, String imageUrl,
+    public Transaction(String infoName, String paidBy, String split, Date dateTime,
                        Location location, double amount, String groupId) {
         this.infoName = infoName;
         this.paidBy = paidBy;
         this.split = split;
         this.dateTime = dateTime;
-        this.imageUrl = imageUrl;
         this.location = location;
         this.amount = amount;
         this.groupId = groupId;

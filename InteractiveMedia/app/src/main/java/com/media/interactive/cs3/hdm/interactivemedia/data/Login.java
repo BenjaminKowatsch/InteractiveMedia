@@ -342,6 +342,7 @@ public class Login {
         try {
             data.put("username", user.getUsername());
             data.put("email", user.getEmail());
+            data.put("imageUrl", user.getImageUrl() != null ? user.getImageUrl() : JSONObject.NULL);
             data.put("password", hashedPassword);
         } catch (JSONException e) {
             e.printStackTrace();

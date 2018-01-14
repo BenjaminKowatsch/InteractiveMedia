@@ -2,10 +2,8 @@ package com.media.interactive.cs3.hdm.interactivemedia.activties;
 
 import android.app.DatePickerDialog;
 import android.app.TimePickerDialog;
-import android.content.ContentValues;
 import android.database.Cursor;
 import android.location.Location;
-import android.net.Uri;
 import android.os.Bundle;
 import android.text.InputType;
 import android.util.Log;
@@ -24,23 +22,15 @@ import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.error.VolleyError;
 import com.media.interactive.cs3.hdm.interactivemedia.R;
-import com.media.interactive.cs3.hdm.interactivemedia.contentprovider.DatabaseHelper;
 import com.media.interactive.cs3.hdm.interactivemedia.RestRequestQueue;
 import com.media.interactive.cs3.hdm.interactivemedia.authorizedrequests.AuthorizedJsonObjectRequest;
 import com.media.interactive.cs3.hdm.interactivemedia.contentprovider.DatabaseProvider;
 import com.media.interactive.cs3.hdm.interactivemedia.contentprovider.tables.GroupTable;
-import com.media.interactive.cs3.hdm.interactivemedia.contentprovider.tables.GroupTransactionTable;
-import com.media.interactive.cs3.hdm.interactivemedia.contentprovider.tables.UserTable;
 import com.media.interactive.cs3.hdm.interactivemedia.contentprovider.tables.UserTable;
 import com.media.interactive.cs3.hdm.interactivemedia.data.DatabaseProviderHelper;
 import com.media.interactive.cs3.hdm.interactivemedia.data.MoneyTextWatcher;
 import com.media.interactive.cs3.hdm.interactivemedia.data.Transaction;
-import com.media.interactive.cs3.hdm.interactivemedia.util.ImageUploadCallbackListener;
 
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -195,13 +185,9 @@ public class AddTransactionActivity extends ImagePickerActivity {
         final String split = "even";
         final double amount = parseAmount(amountText);
         final Date dateTime = parseDateTime(dateText, timeText);
-        final ImageUploadCallbackListener imageUploadCallbackListener =
-                new ImageUploadCallbackListener(getResources().getString(R.string.web_service_url));
-        uploadImage(imageUploadCallbackListener);
         //FIXME: replace this with real location
         final Location location = new Location("");
-        return new Transaction(purpose, userAdapter.getCursor().getString(userAdapter.getCursor().getColumnIndex(UserTable.COLUMN_USER_ID)), split, dateTime,
-                imageUploadCallbackListener.imageUrl, location, amount, groupId);
+        return new Transaction(purpose, userAdapter.getCursor().getString(userAdapter.getCursor().getColumnIndex(UserTable.COLUMN_USER_ID)), split, dateTime, location, amount, groupId);
     }
 
     private double parseAmount(EditText amountText) {
