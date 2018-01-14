@@ -12,6 +12,7 @@ import com.media.interactive.cs3.hdm.interactivemedia.contentprovider.tables.Gro
 import com.media.interactive.cs3.hdm.interactivemedia.contentprovider.tables.GroupTransactionTable;
 import com.media.interactive.cs3.hdm.interactivemedia.contentprovider.tables.GroupUserTable;
 import com.media.interactive.cs3.hdm.interactivemedia.contentprovider.tables.LoginTable;
+import com.media.interactive.cs3.hdm.interactivemedia.contentprovider.tables.TransactionTable;
 import com.media.interactive.cs3.hdm.interactivemedia.contentprovider.tables.UserTable;
 
 import org.json.JSONArray;
@@ -20,6 +21,8 @@ import org.json.JSONObject;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by benny on 08.01.18.
@@ -125,6 +128,7 @@ public class DatabaseProviderHelper {
             final SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
             try {
                 transaction.setDateTime(sdf.parse(transactionObject.getString("infoCreatedAt")));
+                transaction.setPublishedAt(sdf.parse(transactionObject.getString("publishedAt")));
             } catch (ParseException e) {
                 e.printStackTrace();
             }
@@ -181,28 +185,44 @@ public class DatabaseProviderHelper {
         return false;
     }
 
-    public void removeExistingGroupIds(JSONArray groupIds) {
-        for(int i = 0; i< groupIds.length() ;i++){
+    public String getLatestTransactionPubDateByGroupId(String groupId){
+        String result = null;
+        final String[] projection = {TransactionTable.TABLE_NAME+ "." + TransactionTable.COLUMN_PUBLISHED_AT};
+        final String selection = GroupTable.TABLE_NAME+"."+GroupTable.COLUMN_GROUP_ID + " = ?";
+        final String[] selectionArgs = {groupId};
+        final Cursor cursor = contentResolver.query(DatabaseProvider.CONTENT_GROUP_TRANSACTION_JOIN_URI,
+            projection, selection, selectionArgs,
+            TransactionTable.COLUMN_PUBLISHED_AT + " DESC LIMIT 1");
+        Log.d(TAG, "LatestTransaction Count: " + cursor.getCount());
+        if(cursor.moveToFirst()){
+            result = cursor.getString(0);
+        }
+        return result;
+    }
+
+    public List<String> removeExistingGroupIds(JSONArray groupIds) {
+        List<String> existingGroupIds = new ArrayList<>();
+        for(int i = groupIds.length()-1; i>=0 ;i--){
             final String[] projection = {GroupTable.COLUMN_ID};
             final String selection = GroupTable.COLUMN_GROUP_ID + " = ?";
             String groupId = null;
             try {
-                groupId = groupIds.getString(i);
+                groupId = (String)groupIds.get(i);
             } catch (JSONException e) {
                 e.printStackTrace();
             }
             final String[] selectionArgs = {groupId};
             final Cursor search = contentResolver.query(DatabaseProvider.CONTENT_GROUP_URI, projection, selection, selectionArgs, null);
             long foundId = -1;
-            if( search.moveToFirst()) {
+            if(search.moveToFirst()) {
                 foundId = search.getLong(0);
             }
             if(foundId != -1){
                 Log.d(TAG, "Removing groupId: "+ groupId);
+                existingGroupIds.add(groupId);
                 groupIds.remove(i);
-            } else {
-                Log.d(TAG, "Not Removing groupId: "+ groupId);
             }
         }
+        return existingGroupIds;
     }
 }

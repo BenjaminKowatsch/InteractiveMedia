@@ -5,6 +5,7 @@ import android.content.ContentValues;
 import android.location.Location;
 
 import com.media.interactive.cs3.hdm.interactivemedia.contentprovider.tables.TransactionTable;
+import com.media.interactive.cs3.hdm.interactivemedia.util.Helper;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -44,12 +45,12 @@ public class Transaction {
 
     public ContentValues toContentValues() {
         final ContentValues out = new ContentValues();
-        Date now = new Date(System.currentTimeMillis());
-        out.put(TransactionTable.COLUMN_INFO_CREATED_AT, now.toString());
+        out.put(TransactionTable.COLUMN_INFO_CREATED_AT, Helper.GetDateTime());
         out.put(TransactionTable.COLUMN_AMOUNT, amount);
         out.put(TransactionTable.COLUMN_INFO_NAME, infoName);
         out.put(TransactionTable.COLUMN_PAID_BY, paidBy);
         out.put(TransactionTable.COLUMN_INFO_IMAGE_URL, imageUrl);
+        out.put(TransactionTable.COLUMN_PUBLISHED_AT, Helper.FormatDate(publishedAt));
         out.put(TransactionTable.COLUMN_INFO_LOCATION_LONG, location.getLongitude());
         out.put(TransactionTable.COLUMN_INFO_LOCATION_LAT, location.getLatitude());
         out.put(TransactionTable.COLUMN_SYNCHRONIZED, synched);
@@ -171,9 +172,8 @@ public class Transaction {
         infoLocation.put("longitude", location.getLongitude());
         result.put("infoLocation", infoLocation);
 
-        result.put("infoImageUrl", imageUrl);
-        final SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
-        result.put("infoCreatedAt", sdf.format(dateTime));
+        result.put("infoImageUrl", imageUrl != null ? imageUrl : JSONObject.NULL);
+        result.put("infoCreatedAt", Helper.FormatDate(dateTime));
         result.put("paidBy", paidBy);
         result.put("split", split);
         return result;
