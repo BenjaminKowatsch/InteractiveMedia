@@ -6,19 +6,25 @@
  -->
 
 <template>
+<div class = "overview">
+  <div class = "asdasd">
 <!-- START Framework 7 Template Elements for establishing the view -->
-  <f7-page toolbar-fixed>
+<!--   <f7-page toolbar-fixed>
     <f7-navbar>
       <f7-nav-center sliding>Dashboard</f7-nav-center>
        <f7-subnavbar sliding>
-          <f7-buttons>
-            <f7-button v-on:click="createDummyGroup()">AddDummyGroup</f7-button>
-            <f7-button v-on:click="showGroupUserChart = toggleState(showGroupUserChart)">Show User and Groups Chart</f7-button>
-            <f7-button v-on:click="showLoginTypeChart = toggleState(showLoginTypeChart)">Show Logintype Chart</f7-button>
-            <f7-button v-on:click="logout()">Logout</f7-button>
-         </f7-buttons>
+          <f7-buttons> -->
+
+              <input type="button" v-on:click="createDummyGroup()" value="AddDummyGroup"/>
+              <input type="button" v-on:click="showGroupUserChart = toggleState(showGroupUserChart)" value="Show User and Groups Chart"/>
+
+              <input type="button" v-on:click="showLoginTypeChart = toggleState(showLoginTypeChart)" value="Show Logintype Chart"/>
+              <input type="button"  v-on:click="logout()" value="Logout"/>
+
+
+<!--          </f7-buttons>
       </f7-subnavbar>
-    </f7-navbar>
+    </f7-navbar> -->
 
     <br>
     <br>
@@ -41,14 +47,14 @@
 
        <br/>
  -->
-      <div id="tables">
+      <div>
         <user-table v-if="usersLoaded" :users="users"></user-table>
         <group-table v-if="groupsLoaded" :groups="groups"></group-table>
       </div>
 
       <br> 
       
-      <div id="charts">
+      <div>
         <div class="groupUserChart">
           <div v-if="showGroupUserChart && groupsLoaded && usersLoaded">
             <group-user-chart :groupCount="groupCount" :userCount="userCount"></group-user-chart>
@@ -74,10 +80,12 @@
           {{version.name}}  {{version.version}}
         </p>
       </div> -->
-        </f7-list form>  
+ <!--        </f7-list form>  
 
-  </f7-page>
+  </f7-page> -->
     <!-- END of Template Elements -->
+    </div>
+    </div>
 </template>
 
 <script>
@@ -99,8 +107,10 @@ export default {
     UserTable,
     GroupTable
   },
+  
   data() {
     return {
+      drawer: false,
       version: [],
       groups: [],
       users: [],
@@ -124,6 +134,11 @@ export default {
 
     this.authToken = Cookie.getJSONCookie("accessToken").accessToken;
     console.log("The cookie authToken is: " + this.authToken);
+
+    // if no accessToken is set or if something went wrong, redirect user to loginpage
+    if(this.authToken == "undefined" || this.authToken == undefined || this.authToken == null){
+      this.redirect("/");
+    }
 
     this.groups = [];
     this.users = [];

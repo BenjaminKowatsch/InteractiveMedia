@@ -45,9 +45,10 @@
     /* sets the cursor behavior when hovering the item title */
 }
 
-.login-screen-title {
+
+/* .login-screen-title {
     text-transform: uppercase;
-}
+} */
 
 body {
     font-family: Roboto Condensed;
@@ -59,12 +60,13 @@ hr {
     border-bottom: none;
 }
 
-.navbar,
+
+/* .navbar,
 .subnavbar,
 .toolbar {
     background: #00ad4e;
     color: #ffffff;
-}
+} */
 
 .navbar-inner {
     border-bottom: 2px solid #000000;
@@ -106,14 +108,6 @@ hr {
     display: flex;
     justify-content: center;
     align-items: center;
-}
-
-#launeButton {
-    position: fixed;
-    left: 5%;
-    bottom: 5%;
-    width: 90%;
-    /* defines the behavior of the emotion button */
 }
 
 
@@ -221,8 +215,9 @@ hr {
     text-align: center;
 }
 
-.navbar a.icon-only,
+
+/* .navbar a.icon-only,
 .subnavbar a.icon-only,
 .toolbar a.icon-only {
     background-color: #ffffff !important;
-}
+} */
