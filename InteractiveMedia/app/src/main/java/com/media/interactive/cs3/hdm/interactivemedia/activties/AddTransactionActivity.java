@@ -35,6 +35,7 @@ import com.media.interactive.cs3.hdm.interactivemedia.contentprovider.tables.Use
 import com.media.interactive.cs3.hdm.interactivemedia.data.DatabaseProviderHelper;
 import com.media.interactive.cs3.hdm.interactivemedia.data.MoneyTextWatcher;
 import com.media.interactive.cs3.hdm.interactivemedia.data.Transaction;
+import com.media.interactive.cs3.hdm.interactivemedia.util.ImageUploadCallbackListener;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -194,7 +195,8 @@ public class AddTransactionActivity extends ImagePickerActivity {
         final String split = "even";
         final double amount = parseAmount(amountText);
         final Date dateTime = parseDateTime(dateText, timeText);
-        final ImageUploadCallbackListener imageUploadCallbackListener = new ImageUploadCallbackListener();
+        final ImageUploadCallbackListener imageUploadCallbackListener =
+                new ImageUploadCallbackListener(getResources().getString(R.string.web_service_url));
         uploadImage(imageUploadCallbackListener);
         //FIXME: replace this with real location
         final Location location = new Location("");
@@ -293,29 +295,4 @@ public class AddTransactionActivity extends ImagePickerActivity {
         return userAdapter;
     }
 
-    private class ImageUploadCallbackListener extends CallbackListener<JSONObject, Exception> {
-        private String imageUrl;
-
-        @Override
-        public void onSuccess(JSONObject response) {
-            JSONObject payload;
-            String imageName = null;
-            try {
-                payload = response.getJSONObject("payload");
-                imageName = payload.getString("path");
-                Log.d(this.getClass().getName(), "Path returned: " + payload.getString("path"));
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
-            final String newImageUrl = getResources().getString(R.string.web_service_url)
-                    .concat("/v1/object-store/download?filename=").concat(imageName);
-            imageUrl = newImageUrl;
-        }
-
-        @Override
-        public void onFailure(Exception error) {
-            imageUrl = null;
-            makeToast(error.getMessage());
-        }
-    }
 }

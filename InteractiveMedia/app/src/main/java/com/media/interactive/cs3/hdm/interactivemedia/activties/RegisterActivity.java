@@ -1,24 +1,7 @@
 package com.media.interactive.cs3.hdm.interactivemedia.activties;
 
-import android.Manifest;
-import android.app.AlertDialog;
-import android.app.Dialog;
-import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.pm.PackageManager;
-import android.database.Cursor;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
-import android.os.Environment;
-import android.provider.MediaStore;
-import android.support.annotation.RequiresApi;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.content.ContextCompat;
-import android.support.v4.content.FileProvider;
-import android.support.v7.app.AppCompatActivity;
 import android.text.Editable;
 import android.text.InputType;
 import android.text.TextWatcher;
@@ -27,39 +10,21 @@ import android.util.Patterns;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-
-import com.android.volley.error.AuthFailureError;
-import com.bumptech.glide.Glide;
-import com.bumptech.glide.load.model.GlideUrl;
-import com.bumptech.glide.load.model.LazyHeaders;
 import com.media.interactive.cs3.hdm.interactivemedia.CallbackListener;
-
-import com.android.volley.Request;
-import com.android.volley.Response;
-import com.android.volley.error.VolleyError;
-import com.android.volley.request.SimpleMultiPartRequest;
-
 import com.media.interactive.cs3.hdm.interactivemedia.R;
-import com.media.interactive.cs3.hdm.interactivemedia.RestRequestQueue;
 import com.media.interactive.cs3.hdm.interactivemedia.data.Hash;
 import com.media.interactive.cs3.hdm.interactivemedia.data.Login;
 import com.media.interactive.cs3.hdm.interactivemedia.data.UserType;
-
+import com.media.interactive.cs3.hdm.interactivemedia.util.ImageUploadCallbackListener;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
-
 public class RegisterActivity extends ImagePickerActivity
-    implements View.OnClickListener {
+        implements View.OnClickListener {
 
     private static final String TAG = RegisterActivity.class.getSimpleName();
 
@@ -84,21 +49,23 @@ public class RegisterActivity extends ImagePickerActivity
         registerPassword = (EditText) findViewById(R.id.et_register_password);
         registerPasswordError = (TextView) findViewById(R.id.et_register_password_error);
         register.setOnClickListener(this);
-        
+
         register.setEnabled(false);
 
         registerEmail.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_EMAIL_ADDRESS);
 
         registerUsername.addTextChangedListener(new TextWatcher() {
             @Override
-            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {}
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+            }
 
             @Override
-            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {}
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+            }
 
             @Override
             public void afterTextChanged(Editable editable) {
-                if(isNameValid(editable.toString())){
+                if (isNameValid(editable.toString())) {
                     registerUsernameError.setVisibility(View.GONE);
                     register.setEnabled(isRegisterEnabled());
                 } else {
@@ -110,14 +77,16 @@ public class RegisterActivity extends ImagePickerActivity
 
         registerEmail.addTextChangedListener(new TextWatcher() {
             @Override
-            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {}
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+            }
 
             @Override
-            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {}
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+            }
 
             @Override
             public void afterTextChanged(Editable editable) {
-                if(isEmailValid(editable.toString())){
+                if (isEmailValid(editable.toString())) {
                     registerEmailError.setVisibility(View.GONE);
                     register.setEnabled(isRegisterEnabled());
                 } else {
@@ -129,14 +98,16 @@ public class RegisterActivity extends ImagePickerActivity
 
         registerPassword.addTextChangedListener(new TextWatcher() {
             @Override
-            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {}
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+            }
 
             @Override
-            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {}
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+            }
 
             @Override
             public void afterTextChanged(Editable editable) {
-                if(isPasswordValid(editable.toString())){
+                if (isPasswordValid(editable.toString())) {
                     registerPasswordError.setVisibility(View.GONE);
                     register.setEnabled(isRegisterEnabled());
                 } else {
@@ -146,7 +117,7 @@ public class RegisterActivity extends ImagePickerActivity
             }
         });
 
-        initImagePickerActivity(R.id.register_profile_picture,"profile_picture.png");
+        initImagePickerActivity(R.id.register_profile_picture, "profile_picture.png");
     }
 
     private boolean isRegisterEnabled() {
@@ -164,14 +135,14 @@ public class RegisterActivity extends ImagePickerActivity
         return password != null && password.length() > 3;
     }
 
-    private boolean isEmailValid(String email){
-        if(Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
+    private boolean isEmailValid(String email) {
+        if (Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
             return true;
         }
         return false;
     }
 
-    private void navigateToHome(){
+    private void navigateToHome() {
         final Intent toHome = new Intent(RegisterActivity.this, HomeActivity.class);
         toHome.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
         startActivity(toHome);
@@ -187,12 +158,17 @@ public class RegisterActivity extends ImagePickerActivity
                 login.setUserType(UserType.DEFAULT);
                 login.getUser().setEmail(registerEmail.getText().toString());
                 login.setHashedPassword(Hash.hashStringSha256(registerPassword.getText().toString()));
+                ImageUploadCallbackListener callbackListener =
+                        new ImageUploadCallbackListener(getResources().getString(R.string.web_service_url));
+                uploadImage(callbackListener);
+                final String imageUrl = callbackListener.getImageUrl() == null ? "null" : callbackListener.getImageUrl();
+                login.getUser().setImageUrl(imageUrl);
                 login.register(RegisterActivity.this, new CallbackListener<JSONObject, Exception>() {
                     @Override
                     public void onSuccess(JSONObject param) {
                         Toast.makeText(getApplicationContext(),
-                            "Success fully logged in",
-                            Toast.LENGTH_SHORT).show();
+                                "Success fully logged in",
+                                Toast.LENGTH_SHORT).show();
 
                         uploadImage(new CallbackListener<JSONObject, Exception>() {
                             @Override
@@ -208,7 +184,7 @@ public class RegisterActivity extends ImagePickerActivity
                                     e.printStackTrace();
                                 }
                                 final String newImageUrl = getResources().getString(R.string.web_service_url)
-                                    .concat("/v1/object-store/download?filename=").concat(imageName);
+                                        .concat("/v1/object-store/download?filename=").concat(imageName);
                                 Login.getInstance().getUser().setImageUrl(newImageUrl);
                                 navigateToHome();
                             }
