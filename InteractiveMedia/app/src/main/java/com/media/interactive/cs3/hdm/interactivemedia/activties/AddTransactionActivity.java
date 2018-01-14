@@ -165,7 +165,7 @@ public class AddTransactionActivity extends ImagePickerActivity {
             Log.e(this.getClass().getSimpleName(), "Intent is missing id of group");
             return null;
         } else {
-            return new DatabaseHelper(this).getByIdWithUsers(groupId);
+            return new DatabaseHelper(this).getGroupWithUsers(groupId);
         }
     }
 
