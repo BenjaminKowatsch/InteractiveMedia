@@ -47,7 +47,7 @@ export default {
              if (reload) {
                  location.reload()
              } */
-            this.$router.replace(url);
+            this.$router.push(url);
         },
 
         /**

@@ -24,6 +24,7 @@ import App from './app'
 
 import login from './pages/login.vue'
 import overview from './pages/overview.vue'
+import notFound from './pages/notFound.vue'
 
 // Import Cookie JS
 import Cookie from './js/Cookie.js'
@@ -44,6 +45,8 @@ Vue.use(Vuetify)
 
 Vue.use(VueCharts)
 
+
+
 var startApp = function(onLoadingFinished) {
     onLoadingFinished();
 }
@@ -52,21 +55,31 @@ var onLoadingFinished = function() {
 
 
     //ToDO: Try to do the routes into routes.js
-    const routes = [{
-            path: '/',
-            name: "login",
-            component: login
-        },
-        {
-            path: '/overview/',
-            name: "overview",
-            component: overview
-        },
-    ]
+    /*            const routes = [{
+                       path: '/',
+                       name: "login",
+                       component: login
+                   },
+                   {
+                       path: '/overview/',
+                       name: "overview",
+                       component: overview
+                   },
+               ] */
 
 
     const router = new VueRouter({
-        routes
+        mode: "history",
+        routes: [
+            { path: "/", component: login },
+            {
+                path: '/overview',
+                component: overview
+            },
+            // ... other routes ...
+            // and finally the default route, when none of the above matches:
+            { path: "*", component: notFound }
+        ]
     })
 
     // Init App
@@ -99,6 +112,8 @@ var onLoadingFinished = function() {
             };
         },
         created: function() {
+
+
             // Only update the loginStatus if the user is not already logged in with facebook
             this.updateLoginStatus();
         },
