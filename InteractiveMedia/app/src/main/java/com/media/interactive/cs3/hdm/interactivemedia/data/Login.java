@@ -4,14 +4,12 @@ import android.app.Activity;
 import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Context;
-import android.database.Cursor;
 import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.util.Log;
 
 import com.android.volley.Request;
 import com.android.volley.Response;
-import com.android.volley.error.AuthFailureError;
 import com.android.volley.error.VolleyError;
 import com.android.volley.request.JsonObjectRequest;
 import com.facebook.AccessToken;
@@ -30,14 +28,11 @@ import com.media.interactive.cs3.hdm.interactivemedia.RestRequestQueue;
 import com.media.interactive.cs3.hdm.interactivemedia.authorizedrequests.AuthorizedJsonObjectRequest;
 import com.media.interactive.cs3.hdm.interactivemedia.contentprovider.DatabaseProvider;
 import com.media.interactive.cs3.hdm.interactivemedia.contentprovider.tables.LoginTable;
-import com.media.interactive.cs3.hdm.interactivemedia.contentprovider.tables.UserTable;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.util.HashMap;
-import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
 
@@ -194,7 +189,8 @@ public class Login {
                                     newGroup.getUsers().add(user);
                                 }
                                 helper.insertGroupAtDatabase(newGroup);
-                                //TODO: Set/Add Transactions
+                                //Add Transactions
+                                helper.addTransactions(payload.getJSONArray("transactions"), newGroup.getGroupId());
                                 if(onUserDataSet != null && groupIds.length() - 1 == atomicInteger.incrementAndGet()){
                                     onUserDataSet.onSuccess(response);
                                 }

@@ -144,6 +144,23 @@ public class Transaction {
         this.publishedAt = publishedAt;
     }
 
+    @Override
+    public String toString() {
+        return "Transaction{" +
+            "id=" + id +
+            ", infoName='" + infoName + '\'' +
+            ", paidBy='" + paidBy + '\'' +
+            ", split='" + split + '\'' +
+            ", dateTime=" + dateTime +
+            ", imageUrl='" + imageUrl + '\'' +
+            ", location=" + location +
+            ", amount=" + amount +
+            ", groupId='" + groupId + '\'' +
+            ", synched=" + synched +
+            ", publishedAt=" + publishedAt +
+            '}';
+    }
+
     public JSONObject toJson() throws JSONException {
         final JSONObject result = new JSONObject();
         result.put("infoName", infoName);

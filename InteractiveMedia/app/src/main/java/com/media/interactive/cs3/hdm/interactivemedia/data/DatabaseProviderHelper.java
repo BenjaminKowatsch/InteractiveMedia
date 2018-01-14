@@ -3,6 +3,7 @@ package com.media.interactive.cs3.hdm.interactivemedia.data;
 import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.database.Cursor;
+import android.location.Location;
 import android.net.Uri;
 import android.util.Log;
 
@@ -15,6 +16,10 @@ import com.media.interactive.cs3.hdm.interactivemedia.contentprovider.tables.Use
 
 import org.json.JSONArray;
 import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 
 /**
  * Created by benny on 08.01.18.
@@ -101,6 +106,33 @@ public class DatabaseProviderHelper {
             } else {
                 user.setId(foundId);
             }
+        }
+    }
+
+    public void addTransactions(JSONArray jsonArray, String groupId) throws JSONException {
+        for(int i = 0; i < jsonArray.length() ;i++){
+            final JSONObject transactionObject = (JSONObject) jsonArray.get(i);
+            final Transaction transaction = new Transaction();
+            transaction.setGroupId(groupId);
+            transaction.setAmount(transactionObject.getDouble("amount"));
+            transaction.setInfoName(transactionObject.getString("infoName"));
+
+            final JSONObject infoLocation = (JSONObject) transactionObject.getJSONObject("infoLocation");
+            final Location location = new Location("");
+            location.setLatitude(infoLocation.getDouble("latitude"));
+            location.setLongitude(infoLocation.getDouble("longitude"));
+            transaction.setLocation(location);
+            final SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
+            try {
+                transaction.setDateTime(sdf.parse(transactionObject.getString("infoCreatedAt")));
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
+            transaction.setImageUrl(transactionObject.getString("infoImageUrl"));
+            transaction.setPaidBy(transactionObject.getString("paidBy"));
+            transaction.setSplit(transactionObject.getString("split"));
+            Log.d(TAG, "Saving Transaction: "+ transaction.toString());
+            saveTransaction(transaction);
         }
     }
 
