@@ -200,10 +200,11 @@ public class DatabaseProviderHelper {
         return result;
     }
 
-    public List<String> removeExistingGroupIds(JSONArray groupIds) {
-        List<String> existingGroupIds = new ArrayList<>();
+    public List<Group> removeExistingGroupIds(JSONArray groupIds) {
+        List<Group> existingGroups = new ArrayList<>();
         for(int i = groupIds.length()-1; i>=0 ;i--){
-            final String[] projection = {GroupTable.COLUMN_ID};
+            final Group group = new Group();
+            final String[] projection = { GroupTable.TABLE_NAME+".*"};
             final String selection = GroupTable.COLUMN_GROUP_ID + " = ?";
             String groupId = null;
             try {
@@ -212,17 +213,23 @@ public class DatabaseProviderHelper {
                 e.printStackTrace();
             }
             final String[] selectionArgs = {groupId};
-            final Cursor search = contentResolver.query(DatabaseProvider.CONTENT_GROUP_URI, projection, selection, selectionArgs, null);
-            long foundId = -1;
-            if(search.moveToFirst()) {
-                foundId = search.getLong(0);
+            final Cursor cursor = contentResolver.query(DatabaseProvider.CONTENT_GROUP_URI, projection, selection, selectionArgs, null);
+            group.setId(-1);
+            if(cursor.moveToFirst()) {
+                group.setId(cursor.getLong(cursor.getColumnIndexOrThrow(GroupTable.COLUMN_ID)));
+                group.setGroupId(cursor.getString(cursor.getColumnIndexOrThrow(GroupTable.COLUMN_GROUP_ID)));
+                group.setName(cursor.getString(cursor.getColumnIndexOrThrow(GroupTable.COLUMN_NAME)));
+                group.setImageUrl(cursor.getString(cursor.getColumnIndexOrThrow(GroupTable.COLUMN_IMAGE_URL)));
+                group.setCreatedAt(cursor.getString(cursor.getColumnIndexOrThrow(GroupTable.COLUMN_CREATED_AT)));
+                int synced = cursor.getInt(cursor.getColumnIndexOrThrow(GroupTable.COLUMN_SYNCHRONIZED));
+                group.setSync(synced > 0);
             }
-            if(foundId != -1){
-                Log.d(TAG, "Removing groupId: "+ groupId);
-                existingGroupIds.add(groupId);
+            if(group.getId() != -1){
+                Log.d(TAG, "Removing groupId: "+ group);
+                existingGroups.add(group);
                 groupIds.remove(i);
             }
         }
-        return existingGroupIds;
+        return existingGroups;
     }
 }

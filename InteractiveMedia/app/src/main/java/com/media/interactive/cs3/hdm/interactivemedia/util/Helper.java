@@ -41,7 +41,10 @@ public class Helper {
     }
 
     public static String FormatDate(Date date){
-        return DATE_FORMAT.format(date);
+        if(date != null){
+            return DATE_FORMAT.format(date);
+        }
+        return null;
     }
 
     public static Date ParseDateString(String dateString){

@@ -34,6 +34,7 @@ import com.media.interactive.cs3.hdm.interactivemedia.contentprovider.tables.Use
 import com.media.interactive.cs3.hdm.interactivemedia.data.Login;
 import com.media.interactive.cs3.hdm.interactivemedia.data.Transaction;
 
+import static com.media.interactive.cs3.hdm.interactivemedia.activties.AddTransactionActivity.GROUP_CREATED_AT_ADD_TO;
 import static com.media.interactive.cs3.hdm.interactivemedia.activties.AddTransactionActivity.GROUP_TO_ADD_TO;
 
 
@@ -118,6 +119,9 @@ public class TransactionFragment extends ListFragment implements LoaderManager.L
 
     private String getCurrentGroupId() {
         return groupAdapter.getCursor().getString(groupAdapter.getCursor().getColumnIndex(GroupTable.COLUMN_GROUP_ID));
+    }
+    private String getCurrentGroupCreatedAt() {
+        return groupAdapter.getCursor().getString(groupAdapter.getCursor().getColumnIndex(GroupTable.COLUMN_CREATED_AT));
     }
 
     private SimpleCursorAdapter initializeGroupAdapter() {
@@ -230,6 +234,7 @@ public class TransactionFragment extends ListFragment implements LoaderManager.L
                 final Intent intent = new Intent(view.getContext(), AddTransactionActivity.class);
                 intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
                 intent.putExtra(GROUP_TO_ADD_TO, getCurrentGroupId());
+                intent.putExtra(GROUP_CREATED_AT_ADD_TO, getCurrentGroupCreatedAt());
                 startActivity(intent);
             }
         };

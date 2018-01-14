@@ -135,10 +135,10 @@ public class Login {
                         }
                         if (groupIds != null && groupIds.length() > 0) {
                             Log.d(TAG, "Before Removal: " + groupIds.length() + " " + groupIds.toString());
-                            List<String> existingGroupIds = helper.removeExistingGroupIds(groupIds);
+                            List<Group> existingGroups = helper.removeExistingGroupIds(groupIds);
                             Log.d(TAG, "After Removal: " + groupIds.length() + " " + groupIds.toString());
-                            for (final String groupId : existingGroupIds) {
-                                requestTransactionsByGroupId(context, groupId);
+                            for (final Group group : existingGroups) {
+                                requestTransactionsByGroupId(context, group.getGroupId(), group.getCreatedAt(), null);
                             }
                             requestNewGroups(context, groupIds);
                         } else {
@@ -169,39 +169,53 @@ public class Login {
         RestRequestQueue.getInstance(context).addToRequestQueue(jsonObjectRequest);
     }
 
-    public void requestTransactionsByGroupId(Context context, final String groupId) {
+    public void requestTransactionsByGroupId(Context context, final String groupId, String groupCreatedAt, final CallbackListener<JSONObject, Exception> callback) {
 
-        final String latestPublishedDate = helper.getLatestTransactionPubDateByGroupId(groupId);
+        String latestPublishedDate = helper.getLatestTransactionPubDateByGroupId(groupId);
         Log.d(TAG, "latest published date: " + latestPublishedDate);
-        if (latestPublishedDate != null) {
-            final String url = context.getResources().getString(R.string.web_service_url).concat("/v1/groups/").concat(groupId).concat("/transactions?after=").concat(latestPublishedDate);
-            Log.d(TAG, "Get: " + url);
-            final AuthorizedJsonObjectRequest jsonObjectRequest = new AuthorizedJsonObjectRequest(
-                Request.Method.GET, url, null, new Response.Listener<JSONObject>() {
-                @Override
-                public void onResponse(final JSONObject response) {
-                    try {
-                        final boolean success = response.getBoolean("success");
-                        Log.d(TAG, "TransactionsAfter: " + response);
-                        if (success) {
-                            final JSONArray payload = response.getJSONArray("payload");
-                            helper.addTransactions(payload, groupId);
-                        } else {
-                            Log.e(TAG, "Error while setting user data.");
+        if (latestPublishedDate == null) {
+            latestPublishedDate = groupCreatedAt;
+        }
+        final String url = context.getResources().getString(R.string.web_service_url).concat("/v1/groups/").concat(groupId).concat("/transactions?after=").concat(latestPublishedDate);
+        Log.d(TAG, "Get: " + url);
+        final AuthorizedJsonObjectRequest jsonObjectRequest = new AuthorizedJsonObjectRequest(
+            Request.Method.GET, url, null, new Response.Listener<JSONObject>() {
+            @Override
+            public void onResponse(final JSONObject response) {
+                try {
+                    final boolean success = response.getBoolean("success");
+                    Log.d(TAG, "TransactionsAfter: " + response);
+                    if (success) {
+                        final JSONArray payload = response.getJSONArray("payload");
+                        helper.addTransactions(payload, groupId);
+                        if (callback != null) {
+                            callback.onSuccess(null);
                         }
-                    } catch (JSONException e) {
-                        e.printStackTrace();
+                    } else {
+                        Log.e(TAG, "Error while requesting transaction data.");
+                        if (callback != null) {
+                            callback.onFailure(null);
+                        }
+                    }
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                    if (callback != null) {
+                        callback.onFailure(null);
                     }
                 }
-            }, new Response.ErrorListener() {
-                @Override
-                public void onErrorResponse(VolleyError error) {
-                    Log.e(TAG, "Error while setting user data.");
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                Log.e(TAG, "Error while setting user data.");
+                if (callback != null) {
+                    callback.onFailure(null);
                 }
-            });
-            jsonObjectRequest.setShouldCache(false);
-            RestRequestQueue.getInstance(context).addToRequestQueue(jsonObjectRequest);
-        }
+            }
+        });
+        jsonObjectRequest.setShouldCache(false);
+        RestRequestQueue.getInstance(context).addToRequestQueue(jsonObjectRequest);
+
     }
 
     private void requestNewGroups(Context context, final JSONArray groupIds) {
