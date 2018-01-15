@@ -3,10 +3,10 @@ package com.media.interactive.cs3.hdm.interactivemedia.data;
 import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.database.Cursor;
-import android.location.Location;
 import android.net.Uri;
 import android.util.Log;
 
+import com.google.android.gms.maps.model.LatLng;
 import com.media.interactive.cs3.hdm.interactivemedia.contentprovider.DatabaseProvider;
 import com.media.interactive.cs3.hdm.interactivemedia.contentprovider.tables.GroupTable;
 import com.media.interactive.cs3.hdm.interactivemedia.contentprovider.tables.GroupTransactionTable;
@@ -112,18 +112,18 @@ public class DatabaseProviderHelper {
         }
     }
 
-    public void addTransactions(JSONArray jsonArray, String groupId) throws JSONException {
+    public void addTransactions(JSONArray jsonArray, Group group) throws JSONException {
         for(int i = 0; i < jsonArray.length() ;i++){
             final JSONObject transactionObject = (JSONObject) jsonArray.get(i);
             final Transaction transaction = new Transaction();
-            transaction.setGroupId(groupId);
+            transaction.setGroup(group);
             transaction.setAmount(transactionObject.getDouble("amount"));
             transaction.setInfoName(transactionObject.getString("infoName"));
 
-            final JSONObject infoLocation = (JSONObject) transactionObject.getJSONObject("infoLocation");
-            final Location location = new Location("");
-            location.setLatitude(infoLocation.getDouble("latitude"));
-            location.setLongitude(infoLocation.getDouble("longitude"));
+            final JSONObject infoLocation = transactionObject.getJSONObject("infoLocation");
+            final double lat = infoLocation.getDouble("latitude");
+            final double lng = infoLocation.getDouble("longitude");
+            final LatLng location = new LatLng(lat, lng);
             transaction.setLocation(location);
             final SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
             try {

@@ -4,7 +4,6 @@ import android.app.DatePickerDialog;
 import android.app.TimePickerDialog;
 import android.content.Intent;
 import android.database.Cursor;
-import android.location.Location;
 import android.os.Bundle;
 import android.text.InputType;
 import android.util.Log;
@@ -30,11 +29,12 @@ import com.media.interactive.cs3.hdm.interactivemedia.CallbackListener;
 import com.media.interactive.cs3.hdm.interactivemedia.R;
 import com.media.interactive.cs3.hdm.interactivemedia.RestRequestQueue;
 import com.media.interactive.cs3.hdm.interactivemedia.authorizedrequests.AuthorizedJsonObjectRequest;
+import com.media.interactive.cs3.hdm.interactivemedia.contentprovider.DatabaseHelper;
 import com.media.interactive.cs3.hdm.interactivemedia.contentprovider.DatabaseProvider;
 import com.media.interactive.cs3.hdm.interactivemedia.contentprovider.tables.GroupTable;
 import com.media.interactive.cs3.hdm.interactivemedia.contentprovider.tables.UserTable;
-import com.media.interactive.cs3.hdm.interactivemedia.data.Group;
 import com.media.interactive.cs3.hdm.interactivemedia.data.DatabaseProviderHelper;
+import com.media.interactive.cs3.hdm.interactivemedia.data.Group;
 import com.media.interactive.cs3.hdm.interactivemedia.data.Login;
 import com.media.interactive.cs3.hdm.interactivemedia.data.MoneyTextWatcher;
 import com.media.interactive.cs3.hdm.interactivemedia.data.Transaction;
@@ -217,7 +217,7 @@ public class AddTransactionActivity extends ImagePickerActivity {
 
     private void sendToBackend(final Transaction toSave) throws JSONException {
         helper.saveTransaction(toSave);
-        Login.getInstance().requestTransactionsByGroupId(this, toSave.getGroupId(), groupCreatedAt, new CallbackListener<JSONObject, Exception>() {
+        Login.getInstance().requestTransactionsForGroup(this, group, new CallbackListener<JSONObject, Exception>() {
             @Override
             public void onSuccess(JSONObject response) {
                 final String url = getResources().getString(R.string.web_service_url).concat("/v1/groups/").concat(toSave.getGroupId()).concat("/transactions");
@@ -263,21 +263,17 @@ public class AddTransactionActivity extends ImagePickerActivity {
     private Transaction buildTransaction(EditText nameText, TextView splitText,
                                          EditText dateText, EditText timeText, EditText amountText) {
         final String purpose = nameText.getText().toString();
-        final String split = "even";
+        final String split = splitText.getText().toString();
         final double amount = parseAmount(amountText);
         final Date dateTime = parseDateTime(dateText, timeText);
-        //FIXME: replace this with real location
-        final Location location = new Location("");
+        LatLng latLng;
         if(selectedPlace != null) {
-            final LatLng latLng = selectedPlace.getLatLng();
-            location.setLongitude(latLng.longitude);
-            location.setLatitude(latLng.latitude);
+            latLng = selectedPlace.getLatLng();
+        } else {
+            latLng = null;
         }
         final String paidBy = userAdapter.getCursor().getString(userAdapter.getCursor().getColumnIndex(UserTable.COLUMN_USER_ID));
-        Log.d(TAG,"paidBy: "+ paidBy);
-        return new Transaction(purpose, paidBy, split, dateTime, location, amount, groupId);
-        return new Transaction(purpose, userAdapter.getCursor().getString(1), split, dateTime,
-                imageUploadCallbackListener.getImageUrl(), location, amount, group);
+        return new Transaction(purpose, paidBy, split, dateTime, latLng, amount, group);
     }
 
     private double parseAmount(EditText amountText) {

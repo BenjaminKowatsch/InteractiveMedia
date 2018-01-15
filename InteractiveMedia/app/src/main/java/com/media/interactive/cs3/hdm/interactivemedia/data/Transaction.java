@@ -2,16 +2,15 @@ package com.media.interactive.cs3.hdm.interactivemedia.data;
 
 
 import android.content.ContentValues;
-import android.location.Location;
 
+import com.google.android.gms.maps.model.LatLng;
 import com.media.interactive.cs3.hdm.interactivemedia.contentprovider.tables.TransactionTable;
-import com.media.interactive.cs3.hdm.interactivemedia.util.Helper;
 import com.media.interactive.cs3.hdm.interactivemedia.data.split.SplitFactory;
+import com.media.interactive.cs3.hdm.interactivemedia.util.Helper;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 
@@ -22,17 +21,17 @@ public class Transaction {
     private String split;
     private Date dateTime;
     private String imageUrl;
-    private Location location;
+    private LatLng location;
     private double amount;
-    private String groupId;
+    private Group group;
     private boolean synched;
     private Date publishedAt;
 
-    public Transaction(){
+    public Transaction() {
     }
 
     public Transaction(String infoName, String paidBy, String split, Date dateTime,
-                       Location location, double amount, String groupId) {
+                       LatLng location, double amount, Group group) {
         this.infoName = infoName;
         this.paidBy = paidBy;
         this.split = split;
@@ -52,17 +51,18 @@ public class Transaction {
         out.put(TransactionTable.COLUMN_PAID_BY, paidBy);
         out.put(TransactionTable.COLUMN_INFO_IMAGE_URL, imageUrl);
         out.put(TransactionTable.COLUMN_PUBLISHED_AT, Helper.FormatDate(publishedAt));
-        out.put(TransactionTable.COLUMN_INFO_LOCATION_LONG, location.getLongitude());
-        out.put(TransactionTable.COLUMN_INFO_LOCATION_LAT, location.getLatitude());
+        if (location != null) {
+            out.put(TransactionTable.COLUMN_INFO_LOCATION_LONG, location.longitude);
+            out.put(TransactionTable.COLUMN_INFO_LOCATION_LAT, location.latitude);
+        }
         out.put(TransactionTable.COLUMN_SYNCHRONIZED, synched);
         return out;
     }
 
     public List<Debt> split() {
-        return SplitFactory.getSplitByName(split).split(this, paidBy);
+        return SplitFactory.getSplitByName("").split(this, paidBy);
     }
 
-    public long getGroupId() {
     public long getId() {
         return id;
     }
@@ -111,11 +111,11 @@ public class Transaction {
         this.imageUrl = imageUrl;
     }
 
-    public Location getLocation() {
+    public LatLng getLocation() {
         return location;
     }
 
-    public void setLocation(Location location) {
+    public void setLocation(LatLng location) {
         this.location = location;
     }
 
@@ -128,12 +128,11 @@ public class Transaction {
     }
 
     public String getGroupId() {
-        return groupId;
-        return group.getId();
+        return group.getGroupId();
     }
 
-    public void setGroupId(String groupId) {
-        this.groupId = groupId;
+    public void setGroup(Group group) {
+        this.group = group;
     }
 
     public boolean isSynched() {
@@ -155,28 +154,28 @@ public class Transaction {
     @Override
     public String toString() {
         return "Transaction{" +
-            "id=" + id +
-            ", infoName='" + infoName + '\'' +
-            ", paidBy='" + paidBy + '\'' +
-            ", split='" + split + '\'' +
-            ", dateTime=" + dateTime +
-            ", imageUrl='" + imageUrl + '\'' +
-            ", location=" + location +
-            ", amount=" + amount +
-            ", groupId='" + groupId + '\'' +
-            ", synched=" + synched +
-            ", publishedAt=" + publishedAt +
-            '}';
+                "id=" + id +
+                ", infoName='" + infoName + '\'' +
+                ", paidBy='" + paidBy + '\'' +
+                ", split='" + split + '\'' +
+                ", dateTime=" + dateTime +
+                ", imageUrl='" + imageUrl + '\'' +
+                ", location=" + location +
+                ", amount=" + amount +
+                ", groupId='" + getGroupId() + '\'' +
+                ", synched=" + synched +
+                ", publishedAt=" + publishedAt +
+                '}';
     }
 
     public JSONObject toJson() throws JSONException {
         final JSONObject result = new JSONObject();
         result.put("infoName", infoName);
-        result.put("amount",amount);
+        result.put("amount", amount);
 
         final JSONObject infoLocation = new JSONObject();
-        infoLocation.put("latitude", location.getLatitude());
-        infoLocation.put("longitude", location.getLongitude());
+        infoLocation.put("latitude", location.latitude);
+        infoLocation.put("longitude", location.longitude);
         result.put("infoLocation", infoLocation);
 
         result.put("infoImageUrl", imageUrl != null ? imageUrl : JSONObject.NULL);
