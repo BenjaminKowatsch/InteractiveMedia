@@ -27,6 +27,11 @@
         Sorry, nothing to display here :(
       </v-alert>
     </template>
+     <template slot="footer">
+        <td class="text-xs-left" colspan="100%">
+          <strong>Total Groups: {{ items.length }}</strong>
+        </td>
+      </template>
       <template slot="pageText" slot-scope="{ pageStart, pageStop }">
         From {{ pageStart }} to {{ pageStop }}
       </template>
