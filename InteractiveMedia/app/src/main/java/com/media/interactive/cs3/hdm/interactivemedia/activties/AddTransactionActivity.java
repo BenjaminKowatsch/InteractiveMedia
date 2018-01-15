@@ -2,6 +2,7 @@ package com.media.interactive.cs3.hdm.interactivemedia.activties;
 
 import android.app.DatePickerDialog;
 import android.app.TimePickerDialog;
+import android.content.Intent;
 import android.database.Cursor;
 import android.location.Location;
 import android.os.Bundle;
@@ -20,6 +21,11 @@ import android.widget.Toast;
 import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.error.VolleyError;
+import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
+import com.google.android.gms.common.GooglePlayServicesRepairableException;
+import com.google.android.gms.location.places.Place;
+import com.google.android.gms.location.places.ui.PlacePicker;
+import com.google.android.gms.maps.model.LatLng;
 import com.media.interactive.cs3.hdm.interactivemedia.CallbackListener;
 import com.media.interactive.cs3.hdm.interactivemedia.R;
 import com.media.interactive.cs3.hdm.interactivemedia.RestRequestQueue;
@@ -43,6 +49,8 @@ import java.util.Date;
 import java.util.Locale;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import static com.google.android.gms.location.places.ui.PlacePicker.getPlace;
+
 public class AddTransactionActivity extends ImagePickerActivity {
     public static final NumberFormat CURRENCY_FORMAT = NumberFormat.getCurrencyInstance(Locale.GERMANY);
     public static final String GROUP_TO_ADD_TO = "GroupToAddTo";
@@ -56,9 +64,45 @@ public class AddTransactionActivity extends ImagePickerActivity {
     private EditText timeEditText;
     private String groupId;
     private String groupCreatedAt;
+    private TextView locationDisplay;
     private DatabaseProviderHelper helper;
     private SimpleCursorAdapter userAdapter;
     private AtomicInteger placePickerId = new AtomicInteger(0);
+    private Place selectedPlace = null;
+    private final static int PLACE_PICKER_REQUEST = 3;
+
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == PLACE_PICKER_REQUEST) {
+            if (resultCode == RESULT_OK) {
+                selectedPlace = getPlace(this, data);
+                final String toastMsg = String.format("Place: %s %s", selectedPlace.getAddress(), selectedPlace.getLatLng().toString());
+                if(selectedPlace != null) {
+                    final LatLng latLng = selectedPlace.getLatLng();
+                    locationDisplay.setText("Location: \n" + selectedPlace.getAddress()+"\n"
+                                            + "Latitude: " + latLng.latitude + "\n"
+                                            + "Longitude: " + latLng.longitude);
+
+                } else{
+                    locationDisplay.setText(null);
+                }
+                Log.d(TAG, toastMsg);
+                Toast.makeText(this, toastMsg, Toast.LENGTH_LONG).show();
+            }
+        }
+    }
+
+    private void startLocationSelection(){
+        final PlacePicker.IntentBuilder builder = new PlacePicker.IntentBuilder();
+        try {
+            startActivityForResult(builder.build(this), PLACE_PICKER_REQUEST);
+        } catch (GooglePlayServicesRepairableException e) {
+            e.printStackTrace();
+        } catch (GooglePlayServicesNotAvailableException e) {
+            e.printStackTrace();
+        }
+
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -75,14 +119,17 @@ public class AddTransactionActivity extends ImagePickerActivity {
         groupId = getIntent().getStringExtra(GROUP_TO_ADD_TO);
         groupCreatedAt = getIntent().getStringExtra(GROUP_CREATED_AT_ADD_TO);
 
-        Button addTransactionButton = findViewById(R.id.bn_add_transaction);
+
+        locationDisplay = findViewById(R.id.transaction_location_display);
+
+        final Button addTransactionButton = findViewById(R.id.bn_add_transaction);
         addTransactionButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 createAndSaveTransaction(view);
             }
         });
-        Button cancel = findViewById(R.id.bn_add_transaction_cancel);
+        final Button cancel = findViewById(R.id.bn_add_transaction_cancel);
         cancel.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -90,12 +137,14 @@ public class AddTransactionActivity extends ImagePickerActivity {
             }
         });
 
-        Button locationButton = findViewById(R.id.transaction_location);
+        final Button locationButton = findViewById(R.id.transaction_location);
+        locationButton.setText(locationButton.getHint());
 
         locationButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Toast.makeText(AddTransactionActivity.this, "Soon implemented", Toast.LENGTH_SHORT).show();
+                //Toast.makeText(AddTransactionActivity.this, "Soon implemented", Toast.LENGTH_SHORT).show();
+                startLocationSelection();
             }
         });
 
@@ -206,6 +255,11 @@ public class AddTransactionActivity extends ImagePickerActivity {
         final Date dateTime = parseDateTime(dateText, timeText);
         //FIXME: replace this with real location
         final Location location = new Location("");
+        if(selectedPlace != null) {
+            final LatLng latLng = selectedPlace.getLatLng();
+            location.setLongitude(latLng.longitude);
+            location.setLatitude(latLng.latitude);
+        }
         final String paidBy = userAdapter.getCursor().getString(userAdapter.getCursor().getColumnIndex(UserTable.COLUMN_USER_ID));
         Log.d(TAG,"paidBy: "+ paidBy);
         return new Transaction(purpose, paidBy, split, dateTime, location, amount, groupId);

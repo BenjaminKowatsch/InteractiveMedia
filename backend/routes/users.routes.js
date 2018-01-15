@@ -17,7 +17,7 @@ const authenticationService = require('../services/authentication.service');
  * @apiUse paramUsername
  * @apiUse paramHashedPassword
  * @apiUse paramEmail
- * @apiUse paramImageUrlOptional
+ * @apiUse paramImageUrlRequiredButNull
  *
  * @apiUse paramExampleRegister
  *
@@ -121,17 +121,24 @@ router.post('/logout', authenticationService.isAuthenticated, usersController.lo
 router.get('/user', authenticationService.isAuthenticated, usersController.getUserData);
 
 /**
- * @api {PUT} /v1/users/user/fcmtoken Update FCM token
- * @apiName putFcmToken
+ * @api {PUT} /v1/users/user Update user
+ * @apiName putUser
  * @apiGroup user
  * @apiVersion 0.1.0
- * @apiDescription Update token for Firebase Cloud Messaging. FCM token is used for push notifications on Android.
- *  User is identified by auth token.
+ * @apiDescription Update user. User is identified by auth token.
+ *
+ * Empty request body is not allowed.
  *
  * @apiUse headerAuthorization
  * @apiUse headerExampleAuthorization
  *
- * @apiUse paramExampleUserUpdateFcmToken
+ * @apiUse paramUsernameOptional
+ * @apiUse paramHashedPasswordOptional
+ * @apiUse paramEmailOptional
+ * @apiUse paramImageUrlOptional
+ * @apiUse paramFcmTokenOptional
+ *
+ * @apiUse paramExampleUserUpdate
  *
  * @apiUse successBodySuccess
  * @apiSuccess (SuccessCode) {200} Success Update successful
@@ -147,6 +154,6 @@ router.get('/user', authenticationService.isAuthenticated, usersController.getUs
  *
  * @apiUse errorExampleCommon
  */
-router.put('/user/fcmtoken', authenticationService.isAuthenticated, usersController.updateFcmToken);
+router.put('/user', authenticationService.isAuthenticated, usersController.updateUser);
 
 module.exports = router;

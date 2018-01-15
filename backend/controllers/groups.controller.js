@@ -145,8 +145,8 @@ function sendNotificationCreateTransaction(groupId, userIdCreator) {
 
     // compose message
     const dryRun = false;
-    const data = {};
-    const notification = {
+    const notification = {};
+    const data = {
       title: 'New transaction available',
       icon: 'ic_launcher',
       body: 'Click to catch up with your group ' + transactionGroup.name + '.'

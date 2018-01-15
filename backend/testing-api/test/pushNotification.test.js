@@ -41,7 +41,7 @@ describe.skip('PushNotifications', () => {
 
     before('set fcm token of user_0', done => {
       chai.request(HOST)
-      .put(URL.BASE_USER  + '/user/fcmtoken')
+      .put(URL.BASE_USER  + '/user')
       .set('Authorization', '0 ' + token)
       .send({fcmToken: fcmToken})
       .then(res => {

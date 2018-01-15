@@ -651,46 +651,256 @@ describe('User-Controller', () => {
     });
   });
 
-  describe('Update fcm token', () => {
-    let token;
-    const fcmToken = 'cUf35139J8U:APA91bH6pkjWHRAUAW52QGQV6tR8SQdbpJK20QitJrAyWfX22VP4G0OUL-' +
-    'cwnXQob507qnBILDkZaoY0IW3eAvAevjM5dgCTbL297n1pbXoEHLzNDKV-86xJkle0TR6RBi8fA3BzEEOr';
-    before('Clean DB and register User 0', done => {
-      databaseHelper.promiseResetDB().then(()=> {
-        return registerUser(0);
-      }).then(res => {
-        token = res.body.payload.accessToken;
-        done();
-      }).catch((error) => {
-        console.log('Register User Error: ' + error);
+  describe('Update user', () => {
+    describe('all attributes', function() {
+      let token;
+      let constantUserData = {};
+
+      before('Clean DB and register User 0', done => {
+        databaseHelper.promiseResetDB().then(()=> {
+          return registerUser(0);
+        }).then(res => {
+          token = res.body.payload.accessToken;
+          done();
+        }).catch((error) => {
+          console.log('Register User Error: ' + error);
+        });
+      });
+
+      it('should get the original user data of user_0', function() {
+        return chai.request(HOST)
+        .get(URL.BASE_USER  + '/user')
+        .set('Authorization', '0 ' + token)
+        .then(res => {
+          expect(res).to.have.status(200);
+          expect(res).to.be.json;
+          expect(res.body).to.be.an('object');
+          expect(res.body.success).to.be.true;
+          expect(res.body.payload).to.be.an('object');
+          expect(res.body.payload.username).to.equal(testData.users.valid[0].username);
+          expect(res.body.payload.email).to.equal(testData.users.valid[0].email);
+          expect(res.body.payload._id).to.be.undefined;
+          expect(res.body.payload.groupIds).to.be.undefined;
+          expect(res.body.payload.userId).to.have.lengthOf(36).and.to.be.a('string');
+          expect(res.body.payload.role).to.equal('user');
+          expect(res.body.payload.imageUrl).to.equal(testData.users.valid[0].imageUrl);
+          constantUserData.groupIds = res.body.payload.groupIds;
+          constantUserData.userId = res.body.payload.userId;
+        });
+      });
+
+      it('should update user_0', function() {
+        return chai.request(HOST)
+        .put(URL.BASE_USER  + '/user')
+        .set('Authorization', '0 ' + token)
+        .send(testData.users.update.valid.allFields)
+        .then(res => {
+          expect(res).to.have.status(200);
+          expect(res).to.be.json;
+          expect(res.body).to.be.an('object');
+          expect(res.body.success).to.be.true;
+        });
+      });
+
+      it('should get the updated user data of user_0', function() {
+        return chai.request(HOST)
+        .get(URL.BASE_USER  + '/user')
+        .set('Authorization', '0 ' + token)
+        .then(res => {
+          expect(res).to.have.status(200);
+          expect(res).to.be.json;
+          expect(res.body).to.be.an('object');
+          expect(res.body.success).to.be.true;
+          expect(res.body.payload).to.be.an('object');
+          expect(res.body.payload.username).to.equal(testData.users.update.valid.allFields.username);
+          expect(res.body.payload.email).to.equal(testData.users.update.valid.allFields.email);
+          expect(res.body.payload._id).to.be.undefined;
+          expect(res.body.payload.groupIds).to.equal(constantUserData.groupIds);
+          expect(res.body.payload.userId).to.equal(constantUserData.userId);
+          expect(res.body.payload.role).to.equal('user');
+          expect(res.body.payload.imageUrl).to.equal(testData.users.update.valid.allFields.imageUrl);
+        });
       });
     });
 
-    it('should update fcm token of user_0', function() {
-      return chai.request(HOST)
-      .put(URL.BASE_USER  + '/user/fcmtoken')
-      .set('Authorization', '0 ' + token)
-      .send({fcmToken: fcmToken})
-      .then(res => {
-        expect(res).to.have.status(200);
-        expect(res).to.be.json;
-        expect(res.body).to.be.an('object');
-        expect(res.body.success).to.be.true;
+    describe('one attribute', function() {
+      let token;
+      let constantUserData = {};
+
+      before('Clean DB and register User 0', done => {
+        databaseHelper.promiseResetDB().then(()=> {
+          return registerUser(0);
+        }).then(res => {
+          token = res.body.payload.accessToken;
+          done();
+        }).catch((error) => {
+          console.log('Register User Error: ' + error);
+        });
+      });
+
+      it('should get the original user data of user_0', function() {
+        return chai.request(HOST)
+        .get(URL.BASE_USER  + '/user')
+        .set('Authorization', '0 ' + token)
+        .then(res => {
+          expect(res).to.have.status(200);
+          expect(res).to.be.json;
+          expect(res.body).to.be.an('object');
+          expect(res.body.success).to.be.true;
+          expect(res.body.payload).to.be.an('object');
+          expect(res.body.payload.username).to.equal(testData.users.valid[0].username);
+          expect(res.body.payload.email).to.equal(testData.users.valid[0].email);
+          expect(res.body.payload._id).to.be.undefined;
+          expect(res.body.payload.groupIds).to.be.undefined;
+          expect(res.body.payload.userId).to.have.lengthOf(36).and.to.be.a('string');
+          expect(res.body.payload.role).to.equal('user');
+          expect(res.body.payload.imageUrl).to.equal(testData.users.valid[0].imageUrl);
+          constantUserData.groupIds = res.body.payload.groupIds;
+          constantUserData.userId = res.body.payload.userId;
+        });
+      });
+
+      it('should update user_0', function() {
+        return chai.request(HOST)
+        .put(URL.BASE_USER  + '/user')
+        .set('Authorization', '0 ' + token)
+        .send(testData.users.update.valid.oneFieldUsername)
+        .then(res => {
+          expect(res).to.have.status(200);
+          expect(res).to.be.json;
+          expect(res.body).to.be.an('object');
+          expect(res.body.success).to.be.true;
+        });
+      });
+
+      it('should get the updated user data of user_0', function() {
+        return chai.request(HOST)
+        .get(URL.BASE_USER  + '/user')
+        .set('Authorization', '0 ' + token)
+        .then(res => {
+          expect(res).to.have.status(200);
+          expect(res).to.be.json;
+          expect(res.body).to.be.an('object');
+          expect(res.body.success).to.be.true;
+          expect(res.body.payload).to.be.an('object');
+          expect(res.body.payload.username).to.equal(testData.users.update.valid.oneFieldUsername.username);
+          expect(res.body.payload.email).to.equal(testData.users.valid[0].email);
+          expect(res.body.payload._id).to.be.undefined;
+          expect(res.body.payload.groupIds).to.equal(constantUserData.groupIds);
+          expect(res.body.payload.userId).to.equal(constantUserData.userId);
+          expect(res.body.payload.role).to.equal('user');
+          expect(res.body.payload.imageUrl).to.equal(testData.users.valid[0].imageUrl);
+        });
       });
     });
 
-    it('should fail to update due to missing payload', function() {
-      return chai.request(HOST)
-      .put(URL.BASE_USER  + '/user/fcmtoken')
-      .set('Authorization', '0 ' + token)
-      .then(res => {
-        expect(res).to.have.status(400);
-        expect(res).to.be.json;
-        expect(res.body).to.be.an('object');
-        expect(res.body.success).to.be.false;
-        expect(res.body.payload).to.be.an('object');
-        expect(res.body.payload.dataPath).to.equal('validation');
-        expect(res.body.payload.message).to.equal('Invalid body');
+    describe('with error', function() {
+      let token;
+
+      before('Clean DB and register User 0', done => {
+        databaseHelper.promiseResetDB().then(()=> {
+          return registerUser(0);
+        }).then(res => {
+          token = res.body.payload.accessToken;
+          done();
+        }).catch((error) => {
+          console.log('Register User Error: ' + error);
+        });
+      });
+
+      it('should fail to update due to missing payload', function() {
+        return chai.request(HOST)
+        .put(URL.BASE_USER  + '/user')
+        .set('Authorization', '0 ' + token)
+        .then(res => {
+          expect(res).to.have.status(400);
+          expect(res).to.be.json;
+          expect(res.body).to.be.an('object');
+          expect(res.body.success).to.be.false;
+          expect(res.body.payload).to.be.an('object');
+          expect(res.body.payload.dataPath).to.equal('validation');
+          expect(res.body.payload.message).to.equal('invalid body');
+        });
+      });
+
+      it('should fail to update userId', function() {
+        return chai.request(HOST)
+        .put(URL.BASE_USER  + '/user')
+        .set('Authorization', '0 ' + token)
+        .send(testData.users.update.invalid.updateUserId)
+        .then(res => {
+          expect(res).to.have.status(400);
+          expect(res).to.be.json;
+          expect(res.body).to.be.an('object');
+          expect(res.body.success).to.be.false;
+          expect(res.body.payload).to.be.an('object');
+          expect(res.body.payload.dataPath).to.equal('validation');
+          expect(res.body.payload.message).to.equal('invalid body');
+        });
+      });
+
+      it('should fail to update groupd ids', function() {
+        return chai.request(HOST)
+        .put(URL.BASE_USER  + '/user')
+        .set('Authorization', '0 ' + token)
+        .send(testData.users.update.invalid.updateGroupIds)
+        .then(res => {
+          expect(res).to.have.status(400);
+          expect(res).to.be.json;
+          expect(res.body).to.be.an('object');
+          expect(res.body.success).to.be.false;
+          expect(res.body.payload).to.be.an('object');
+          expect(res.body.payload.dataPath).to.equal('validation');
+          expect(res.body.payload.message).to.equal('invalid body');
+        });
+      });
+
+      it('should fail to update internal id', function() {
+        return chai.request(HOST)
+        .put(URL.BASE_USER  + '/user')
+        .set('Authorization', '0 ' + token)
+        .send(testData.users.update.invalid.updateInternalId)
+        .then(res => {
+          expect(res).to.have.status(400);
+          expect(res).to.be.json;
+          expect(res.body).to.be.an('object');
+          expect(res.body.success).to.be.false;
+          expect(res.body.payload).to.be.an('object');
+          expect(res.body.payload.dataPath).to.equal('validation');
+          expect(res.body.payload.message).to.equal('invalid body');
+        });
+      });
+
+      it('should fail to update authType', function() {
+        return chai.request(HOST)
+        .put(URL.BASE_USER  + '/user')
+        .set('Authorization', '0 ' + token)
+        .send(testData.users.update.invalid.updateAuthType)
+        .then(res => {
+          expect(res).to.have.status(400);
+          expect(res).to.be.json;
+          expect(res.body).to.be.an('object');
+          expect(res.body.success).to.be.false;
+          expect(res.body.payload).to.be.an('object');
+          expect(res.body.payload.dataPath).to.equal('validation');
+          expect(res.body.payload.message).to.equal('invalid body');
+        });
+      });
+
+      it('should fail to update unknown field', function() {
+        return chai.request(HOST)
+        .put(URL.BASE_USER  + '/user')
+        .set('Authorization', '0 ' + token)
+        .send(testData.users.update.invalid.updateUnknownField)
+        .then(res => {
+          expect(res).to.have.status(400);
+          expect(res).to.be.json;
+          expect(res.body).to.be.an('object');
+          expect(res.body.success).to.be.false;
+          expect(res.body.payload).to.be.an('object');
+          expect(res.body.payload.dataPath).to.equal('validation');
+          expect(res.body.payload.message).to.equal('invalid body');
+        });
       });
     });
   });

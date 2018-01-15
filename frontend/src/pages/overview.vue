@@ -6,47 +6,20 @@
  -->
 
 <template>
-<div class = "overview">
-  <div class = "asdasd">
-<!-- START Framework 7 Template Elements for establishing the view -->
-<!--   <f7-page toolbar-fixed>
-    <f7-navbar>
-      <f7-nav-center sliding>Dashboard</f7-nav-center>
-       <f7-subnavbar sliding>
-          <f7-buttons> -->
 
-              <input type="button" v-on:click="createDummyGroup()" value="AddDummyGroup"/>
+  <v-container>
+
+  <v-container fluid fill-height >
+                  <input type="button" v-on:click="createDummyGroup()" value="AddDummyGroup"/>
               <input type="button" v-on:click="showGroupUserChart = toggleState(showGroupUserChart)" value="Show User and Groups Chart"/>
 
               <input type="button" v-on:click="showLoginTypeChart = toggleState(showLoginTypeChart)" value="Show Logintype Chart"/>
               <input type="button"  v-on:click="logout()" value="Logout"/>
-
-
-<!--          </f7-buttons>
-      </f7-subnavbar>
-    </f7-navbar> -->
+    
+    <v-layout justify-center align-center> 
 
     <br>
     <br>
-
-    <!-- <f7-list form>
-      <h2>Groups overview</h2> 
-      <div v-if="groupCount > 0">
-        <li v-for="group in groups">
-          <p><b>Group name:</b> {{group.name}}, <b>Group id:</b> {{group.groupId}}</p>
-          <p><b>User count:</b> {{group.countUsers}}, <b>Transaction count:</b> {{group.countTransactions}}</p>
-        </li>
-      </div>
-      <div v-else>
-        <h2>NO GROUPS FOUND</h2>
-      </div>
-
-      <div id="groupcount">
-         <h3>Number of groups: {{groupCount}}</h3>
-      </div>
-
-       <br/>
- -->
       <div>
         <user-table v-if="usersLoaded" :users="users"></user-table>
         <group-table v-if="groupsLoaded" :groups="groups"></group-table>
@@ -65,27 +38,14 @@
             <login-type-chart :passwordUsers="passwordUsers" :facebookUsers="facebookUsers" :googleUsers="googleUsers"></login-type-chart>
           </div> 
         </div>              
-      </div>
-
- <!--      <div class="groupUserChartsButton">
-        <f7-button v-on:click="showGroupUserChart = toggleState(showGroupUserChart)">Show User and Groups Chart</f7-button>
-      </div>
-      <div class="loginTypeChartsButton">
-       <f7-button v-on:click="showLoginTypeChart = toggleState(showLoginTypeChart)">Show Logintype Chart</f7-button>
-      </div>     -->
- 
-
 <!--       <div class="version" v-if="version">
         <p>Debts² admin panel version informations: 
           {{version.name}}  {{version.version}}
         </p>
       </div> -->
- <!--        </f7-list form>  
-
-  </f7-page> -->
-    <!-- END of Template Elements -->
-    </div>
-    </div>
+ 
+    </container>
+  </v-container>
 </template>
 
 <script>
@@ -151,6 +111,7 @@ export default {
     this.getUsers();
     this.getUserById(this.userId);
     this.getVersionInfos();
+
   },
 
   methods: {
@@ -327,7 +288,7 @@ export default {
         console.log("AuthToken in checkAccess fct: " + this.authToken);
         //Post data to the backend to successfully logout the user and redirect to login page
         axios
-          .post(Config.webServiceURL + `/v1/users/logout`, this.authToken, {
+          .post(Config.webServiceURL + `/v1/users/logout`, {
             headers: {
               Authorization: "0 " + this.authToken
             }
