@@ -21,8 +21,11 @@
     <br>
     <br>
       <div>
-        <user-table v-if="usersLoaded" :users="users"></user-table>
-        <group-table v-if="groupsLoaded" :groups="groups"></group-table>
+        <!-- <user-table v-if="usersLoaded" :users="users"></user-table> -->
+        <!-- <group-table v-if="groupsLoaded" :groups="groups"></group-table> -->
+        <user-table-vuetify v-if="usersLoaded" :users="users"></user-table-vuetify>
+        <group-table-vuetify v-if="groupsLoaded" :groups="groups"></group-table-vuetify>
+  
       </div>
 
       <br> 
@@ -55,8 +58,12 @@ import Cookie from "../js/Cookie.js";
 import Config from "../js/Config.js";
 import GroupUserChart from "@/components/GroupUserChart.js";
 import LoginTypeChart from "@/components/LoginTypeChart.js";
-import UserTable from "@/components/UserTable.vue";
-import GroupTable from "@/components/GroupTable.vue";
+/* import UserTable from "@/components/UserTable.vue";
+import GroupTable from "@/components/GroupTable.vue"; */
+import UserTableVuetify from "@/components/UserTableVuetify.vue";
+import GroupTableVuetify from "@/components/GroupTableVuetify.vue";
+
+
 
 export default {
   name: "overview",
@@ -64,8 +71,10 @@ export default {
   components: {
     GroupUserChart,
     LoginTypeChart,
-    UserTable,
-    GroupTable
+/*     UserTable,
+    GroupTable, */
+    UserTableVuetify,
+    GroupTableVuetify
   },
   
   data() {
@@ -116,7 +125,7 @@ export default {
 
   methods: {
     /*     Create a dummy group for testpurpose. After creating, page has to be reloaded to see group*/
-    createDummyGroup: function() {
+    /* createDummyGroup: function() {
       axios
         .post(
           Config.webServiceURL + "/v1/groups",
@@ -135,7 +144,7 @@ export default {
         .catch(function(error) {
           console.log(error);
         });
-    },
+    }, */
 
     authorizeAdmin: function() {
       axios
