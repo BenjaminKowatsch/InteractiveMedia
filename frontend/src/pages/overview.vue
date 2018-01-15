@@ -7,27 +7,26 @@
 
 <template>
 
-  <v-container>
-
   <v-container fluid fill-height >
-                  <input type="button" v-on:click="createDummyGroup()" value="AddDummyGroup"/>
-              <input type="button" v-on:click="showGroupUserChart = toggleState(showGroupUserChart)" value="Show User and Groups Chart"/>
 
-              <input type="button" v-on:click="showLoginTypeChart = toggleState(showLoginTypeChart)" value="Show Logintype Chart"/>
-              <input type="button"  v-on:click="logout()" value="Logout"/>
     
     <v-layout justify-center align-center> 
 
     <br>
     <br>
-      <div>
-        <!-- <user-table v-if="usersLoaded" :users="users"></user-table> -->
-        <!-- <group-table v-if="groupsLoaded" :groups="groups"></group-table> -->
+    <v-container>
+      <v-layout justify-centner align-center>
         <user-table-vuetify v-if="usersLoaded" :users="users"></user-table-vuetify>
+        <v-spacer></v-spacer>
         <group-table-vuetify v-if="groupsLoaded" :groups="groups"></group-table-vuetify>
-  
-      </div>
+      </v-layout>
+</v-container>
 
+<!--         <input type="button" v-on:click="createDummyGroup()" value="AddDummyGroup"/>
+        <input type="button" v-on:click="showGroupUserChart = toggleState(showGroupUserChart)" value="Show User and Groups Chart"/>
+
+        <input type="button" v-on:click="showLoginTypeChart = toggleState(showLoginTypeChart)" value="Show Logintype Chart"/>
+        <input type="button"  v-on:click="logout()" value="Logout"/> -->
       <br> 
       
       <div>
@@ -47,7 +46,6 @@
         </p>
       </div> -->
  
-    </container>
   </v-container>
 </template>
 

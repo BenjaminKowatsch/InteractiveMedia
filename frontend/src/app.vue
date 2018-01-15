@@ -1,62 +1,78 @@
 <template>
 
    <v-app id="inspire" :dark="isDark">
-        <v-navigation-drawer
+      <v-navigation-drawer
       clipped
       absolute
       v-model="drawer"
       disable-resize-watcher="true"
       app>
 
-       <v-list dense>
-        <v-list-tile @click="changeTheme">
-          <v-list-tile-action>
-            <v-icon>invert_colors</v-icon>
-          </v-list-tile-action>
-          <v-list-tile-content>
-            <v-list-tile-title>Change Theme</v-list-tile-title>
-          </v-list-tile-content>
-        </v-list-tile>
-        <v-divider inset></v-divider>
-      </v-list>
-    </v-navigation-drawer> 
-    <v-toolbar app fixed clipped-left>
-      <v-toolbar-side-icon @click="drawer = !drawer"></v-toolbar-side-icon>
-      <v-spacer></v-spacer>
-      <v-toolbar-title>Debts² admin panel</v-toolbar-title>
-      <v-spacer></v-spacer>
-      <v-tooltip bottom>
-        <v-btn icon slot="activator" @click="logout">
-          <v-icon>fa-sign-out</v-icon>
-        </v-btn>
-        <span>Logout</span>
-      </v-tooltip>
-    </v-toolbar> 
-     <v-snackbar
-          :timeout="3000"
-          :bottom="true"
-          class="red darken-4"
-          v-model="notLoggedInAlert"
-        >
-          Not logged in
-          <v-btn dark flat @click.native="notLoggedInAlert = false">X</v-btn>
-        </v-snackbar>
-         <v-snackbar
-          :timeout="3000"
-          :bottom="true"
-          class="green darken-4"
-          v-model="loggedOut"
-        >
-          Sucessfully logged out
-          <v-btn dark flat @click.native="notLoggedInAlert = false">X</v-btn>
-        </v-snackbar>
-    <v-content>
-          <router-view></router-view>
-    </v-content>
-    <v-footer app fixed>
-      <span>&copy; 2017 Debts² Dev Team </span>
-    </v-footer>
-  </v-app>
+        <v-list>
+          <v-list-tile @click="checkForDashboard">
+            <v-list-tile-action>
+              <v-icon>fa-th</v-icon>
+            </v-list-tile-action>
+            <v-list-tile-content>
+              <v-list-tile-title>Dashboard</v-list-tile-title>
+            </v-list-tile-content>
+          </v-list-tile>
+          <v-list-tile @click="checkForAdminProfile">
+            <v-list-tile-action>
+              <v-icon>fa-user-o </v-icon>
+            </v-list-tile-action>
+            <v-list-tile-content>
+              <v-list-tile-title>Admin profile</v-list-tile-title>
+            </v-list-tile-content>
+          </v-list-tile>
+          <v-list-tile>
+            <v-divider></v-divider>
+          </v-list-tile> 
+          <v-list-tile>
+            <v-switch
+              label="Darktheme"
+              v-model="isDark"
+            ></v-switch>  
+          </v-list-tile>       
+        </v-list>
+      </v-navigation-drawer> 
+      <v-toolbar app fixed clipped-left>
+        <v-toolbar-side-icon @click="drawer = !drawer"></v-toolbar-side-icon>
+        <v-spacer></v-spacer>
+        <v-toolbar-title>Debts² admin panel</v-toolbar-title>
+        <v-spacer></v-spacer>
+        <v-tooltip bottom>
+          <v-btn icon slot="activator" @click="logout">
+            <v-icon>fa-sign-out</v-icon>
+          </v-btn>
+          <span>Logout</span>
+         </v-tooltip>
+      </v-toolbar> 
+      <v-snackbar
+        :timeout="3000"
+        :bottom="true"
+        class="red darken-4"
+        v-model="notLoggedInAlert"
+      >
+         Not logged in
+        <v-btn dark flat @click.native="notLoggedInAlert = false">X</v-btn>
+      </v-snackbar>
+      <v-snackbar
+        :timeout="3000"
+        :bottom="true"
+        class="green darken-4"
+        v-model="loggedOut"
+      >
+        Sucessfully logged out
+        <v-btn dark flat @click.native="notLoggedInAlert = false">X</v-btn>
+      </v-snackbar>
+      <v-content>
+        <router-view></router-view>
+      </v-content>
+      <v-footer app fixed>
+        <span>&copy; 2017 Debts² Dev Team </span>
+      </v-footer>
+    </v-app>
 </template>
 
 <script>
@@ -110,6 +126,35 @@ export default {
 /*     reload: function () {
        location.reload();
      } */
+
+     checkForDashboard: function(){
+
+        var authToken = Cookie.getJSONCookie('accessToken').accessToken
+
+        if(authToken)
+        {
+          this.redirect("/overview")
+        }
+        else
+        {
+          this.redirect("/noPermission")
+        }
+    },
+     
+
+     checkForAdminProfile: function(){
+
+      var authToken = Cookie.getJSONCookie('accessToken').accessToken
+
+      if(authToken)
+      {
+        this.redirect("/admin")
+      }
+      else
+      {
+        this.redirect("/noPermission")
+      }
+     },
  
      logout: function() {
 

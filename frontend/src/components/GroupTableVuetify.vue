@@ -1,6 +1,5 @@
 <template>
-  <v-card>
-    <v-card-title>
+  <v-container>
       <h2>Overview Groups</h2>
       <v-spacer></v-spacer>
       <v-text-field
@@ -9,7 +8,6 @@
         hide-details
         v-model="search"
       ></v-text-field>
-    </v-card-title>
     <v-data-table
         v-bind:headers="headers"
         v-bind:items="items"
@@ -20,6 +18,7 @@
         <td class="text-xs-right">{{ props.item.name }}</td>
         <td class="text-xs-right">{{ props.item.groupId }}</td>
         <td class="text-xs-right">{{ props.item.createdAt }}</td>
+        <td class="text-xs-right">{{ props.item.imageUrl }}</td>
         <td class="text-xs-right">{{ props.item.countUsers }}</td>
         <td class="text-xs-right">{{ props.item.countTransactions }}</td>
       </template>
@@ -32,7 +31,7 @@
         From {{ pageStart }} to {{ pageStop }}
       </template>
     </v-data-table>
-  </v-card>
+  </v-container>
 </template>
 
 <script>
@@ -50,6 +49,7 @@
           { text: 'Groupname', value: 'name' },
           { text: 'Group ID', value: 'groupId', align: 'center', sortable: false},
           { text: 'Date of creation', value: 'createdAt', align: 'center'},
+          { text: 'Groupimage', value: 'imageUrl' },
           { text: 'Users', value: 'countUsers' },
           { text: 'Transactions', value: 'countTransactions' },
         ],

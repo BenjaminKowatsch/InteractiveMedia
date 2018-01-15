@@ -1,6 +1,5 @@
 <template>
-  <v-card fixed>
-    <v-card-title>
+  <v-container>
       <h2>Overview Users</h2>
       <v-spacer></v-spacer>
       <v-text-field
@@ -9,7 +8,6 @@
         hide-details
         v-model="search"
       ></v-text-field>
-    </v-card-title>
     <v-data-table
         v-bind:headers="headers"
         v-bind:items="items"
@@ -46,7 +44,7 @@
         From {{ pageStart }} to {{ pageStop }}
       </template>
     </v-data-table>
-  </v-card>
+  </v-container>
 </template>
 
 <script>
