@@ -3,13 +3,13 @@ package com.media.interactive.cs3.hdm.interactivemedia.data.split;
 
 import com.media.interactive.cs3.hdm.interactivemedia.data.Debt;
 import com.media.interactive.cs3.hdm.interactivemedia.data.Transaction;
+import com.media.interactive.cs3.hdm.interactivemedia.data.User;
 
 import java.util.List;
 
 public class EvenSplit implements Split {
     @Override
-    public List<Debt> split(Transaction transaction) {
-
+    public List<Debt> split(Transaction transaction, User paidBy) {
         return null;
     }
 
