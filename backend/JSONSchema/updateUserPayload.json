@@ -1,0 +1,66 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "type": "object",
+  "properties": {
+    "username": {
+      "oneOf": [
+        {
+          "type": "null"
+        },
+        {
+          "type": "string",
+          "minLength": 5,
+          "maxLength": 255
+        }
+      ]
+    },
+    "email": {
+      "oneOf": [
+        {
+          "type": "null"
+        },
+        {
+          "type": "string",
+          "minLength": 5,
+          "maxLength": 255
+        }
+      ]
+    },
+    "password": {
+      "oneOf":[
+        {
+          "type": "null"
+        },
+        {
+          "type": "string",
+          "minLength": 5,
+          "maxLength": 255
+        }
+      ]
+    },
+    "imageUrl": {
+      "oneOf": [
+        {
+          "type": "null"
+        },
+        {
+          "type": "string",
+          "minLength": 5
+        }
+      ]
+    },
+    "fcmToken": {
+      "oneOf": [
+        {
+          "type": "null"
+        },
+        {
+          "type": "string",
+          "minLength": 5
+        }
+      ]
+    }
+  },
+  "additionalProperties": false,
+  "minProperties": 1
+}

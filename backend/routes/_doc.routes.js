@@ -11,8 +11,16 @@
     @apiParam (Parameter) {string} username Username
  */
 /**
+ * @apiDefine paramUsernameOptional
+    @apiParam (Parameter) {string} username Username. Optional. "null" is allowed.
+ */
+/**
  * @apiDefine paramHashedPassword
     @apiParam (Parameter) {string} password Hash of a password
+ */
+/**
+ * @apiDefine paramHashedPasswordOptional
+    @apiParam (Parameter) {string} password Hash of a password. Optional. "null" is allowed.
  */
 /**
  * @apiDefine paramAuthtype
@@ -23,8 +31,20 @@
     @apiParam (Parameter) {string} email Email of user
  */
 /**
- * @apiDefine paramImageUrlOptional
+ * @apiDefine paramEmailOptional
+    @apiParam (Parameter) {string} email Email of user. Optional. "null" is allowed.
+ */
+/**
+ * @apiDefine paramFcmTokenOptional
+    @apiParam (Parameter) {string} fcmToken Firebase cloud messaging token of user. Optional. "null" is allowed.
+ */
+/**
+ * @apiDefine paramImageUrlRequiredButNull
     @apiParam (Parameter) {string} imageUrl Url of user's profile image. "null" is allowed.
+ */
+/**
+ * @apiDefine paramImageUrlOptional
+    @apiParam (Parameter) {string} imageUrl Url of user's profile image. Optional. "null" is allowed.
  */
 /**
  * @apiDefine paramUrlGroupId
@@ -246,10 +266,18 @@
     }
  */
 /**
- * @apiDefine paramExampleUserUpdateFcmToken
-    @apiParamExample {JSON} Request Body
+ * @apiDefine paramExampleUserUpdate
+    @apiParamExample {JSON} Update all attributes
     {
-        fcmToken: 'asdfn489ha9hv89earaji838fae89f849h9arh9a48hf9r'
+        "username": "new user name",
+        "email": "new.alex@alex.de",
+        "password": "hashedPassword",
+        "imageUrl": "http://new.example.com/image.jpg",
+        "fcmToken": "cUf35139J8U:APA91bH6pkjWHRAUAW52QGQV6tR8SQdbpJK20QitJrAyWfX22VP4G0OUL-cwnXQob507qnBILDkZaoY0IW3eAvAevjM5dgCTbL297n1pbXoEHLzNDKV-86xJkle0TR6RBi8fA3BzEEOr"
+    }
+    @apiParamExample {JSON} Update at least one attribute
+    {
+        "fcmToken": "cUf35139J8U:APA91bH6pkjWHRAUAW52QGQV6tR8SQdbpJK20QitJrAyWfX22VP4G0OUL-cwnXQob507qnBILDkZaoY0IW3eAvAevjM5dgCTbL297n1pbXoEHLzNDKV-86xJkle0TR6RBi8fA3BzEEOr"
     }
  */
 

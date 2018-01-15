@@ -71,6 +71,42 @@
         "password": "alexpassword",        
         "email": "alex12@alex.de"
       }
+    },
+    "update": {
+      "valid": {
+        "allFields": {
+          "username": "new user name",
+          "password": "hashedPassword",
+          "email": "new.alex@alex.de",
+          "imageUrl": "http://new.example.com/image.jpg",
+          "fcmToken": "cUf35139J8U:APA91bH6pkjWHRAUAW52QGQV6tR8SQdbpJK20QitJrAyWfX22VP4G0OUL-cwnXQob507qnBILDkZaoY0IW3eAvAevjM5dgCTbL297n1pbXoEHLzNDKV-86xJkle0TR6RBi8fA3BzEEOr"
+        },
+        "oneFieldUsername": {
+          "username": "Harry Hirsch"
+        }
+      },
+      "invalid": {
+        "updateUserId": {
+          "imageUrl": "http://new.example.com/image.jpg",
+          "userId": "AAAAAAAA-AAAA-AAAA-AAAA-AAAAAAAAAAAA"
+        },
+        "updateGroupIds": {
+          "imageUrl": "http://new.example.com/image.jpg",
+          "groupIds": ["BBBBBBBB-BBBB-BBBB-BBBB-BBBBBBBBBBBB"]
+        },
+        "updateInternalId": {
+          "imageUrl": "http://new.example.com/image.jpg",
+          "_id": "aaaaaaaaaaaaaaaaaaaaaaaa"
+        },
+        "updateAuthType": {
+          "imageUrl": "http://new.example.com/image.jpg",
+          "authType": 1
+        },
+        "updateUnknownField": {
+          "imageUrl": "http://new.example.com/image.jpg",
+          "unknownField": "value of unknown filed"
+        }
+      }
     }
   }
 }

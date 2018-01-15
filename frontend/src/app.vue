@@ -1,7 +1,7 @@
 <template>
 
    <v-app id="inspire" :dark="isDark">
-       <v-navigation-drawer
+        <v-navigation-drawer
       clipped
       absolute
       v-model="drawer"
@@ -20,23 +20,28 @@
         <v-divider inset></v-divider>
       </v-list>
     </v-navigation-drawer> 
-    <v-toolbar app fixed clipped-left prominent="true">
- <v-toolbar-side-icon @click="drawer = !drawer"></v-toolbar-side-icon>      <v-spacer></v-spacer>
-        <v-toolbar-title>Debts² admin panel</v-toolbar-title>
+    <v-toolbar app fixed clipped-left>
+      <v-toolbar-side-icon @click="drawer = !drawer"></v-toolbar-side-icon>
       <v-spacer></v-spacer>
-    </v-toolbar>
+      <v-toolbar-title>Debts² admin panel</v-toolbar-title>
+      <v-spacer></v-spacer>
+      <v-btn icon @click="logout">
+        <v-icon dark>fa-sign-out</v-icon>
+      </v-btn>
+      
+    </v-toolbar> 
+     <v-snackbar
+          :timeout="3000"
+          :bottom="true"
+          :multi-line="true"
+          class="red"
+          v-model="notLoggedInAlert"
+        >
+          Not logged in
+          <v-btn dark flat @click.native="notLoggedInAlert = false">X</v-btn>
+        </v-snackbar>
     <v-content>
-      <v-container fluid fill-height>
-        <v-layout justify-center align-center>
-<!--           <v-tooltip right>
-            <v-btn icon large :href="source" target="_blank" slot="activator">
-              <v-icon large>code</v-icon>
-            </v-btn>
-            <span>Source</span>
-          </v-tooltip> -->
           <router-view></router-view>
-          </v-layout>
-      </v-container>
     </v-content>
     <v-footer app fixed>
       <span>&copy; 2017 Debts² Dev Team </span>
@@ -59,7 +64,8 @@ export default {
   },
   data: () => ({
       isDark: true,
-      drawer: false
+      drawer: false,
+      notLoggedInAlert: false
     }),
     props: {
       source: String
@@ -91,13 +97,43 @@ export default {
        {
          this.drawer = true
        }
-     }
+     },
 /*     reload: function () {
        location.reload();
      } */
  
-  }
+     logout: function() {
 
+      var authToken = Cookie.getJSONCookie('accessToken').accessToken
+      //Check for existing accessToken
+      if(authToken){
+
+        console.log("Cookie exists :")
+        console.log(authToken)
+
+        //Post data to the backend to successfully logout the user and redirect to login page
+        axios
+          .post(Config.webServiceURL + `/v1/users/logout`, authToken, {
+            headers: {
+              Authorization: "0 " + authToken
+            }
+          })
+          .then(response => {
+            console.log("Logout response:")
+            console.log(JSON.stringify(response.data));
+            Cookie.deleteCookie("accessToken");
+            this.redirect("/", false, false, true);
+            console.log("Logging out...")
+          })
+          .catch(e => {
+            console.log(JSON.stringify(e));
+          });
+    }
+    else {
+      this.notLoggedInAlert = true; 
+    }
+  }
+   }
 }
 
 </script>
