@@ -25,19 +25,29 @@
       <v-spacer></v-spacer>
       <v-toolbar-title>Debts² admin panel</v-toolbar-title>
       <v-spacer></v-spacer>
-      <v-btn icon @click="logout">
-        <v-icon dark>fa-sign-out</v-icon>
-      </v-btn>
-      
+      <v-tooltip bottom>
+        <v-btn icon slot="activator" @click="logout">
+          <v-icon>fa-sign-out</v-icon>
+        </v-btn>
+        <span>Logout</span>
+      </v-tooltip>
     </v-toolbar> 
      <v-snackbar
           :timeout="3000"
           :bottom="true"
-          :multi-line="true"
-          class="red"
+          class="red darken-4"
           v-model="notLoggedInAlert"
         >
           Not logged in
+          <v-btn dark flat @click.native="notLoggedInAlert = false">X</v-btn>
+        </v-snackbar>
+         <v-snackbar
+          :timeout="3000"
+          :bottom="true"
+          class="green darken-4"
+          v-model="loggedOut"
+        >
+          Sucessfully logged out
           <v-btn dark flat @click.native="notLoggedInAlert = false">X</v-btn>
         </v-snackbar>
     <v-content>
@@ -51,7 +61,6 @@
 
 <script>
 import Mixins from './mixins.js'
-import Login from './pages/login'
 import axios from 'axios'
 import Cookie from './js/Cookie.js'
 import Config from './js/Config.js'
@@ -60,12 +69,12 @@ export default {
   name: 'app',
   mixins: [ Mixins ],
   components: {
-    Login
   },
   data: () => ({
       isDark: true,
       drawer: false,
-      notLoggedInAlert: false
+      notLoggedInAlert: false,
+      loggedOut: false,
     }),
     props: {
       source: String
@@ -124,10 +133,11 @@ export default {
             Cookie.deleteCookie("accessToken");
             this.redirect("/", false, false, true);
             console.log("Logging out...")
+            this.loggedOut = true
           })
           .catch(e => {
             console.log(JSON.stringify(e));
-          });
+          });              
     }
     else {
       this.notLoggedInAlert = true; 

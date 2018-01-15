@@ -280,7 +280,7 @@ export default {
     },
 
     //Logout the current user
-    logout: function() {
+  /*   logout: function() {
       let accessToken = this.authToken;
 
       //Check for existing accessToken
@@ -302,7 +302,7 @@ export default {
             console.log(JSON.stringify(e));
           });
       });
-    }
+    } */
   }
 };
 </script>
