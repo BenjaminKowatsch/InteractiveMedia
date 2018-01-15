@@ -14,7 +14,7 @@ const jsonSchema = {
   registerUserPayload: require('../JSONSchema/registerUserPayload.json'),
   loginUserExternalPayload: require('../JSONSchema/loginUserExternalPayload.json'),
   loginUserPasswordPayload: require('../JSONSchema/loginUserPasswordPayload.json'),
-  updateFcmTokenPayload: require('../JSONSchema/userUpdateFcmTokenPayload.json')
+  updateUserPayload: require('../JSONSchema/updateUserPayload.json')
 };
 
 exports.registerNewUser = function(req, res) {
@@ -189,12 +189,11 @@ exports.getUserData = function(req, res) {
   });
 };
 
-exports.updateFcmToken = function(req, res) {
-  winston.debug('Hello from updateFcmToken');
-  validateJsonService.againstSchema(req.body, jsonSchema.updateFcmTokenPayload)
+exports.updateUser = function(req, res) {
+  winston.debug('Hello from updateUser');
+  validateJsonService.againstSchema(req.body, jsonSchema.updateUserPayload)
   .then(() => {
-    const fcmToken = req.body.fcmToken;
-    return user.updateFcmToken(res.locals.userId, fcmToken);
+    return user.updateUser(res.locals.userId, req.body);
   })
   .then(updateResult => {
     httpResponseService.send(res, 200, updateResult);
