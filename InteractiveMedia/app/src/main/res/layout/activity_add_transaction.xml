@@ -81,11 +81,30 @@
             android:adjustViewBounds="true"
             android:src="@drawable/anonymoususer" />
 
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="30dp"
+            android:layout_marginRight="30dp"
+            android:textSize="16dp"
+            android:text="Location:"/>
+
+        <TextView
+            android:id="@+id/transaction_location_display"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginLeft="30dp"
+            android:layout_marginRight="30dp"
+            android:hint="No location selected"/>
+
         <Button
             android:id="@+id/transaction_location"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Choose Location" />
+            android:layout_marginLeft="30dp"
+            android:layout_marginRight="30dp"
+            android:hint="Choose Location" />
 
         <RelativeLayout
             android:layout_width="fill_parent"
