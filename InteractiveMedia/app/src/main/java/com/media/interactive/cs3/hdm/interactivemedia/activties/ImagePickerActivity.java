@@ -21,6 +21,7 @@ import android.text.Editable;
 import android.text.InputType;
 import android.text.TextWatcher;
 import android.util.Log;
+import android.util.SparseArray;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
@@ -38,6 +39,10 @@ import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.request.animation.GlideAnimation;
 import com.bumptech.glide.request.target.SimpleTarget;
+import com.google.android.gms.vision.Frame;
+import com.google.android.gms.vision.text.Text;
+import com.google.android.gms.vision.text.TextBlock;
+import com.google.android.gms.vision.text.TextRecognizer;
 import com.media.interactive.cs3.hdm.interactivemedia.CallbackListener;
 import com.media.interactive.cs3.hdm.interactivemedia.R;
 import com.media.interactive.cs3.hdm.interactivemedia.RestRequestQueue;
@@ -51,7 +56,14 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -67,6 +79,10 @@ public class ImagePickerActivity extends AppCompatActivity {
     private static final int PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE = 1;
     protected ImageView imageView;
     private boolean readExternalStoragePermissionGranted = false;
+    private TextRecognizer detector;
+    private Date recognizedDate = null;
+    private Double recognizedAmount = null;
+    private boolean ocrEnable = false;
 
     private String imageFilename;
 
@@ -78,7 +94,8 @@ public class ImagePickerActivity extends AppCompatActivity {
      * @param viewId        Reference to the ImageView where the picked image shall be displayed
      * @param imageFilename if null a default imageFilename 'image.png' will be used
      */
-    protected void initImagePickerActivity(final int viewId, String imageFilename) {
+    protected void initImagePickerActivity(final int viewId, String imageFilename, boolean ocrEnabled) {
+        this.ocrEnable = ocrEnabled;
         this.imageFilename = imageFilename != null ? imageFilename : "image.png";
         imageView = (ImageView) findViewById(viewId);
         imageView.setOnClickListener(new View.OnClickListener() {
@@ -93,6 +110,7 @@ public class ImagePickerActivity extends AppCompatActivity {
 
             }
         });
+        detector = new TextRecognizer.Builder(getApplicationContext()).build();
         readExternalStoragePermissionGranted = isStoragePermissionGranted();
     }
 
@@ -155,7 +173,95 @@ public class ImagePickerActivity extends AppCompatActivity {
 
         Bitmap bitmap = BitmapFactory.decodeFile(currentPhotoPath, bmOptions);
         Log.d(TAG, "Bitmap-size:" + bitmap.getWidth() + " x " + bitmap.getHeight());
+        doOCR(bitmap);
         imageView.setImageBitmap(bitmap);
+    }
+
+    private void doOCR(Bitmap bitmap) {
+        if(ocrEnable) {
+            recognizedAmount = null;
+            recognizedDate = null;
+            if (detector.isOperational() && bitmap != null) {
+                final Frame frame = new Frame.Builder().setBitmap(bitmap).build();
+                final SparseArray<TextBlock> textBlocks = detector.detect(frame);
+
+                final SimpleDateFormat sdfDate = new SimpleDateFormat("dd.MM.yyyy");
+                final SimpleDateFormat sdfTime = new SimpleDateFormat("hh:mm");
+                final List<Double> parsedNumbers = new ArrayList<>();
+                Date date = null;
+                Date time = null;
+                double meanValue = 0;
+                for (int i = 0; i < textBlocks.size(); i++) {
+                    //extract scanned text blocks here
+                    final TextBlock tBlock = textBlocks.valueAt(i);
+                    for (Text line : tBlock.getComponents()) {
+                        //extract scanned text lines here
+                        final String lineElement = line.getValue().replace(" ", "");
+                        try {
+                            double parsed = Double.parseDouble(lineElement.replace(",", "."));
+                            parsedNumbers.add(parsed);
+                            meanValue += parsed;
+                        } catch (NumberFormatException e) {
+                        }
+                        for (Text element : line.getComponents()) {
+                            //extract scanned text words here
+                            final String elem = element.getValue().replace(" ", "");
+                            try {
+                                date = sdfDate.parse(elem);
+                            } catch (ParseException e) {
+                            }
+                            try {
+                                time = sdfTime.parse(elem);
+                            } catch (ParseException e) {
+                            }
+                        }
+                    }
+                }
+                if (textBlocks.size() > 0) {
+                    if (date != null) {
+                        recognizedDate = new Date(date.getTime());
+                    }
+                    if (time != null && recognizedDate != null) {
+                        recognizedDate = new Date(recognizedDate.getTime() + time.getTime());
+                    }
+                    // Sort ascending
+                    Collections.sort(parsedNumbers, new Comparator<Double>() {
+                        public int compare(Double o1, Double o2) {
+                            return o1.compareTo(o2);
+                        }
+                    });
+                    meanValue /= parsedNumbers.size();
+                    double variance = 0;
+                    for (double possiblePrice : parsedNumbers) {
+                        variance += ((possiblePrice - meanValue) * (possiblePrice - meanValue)) / (parsedNumbers.size() - 1);
+                    }
+                    double varianceCoefficient = Math.sqrt(variance) / meanValue;
+                    // Remove autliers based on variance coefficient
+                    while (varianceCoefficient > 1.1) {
+                        // Remove highest entry and recalculate
+                        parsedNumbers.remove(parsedNumbers.size() - 1);
+                        // recalculate mean value
+                        meanValue = 0;
+                        for (double number : parsedNumbers) {
+                            meanValue += number / parsedNumbers.size();
+                        }
+                        variance = 0;
+                        for (double number : parsedNumbers) {
+                            variance += ((number - meanValue) * (number - meanValue)) / (parsedNumbers.size() - 1);
+                        }
+                        varianceCoefficient = Math.sqrt(variance) / meanValue;
+                    }
+                    // Set second highest amount to recognizedAmount
+                    if (parsedNumbers.size() >= 2) {
+                        recognizedAmount = parsedNumbers.get(parsedNumbers.size() - 2);
+                    }
+                }
+            } else {
+                Log.d(TAG, "Could not set up the detector!");
+            }
+            Log.d(TAG, "Possible price: " + recognizedAmount);
+            Log.d(TAG, "Possible date: " + recognizedDate);
+        }
     }
 
     protected void uploadImage(final CallbackListener<JSONObject, Exception> callbackListener) {
@@ -340,6 +446,7 @@ public class ImagePickerActivity extends AppCompatActivity {
 
                         @Override
                         public void onResourceReady(Bitmap resource, GlideAnimation<? super Bitmap> glideAnimation) {
+                            doOCR(resource);
                             imageView.setImageBitmap(resource);
                             try {
                                 final File created = createImageFile();
@@ -399,6 +506,14 @@ public class ImagePickerActivity extends AppCompatActivity {
 
     protected String getCurrentPhotoPath() {
         return currentPhotoPath;
+    }
+
+    public Date getRecognizedDate() {
+        return recognizedDate;
+    }
+
+    public Double getRecognizedAmount() {
+        return recognizedAmount;
     }
 
     public String getImageFilename() {
