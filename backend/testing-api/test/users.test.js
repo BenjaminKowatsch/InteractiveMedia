@@ -737,6 +737,61 @@ describe('User-Controller', () => {
           console.log('Register User Error: ' + error);
         });
       });
+
+      it('should get the original user data of user_0', function() {
+        return chai.request(HOST)
+        .get(URL.BASE_USER  + '/user')
+        .set('Authorization', '0 ' + token)
+        .then(res => {
+          expect(res).to.have.status(200);
+          expect(res).to.be.json;
+          expect(res.body).to.be.an('object');
+          expect(res.body.success).to.be.true;
+          expect(res.body.payload).to.be.an('object');
+          expect(res.body.payload.username).to.equal(testData.users.valid[0].username);
+          expect(res.body.payload.email).to.equal(testData.users.valid[0].email);
+          expect(res.body.payload._id).to.be.undefined;
+          expect(res.body.payload.groupIds).to.be.undefined;
+          expect(res.body.payload.userId).to.have.lengthOf(36).and.to.be.a('string');
+          expect(res.body.payload.role).to.equal('user');
+          expect(res.body.payload.imageUrl).to.equal(testData.users.valid[0].imageUrl);
+          constantUserData.groupIds = res.body.payload.groupIds;
+          constantUserData.userId = res.body.payload.userId;
+        });
+      });
+
+      it('should update user_0', function() {
+        return chai.request(HOST)
+        .put(URL.BASE_USER  + '/user')
+        .set('Authorization', '0 ' + token)
+        .send(testData.users.update.valid.oneFieldUsername)
+        .then(res => {
+          expect(res).to.have.status(200);
+          expect(res).to.be.json;
+          expect(res.body).to.be.an('object');
+          expect(res.body.success).to.be.true;
+        });
+      });
+
+      it('should get the updated user data of user_0', function() {
+        return chai.request(HOST)
+        .get(URL.BASE_USER  + '/user')
+        .set('Authorization', '0 ' + token)
+        .then(res => {
+          expect(res).to.have.status(200);
+          expect(res).to.be.json;
+          expect(res.body).to.be.an('object');
+          expect(res.body.success).to.be.true;
+          expect(res.body.payload).to.be.an('object');
+          expect(res.body.payload.username).to.equal(testData.users.update.valid.oneFieldUsername.username);
+          expect(res.body.payload.email).to.equal(testData.users.valid[0].email);
+          expect(res.body.payload._id).to.be.undefined;
+          expect(res.body.payload.groupIds).to.equal(constantUserData.groupIds);
+          expect(res.body.payload.userId).to.equal(constantUserData.userId);
+          expect(res.body.payload.role).to.equal('user');
+          expect(res.body.payload.imageUrl).to.equal(testData.users.valid[0].imageUrl);
+        });
+      });
     });
 
     describe('with error', function() {
