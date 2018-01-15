@@ -6,20 +6,13 @@
  -->
 
 <template>
-
-  <v-container fluid fill-height >
-
-    
-    <v-layout justify-center align-center> 
-
-    <br>
-    <br>
-    <v-container>
-      <v-layout justify-centner align-center>
+<div>
+  <v-container>
+    <layout>
         <user-table-vuetify v-if="usersLoaded" :users="users"></user-table-vuetify>
         <v-spacer></v-spacer>
         <group-table-vuetify v-if="groupsLoaded" :groups="groups"></group-table-vuetify>
-      </v-layout>
+        </layout>
 </v-container>
 
 <!--         <input type="button" v-on:click="createDummyGroup()" value="AddDummyGroup"/>
@@ -45,8 +38,7 @@
           {{version.name}}  {{version.version}}
         </p>
       </div> -->
- 
-  </v-container>
+ </div>
 </template>
 
 <script>
