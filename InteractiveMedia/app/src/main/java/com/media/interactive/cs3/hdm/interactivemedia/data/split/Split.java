@@ -12,10 +12,9 @@ public interface Split {
      * Splits a transaction into a List of Debts targeting the transactions' payer
      *
      * @param transaction to be split into debts
-     * @param paidBy user that paid for the transaction
      * @return list of debts
      */
-    List<Debt> split(Transaction transaction, String paidBy);
+    List<Debt> split(Transaction transaction);
 
     /**
      * Adds a Split to be used after resolving this one.

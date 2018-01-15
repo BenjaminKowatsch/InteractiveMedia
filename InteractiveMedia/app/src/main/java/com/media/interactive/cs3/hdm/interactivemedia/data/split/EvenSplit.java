@@ -11,7 +11,8 @@ import java.util.List;
 
 public class EvenSplit implements Split {
     @Override
-    public List<Debt> split(Transaction transaction, String paidByUserId) {
+    public List<Debt> split(Transaction transaction) {
+        String paidByUserId = transaction.getPaidByUserId();
         Group group = transaction.getGroup();
         SplittingParties splittingParties = SplittingParties.extractFromGroup(group, paidByUserId);
         validateForGroup(splittingParties, group);

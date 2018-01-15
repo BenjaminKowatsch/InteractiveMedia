@@ -60,7 +60,7 @@ public class Transaction {
     }
 
     public List<Debt> split() {
-        return SplitFactory.getSplitByName(split).split(this, paidByUserId);
+        return SplitFactory.getSplitByName(split).split(this);
     }
 
     public long getId() {
