@@ -32,12 +32,11 @@
           Login
         </v-btn>
         <v-btn @click="reset">Reset</v-btn>
-  
+
         <v-snackbar
           :timeout="3000"
           :bottom="true"
-          :multi-line="true"
-          class="red"
+          class="red darken-4"
           v-model="alertAccessDenied"
         >
           Access denied
@@ -47,8 +46,7 @@
         <v-snackbar
           :timeout="3000"
           :bottom="true"
-          :multi-line="true"
-          class="red"
+          class="red darken-4"
           v-model="alertWrongCredentials"
         >
           Wrong credentials
@@ -58,8 +56,7 @@
         <v-snackbar
           :timeout="3000"
           :bottom="true"
-          :multi-line="true"
-          class="red"
+          class="red darken-4"
           v-model="alertUnknownRole"
         >
           Unknown role of user
@@ -151,9 +148,9 @@ export default {
           //check role for admin and send informations to create a cookie and redirect admin to overview page
           console.log(this.userDataRole)
           if (this.userDataRole === "admin") {
-            console.log("Role: " + this.userDataRole);
+            this.altertLoggedIn = true;
             this.checkServerResponse(response, payload => {
-              console.log("Correct"); // logs to console when the login data was correct with the database
+              console.log("Login corret: Role 'admin'"); // logs to console when the login data was correct with the database
               this.loginUser(payload);
             });
             //handling other roles

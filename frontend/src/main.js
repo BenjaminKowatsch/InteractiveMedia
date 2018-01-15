@@ -24,7 +24,9 @@ import App from './app'
 
 import login from './pages/login.vue'
 import overview from './pages/overview.vue'
+import adminProfile from './pages/adminProfile.vue'
 import notFound from './pages/notFound.vue'
+import noPermission from './pages/noPermission.vue'
 
 // Import Cookie JS
 import Cookie from './js/Cookie.js'
@@ -79,6 +81,8 @@ var onLoadingFinished = function() {
                 name: "overview",
                 component: overview
             },
+            { path: "/admin", name: "admin", component: adminProfile },
+            { path: "/noPermission", name: "noPermission", component: noPermission },
             { path: '*', component: notFound },
             { path: '/*/', component: notFound },
 
