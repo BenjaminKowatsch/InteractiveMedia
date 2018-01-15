@@ -7,12 +7,15 @@
 
 <template>
 <div>
-  <v-container>
-    <layout>
+  <v-container fluid grid-list-md text-xs-center>
+    <v-layout row wrap>
+    <v-flex xs12 sm12 md12 lg6 xl6>
         <user-table-vuetify v-if="usersLoaded" :users="users"></user-table-vuetify>
-        <v-spacer></v-spacer>
+    </v-flex>
+    <v-flex xs12 sm12 md12 lg6 xl6>
         <group-table-vuetify v-if="groupsLoaded" :groups="groups"></group-table-vuetify>
-        </layout>
+    </v-flex>
+    </v-layout>
 </v-container>
 
 <!--         <input type="button" v-on:click="createDummyGroup()" value="AddDummyGroup"/>
