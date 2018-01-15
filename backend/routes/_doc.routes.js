@@ -267,12 +267,16 @@
  */
 /**
  * @apiDefine paramExampleUserUpdate
-    @apiParamExample {JSON} Request Body
+    @apiParamExample {JSON} Update all attributes
     {
         "username": "new user name",
         "email": "new.alex@alex.de",
         "password": "hashedPassword",
         "imageUrl": "http://new.example.com/image.jpg",
+        "fcmToken": "cUf35139J8U:APA91bH6pkjWHRAUAW52QGQV6tR8SQdbpJK20QitJrAyWfX22VP4G0OUL-cwnXQob507qnBILDkZaoY0IW3eAvAevjM5dgCTbL297n1pbXoEHLzNDKV-86xJkle0TR6RBi8fA3BzEEOr"
+    }
+    @apiParamExample {JSON} Update only one attribute
+    {
         "fcmToken": "cUf35139J8U:APA91bH6pkjWHRAUAW52QGQV6tR8SQdbpJK20QitJrAyWfX22VP4G0OUL-cwnXQob507qnBILDkZaoY0IW3eAvAevjM5dgCTbL297n1pbXoEHLzNDKV-86xJkle0TR6RBi8fA3BzEEOr"
     }
  */
