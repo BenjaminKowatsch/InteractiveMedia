@@ -11,4 +11,16 @@ public class Debt {
         this.debtor = debtor;
         this.amount = amount;
     }
+
+    public User getCreditor() {
+        return creditor;
+    }
+
+    public User getDebtor() {
+        return debtor;
+    }
+
+    public double getAmount() {
+        return amount;
+    }
 }

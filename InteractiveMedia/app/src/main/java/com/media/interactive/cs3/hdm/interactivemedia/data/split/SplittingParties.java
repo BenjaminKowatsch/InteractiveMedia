@@ -8,16 +8,16 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-class PaymentParties {
+class SplittingParties {
     private final User paidBy;
     private final List<User> paidFor;
 
-    private PaymentParties(User paidBy, List<User> paidFor) {
+    private SplittingParties(User paidBy, List<User> paidFor) {
         this.paidBy = paidBy;
         this.paidFor = paidFor;
     }
 
-    public static PaymentParties extractFromGroup(Group group, String paidByUserId) {
+    public static SplittingParties extractFromGroup(Group group, String paidByUserId) {
         final Iterator<User> iterator = group.getUsers().iterator();
         User paidBy = null;
         List<User> paidFor = new ArrayList<>();
@@ -29,7 +29,7 @@ class PaymentParties {
                 paidFor.add(current);
             }
         }
-        return new PaymentParties(paidBy, paidFor);
+        return new SplittingParties(paidBy, paidFor);
     }
 
     public User getPaidBy() {

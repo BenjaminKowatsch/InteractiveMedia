@@ -13,22 +13,22 @@ public class EvenSplit implements Split {
     @Override
     public List<Debt> split(Transaction transaction, String paidByUserId) {
         Group group = transaction.getGroup();
-        PaymentParties paymentParties = PaymentParties.extractFromGroup(group, paidByUserId);
-        validateForGroup(paymentParties, group);
+        SplittingParties splittingParties = SplittingParties.extractFromGroup(group, paidByUserId);
+        validateForGroup(splittingParties, group);
         double amountPerUser = transaction.getAmount() / group.getUsers().size();
         List<Debt> out = new ArrayList<>();
-        for (User paidFor : paymentParties.getPaidFor()) {
-            out.add(new Debt(paymentParties.getPaidBy(), paidFor, amountPerUser));
+        for (User paidFor : splittingParties.getPaidFor()) {
+            out.add(new Debt(splittingParties.getPaidBy(), paidFor, amountPerUser));
         }
         return out;
     }
 
-    private void validateForGroup(PaymentParties paymentParties, Group group) {
-        if (paymentParties.getPaidBy() == null) {
+    private void validateForGroup(SplittingParties splittingParties, Group group) {
+        if (splittingParties.getPaidBy() == null) {
             throw new IllegalStateException("payedBy user could not be found in group " + group);
-        } else if (paymentParties.getPaidFor().isEmpty()) {
+        } else if (splittingParties.getPaidFor().isEmpty()) {
             throw new IllegalStateException("No user to pay for was found in group");
-        } else if (paymentParties.getPaidFor().size() != group.getUsers().size() - 1) {
+        } else if (splittingParties.getPaidFor().size() != group.getUsers().size() - 1) {
             throw new IllegalStateException("paidFor user count does not match group size - payer");
         }
     }
