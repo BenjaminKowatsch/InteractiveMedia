@@ -5,33 +5,9 @@
 
 @import url('https://fonts.googleapis.com/css?family=Roboto+Condensed');
 * //* imports the font family Roboto Condensed from google fonts which is the main font family of the app */
-
-/*
-* ---------------------------
-* BEGIN EMOTIONS PAGE COLORS
-* ---------------------------
-*/
-
-
-/*
-*---------------------------
-*END EMOTIONS PAGE COLORS
-*
-*
-*BEGIN EMOTIONS POPUP
-*---------------------------
-*/
-
-
-/*
-*---------------------------
-*END EMOTIONS POPUP
-*---------------------------
-* 
-*---------------------------------------------
-*BEGIN EMOTIONS STATISTIC AND GENEREL STYLES
-*---------------------------------------------
-*/
+.overflow-x {
+    overflow-y: scroll !important;
+}
 
 #bar-chart {
     margin-top: 0px;
