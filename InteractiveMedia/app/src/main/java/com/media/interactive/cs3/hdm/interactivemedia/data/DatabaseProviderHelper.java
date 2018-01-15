@@ -133,7 +133,7 @@ public class DatabaseProviderHelper {
                 e.printStackTrace();
             }
             transaction.setImageUrl(transactionObject.getString("infoImageUrl"));
-            transaction.setPaidBy(transactionObject.getString("paidBy"));
+            transaction.setPaidByUserId(transactionObject.getString("paidBy"));
             transaction.setSplit(transactionObject.getString("split"));
             Log.d(TAG, "Saving Transaction: "+ transaction.toString());
             saveTransaction(transaction);

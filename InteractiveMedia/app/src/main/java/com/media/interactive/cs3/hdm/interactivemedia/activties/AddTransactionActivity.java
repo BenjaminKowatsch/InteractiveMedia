@@ -272,8 +272,8 @@ public class AddTransactionActivity extends ImagePickerActivity {
         } else {
             latLng = null;
         }
-        final String paidBy = userAdapter.getCursor().getString(userAdapter.getCursor().getColumnIndex(UserTable.COLUMN_USER_ID));
-        return new Transaction(purpose, paidBy, split, dateTime, latLng, amount, group);
+        final String paidByUserId = userAdapter.getCursor().getString(userAdapter.getCursor().getColumnIndex(UserTable.COLUMN_USER_ID));
+        return new Transaction(purpose, paidByUserId, split, dateTime, latLng, amount, group);
     }
 
     private double parseAmount(EditText amountText) {

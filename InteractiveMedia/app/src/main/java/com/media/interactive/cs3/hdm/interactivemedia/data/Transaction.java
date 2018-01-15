@@ -17,7 +17,7 @@ import java.util.List;
 public class Transaction {
     private long id;
     private String infoName;
-    private String paidBy;
+    private String paidByUserId;
     private String split;
     private Date dateTime;
     private String imageUrl;
@@ -30,10 +30,10 @@ public class Transaction {
     public Transaction() {
     }
 
-    public Transaction(String infoName, String paidBy, String split, Date dateTime,
+    public Transaction(String infoName, String paidByUserId, String split, Date dateTime,
                        LatLng location, double amount, Group group) {
         this.infoName = infoName;
-        this.paidBy = paidBy;
+        this.paidByUserId = paidByUserId;
         this.split = split;
         this.dateTime = dateTime;
         this.location = location;
@@ -48,7 +48,7 @@ public class Transaction {
         out.put(TransactionTable.COLUMN_INFO_CREATED_AT, Helper.GetDateTime());
         out.put(TransactionTable.COLUMN_AMOUNT, amount);
         out.put(TransactionTable.COLUMN_INFO_NAME, infoName);
-        out.put(TransactionTable.COLUMN_PAID_BY, paidBy);
+        out.put(TransactionTable.COLUMN_PAID_BY, paidByUserId);
         out.put(TransactionTable.COLUMN_INFO_IMAGE_URL, imageUrl);
         out.put(TransactionTable.COLUMN_PUBLISHED_AT, Helper.FormatDate(publishedAt));
         if (location != null) {
@@ -60,7 +60,7 @@ public class Transaction {
     }
 
     public List<Debt> split() {
-        return SplitFactory.getSplitByName("").split(this, paidBy);
+        return SplitFactory.getSplitByName(split, group).split(this, paidByUserId);
     }
 
     public long getId() {
@@ -79,12 +79,12 @@ public class Transaction {
         this.infoName = infoName;
     }
 
-    public String getPaidBy() {
-        return paidBy;
+    public String getPaidByUserId() {
+        return paidByUserId;
     }
 
-    public void setPaidBy(String paidBy) {
-        this.paidBy = paidBy;
+    public void setPaidByUserId(String paidByUserId) {
+        this.paidByUserId = paidByUserId;
     }
 
     public String getSplit() {
@@ -156,7 +156,7 @@ public class Transaction {
         return "Transaction{" +
                 "id=" + id +
                 ", infoName='" + infoName + '\'' +
-                ", paidBy='" + paidBy + '\'' +
+                ", paidByUserId='" + paidByUserId + '\'' +
                 ", split='" + split + '\'' +
                 ", dateTime=" + dateTime +
                 ", imageUrl='" + imageUrl + '\'' +
@@ -180,8 +180,12 @@ public class Transaction {
 
         result.put("infoImageUrl", imageUrl != null ? imageUrl : JSONObject.NULL);
         result.put("infoCreatedAt", Helper.FormatDate(dateTime));
-        result.put("paidBy", paidBy);
+        result.put("paidBy", paidByUserId);
         result.put("split", split);
         return result;
+    }
+
+    public Group getGroup() {
+        return group;
     }
 }
