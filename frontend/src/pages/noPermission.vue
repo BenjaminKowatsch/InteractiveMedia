@@ -6,9 +6,8 @@
 
             <p>No Permission.</p>
             
-            <router-link to="/overview" exact>          
-                Go back
-            </router-link>
+            <v-btn :to="{path:'/overview'}">Back</v-btn>
+
             </span>
             </v-layout>
             </v-container>
