@@ -30,17 +30,14 @@ public class MainActivity extends AppCompatActivity {
     private String hasRun;
     private SharedPreferences sharedPreferences;
     private DatabaseHelper databaseHelper;
-
+    private Boolean transactionReload = null;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         databaseHelper = new DatabaseHelper(this);
 
-        final Intent deleteTokenIntent = new Intent(this, DeleteInstanceIDService.class);
-        startService(deleteTokenIntent);
-
         //databaseHelper.deleteAllUsers();
-        databaseHelper.resetDatabase();
+        //databaseHelper.resetDatabase();
 
         Login.getInstance().clear();
 
@@ -48,10 +45,10 @@ public class MainActivity extends AppCompatActivity {
         hasRun = getResources().getString(R.string.has_run);
         sharedPreferences = getSharedPreferences(appTag, MODE_PRIVATE);
 
+        transactionReload = getIntent().getExtras().getBoolean("transactionReload");
+
         Log.e(TAG, "Exceptionally Thread Id: " + android.os.Process.getThreadPriority(android.os.Process.myTid()));
     }
-
-
 
     private void launchNextActivity() {
         Login.getInstance().login(MainActivity.this, new CallbackListener<JSONObject, Exception>() {
@@ -61,6 +58,10 @@ public class MainActivity extends AppCompatActivity {
                     // This is not the first run
                     Log.d(TAG, "Launching Home Activity");
                     final Intent intent = new Intent(MainActivity.this, HomeActivity.class);
+                    if(transactionReload != null && transactionReload){
+                        Log.d(TAG, "transactionReload set");
+                        intent.putExtra("transactionReload",true);
+                    }
                     intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
                     startActivity(intent);
                 } else {
