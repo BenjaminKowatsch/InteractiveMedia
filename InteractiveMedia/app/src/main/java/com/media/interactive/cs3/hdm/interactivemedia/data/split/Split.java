@@ -3,7 +3,6 @@ package com.media.interactive.cs3.hdm.interactivemedia.data.split;
 
 import com.media.interactive.cs3.hdm.interactivemedia.data.Debt;
 import com.media.interactive.cs3.hdm.interactivemedia.data.Transaction;
-import com.media.interactive.cs3.hdm.interactivemedia.data.User;
 
 import java.util.List;
 
@@ -16,7 +15,7 @@ public interface Split {
      * @param paidBy user that paid for the transaction
      * @return list of debts
      */
-    List<Debt> split(Transaction transaction, User paidBy);
+    List<Debt> split(Transaction transaction, String paidBy);
 
     /**
      * Adds a Split to be used after resolving this one.
