@@ -1,3 +1,6 @@
+<!-- TEMPLATE for group table
+  * Description: Table to display all groups
+ -->
 <template>
   <v-container>
       <h2>Overview Groups</h2>

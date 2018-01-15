@@ -1,3 +1,6 @@
+<!-- TEMPLATE for about view
+  * Description: Gives details about this web app and the app Debts²
+ -->
 <template>
   <v-container fluid fill-height>
     <v-layout  justify-center align-center> 

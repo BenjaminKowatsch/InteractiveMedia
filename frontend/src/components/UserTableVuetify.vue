@@ -1,3 +1,6 @@
+<!-- TEMPLATE for user table
+  * Description: Table to display all users
+ -->
 <template>
   <v-container>
       <h2>Overview Users</h2>

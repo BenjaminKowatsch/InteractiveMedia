@@ -1,8 +1,5 @@
-<!-- TEMPLATE for emotion overview with moodslider
-  * Name:        Overview VUE
-  * Author:      Daniel Bruckner, Isabeau Schmidt-Nunez
-  * Comments:    Isabeau Schmidt-Nunez
-  * Description: View to slide the level of one's actual emotion in the process of entering one's daily emotion
+<!-- TEMPLATE for dashboard overview
+  * Description: Displays all content for monitoring. Fetch all data from backend and pass to other componens
  -->
 
 <template>

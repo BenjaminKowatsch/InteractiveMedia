@@ -1,7 +1,4 @@
-<!-- TEMPLATE for login screen
-  * Name:        Login VUE
-  * Author:      Alexander Schübl
-  * Comments:    Alexander Schübl
+<!-- TEMPLATE for login view
   * Description: View for logging into the web app
  -->
 <template>
