@@ -3,8 +3,6 @@
  -->
 <template>
   <v-container>
-      <h2>Overview Groups</h2>
-      <v-spacer></v-spacer>
       <v-text-field
         append-icon="search"
         label="Search"

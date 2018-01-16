@@ -7,13 +7,16 @@
   <v-container fluid grid-list-md text-xs-center>
     <v-layout row wrap>
     <v-flex xs12 sm12 md12 lg6 xl6>
-        <user-table-vuetify v-if="usersLoaded" :users="users"></user-table-vuetify>
+        <v-btn large @click="showUserTable = toggleState(showUserTable)">Overview Users</v-btn>
+        <v-spacer></v-spacer>
+        <user-table-vuetify v-if="usersLoaded && showUserTable" :users="users"></user-table-vuetify>
     </v-flex>
     <v-flex xs12 sm12 md12 lg6 xl6>
-        <group-table-vuetify v-if="groupsLoaded" :groups="groups"></group-table-vuetify>
+        <v-btn large @click="showGroupTable = toggleState(showGroupTable)">Overview Groups</v-btn>
+        <group-table-vuetify v-if="groupsLoaded && showGroupTable" :groups="groups"></group-table-vuetify>
     </v-flex>
     <v-flex xs12 sm12 md12 lg6 xl6>
-        <v-btn @click="showLoginTypeChart = toggleState(showLoginTypeChart)">Logintypes</v-btn>
+        <v-btn large @click="showLoginTypeChart = toggleState(showLoginTypeChart)">Logintypes</v-btn>
         <v-spacer></v-spacer>
         <login-type-chart v-if="usersLoaded && showLoginTypeChart" :passwordUsers="passwordUsers" :facebookUsers="facebookUsers" :googleUsers="googleUsers"></login-type-chart>
     </v-flex>
@@ -85,6 +88,8 @@ export default {
       googleUsers: "",
       showGroupUserChart: false,
       showLoginTypeChart: true,
+      showUserTable: true,
+      showGroupTable: true,
       groupsLoaded: false,
       usersLoaded: false,
     };
