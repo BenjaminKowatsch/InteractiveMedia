@@ -12,6 +12,11 @@
     <v-flex xs12 sm12 md12 lg6 xl6>
         <group-table-vuetify v-if="groupsLoaded" :groups="groups"></group-table-vuetify>
     </v-flex>
+    <v-flex xs12 sm12 md12 lg6 xl6>
+        <v-btn @click="showLoginTypeChart = toggleState(showLoginTypeChart)">Logintypes</v-btn>
+        <v-spacer></v-spacer>
+        <login-type-chart v-if="usersLoaded && showLoginTypeChart" :passwordUsers="passwordUsers" :facebookUsers="facebookUsers" :googleUsers="googleUsers"></login-type-chart>
+    </v-flex>
     </v-layout>
 </v-container>
 
@@ -28,11 +33,11 @@
             <group-user-chart :groupCount="groupCount" :userCount="userCount"></group-user-chart>
           </div>
         </div>                    
-        <div class="loginTypeChart">
+<!--         <div class="loginTypeChart">
           <div v-if="usersLoaded && showLoginTypeChart">
             <login-type-chart :passwordUsers="passwordUsers" :facebookUsers="facebookUsers" :googleUsers="googleUsers"></login-type-chart>
           </div> 
-        </div>              
+        </div>     -->          
 <!--       <div class="version" v-if="version">
         <p>Debts² admin panel version informations: 
           {{version.name}}  {{version.version}}
@@ -48,8 +53,6 @@ import Cookie from "../js/Cookie.js";
 import Config from "../js/Config.js";
 import GroupUserChart from "@/components/GroupUserChart.js";
 import LoginTypeChart from "@/components/LoginTypeChart.js";
-/* import UserTable from "@/components/UserTable.vue";
-import GroupTable from "@/components/GroupTable.vue"; */
 import UserTableVuetify from "@/components/UserTableVuetify.vue";
 import GroupTableVuetify from "@/components/GroupTableVuetify.vue";
 
@@ -61,8 +64,6 @@ export default {
   components: {
     GroupUserChart,
     LoginTypeChart,
-/*     UserTable,
-    GroupTable, */
     UserTableVuetify,
     GroupTableVuetify
   },
@@ -83,7 +84,7 @@ export default {
       facebookUsers: "",
       googleUsers: "",
       showGroupUserChart: false,
-      showLoginTypeChart: false,
+      showLoginTypeChart: true,
       groupsLoaded: false,
       usersLoaded: false,
     };

@@ -11,20 +11,26 @@ export default Pie.extend({
         return {
             options: {
                 //ToDo: Add some specific chart options
+                legend: {
+                    position: 'bottom',
+                    labels: {
+                        fontColor: '#BDBDBD'
+                    }
+                }
             }
         }
     },
 
     mounted: function() {
 
-
+        //ToDo: Integrate Options
         //Resolve promise to render chart with desired counts
         console.log("Usercount in LoginTypeChart " + this.userCount)
 
         this.renderChart({
             labels: ['Password', 'Facebook', 'Google'],
             datasets: [{
-                backgroundColor: ['#5FB404', '#2E64FE', '#DF0101'],
+                backgroundColor: ['##A4A4A4', '#585858', '#424242'],
                 data: [this.passwordUsers, this.facebookUsers, this.googleUsers]
             }, ],
         }, { responsive: true, maintainAspectRatio: false }, )
