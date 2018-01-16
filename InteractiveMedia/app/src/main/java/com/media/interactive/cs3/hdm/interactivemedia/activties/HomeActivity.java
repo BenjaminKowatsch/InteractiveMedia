@@ -20,17 +20,24 @@ import android.widget.AdapterView;
 import android.widget.ImageView;
 import android.widget.Toast;
 
+import com.android.volley.Request;
+import com.android.volley.Response;
+import com.android.volley.error.VolleyError;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.load.model.GlideUrl;
 import com.bumptech.glide.load.model.LazyHeaders;
 import com.media.interactive.cs3.hdm.interactivemedia.CallbackListener;
 import com.media.interactive.cs3.hdm.interactivemedia.R;
+import com.media.interactive.cs3.hdm.interactivemedia.RestRequestQueue;
+import com.media.interactive.cs3.hdm.interactivemedia.authorizedrequests.AuthorizedJsonObjectRequest;
 import com.media.interactive.cs3.hdm.interactivemedia.data.Login;
 import com.media.interactive.cs3.hdm.interactivemedia.fragments.GroupFragment;
 import com.media.interactive.cs3.hdm.interactivemedia.fragments.IMyFragment;
 import com.media.interactive.cs3.hdm.interactivemedia.fragments.TransactionFragment;
+import com.media.interactive.cs3.hdm.interactivemedia.notification.DeleteInstanceIDService;
 
+import org.json.JSONException;
 import org.json.JSONObject;
 
 public class HomeActivity extends AppCompatActivity
@@ -50,7 +57,6 @@ public class HomeActivity extends AppCompatActivity
         setSupportActionBar(toolbar);
 
         fab = (FloatingActionButton) findViewById(R.id.fab);
-
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
 
@@ -75,7 +81,14 @@ public class HomeActivity extends AppCompatActivity
         };
         Login.getInstance().addOnUserDataSetListener(userDataCompleted);
 
-        displayFragment(R.id.nav_groups);
+        final Boolean transactionReload = getIntent().getExtras().getBoolean("transactionReload");
+
+        if(transactionReload != null && transactionReload){
+            Log.d(TAG,"Started from Notification Intent to reload transactions");
+            displayFragment(R.id.nav_transactions);
+        }else {
+            displayFragment(R.id.nav_groups);
+        }
     }
 
     @Override

@@ -15,8 +15,8 @@ router.get('/', authenticationService.isAuthenticated,
     authorizationService.isAuthorizedAdmin, groupsController.getAll);
 
 /**
- * @api {POST} /v1/groups/ Create Group
- * @apiName CreateGroup
+ * @api {POST} /v1/groups/ Create
+ * @apiName Create
  * @apiGroup group
  * @apiVersion 0.1.0
  *

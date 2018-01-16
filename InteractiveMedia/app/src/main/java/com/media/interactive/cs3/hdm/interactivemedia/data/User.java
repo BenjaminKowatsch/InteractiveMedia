@@ -16,6 +16,7 @@ public class User {
     private String email;
     private String userId;
     private String imageUrl;
+    private String fcmToken;
     private String createdAt;
     private boolean sync;
 
@@ -88,6 +89,14 @@ public class User {
 
     public void setCreatedAt(String createdAt) {
         this.createdAt = createdAt;
+    }
+
+    public String getFcmToken() {
+        return fcmToken;
+    }
+
+    public void setFcmToken(String fcmToken) {
+        this.fcmToken = fcmToken;
     }
 
     @Override
