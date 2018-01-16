@@ -28,14 +28,7 @@
 
         <input type="button" v-on:click="showLoginTypeChart = toggleState(showLoginTypeChart)" value="Show Logintype Chart"/>
         <input type="button"  v-on:click="logout()" value="Logout"/> -->
-      <br> 
-      
-      <div>
-        <div class="groupUserChart">
-          <div v-if="showGroupUserChart && groupsLoaded && usersLoaded">
-            <group-user-chart :groupCount="groupCount" :userCount="userCount"></group-user-chart>
-          </div>
-        </div>                    
+                    
 <!--         <div class="loginTypeChart">
           <div v-if="usersLoaded && showLoginTypeChart">
             <login-type-chart :passwordUsers="passwordUsers" :facebookUsers="facebookUsers" :googleUsers="googleUsers"></login-type-chart>
@@ -54,7 +47,6 @@ import Mixins from "../mixins.js";
 import axios from "axios";
 import Cookie from "../js/Cookie.js";
 import Config from "../js/Config.js";
-import GroupUserChart from "@/components/GroupUserChart.js";
 import LoginTypeChart from "@/components/LoginTypeChart.js";
 import UserTableVuetify from "@/components/UserTableVuetify.vue";
 import GroupTableVuetify from "@/components/GroupTableVuetify.vue";
@@ -65,7 +57,6 @@ export default {
   name: "overview",
   mixins: [Mixins],
   components: {
-    GroupUserChart,
     LoginTypeChart,
     UserTableVuetify,
     GroupTableVuetify
@@ -86,7 +77,6 @@ export default {
       passwordUsers: "",
       facebookUsers: "",
       googleUsers: "",
-      showGroupUserChart: false,
       showLoginTypeChart: true,
       showUserTable: true,
       showGroupTable: true,
