@@ -1,7 +1,4 @@
-<!-- TEMPLATE for login screen
-  * Name:        Login VUE
-  * Author:      Alexander Schübl
-  * Comments:    Alexander Schübl
+<!-- TEMPLATE for login view
   * Description: View for logging into the web app
  -->
 <template>
@@ -163,6 +160,9 @@ export default {
         .catch(e => {
           this.errors.push(e);
           console.log("Errors userrequest: " + e);
+          if(e.toString() =="Error: Request failed with status code 401"){
+            this.alertAccessDenied = true
+          }
         });
     },
     /**

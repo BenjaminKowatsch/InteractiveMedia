@@ -9,6 +9,13 @@
     overflow-y: scroll !important;
 }
 
+.logo {
+    height: 300px;
+    width: 300px;
+    border: 4px solid #3d5059;
+    border-radius: 50%;
+}
+
 #bar-chart {
     margin-top: 0px;
     max-height: 500px;

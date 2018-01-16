@@ -1,3 +1,6 @@
+<!-- TEMPLATE for not found error page
+  * Description: Displays a 404 error if a not available route is adressed
+ -->
 <template>
     <v-container fluid fill-height>
     <v-layout  justify-center align-center> 

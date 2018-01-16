@@ -1,5 +1,7 @@
+<!-- TEMPLATE for main view
+  * Description: Entrypoint for the app. Contains a app wide toolbar and sidepanel (navigation-drawer)
+ -->
 <template>
-
    <v-app id="inspire" :dark="isDark">
       <v-navigation-drawer
       clipped

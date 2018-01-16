@@ -1,6 +1,8 @@
+<!-- TEMPLATE for user table
+  * Description: Table to display all users
+ -->
 <template>
   <v-container>
-      <h2>Overview Users</h2>
       <v-spacer></v-spacer>
       <v-text-field
         append-icon="search"
@@ -40,6 +42,11 @@
         Sorry, nothing to display here :(
       </v-alert>
     </template>
+     <template slot="footer">
+        <td class="text-xs-left" colspan="100%">
+          <strong>Total Users: {{ items.length }}</strong>
+        </td>
+      </template>
       <template slot="pageText" slot-scope="{ pageStart, pageStop }">
         From {{ pageStart }} to {{ pageStop }}
       </template>
