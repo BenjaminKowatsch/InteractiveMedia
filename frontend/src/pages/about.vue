@@ -4,7 +4,8 @@
 <template>
   <v-container fluid fill-height>
     <v-layout  justify-center align-center> 
-      <span class="text-md-center">
+      <span class="text-md-center">        
+        <img src="../assets/logo.png"  alt="Debts² logo" class="logo">
         <h1>About Debts²</h1>
         <br>
         <p>This website contains a monitoring dashboard for administrators of the Debts² mobile application.</p>
