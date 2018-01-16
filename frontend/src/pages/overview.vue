@@ -8,16 +8,15 @@
     <v-layout row wrap>
     <v-flex xs12 sm12 md12 lg6 xl6>
         <v-btn large @click="showUserTable = toggleState(showUserTable)">Overview Users</v-btn>
-        <v-spacer></v-spacer>
         <user-table-vuetify v-if="usersLoaded && showUserTable" :users="users"></user-table-vuetify>
     </v-flex>
     <v-flex xs12 sm12 md12 lg6 xl6>
-        <v-btn large @click="showGroupTable = toggleState(showGroupTable)">Overview Groups</v-btn>
+        <v-btn  large @click="showGroupTable = toggleState(showGroupTable)">Overview Groups</v-btn>
         <group-table-vuetify v-if="groupsLoaded && showGroupTable" :groups="groups"></group-table-vuetify>
     </v-flex>
     <v-flex xs12 sm12 md12 lg6 xl6>
-        <v-btn large @click="showLoginTypeChart = toggleState(showLoginTypeChart)">Logintypes</v-btn>
-        <v-spacer></v-spacer>
+        <v-btn  large @click="showLoginTypeChart = toggleState(showLoginTypeChart)">Logintypes</v-btn>
+        <p></p>
         <login-type-chart v-if="usersLoaded && showLoginTypeChart" :passwordUsers="passwordUsers" :facebookUsers="facebookUsers" :googleUsers="googleUsers"></login-type-chart>
     </v-flex>
     </v-layout>
@@ -81,7 +80,7 @@ export default {
       showUserTable: true,
       showGroupTable: true,
       groupsLoaded: false,
-      usersLoaded: false,
+      usersLoaded: false
     };
   },
 

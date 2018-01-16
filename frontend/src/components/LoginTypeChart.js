@@ -10,6 +10,8 @@ export default Pie.extend({
     data() {
         return {
             options: {
+                responsive: true,
+                maintainAspectRatio: false,
                 //ToDo: Add some specific chart options
                 legend: {
                     position: 'bottom',
@@ -30,9 +32,9 @@ export default Pie.extend({
         this.renderChart({
             labels: ['Password', 'Facebook', 'Google'],
             datasets: [{
-                backgroundColor: ['##A4A4A4', '#585858', '#424242'],
+                backgroundColor: ['#6E6E6E', '#585858', '#424242'],
                 data: [this.passwordUsers, this.facebookUsers, this.googleUsers]
             }, ],
-        }, { responsive: true, maintainAspectRatio: false }, )
+        }, this.options)
     },
 })
