@@ -38,6 +38,8 @@ import com.media.interactive.cs3.hdm.interactivemedia.data.Group;
 import com.media.interactive.cs3.hdm.interactivemedia.data.Login;
 import com.media.interactive.cs3.hdm.interactivemedia.data.MoneyTextWatcher;
 import com.media.interactive.cs3.hdm.interactivemedia.data.Transaction;
+import com.media.interactive.cs3.hdm.interactivemedia.data.settlement.PairBasedSettlement;
+import com.media.interactive.cs3.hdm.interactivemedia.util.TransactionSplittingTask;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -79,13 +81,13 @@ public class AddTransactionActivity extends ImagePickerActivity {
             if (resultCode == RESULT_OK) {
                 selectedPlace = getPlace(this, data);
                 final String toastMsg = String.format("Place: %s %s", selectedPlace.getAddress(), selectedPlace.getLatLng().toString());
-                if(selectedPlace != null) {
+                if (selectedPlace != null) {
                     final LatLng latLng = selectedPlace.getLatLng();
-                    locationDisplay.setText("Location: \n" + selectedPlace.getAddress()+"\n"
-                                            + "Latitude: " + latLng.latitude + "\n"
-                                            + "Longitude: " + latLng.longitude);
+                    locationDisplay.setText("Location: \n" + selectedPlace.getAddress() + "\n"
+                            + "Latitude: " + latLng.latitude + "\n"
+                            + "Longitude: " + latLng.longitude);
 
-                } else{
+                } else {
                     locationDisplay.setText(null);
                 }
                 Log.d(TAG, toastMsg);
@@ -94,7 +96,7 @@ public class AddTransactionActivity extends ImagePickerActivity {
         }
     }
 
-    private void startLocationSelection(){
+    private void startLocationSelection() {
         final PlacePicker.IntentBuilder builder = new PlacePicker.IntentBuilder();
         try {
             startActivityForResult(builder.build(this), PLACE_PICKER_REQUEST);
@@ -129,7 +131,8 @@ public class AddTransactionActivity extends ImagePickerActivity {
         addTransactionButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                createAndSaveTransaction(view);
+                final Transaction saved = createAndSaveTransaction(view);
+                calcualteSplit(saved);
             }
         });
         final Button cancel = findViewById(R.id.bn_add_transaction_cancel);
@@ -159,6 +162,14 @@ public class AddTransactionActivity extends ImagePickerActivity {
         initImagePickerActivity(R.id.iv_transaction_image, null);
     }
 
+    private void calcualteSplit(Transaction saved) {
+        DatabaseProviderHelper helper = new DatabaseProviderHelper(this.getContentResolver());
+        TransactionSplittingTask task = new TransactionSplittingTask(helper,
+                new DatabaseHelper(this.getApplicationContext()), new PairBasedSettlement());
+        Log.d(TAG, "Calculating Split now!");
+        task.execute(saved);
+    }
+
     private Group loadGroup() {
         final String groupId = getIntent().getStringExtra(GROUP_TO_ADD_TO);
         if (groupId == null) {
@@ -169,7 +180,7 @@ public class AddTransactionActivity extends ImagePickerActivity {
         }
     }
 
-    private void createAndSaveTransaction(View view) {
+    private Transaction createAndSaveTransaction(View view) {
         final Transaction toSave = buildFromCurrentView();
         // Upload group image if sending the group data was successfull
         if (getCurrentPhotoPath() != null) {
@@ -186,7 +197,7 @@ public class AddTransactionActivity extends ImagePickerActivity {
                         e.printStackTrace();
                     }
                     final String newImageUrl = getResources().getString(R.string.web_service_url)
-                        .concat("/v1/object-store/download?filename=").concat(imageName);
+                            .concat("/v1/object-store/download?filename=").concat(imageName);
                     toSave.setImageUrl(newImageUrl);
                     try {
                         sendToBackend(toSave);
@@ -213,6 +224,7 @@ public class AddTransactionActivity extends ImagePickerActivity {
         } catch (JSONException e) {
             e.printStackTrace();
         }
+        return toSave;
     }
 
     private void sendToBackend(final Transaction toSave) throws JSONException {
@@ -224,7 +236,7 @@ public class AddTransactionActivity extends ImagePickerActivity {
                 Log.d(TAG, "url: " + url);
                 try {
                     final AuthorizedJsonObjectRequest jsonObjectRequest = new AuthorizedJsonObjectRequest(
-                        Request.Method.POST, url, toSave.toJson(), new Response.Listener<JSONObject>() {
+                            Request.Method.POST, url, toSave.toJson(), new Response.Listener<JSONObject>() {
                         @Override
                         public void onResponse(JSONObject response) {
 
@@ -267,7 +279,7 @@ public class AddTransactionActivity extends ImagePickerActivity {
         final double amount = parseAmount(amountText);
         final Date dateTime = parseDateTime(dateText, timeText);
         LatLng latLng;
-        if(selectedPlace != null) {
+        if (selectedPlace != null) {
             latLng = selectedPlace.getLatLng();
         } else {
             latLng = null;
@@ -292,7 +304,7 @@ public class AddTransactionActivity extends ImagePickerActivity {
             return dateTimeFormat.parse(dateTimeText);
         } catch (ParseException e) {
             Log.e(this.getClass().getName(), "Could not parse dateTime from text " + dateTimeText
-                + " using default of now instead.");
+                    + " using default of now instead.");
             Log.d(this.getClass().getName(), e.getMessage());
             return new Date(System.currentTimeMillis());
         }
@@ -308,7 +320,7 @@ public class AddTransactionActivity extends ImagePickerActivity {
                 setDateText(year, month, day, dateEditText);
             }
         }, calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar
-            .DAY_OF_MONTH));
+                .DAY_OF_MONTH));
 
         final TimePickerDialog timePicker = new TimePickerDialog(this, new TimePickerDialog.OnTimeSetListener() {
             @Override
@@ -359,8 +371,8 @@ public class AddTransactionActivity extends ImagePickerActivity {
         final String[] selectionArgs = {groupId};
         Cursor query = getContentResolver().query(DatabaseProvider.CONTENT_GROUP_USER_JOIN_URI, projection, selection, selectionArgs, null);
 
-        String[] columns = new String[] {UserTable.COLUMN_USERNAME};
-        int[] to = new int[] {android.R.id.text1};
+        String[] columns = new String[]{UserTable.COLUMN_USERNAME};
+        int[] to = new int[]{android.R.id.text1};
 
         SimpleCursorAdapter userAdapter = new SimpleCursorAdapter(this, android.R.layout.simple_spinner_item, query, columns, to, 0);
         userAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);

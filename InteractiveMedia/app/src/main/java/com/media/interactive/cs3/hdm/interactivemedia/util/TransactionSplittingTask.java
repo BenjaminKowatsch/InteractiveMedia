@@ -82,7 +82,7 @@ public class TransactionSplittingTask extends AsyncTask<Transaction, Void, Boole
         if (result) {
             Log.d(TAG, "Successfully resolved transaction.");
         } else {
-            Log.e(TAG, "Error on resolving transactions.");
+            Log.d(TAG, "Error on resolving transactions.");
         }
     }
 }

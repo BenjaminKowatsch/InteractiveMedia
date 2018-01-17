@@ -2,10 +2,7 @@ package com.media.interactive.cs3.hdm.interactivemedia.activties;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.database.Cursor;
-import android.os.Build;
 import android.os.Bundle;
-import android.support.annotation.RequiresApi;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.widget.Toast;
@@ -13,8 +10,6 @@ import android.widget.Toast;
 import com.media.interactive.cs3.hdm.interactivemedia.CallbackListener;
 import com.media.interactive.cs3.hdm.interactivemedia.R;
 import com.media.interactive.cs3.hdm.interactivemedia.contentprovider.DatabaseHelper;
-import com.media.interactive.cs3.hdm.interactivemedia.contentprovider.DummyDataAdder;
-import com.media.interactive.cs3.hdm.interactivemedia.data.Hash;
 import com.media.interactive.cs3.hdm.interactivemedia.data.Login;
 
 import org.json.JSONObject;
@@ -32,7 +27,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         databaseHelper = new DatabaseHelper(this);
 
-        databaseHelper.resetDatabase();
+        //databaseHelper.resetDatabase();
 
         Login.getInstance().clear();
 

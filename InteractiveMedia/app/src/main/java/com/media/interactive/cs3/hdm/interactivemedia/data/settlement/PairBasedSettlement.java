@@ -11,7 +11,7 @@ import java.util.Map;
 /**
  * Settles debts by resolving all debts for a user-pair, ignoring cross-user simplification options
  */
-class PairBasedSettlement implements Settlement {
+public class PairBasedSettlement implements Settlement {
 
     /**
      * Resolves debts by creating one payment for each user-pair (that is all combinations of first
