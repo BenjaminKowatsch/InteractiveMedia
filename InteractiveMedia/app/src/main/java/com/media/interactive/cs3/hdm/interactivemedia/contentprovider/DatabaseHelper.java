@@ -131,11 +131,12 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return cursor;
     }
 
-    public Cursor getNewestPaymentsWithUserNames() {
+    public Cursor getNewestPaymentsWithUserNamesForGroup(long groupId) {
         final SQLiteDatabase db = this.getReadableDatabase();
         final String fromUserTable = "u1";
         final String toUserTable = "u2";
-        final String dateSelect = "SELECT " + PaymentTable.COLUMN_CREATED_AT + " FROM " + PaymentTable.TABLE_NAME;
+        final String dateSelect = "SELECT " + PaymentTable.COLUMN_CREATED_AT + " FROM " +
+                PaymentTable.TABLE_NAME + " WHERE " + PaymentTable.COLUMN_GROUP_ID + " = ?";
         final String query = "SELECT " + PaymentTable.COLUMN_AMOUNT + ", "
                 + buildAlias(fromUserTable, PAYMENT_USER_JOIN_COLUMN_FROM_USER) + ", "
                 + buildAlias(toUserTable, PAYMENT_USER_JOIN_COLUMN_TO_USER)
@@ -143,7 +144,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 + getUserNameLeftJoinString(fromUserTable)
                 + getUserNameLeftJoinString(toUserTable)
                 + " WHERE " + PaymentTable.COLUMN_CREATED_AT + " = MAX(" + dateSelect + ")";
-        return db.rawQuery(query, new String[]{});
+        return db.rawQuery(query, new String[]{"" + groupId});
     }
 
     @NonNull

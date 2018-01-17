@@ -106,7 +106,8 @@ public class TransactionFragment extends ListFragment implements LoaderManager.L
 
     private void initPaymentList() {
         final ListView paymentList = getActivity().findViewById(R.id.payment_list);
-        final Cursor payments = new DatabaseHelper(this.getContext()).getNewestPaymentsWithUserNames();
+        final Cursor payments = new DatabaseHelper(this.getContext())
+                .getNewestPaymentsWithUserNamesForGroup(getCurrentGroupInternalId());
         final String[] columns = new String[]{PaymentTable.COLUMN_AMOUNT,
                 DatabaseHelper.PAYMENT_USER_JOIN_COLUMN_FROM_USER,
                 DatabaseHelper.PAYMENT_USER_JOIN_COLUMN_TO_USER};
@@ -132,6 +133,10 @@ public class TransactionFragment extends ListFragment implements LoaderManager.L
 
     private String getCurrentGroupId() {
         return groupAdapter.getCursor().getString(groupAdapter.getCursor().getColumnIndex(GroupTable.COLUMN_GROUP_ID));
+    }
+
+    private long getCurrentGroupInternalId() {
+        return groupAdapter.getCursor().getLong(groupAdapter.getCursor().getColumnIndex(GroupTable.COLUMN_ID));
     }
 
     private String getCurrentGroupCreatedAt() {
