@@ -4,6 +4,7 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.support.annotation.NonNull;
 
 import com.media.interactive.cs3.hdm.interactivemedia.contentprovider.tables.DebtTable;
 import com.media.interactive.cs3.hdm.interactivemedia.contentprovider.tables.GroupTable;
@@ -33,6 +34,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     private static final int DB_VERSION = 1;
 
     private static final String DATABASE_NAME = "database.db";
+    public static final String PAYMENT_USER_JOIN_COLUMN_FROM_USER = "from_name";
+    public static final String PAYMENT_USER_JOIN_COLUMN_TO_USER = "to_name";
 
     public DatabaseHelper(Context context) {
         super(context, DATABASE_NAME, null, DB_VERSION);
@@ -126,6 +129,33 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 + " WHERE " + UserTable.COLUMN_ID + " IN (" + subQuery + " )";
         final Cursor cursor = db.rawQuery(query, new String[]{"" + groupId});
         return cursor;
+    }
+
+    public Cursor getNewestPaymentsWithUserNames() {
+        final SQLiteDatabase db = this.getReadableDatabase();
+        final String fromUserTable = "u1";
+        final String toUserTable = "u2";
+        final String dateSelect = "SELECT " + PaymentTable.COLUMN_CREATED_AT + " FROM " + PaymentTable.TABLE_NAME;
+        final String query = "SELECT " + PaymentTable.COLUMN_AMOUNT + ", "
+                + buildAlias(fromUserTable, PAYMENT_USER_JOIN_COLUMN_FROM_USER) + ", "
+                + buildAlias(toUserTable, PAYMENT_USER_JOIN_COLUMN_TO_USER)
+                + " FROM " + PaymentTable.TABLE_NAME
+                + getUserNameLeftJoinString(fromUserTable)
+                + getUserNameLeftJoinString(toUserTable)
+                + " WHERE " + PaymentTable.COLUMN_CREATED_AT + " = MAX(" + dateSelect + ")";
+        return db.rawQuery(query, new String[]{});
+    }
+
+    @NonNull
+    private String buildAlias(String fromUserTable, String columnName) {
+        return fromUserTable + "." +
+                UserTable.COLUMN_USERNAME + " " + columnName;
+    }
+
+    @NonNull
+    private String getUserNameLeftJoinString(String fromUserTable) {
+        return "left join " + UserTable.TABLE_NAME + " " + fromUserTable + " on (" + PaymentTable.TABLE_NAME
+                + "." + PaymentTable.COLUMN_FROM_USER + "=" + fromUserTable + "." + UserTable.COLUMN_ID + " ";
     }
 
 }

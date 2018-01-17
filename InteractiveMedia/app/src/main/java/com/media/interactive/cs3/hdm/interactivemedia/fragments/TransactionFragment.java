@@ -22,17 +22,16 @@ import android.widget.SearchView;
 import android.widget.SimpleCursorAdapter;
 import android.widget.Spinner;
 
-import com.media.interactive.cs3.hdm.interactivemedia.GroupAdapter;
 import com.media.interactive.cs3.hdm.interactivemedia.R;
 import com.media.interactive.cs3.hdm.interactivemedia.TransactionAdapter;
 import com.media.interactive.cs3.hdm.interactivemedia.activties.AddTransactionActivity;
 import com.media.interactive.cs3.hdm.interactivemedia.contentprovider.DatabaseHelper;
 import com.media.interactive.cs3.hdm.interactivemedia.contentprovider.DatabaseProvider;
 import com.media.interactive.cs3.hdm.interactivemedia.contentprovider.tables.GroupTable;
+import com.media.interactive.cs3.hdm.interactivemedia.contentprovider.tables.PaymentTable;
 import com.media.interactive.cs3.hdm.interactivemedia.contentprovider.tables.TransactionTable;
 import com.media.interactive.cs3.hdm.interactivemedia.contentprovider.tables.UserTable;
 import com.media.interactive.cs3.hdm.interactivemedia.data.Login;
-import com.media.interactive.cs3.hdm.interactivemedia.data.Transaction;
 
 import static com.media.interactive.cs3.hdm.interactivemedia.activties.AddTransactionActivity.GROUP_CREATED_AT_ADD_TO;
 import static com.media.interactive.cs3.hdm.interactivemedia.activties.AddTransactionActivity.GROUP_TO_ADD_TO;
@@ -101,6 +100,20 @@ public class TransactionFragment extends ListFragment implements LoaderManager.L
         groupAdapter.getCursor().moveToFirst();
 
         initOrRestartLoaderWithGroupId();
+
+        initPaymentList();
+    }
+
+    private void initPaymentList() {
+        final ListView paymentList = getActivity().findViewById(R.id.payment_list);
+        final Cursor payments = new DatabaseHelper(this.getContext()).getNewestPaymentsWithUserNames();
+        final String[] columns = new String[]{PaymentTable.COLUMN_AMOUNT,
+                DatabaseHelper.PAYMENT_USER_JOIN_COLUMN_FROM_USER,
+                DatabaseHelper.PAYMENT_USER_JOIN_COLUMN_TO_USER};
+        final int[] to = new int[]{R.id.payment_amount, R.id.payment_from, R.id.payment_to};
+        final SimpleCursorAdapter adapter = new SimpleCursorAdapter(this.getContext(), R.layout.payment,
+                payments, columns, to, 0);
+        paymentList.setAdapter(adapter);
     }
 
     private void initOrRestartLoaderWithGroupId() {
@@ -120,20 +133,21 @@ public class TransactionFragment extends ListFragment implements LoaderManager.L
     private String getCurrentGroupId() {
         return groupAdapter.getCursor().getString(groupAdapter.getCursor().getColumnIndex(GroupTable.COLUMN_GROUP_ID));
     }
+
     private String getCurrentGroupCreatedAt() {
         return groupAdapter.getCursor().getString(groupAdapter.getCursor().getColumnIndex(GroupTable.COLUMN_CREATED_AT));
     }
 
     private SimpleCursorAdapter initializeGroupAdapter() {
 
-        final String[] projection = { GroupTable.TABLE_NAME + ".*"};
+        final String[] projection = {GroupTable.TABLE_NAME + ".*"};
         final String sortOrder = GroupTable.TABLE_NAME + "." + GroupTable.COLUMN_CREATED_AT + " DESC";
         final String selection = UserTable.TABLE_NAME + "." + UserTable.COLUMN_USER_ID + " = ?";
         final String[] selectionArgs = {Login.getInstance().getUser().getUserId()};
         final Cursor query = contentResolver.query(DatabaseProvider.CONTENT_GROUP_USER_JOIN_URI, projection, selection, selectionArgs, sortOrder);
 
-        final String[] columns = new String[] { GroupTable.COLUMN_NAME };
-        final int[] to = new int[] { android.R.id.text1 };
+        final String[] columns = new String[]{GroupTable.COLUMN_NAME};
+        final int[] to = new int[]{android.R.id.text1};
 
         final SimpleCursorAdapter groupAdapter = new SimpleCursorAdapter(this.getContext(), android.R.layout.simple_spinner_item, query, columns, to, 0);
         groupAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
@@ -171,8 +185,8 @@ public class TransactionFragment extends ListFragment implements LoaderManager.L
             onItemSelectedListener = (AdapterView.OnItemSelectedListener) context;
         } catch (ClassCastException e) {
             throw new ClassCastException(
-                context.toString()
-                    + " muss OnItemSelectedListener implementieren");
+                    context.toString()
+                            + " muss OnItemSelectedListener implementieren");
         }
     }
 
@@ -200,7 +214,7 @@ public class TransactionFragment extends ListFragment implements LoaderManager.L
             default:
                 break;
         }
-        final String[] projection = { TransactionTable.TABLE_NAME + ".*", UserTable.TABLE_NAME + "." + UserTable.COLUMN_USERNAME};
+        final String[] projection = {TransactionTable.TABLE_NAME + ".*", UserTable.TABLE_NAME + "." + UserTable.COLUMN_USERNAME};
         final String sortOrder = TransactionTable.TABLE_NAME + "." + TransactionTable.COLUMN_INFO_CREATED_AT + " DESC";
         final String selection = GroupTable.TABLE_NAME + "." + GroupTable.COLUMN_GROUP_ID + " = ? AND " + GroupTable.TABLE_NAME + "." + GroupTable.COLUMN_NAME + " like ? ";
         final String[] selectionArgs = {getCurrentGroupId(), search};
