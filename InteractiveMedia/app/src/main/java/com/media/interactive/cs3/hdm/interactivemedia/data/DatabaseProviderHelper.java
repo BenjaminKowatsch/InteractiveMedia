@@ -236,12 +236,13 @@ public class DatabaseProviderHelper {
         return existingGroups;
     }
 
-    public void savePayment(Payment payment, Date creationTimestmap) {
+    public void savePayment(Payment payment, Date creationTimestmap, long groupId) {
         final ContentValues paymentContent = new ContentValues();
         paymentContent.put(PaymentTable.COLUMN_AMOUNT, payment.getAmount());
         paymentContent.put(PaymentTable.COLUMN_FROM_USER, payment.getFrom().getId());
         paymentContent.put(PaymentTable.COLUMN_TO_USER, payment.getTo().getId());
         paymentContent.put(PaymentTable.COLUMN_CREATED_AT, formatDate(creationTimestmap));
+        paymentContent.put(PaymentTable.COLUMN_GROUP_ID, groupId);
         contentResolver.insert(DatabaseProvider.CONTENT_PAYMENT_URI, paymentContent);
     }
 }

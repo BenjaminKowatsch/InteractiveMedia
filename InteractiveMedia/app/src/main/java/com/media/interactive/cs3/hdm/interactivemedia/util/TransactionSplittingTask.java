@@ -67,7 +67,7 @@ public class TransactionSplittingTask extends AsyncTask<Transaction, Void, Boole
             final Date paymentGenerationTimestamp = new Date(System.currentTimeMillis());
             for (Payment payment : payments) {
                 try {
-                    databaseProviderHelper.savePayment(payment, paymentGenerationTimestamp);
+                    databaseProviderHelper.savePayment(payment, paymentGenerationTimestamp, transaction.getGroup().getId());
                 } catch (Exception e) {
                     Log.e(TAG, "An error occurred in saving payment " + payment, e);
                     return false;
