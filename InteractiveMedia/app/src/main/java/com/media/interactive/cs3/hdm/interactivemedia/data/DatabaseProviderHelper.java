@@ -176,6 +176,48 @@ public class DatabaseProviderHelper {
         return null;
     }
 
+    public List<Transaction> getUnsyncedTransactions(){
+        final List<Transaction> result = new ArrayList<>();
+
+        return result;
+    }
+
+
+    public List<Group> getUnsyncedGroups(String userId){
+        final List<Group> result = new ArrayList<>();
+
+        final String[] projection = {GroupTable.TABLE_NAME + ".*", UserTable.TABLE_NAME+"."+UserTable.COLUMN_EMAIL};
+        final String selection = "(" + UserTable.TABLE_NAME + "." + UserTable.COLUMN_USER_ID + " = ?  OR"
+            + " " +  UserTable.TABLE_NAME + "." + UserTable.COLUMN_USER_ID + " IS NULL ) AND"
+            + " "+ GroupTable.TABLE_NAME + "." + GroupTable.COLUMN_SYNCHRONIZED + " = 0 ";
+        final String[] selectionArgs = {userId};
+        final Cursor cursor = contentResolver.query(DatabaseProvider.CONTENT_GROUP_USER_JOIN_URI, projection, selection, selectionArgs,null);
+        Log.d(TAG, "Cursor: Count: " + cursor.getCount());
+        long oldGroupId = -1;
+        Group group = null;
+
+        while(cursor.moveToNext()){
+            long possibleNewGroupId = cursor.getLong(cursor.getColumnIndexOrThrow(GroupTable.COLUMN_ID));
+            if(oldGroupId != possibleNewGroupId) {
+                oldGroupId = possibleNewGroupId;
+                group = new Group();
+                group.setId(possibleNewGroupId);
+                group.setName(cursor.getString(cursor.getColumnIndexOrThrow(GroupTable.COLUMN_NAME)));
+                group.setImageUrl(cursor.getString(cursor.getColumnIndexOrThrow(GroupTable.COLUMN_IMAGE_URL)));
+                group.setUsers(new ArrayList<User>());
+                group.setCreatedAt(cursor.getString(cursor.getColumnIndexOrThrow(GroupTable.COLUMN_CREATED_AT)));
+                int synced = cursor.getInt(cursor.getColumnIndexOrThrow(GroupTable.COLUMN_SYNCHRONIZED));
+                group.setSync(synced > 0);
+                result.add(group);
+            }
+            final User user = new User();
+            user.setEmail(cursor.getString(cursor.getColumnIndexOrThrow(UserTable.COLUMN_EMAIL)));
+            group.getUsers().add(user);
+        }
+
+        return result;
+    }
+
     public boolean checkForCachedCredentials(Login login) {
         if (contentResolver != null) {
             boolean result = false;
