@@ -12,7 +12,7 @@
     </v-flex>
     <v-flex xs12 sm12 md12 lg6 xl6>
         <v-btn  large @click="showGroupTable = toggleState(showGroupTable)">Overview Groups</v-btn>
-        <group-table-vuetify v-if="groupsLoaded && showGroupTable" :groups="groups"></group-table-vuetify>
+        <group-table-vuetify v-if="groupsLoaded && showGroupTable" :groups="groups" :authToken="authToken"></group-table-vuetify>
     </v-flex>
     <v-flex xs12 sm12 md12 lg6 xl6>
         <v-btn  large @click="showLoginTypeChart = toggleState(showLoginTypeChart)">Logintypes</v-btn>
@@ -22,11 +22,11 @@
     </v-layout>
 </v-container>
 
-<!--         <input type="button" v-on:click="createDummyGroup()" value="AddDummyGroup"/>
-        <input type="button" v-on:click="showGroupUserChart = toggleState(showGroupUserChart)" value="Show User and Groups Chart"/>
+       <input type="button" v-on:click="createDummyGroup()" value="AddDummyGroup"/>
+  <!--       <input type="button" v-on:click="showGroupUserChart = toggleState(showGroupUserChart)" value="Show User and Groups Chart"/>
 
         <input type="button" v-on:click="showLoginTypeChart = toggleState(showLoginTypeChart)" value="Show Logintype Chart"/>
-        <input type="button"  v-on:click="logout()" value="Logout"/> -->
+        <input type="button"  v-on:click="logout()" value="Logout"/>  -->
                     
 <!--         <div class="loginTypeChart">
           <div v-if="usersLoaded && showLoginTypeChart">
@@ -110,7 +110,7 @@ export default {
 
   methods: {
     /*     Create a dummy group for testpurpose. After creating, page has to be reloaded to see group*/
-    /* createDummyGroup: function() {
+    createDummyGroup: function() {
       axios
         .post(
           Config.webServiceURL + "/v1/groups",
@@ -129,7 +129,7 @@ export default {
         .catch(function(error) {
           console.log(error);
         });
-    }, */
+    },
 
     authorizeAdmin: function() {
       axios
