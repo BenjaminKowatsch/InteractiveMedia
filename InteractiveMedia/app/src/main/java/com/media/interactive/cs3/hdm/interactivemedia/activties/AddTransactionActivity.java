@@ -166,7 +166,6 @@ public class AddTransactionActivity extends ImagePickerActivity {
         DatabaseProviderHelper helper = new DatabaseProviderHelper(this.getContentResolver());
         TransactionSplittingTask task = new TransactionSplittingTask(helper,
                 new DatabaseHelper(this.getApplicationContext()), new PairBasedSettlement());
-        Log.d(TAG, "Calculating Split now!");
         task.execute(saved);
     }
 
