@@ -11,10 +11,10 @@ const validateJsonService = require('../services/validateJson.service');
 const httpResponseService = require('../services/httpResponse.service');
 
 const jsonSchema = {
-  registerUserPayload: require('../JSONSchema/registerUserPayload.json'),
-  loginUserExternalPayload: require('../JSONSchema/loginUserExternalPayload.json'),
-  loginUserPasswordPayload: require('../JSONSchema/loginUserPasswordPayload.json'),
-  updateUserPayload: require('../JSONSchema/updateUserPayload.json')
+  registerUserPayload: require('../jsonSchema/registerUserPayload.json'),
+  loginUserExternalPayload: require('../jsonSchema/loginUserExternalPayload.json'),
+  loginUserPasswordPayload: require('../jsonSchema/loginUserPasswordPayload.json'),
+  updateUserPayload: require('../jsonSchema/updateUserPayload.json')
 };
 
 exports.registerNewUser = function(req, res) {

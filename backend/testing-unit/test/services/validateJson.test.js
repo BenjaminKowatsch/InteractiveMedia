@@ -9,7 +9,7 @@ const expect = chai.expect;
 const validateJsonService = require('../../../services/validateJson.service');
 
 const jsonSchema = {
-    registerUserPayload: require('../../../JSONSchema/registerUserPayload.json')
+    registerUserPayload: require('../../../jsonSchema/registerUserPayload.json')
   };
 
 const testData = {
