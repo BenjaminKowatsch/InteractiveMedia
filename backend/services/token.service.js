@@ -3,8 +3,8 @@
 const jwt = require('jwt-simple');
 const winston = require('winston');
 
-const config = require('../modules/config');
-const ERROR = require('../config.error');
+const config = require('../config/settings.config');
+const ERROR = require('../config/error.config');
 
 /**
  * Function to calculate a new expiry date for tokens.

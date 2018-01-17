@@ -6,14 +6,14 @@ const https = require('https');
 const querystring = require('querystring');
 const GoogleAuth = require('google-auth-library');
 
-const config = require('./config');
+const config = require('../config/settings.config');
 const uuidService = require('../services/uuid.service');
 const tokenService = require('../services/token.service');
 const emailService = require('../services/email.service');
 const database = require('../modules/database.module');
-const ERROR = require('../config.error');
-const ROLES = require('../config.roles');
-const AUTH_TYPE = require('../config.authType');
+const ERROR = require('../config/error.config');
+const ROLES = require('../config/roles.config');
+const AUTH_TYPE = require('../config/authType.config');
 
 const MONGO_ERRCODE = {
   'DUPLICATEKEY': 11000

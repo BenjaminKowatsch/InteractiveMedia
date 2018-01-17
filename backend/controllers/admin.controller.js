@@ -1,12 +1,12 @@
 'use strict';
 
 const winston = require('winston');
-const config = require('../modules/config');
+const config = require('../config/settings.config');
 const user = require('../modules/user.module');
 const group = require('../modules/group.module');
 const httpResponseService = require('../services/httpResponse.service');
-const ERROR = require('../config.error');
-const ROLES = require('../config.roles');
+const ERROR = require('../config/error.config');
+const ROLES = require('../config/roles.config');
 
 module.exports.getAllGroups = function(req, res) {
   group.getAllGroups().then(groupResult => {

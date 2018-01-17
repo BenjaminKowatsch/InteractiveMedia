@@ -8,8 +8,8 @@ const winston = require('winston');
 const user = require('../modules/user.module');
 const httpResponseService = require('./httpResponse.service');
 
-const ERROR = require('../config.error');
-const AUTH_TYPE = require('../config.authType');
+const ERROR = require('../config/error.config');
+const AUTH_TYPE = require('../config/authType.config');
 
 module.exports.isAuthenticated = function(req, res, next) {
   let authType;

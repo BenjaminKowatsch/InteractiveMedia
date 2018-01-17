@@ -3,9 +3,9 @@
 const winston = require('winston');
 
 const user = require('../modules/user.module');
-const ROLES = require('../config.roles');
-const ERROR = require('../config.error');
-const AUTH_TYPE = require('../config.authType');
+const ROLES = require('../config/roles.config');
+const ERROR = require('../config/error.config');
+const AUTH_TYPE = require('../config/authType.config');
 
 const validateJsonService = require('../services/validateJson.service');
 const httpResponseService = require('../services/httpResponse.service');

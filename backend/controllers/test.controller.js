@@ -4,7 +4,7 @@ const winston = require('winston');
 const httpResponseService = require('../services/httpResponse.service');
 const pushNotificationService = require('../services/pushNotification.service');
 const user = require('../modules/user.module');
-const ERROR = require('../config.error');
+const ERROR = require('../config/error.config');
 
 module.exports.getAuthenticationNotRequired = function(req, res) {
   httpResponseService.send(res, 200, {'success': true, 'payload': {'hello': 'open world'}});

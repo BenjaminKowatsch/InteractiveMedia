@@ -1,11 +1,11 @@
 'use strict';
 
 const winston = require('winston');
-const config = require('../modules/config');
+const config = require('../config/settings.config');
 const httpResponseService = require('../services/httpResponse.service');
 const uuidService = require('../services/uuid.service');
 const objectStore = require('../modules/objectstore.module');
-const ERROR = require('../config.error');
+const ERROR = require('../config/error.config');
 
 function parseRequestUploadFile(req) {
   let responseData = {payload: {}};
