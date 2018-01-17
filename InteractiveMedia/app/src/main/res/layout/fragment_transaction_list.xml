@@ -6,19 +6,62 @@
     android:orientation="vertical"
     tools:context="com.media.interactive.cs3.hdm.interactivemedia.fragments.TransactionFragment">
 
-    <Spinner
-        android:id="@+id/spinner_group_selection"
+    <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:spinnerMode="dropdown"/>
+        android:layout_height="100dp">
+
+        <TextView
+            android:id="@+id/transaction_debt_overview_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentStart="true"
+            android:text="Debt Overview"
+            android:textAppearance="@android:style/TextAppearance.Material.DialogWindowTitle" />
+
+        <ListView
+            android:id="@+id/payment_list"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_below="@+id/transaction_debt_overview_title"
+            android:layout_gravity="center" />
+
+    </RelativeLayout>
 
     <Space
         android:layout_width="match_parent"
         android:layout_height="20dp" />
 
-    <ListView
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:text="Transactions"
+            android:textAppearance="@android:style/TextAppearance.Material.DialogWindowTitle" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_toLeftOf="@+id/spinner_group_selection"
+            android:text="Show for group:"/>
+        <Spinner
+            android:id="@+id/spinner_group_selection"
+            android:layout_width="150dp"
+            android:layout_height="wrap_content"
+            android:spinnerMode="dropdown"
+            android:layout_alignParentRight="true"/>
+
+        <ListView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:id="@+id/android:list"
-        android:layout_gravity="center" />
+        android:layout_gravity="center"
+            android:layout_below="@+id/spinner_group_selection"/>
+
+    </RelativeLayout>
+
+
 </LinearLayout>
