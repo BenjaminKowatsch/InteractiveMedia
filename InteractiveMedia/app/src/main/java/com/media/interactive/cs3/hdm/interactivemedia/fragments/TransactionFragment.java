@@ -99,13 +99,11 @@ public class TransactionFragment extends ListFragment implements LoaderManager.L
         groupAdapter = initializeGroupAdapter();
         groupAdapter.getCursor().moveToFirst();
 
-        initOrRestartLoaderWithGroupId();
-
         initPaymentList();
+        initOrRestartLoaderWithGroupId();
     }
 
     private void initPaymentList() {
-        final ListView paymentList = getActivity().findViewById(R.id.payment_list);
         final Cursor payments = new DatabaseHelper(this.getContext())
                 .getNewestPaymentsWithUserNamesForGroup(getCurrentGroupInternalId());
         final String[] columns = new String[]{PaymentTable.COLUMN_AMOUNT,
@@ -114,7 +112,7 @@ public class TransactionFragment extends ListFragment implements LoaderManager.L
         final int[] to = new int[]{R.id.payment_amount, R.id.payment_from, R.id.payment_to};
         final SimpleCursorAdapter adapter = new SimpleCursorAdapter(this.getContext(), R.layout.payment,
                 payments, columns, to, 0);
-        paymentList.setAdapter(adapter);
+        adapter.setViewResource(R.id.payment_list);
     }
 
     private void initOrRestartLoaderWithGroupId() {

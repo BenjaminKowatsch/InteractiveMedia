@@ -135,15 +135,17 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         final SQLiteDatabase db = this.getReadableDatabase();
         final String fromUserTable = "u1";
         final String toUserTable = "u2";
-        final String dateSelect = "SELECT " + PaymentTable.COLUMN_CREATED_AT + " FROM " +
-                PaymentTable.TABLE_NAME + " WHERE " + PaymentTable.COLUMN_GROUP_ID + " = ?";
-        final String query = "SELECT " + PaymentTable.COLUMN_AMOUNT + ", "
-                + buildAlias(fromUserTable, PAYMENT_USER_JOIN_COLUMN_FROM_USER) + ", "
-                + buildAlias(toUserTable, PAYMENT_USER_JOIN_COLUMN_TO_USER)
-                + " FROM " + PaymentTable.TABLE_NAME
+        final String subQuery = "(SELECT " + "MAX(t." + PaymentTable.COLUMN_CREATED_AT + ") FROM " +
+                PaymentTable.TABLE_NAME + " t WHERE t." + PaymentTable.COLUMN_GROUP_ID + " = ?" + ")";
+        final String query = "SELECT " + PaymentTable.TABLE_NAME + "." + PaymentTable.COLUMN_ID
+                + ", " + PaymentTable.TABLE_NAME + "." + PaymentTable.COLUMN_AMOUNT
+                + ", " + buildAlias(fromUserTable, PAYMENT_USER_JOIN_COLUMN_FROM_USER)
+                + ", " + buildAlias(toUserTable, PAYMENT_USER_JOIN_COLUMN_TO_USER)
+                + " FROM " + PaymentTable.TABLE_NAME + " "
                 + getUserNameLeftJoinString(fromUserTable)
                 + getUserNameLeftJoinString(toUserTable)
-                + " WHERE " + PaymentTable.COLUMN_CREATED_AT + " = MAX(" + dateSelect + ")";
+                + "\nWHERE " + PaymentTable.TABLE_NAME + "." + PaymentTable.COLUMN_CREATED_AT
+                + " = " + subQuery;
         return db.rawQuery(query, new String[]{"" + groupId});
     }
 
@@ -155,8 +157,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     @NonNull
     private String getUserNameLeftJoinString(String fromUserTable) {
-        return "left join " + UserTable.TABLE_NAME + " " + fromUserTable + " on (" + PaymentTable.TABLE_NAME
-                + "." + PaymentTable.COLUMN_FROM_USER + "=" + fromUserTable + "." + UserTable.COLUMN_ID + " ";
+        return "\nleft join " + UserTable.TABLE_NAME + " " + fromUserTable + " ON (" + PaymentTable.TABLE_NAME
+                + "." + PaymentTable.COLUMN_FROM_USER + " = " + fromUserTable + "." + UserTable.COLUMN_ID + ") ";
     }
 
 }
