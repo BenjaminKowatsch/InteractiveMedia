@@ -116,7 +116,7 @@ public class RegisterActivity extends ImagePickerActivity
             }
         });
 
-        initImagePickerActivity(R.id.register_profile_picture, "profile_picture.png");
+        initImagePickerActivity(R.id.register_profile_picture, "profile_picture.png",false);
     }
 
     private boolean isRegisterEnabled() {

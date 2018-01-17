@@ -49,6 +49,7 @@ dependencies {
     implementation 'com.google.firebase:firebase-messaging:11.6.2'
     implementation 'com.google.android.gms:play-services-location:11.6.2'
     implementation 'com.google.android.gms:play-services-places:11.6.2'
+    compile 'com.google.android.gms:play-services-vision:11.6.2'
     implementation 'com.facebook.android:facebook-login:4.29.0'
     implementation 'dev.dworks.libs:volleyplus:0.1.4'
     implementation 'com.github.bumptech.glide:glide:3.7.0'
