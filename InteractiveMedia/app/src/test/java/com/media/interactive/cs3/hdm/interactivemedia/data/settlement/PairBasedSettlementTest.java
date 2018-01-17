@@ -26,8 +26,11 @@ public class PairBasedSettlementTest {
         settlement = new PairBasedSettlement();
         debts = new ArrayList<>();
         testUser1 = new User("User1", "mail1@mail.com", "userId1", "null", true);
+        testUser1.setId(1);
         testUser2 = new User("User2", "mail2@mail.com", "userId2", "null", true);
+        testUser2.setId(2);
         testUser3 = new User("User3", "mail3@mail.com", "userId3", "null", true);
+        testUser3.setId(3);
     }
 
     @Test
@@ -40,7 +43,7 @@ public class PairBasedSettlementTest {
     @Test
     public void settle_singleDebt_returnsOnePayment() {
         final double amount = 50.12;
-        Debt testDebt = new Debt(testUser2, testUser1, amount, null);
+        Debt testDebt = new Debt(testUser2, testUser1, amount, 1);
         debts.add(testDebt);
         final List<Payment> payments = settlement.settle(debts);
         assertEquals(1, payments.size());
@@ -49,20 +52,20 @@ public class PairBasedSettlementTest {
     @Test
     public void settle_singleDebt_returnsOnePaymentWithAmountFromDebtorToCreditor() {
         final double amount = 50.12;
-        Debt testDebt = new Debt(testUser2, testUser1, amount, null);
+        Debt testDebt = new Debt(testUser2, testUser1, amount, 1);
         debts.add(testDebt);
         final Payment payment = settlement.settle(debts).get(0);
         //assert that amount and direction is correct
         assertEquals(amount, payment.getAmount(), DELTA);
-        assertEquals(payment.getFrom().getId(), testDebt.getDebtorId());
-        assertEquals(payment.getTo().getId(), testDebt.getCreditorId());
+        assertEquals(payment.getFromUserId(), testDebt.getDebtorId());
+        assertEquals(payment.getToUserId(), testDebt.getCreditorId());
     }
 
     @Test
     public void settle_multipleDebtsOnePair_returnsOnePayment() {
-        Debt testDebt1 = new Debt(testUser2, testUser1, 10.0, null);
-        Debt testDebt2 = new Debt(testUser2, testUser1, 11.0, null);
-        Debt testDebt3 = new Debt(testUser1, testUser2, 15.0, null);
+        Debt testDebt1 = new Debt(testUser2, testUser1, 10.0, 1);
+        Debt testDebt2 = new Debt(testUser2, testUser1, 11.0, 2);
+        Debt testDebt3 = new Debt(testUser1, testUser2, 15.0, 3);
         debts.add(testDebt1);
         debts.add(testDebt2);
         debts.add(testDebt3);
@@ -73,11 +76,11 @@ public class PairBasedSettlementTest {
     @Test
     public void settle_multipleDebtsOnePair_returnsOnePaymentWithCorrectAmount() {
         final double summedAmount = 50.0;
-        Debt testDebt1 = new Debt(testUser2, testUser1, summedAmount, null);
+        Debt testDebt1 = new Debt(testUser2, testUser1, summedAmount, 1);
         final double negatedAmount = 11.0;
         // amount applied in both direction negates itself
-        Debt testDebt2 = new Debt(testUser2, testUser1, negatedAmount, null);
-        Debt testDebt3 = new Debt(testUser1, testUser2, negatedAmount, null);
+        Debt testDebt2 = new Debt(testUser2, testUser1, negatedAmount, 2);
+        Debt testDebt3 = new Debt(testUser1, testUser2, negatedAmount, 3);
         debts.add(testDebt1);
         debts.add(testDebt2);
         debts.add(testDebt3);
@@ -88,9 +91,9 @@ public class PairBasedSettlementTest {
 
     @Test
     public void settle_oneDebtPerPairMultiplePairs_returnsNumberOfPairAmountOfPayments() {
-        Debt pair1Debt = new Debt(testUser2, testUser1, 50.0, null);
-        Debt pair2Debt = new Debt(testUser3, testUser1, 50.0, null);
-        Debt pair3Debt = new Debt(testUser3, testUser2, 50.0, null);
+        Debt pair1Debt = new Debt(testUser2, testUser1, 50.0, 1);
+        Debt pair2Debt = new Debt(testUser3, testUser1, 50.0, 2);
+        Debt pair3Debt = new Debt(testUser3, testUser2, 50.0, 3);
         debts.add(pair1Debt);
         debts.add(pair2Debt);
         debts.add(pair3Debt);
@@ -101,9 +104,9 @@ public class PairBasedSettlementTest {
     @Test
     public void settle_oneDebtPerPairMultiplePairs_returnsCorrectAmountForEachPair() {
         final double amount = 50.0;
-        Debt pair1Debt = new Debt(testUser2, testUser1, amount, null);
-        Debt pair2Debt = new Debt(testUser3, testUser1, amount, null);
-        Debt pair3Debt = new Debt(testUser3, testUser2, amount, null);
+        Debt pair1Debt = new Debt(testUser2, testUser1, amount, 1);
+        Debt pair2Debt = new Debt(testUser3, testUser1, amount, 2);
+        Debt pair3Debt = new Debt(testUser3, testUser2, amount, 3);
         debts.add(pair1Debt);
         debts.add(pair2Debt);
         debts.add(pair3Debt);

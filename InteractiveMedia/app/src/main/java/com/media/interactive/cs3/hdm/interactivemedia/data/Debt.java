@@ -21,6 +21,13 @@ public class Debt {
         this.transactionId = transactionId;
     }
 
+    public Debt(User creditor, User debtor, double amount, long transactionId) {
+        this.creditorId = creditor.getId();
+        this.debtorId = debtor.getId();
+        this.amount = amount;
+        this.transactionId = transactionId;
+    }
+
     public long getCreditorId() {
         return creditorId;
     }

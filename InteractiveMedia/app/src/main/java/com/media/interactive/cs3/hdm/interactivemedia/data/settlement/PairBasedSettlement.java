@@ -2,7 +2,6 @@ package com.media.interactive.cs3.hdm.interactivemedia.data.settlement;
 
 
 import com.media.interactive.cs3.hdm.interactivemedia.data.Debt;
-import com.media.interactive.cs3.hdm.interactivemedia.data.User;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -37,19 +36,19 @@ class PairBasedSettlement implements Settlement {
 
     private Payment calculatePayment(List<Debt> onePairsDebts) {
         double currentAmount = 0;
-        User initialCreditor = onePairsDebts.get(0).getCreditor();
-        User initialDebtor = onePairsDebts.get(0).getDebtor();
+        final long initialCreditorId = onePairsDebts.get(0).getCreditorId();
+        final long initialDebtorId = onePairsDebts.get(0).getDebtorId();
         for (Debt debt : onePairsDebts) {
-            if (debt.getCreditor().equals(initialCreditor)) {
+            if (debt.getCreditorId() == initialCreditorId) {
                 currentAmount += debt.getAmount();
             } else {
                 currentAmount -= debt.getAmount();
             }
         }
         if (currentAmount > 0) {
-            return new Payment(initialDebtor, initialCreditor, currentAmount);
+            return new Payment(initialDebtorId, initialCreditorId, currentAmount);
         } else if (currentAmount < 0) {
-            return new Payment(initialCreditor, initialDebtor, -currentAmount);
+            return new Payment(initialCreditorId, initialDebtorId, -currentAmount);
         } else {
             return null;
         }
@@ -58,7 +57,7 @@ class PairBasedSettlement implements Settlement {
     private Map<UserPair, List<Debt>> findUniquePairsWithDebts(List<Debt> debts) {
         Map<UserPair, List<Debt>> debtsPerPair = new HashMap<>();
         for (Debt debt : debts) {
-            UserPair fromDebt = new UserPair(debt.getCreditor(), debt.getDebtor());
+            UserPair fromDebt = new UserPair(debt.getCreditorId(), debt.getDebtorId());
             getOrInitialize(debtsPerPair, fromDebt).add(debt);
         }
         return debtsPerPair;
@@ -76,11 +75,11 @@ class PairBasedSettlement implements Settlement {
      * always build the same object for hashCode() and equals() calculation.
      */
     private final static class UserPair {
-        private final User first;
-        private final User second;
+        private final long first;
+        private final long second;
 
-        private UserPair(User a, User b) {
-            if (a.getUserId().compareTo(b.getUserId()) > 0) {
+        private UserPair(long a, long b) {
+            if (a > b) {
                 this.first = a;
                 this.second = b;
             } else {
@@ -96,14 +95,14 @@ class PairBasedSettlement implements Settlement {
 
             UserPair userPair = (UserPair) o;
 
-            if (!first.equals(userPair.first)) return false;
-            return second.equals(userPair.second);
+            if (first != userPair.first) return false;
+            return second == userPair.second;
         }
 
         @Override
         public int hashCode() {
-            int result = first.hashCode();
-            result = 31 * result + second.hashCode();
+            int result = (int) (first ^ (first >>> 32));
+            result = 31 * result + (int) (second ^ (second >>> 32));
             return result;
         }
     }
