@@ -19,7 +19,7 @@ public class EvenSplit implements Split {
         double amountPerUser = transaction.getAmount() / group.getUsers().size();
         List<Debt> out = new ArrayList<>();
         for (User paidFor : splittingParties.getPaidFor()) {
-            out.add(new Debt(splittingParties.getPaidBy(), paidFor, amountPerUser));
+            out.add(new Debt(splittingParties.getPaidBy(), paidFor, amountPerUser, transaction));
         }
         return out;
     }

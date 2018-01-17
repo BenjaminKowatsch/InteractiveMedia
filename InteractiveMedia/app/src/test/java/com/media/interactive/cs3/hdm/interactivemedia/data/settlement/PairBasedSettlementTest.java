@@ -40,7 +40,7 @@ public class PairBasedSettlementTest {
     @Test
     public void settle_singleDebt_returnsOnePayment() {
         final double amount = 50.12;
-        Debt testDebt = new Debt(testUser2, testUser1, amount);
+        Debt testDebt = new Debt(testUser2, testUser1, amount, null);
         debts.add(testDebt);
         final List<Payment> payments = settlement.settle(debts);
         assertEquals(1, payments.size());
@@ -49,20 +49,20 @@ public class PairBasedSettlementTest {
     @Test
     public void settle_singleDebt_returnsOnePaymentWithAmountFromDebtorToCreditor() {
         final double amount = 50.12;
-        Debt testDebt = new Debt(testUser2, testUser1, amount);
+        Debt testDebt = new Debt(testUser2, testUser1, amount, null);
         debts.add(testDebt);
         final Payment payment = settlement.settle(debts).get(0);
         //assert that amount and direction is correct
         assertEquals(amount, payment.getAmount(), DELTA);
-        assertEquals(payment.getFrom(), testDebt.getDebtor());
-        assertEquals(payment.getTo(), testDebt.getCreditor());
+        assertEquals(payment.getFrom().getId(), testDebt.getDebtorId());
+        assertEquals(payment.getTo().getId(), testDebt.getCreditorId());
     }
 
     @Test
     public void settle_multipleDebtsOnePair_returnsOnePayment() {
-        Debt testDebt1 = new Debt(testUser2, testUser1, 10.0);
-        Debt testDebt2 = new Debt(testUser2, testUser1, 11.0);
-        Debt testDebt3 = new Debt(testUser1, testUser2, 15.0);
+        Debt testDebt1 = new Debt(testUser2, testUser1, 10.0, null);
+        Debt testDebt2 = new Debt(testUser2, testUser1, 11.0, null);
+        Debt testDebt3 = new Debt(testUser1, testUser2, 15.0, null);
         debts.add(testDebt1);
         debts.add(testDebt2);
         debts.add(testDebt3);
@@ -73,11 +73,11 @@ public class PairBasedSettlementTest {
     @Test
     public void settle_multipleDebtsOnePair_returnsOnePaymentWithCorrectAmount() {
         final double summedAmount = 50.0;
-        Debt testDebt1 = new Debt(testUser2, testUser1, summedAmount);
+        Debt testDebt1 = new Debt(testUser2, testUser1, summedAmount, null);
         final double negatedAmount = 11.0;
         // amount applied in both direction negates itself
-        Debt testDebt2 = new Debt(testUser2, testUser1, negatedAmount);
-        Debt testDebt3 = new Debt(testUser1, testUser2, negatedAmount);
+        Debt testDebt2 = new Debt(testUser2, testUser1, negatedAmount, null);
+        Debt testDebt3 = new Debt(testUser1, testUser2, negatedAmount, null);
         debts.add(testDebt1);
         debts.add(testDebt2);
         debts.add(testDebt3);
@@ -88,9 +88,9 @@ public class PairBasedSettlementTest {
 
     @Test
     public void settle_oneDebtPerPairMultiplePairs_returnsNumberOfPairAmountOfPayments() {
-        Debt pair1Debt = new Debt(testUser2, testUser1, 50.0);
-        Debt pair2Debt = new Debt(testUser3, testUser1, 50.0);
-        Debt pair3Debt = new Debt(testUser3, testUser2, 50.0);
+        Debt pair1Debt = new Debt(testUser2, testUser1, 50.0, null);
+        Debt pair2Debt = new Debt(testUser3, testUser1, 50.0, null);
+        Debt pair3Debt = new Debt(testUser3, testUser2, 50.0, null);
         debts.add(pair1Debt);
         debts.add(pair2Debt);
         debts.add(pair3Debt);
@@ -101,14 +101,14 @@ public class PairBasedSettlementTest {
     @Test
     public void settle_oneDebtPerPairMultiplePairs_returnsCorrectAmountForEachPair() {
         final double amount = 50.0;
-        Debt pair1Debt = new Debt(testUser2, testUser1, amount);
-        Debt pair2Debt = new Debt(testUser3, testUser1, amount);
-        Debt pair3Debt = new Debt(testUser3, testUser2, amount);
+        Debt pair1Debt = new Debt(testUser2, testUser1, amount, null);
+        Debt pair2Debt = new Debt(testUser3, testUser1, amount, null);
+        Debt pair3Debt = new Debt(testUser3, testUser2, amount, null);
         debts.add(pair1Debt);
         debts.add(pair2Debt);
         debts.add(pair3Debt);
         final List<Payment> payments = settlement.settle(debts);
-        for(Payment payment: payments) {
+        for (Payment payment : payments) {
             assertEquals(amount, payment.getAmount(), DELTA);
         }
     }

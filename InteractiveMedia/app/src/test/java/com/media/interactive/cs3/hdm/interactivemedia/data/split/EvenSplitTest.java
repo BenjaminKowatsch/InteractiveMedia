@@ -54,20 +54,20 @@ public class EvenSplitTest {
     public void split_validInput_returnsDebtsWithPayingUserAsCreditor() {
         final List<Debt> debts = split.split(transaction);
         for (Debt debt : debts) {
-            assertEquals(payingUser, debt.getCreditor());
+            assertEquals(payingUser.getId(), debt.getCreditorId());
         }
     }
 
     @Test
     public void split_validInput_returnsDebtsTargetingEachNotPayingUser() {
         final List<Debt> debts = split.split(transaction);
-        final Set<User> expectedDebtors = new HashSet<>();
-        expectedDebtors.add(testUser1);
-        expectedDebtors.add(testUser2);
-        expectedDebtors.add(testUser3);
-        final Set<User> foundDebtors = new HashSet<>();
+        final Set<Long> expectedDebtors = new HashSet<>();
+        expectedDebtors.add(testUser1.getId());
+        expectedDebtors.add(testUser2.getId());
+        expectedDebtors.add(testUser3.getId());
+        final Set<Long> foundDebtors = new HashSet<>();
         for (Debt debt : debts) {
-            foundDebtors.add(debt.getDebtor());
+            foundDebtors.add(debt.getDebtorId());
         }
         assertEquals(expectedDebtors, foundDebtors);
     }
