@@ -8,7 +8,6 @@ import android.content.CursorLoader;
 import android.content.Intent;
 import android.content.Loader;
 import android.database.Cursor;
-import android.database.DatabaseUtils;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -110,7 +109,6 @@ public class TransactionFragment extends ListFragment implements LoaderManager.L
     private SimpleCursorAdapter initPaymentListAdapter() {
         final Cursor payments = new DatabaseHelper(this.getContext())
                 .getNewestPaymentsWithUserNamesForGroup(getCurrentGroupInternalId());
-        Log.d(TAG, DatabaseUtils.dumpCursorToString(payments));
         final String[] columns = new String[]{PaymentTable.COLUMN_AMOUNT,
                 DatabaseHelper.PAYMENT_USER_JOIN_COLUMN_FROM_USER,
                 DatabaseHelper.PAYMENT_USER_JOIN_COLUMN_TO_USER};
