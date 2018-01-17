@@ -132,7 +132,7 @@ public class AddTransactionActivity extends ImagePickerActivity {
             @Override
             public void onClick(View view) {
                 final Transaction saved = createAndSaveTransaction(view);
-                calcualteSplit(saved);
+                calculateSplit(saved);
             }
         });
         final Button cancel = findViewById(R.id.bn_add_transaction_cancel);
@@ -162,7 +162,7 @@ public class AddTransactionActivity extends ImagePickerActivity {
         initImagePickerActivity(R.id.iv_transaction_image, null);
     }
 
-    private void calcualteSplit(Transaction saved) {
+    private void calculateSplit(Transaction saved) {
         DatabaseProviderHelper helper = new DatabaseProviderHelper(this.getContentResolver());
         TransactionSplittingTask task = new TransactionSplittingTask(helper,
                 new DatabaseHelper(this.getApplicationContext()), new PairBasedSettlement());
