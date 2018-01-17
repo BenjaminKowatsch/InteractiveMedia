@@ -99,15 +99,15 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return out;
     }
 
-    public Group getGroupWithUsers(long groupId) {
+    public Group getGroupWithUsers(String groupId) {
         final SQLiteDatabase db = this.getReadableDatabase();
         final String query = "SELECT *"
                 + " FROM " + GroupTable.TABLE_NAME
-                + " WHERE " + GroupTable.COLUMN_ID + " =  ?";
+                + " WHERE " + GroupTable.COLUMN_GROUP_ID + " =  ?";
         final Cursor groupData = db.rawQuery(query, new String[]{String.valueOf(groupId)});
-        final Cursor userData = getUsersForGroup(groupId);
         if (groupData.moveToFirst()) {
             final Group group = extractGroupFromCurrentPosition(groupData);
+            final Cursor userData = getUsersForGroup(group.getId());
             while (userData.moveToNext()) {
                 group.getUsers().add(extractUserFromCurrentPosition(userData));
             }

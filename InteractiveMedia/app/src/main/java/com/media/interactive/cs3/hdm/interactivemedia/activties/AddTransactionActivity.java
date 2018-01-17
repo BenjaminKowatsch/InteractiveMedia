@@ -160,8 +160,8 @@ public class AddTransactionActivity extends ImagePickerActivity {
     }
 
     private Group loadGroup() {
-        final long groupId = getIntent().getLongExtra(GROUP_TO_ADD_TO, -1);
-        if (groupId < 0) {
+        final String groupId = getIntent().getStringExtra(GROUP_TO_ADD_TO);
+        if (groupId == null) {
             Log.e(this.getClass().getSimpleName(), "Intent is missing id of group");
             return null;
         } else {
