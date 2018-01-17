@@ -7,16 +7,12 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.widget.Toast;
 
-import com.google.firebase.iid.FirebaseInstanceId;
 import com.media.interactive.cs3.hdm.interactivemedia.CallbackListener;
 import com.media.interactive.cs3.hdm.interactivemedia.R;
 import com.media.interactive.cs3.hdm.interactivemedia.contentprovider.DatabaseHelper;
 import com.media.interactive.cs3.hdm.interactivemedia.data.Login;
-import com.media.interactive.cs3.hdm.interactivemedia.notification.DeleteInstanceIDService;
 
 import org.json.JSONObject;
-
-import java.io.IOException;
 
 public class MainActivity extends AppCompatActivity {
 

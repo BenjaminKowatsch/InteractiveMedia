@@ -8,6 +8,7 @@ import android.content.CursorLoader;
 import android.content.Intent;
 import android.content.Loader;
 import android.database.Cursor;
+import android.database.DatabaseUtils;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -48,6 +49,7 @@ public class TransactionFragment extends ListFragment implements LoaderManager.L
     private View transactionListFragment;
     private ContentResolver contentResolver;
     private SimpleCursorAdapter groupAdapter;
+    private SimpleCursorAdapter paymentListAdapter;
     private static final int CURSOR_LOADER_TRANSACTIONS_NAME = 0;
     private static final String TRANSACTION_NAME_FILTER = "transactionName";
 
@@ -99,20 +101,22 @@ public class TransactionFragment extends ListFragment implements LoaderManager.L
         groupAdapter = initializeGroupAdapter();
         groupAdapter.getCursor().moveToFirst();
 
-        initPaymentList();
+        paymentListAdapter = initPaymentListAdapter();
         initOrRestartLoaderWithGroupId();
     }
 
-    private void initPaymentList() {
+    private SimpleCursorAdapter initPaymentListAdapter() {
         final Cursor payments = new DatabaseHelper(this.getContext())
                 .getNewestPaymentsWithUserNamesForGroup(getCurrentGroupInternalId());
+        Log.d(TAG, DatabaseUtils.dumpCursorToString(payments));
         final String[] columns = new String[]{PaymentTable.COLUMN_AMOUNT,
                 DatabaseHelper.PAYMENT_USER_JOIN_COLUMN_FROM_USER,
                 DatabaseHelper.PAYMENT_USER_JOIN_COLUMN_TO_USER};
         final int[] to = new int[]{R.id.payment_amount, R.id.payment_from, R.id.payment_to};
-        final SimpleCursorAdapter adapter = new SimpleCursorAdapter(this.getContext(), R.layout.payment,
-                payments, columns, to, 0);
+        final SimpleCursorAdapter adapter = new SimpleCursorAdapter(this.getContext(),
+                R.layout.payment, payments, columns, to, 0);
         adapter.setViewResource(R.id.payment_list);
+        return adapter;
     }
 
     private void initOrRestartLoaderWithGroupId() {

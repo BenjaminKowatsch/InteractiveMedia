@@ -178,8 +178,8 @@ public class Transaction {
             infoLocation.put("latitude", location.latitude);
             infoLocation.put("longitude", location.longitude);
         } else {
-            infoLocation.put("latitude", null);
-            infoLocation.put("longitude", null);
+            infoLocation.put("latitude", JSONObject.NULL);
+            infoLocation.put("longitude", JSONObject.NULL);
         }
         result.put("infoLocation", infoLocation);
 
