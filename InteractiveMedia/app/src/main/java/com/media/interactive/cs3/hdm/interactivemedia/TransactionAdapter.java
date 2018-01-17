@@ -62,7 +62,7 @@ public class TransactionAdapter extends CursorAdapter {
         Log.d(Transaction.class.getSimpleName(), transaction.toString());
         // Populate fields with extracted properties
         viewHolder.transactionTitle.setText(transaction.getInfoName());
-        viewHolder.transactionCreationDate.setText(Helper.FormatDate(transaction.getDateTime()));
+        viewHolder.transactionCreationDate.setText(Helper.formatDate(transaction.getDateTime()));
         viewHolder.transactionPaidBy.setText("Paid by: "+cursor.getString(cursor.getColumnIndexOrThrow(UserTable.COLUMN_USERNAME)));
         viewHolder.transactionAmount.setText(String.valueOf(transaction.getAmount()));
 

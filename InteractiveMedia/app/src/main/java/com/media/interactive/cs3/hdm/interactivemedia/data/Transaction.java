@@ -45,12 +45,12 @@ public class Transaction {
 
     public ContentValues toContentValues() {
         final ContentValues out = new ContentValues();
-        out.put(TransactionTable.COLUMN_INFO_CREATED_AT, Helper.GetDateTime());
+        out.put(TransactionTable.COLUMN_INFO_CREATED_AT, Helper.getDateTime());
         out.put(TransactionTable.COLUMN_AMOUNT, amount);
         out.put(TransactionTable.COLUMN_INFO_NAME, infoName);
         out.put(TransactionTable.COLUMN_PAID_BY, paidByUserId);
         out.put(TransactionTable.COLUMN_INFO_IMAGE_URL, imageUrl);
-        out.put(TransactionTable.COLUMN_PUBLISHED_AT, Helper.FormatDate(publishedAt));
+        out.put(TransactionTable.COLUMN_PUBLISHED_AT, Helper.formatDate(publishedAt));
         if (location != null) {
             out.put(TransactionTable.COLUMN_INFO_LOCATION_LONG, location.longitude);
             out.put(TransactionTable.COLUMN_INFO_LOCATION_LAT, location.latitude);
@@ -179,7 +179,7 @@ public class Transaction {
         result.put("infoLocation", infoLocation);
 
         result.put("infoImageUrl", imageUrl != null ? imageUrl : JSONObject.NULL);
-        result.put("infoCreatedAt", Helper.FormatDate(dateTime));
+        result.put("infoCreatedAt", Helper.formatDate(dateTime));
         result.put("paidBy", paidByUserId);
         result.put("split", split);
         return result;

@@ -8,12 +8,15 @@ import android.util.Log;
 
 import com.google.android.gms.maps.model.LatLng;
 import com.media.interactive.cs3.hdm.interactivemedia.contentprovider.DatabaseProvider;
+import com.media.interactive.cs3.hdm.interactivemedia.contentprovider.tables.DebtTable;
 import com.media.interactive.cs3.hdm.interactivemedia.contentprovider.tables.GroupTable;
 import com.media.interactive.cs3.hdm.interactivemedia.contentprovider.tables.GroupTransactionTable;
 import com.media.interactive.cs3.hdm.interactivemedia.contentprovider.tables.GroupUserTable;
 import com.media.interactive.cs3.hdm.interactivemedia.contentprovider.tables.LoginTable;
+import com.media.interactive.cs3.hdm.interactivemedia.contentprovider.tables.PaymentTable;
 import com.media.interactive.cs3.hdm.interactivemedia.contentprovider.tables.TransactionTable;
 import com.media.interactive.cs3.hdm.interactivemedia.contentprovider.tables.UserTable;
+import com.media.interactive.cs3.hdm.interactivemedia.data.settlement.Payment;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -22,7 +25,10 @@ import org.json.JSONObject;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+
+import static com.media.interactive.cs3.hdm.interactivemedia.util.Helper.formatDate;
 
 /**
  * Created by benny on 08.01.18.
@@ -57,8 +63,8 @@ public class DatabaseProviderHelper {
             user.setId(Long.parseLong(result.getLastPathSegment()));
         } else {
             final int update = contentResolver.update(DatabaseProvider.CONTENT_USER_URI, userValues, selection, selectionArgs);
-            if(update > 0){
-                Log.d(TAG,"Updated user entry.");
+            if (update > 0) {
+                Log.d(TAG, "Updated user entry.");
             }
             user.setId(foundId);
         }
@@ -75,7 +81,7 @@ public class DatabaseProviderHelper {
         final Uri result = contentResolver.insert(DatabaseProvider.CONTENT_GROUP_URI, groupValues);
 
         group.setId(Long.parseLong(result.getLastPathSegment()));
-        Log.d(TAG,"Inserted group: "+ group.getId());
+        Log.d(TAG, "Inserted group: " + group.getId());
         findInsertUsersAtDatabase(group);
 
         for (User user : group.getUsers()) {
@@ -84,7 +90,7 @@ public class DatabaseProviderHelper {
             groupUserValues.put(GroupUserTable.COLUMN_USER_ID, user.getId());
             contentResolver.insert(DatabaseProvider.CONTENT_GROUP_USER_URI, groupUserValues);
         }
-        contentResolver.notifyChange(DatabaseProvider.CONTENT_GROUP_USER_JOIN_URI,null);
+        contentResolver.notifyChange(DatabaseProvider.CONTENT_GROUP_USER_JOIN_URI, null);
     }
 
     public void findInsertUsersAtDatabase(Group group) {
@@ -113,7 +119,7 @@ public class DatabaseProviderHelper {
     }
 
     public void addTransactions(JSONArray jsonArray, Group group) throws JSONException {
-        for(int i = 0; i < jsonArray.length() ;i++){
+        for (int i = 0; i < jsonArray.length(); i++) {
             final JSONObject transactionObject = (JSONObject) jsonArray.get(i);
             final Transaction transaction = new Transaction();
             transaction.setGroup(group);
@@ -135,7 +141,7 @@ public class DatabaseProviderHelper {
             transaction.setImageUrl(transactionObject.getString("infoImageUrl"));
             transaction.setPaidByUserId(transactionObject.getString("paidBy"));
             transaction.setSplit(transactionObject.getString("split"));
-            Log.d(TAG, "Saving Transaction: "+ transaction.toString());
+            Log.d(TAG, "Saving Transaction: " + transaction.toString());
             saveTransaction(transaction);
         }
     }
@@ -150,38 +156,24 @@ public class DatabaseProviderHelper {
             transactionGroupContent.put(GroupTransactionTable.COLUMN_GROUP_ID, transaction.getGroupId());
             contentResolver.insert(DatabaseProvider.CONTENT_GROUP_TRANSACTION_URI, transactionGroupContent);
         }
-        contentResolver.notifyChange(DatabaseProvider.CONTENT_GROUP_USER_TRANSACTION_JOIN_URI,null);
+        contentResolver.notifyChange(DatabaseProvider.CONTENT_GROUP_USER_TRANSACTION_JOIN_URI, null);
     }
 
-    public long getGroupsByUserId(String userId){
-        final String[] projection = {UserTable.COLUMN_ID};
-        final String selection = UserTable.COLUMN_USER_ID.concat(" = ?");
-        final String[] selectionArgs = {Login.getInstance().getUser().getUserId()};
-        final Cursor userCursor = contentResolver.query(DatabaseProvider.CONTENT_USER_URI,projection,selection,selectionArgs,null);
-        if(1 == userCursor.getCount()){
-            userCursor.moveToNext();
-            return userCursor.getLong(0);
-        }
-        return -1;
-    }
-
-    public String getUserNameById(String userId){
-        final String[] projection = { UserTable.COLUMN_USERNAME};
-        final String selection = UserTable.COLUMN_USER_ID + " = ?";
-        final String[] selectionArgs = {userId};
-        final Cursor query = contentResolver.query(DatabaseProvider.CONTENT_USER_URI, projection, selection, selectionArgs, null);
-        if(query.getCount() == 1 && query.moveToFirst()){
-            return query.getString(query.getColumnIndex(UserTable.COLUMN_USERNAME));
-        }
-        return null;
+    public void saveDebt(Debt debt) {
+        final ContentValues debtContent = new ContentValues();
+        debtContent.put(DebtTable.COLUMN_TRANSACTION_ID, debt.getTransactionId());
+        debtContent.put(DebtTable.COLUMN_AMOUNT, debt.getAmount());
+        debtContent.put(DebtTable.COLUMN_FROM_USER, debt.getDebtorId());
+        debtContent.put(DebtTable.COLUMN_TO_USER, debt.getCreditorId());
+        contentResolver.insert(DatabaseProvider.CONTENT_DEBT_URI, debtContent);
     }
 
     public boolean checkForCachedCredentials(Login login) {
         if (contentResolver != null) {
             boolean result = false;
             final Cursor cursor = contentResolver.query(DatabaseProvider.CONTENT_LOGIN_URI,
-                null, null, null,
-                LoginTable.COLUMN_CREATED_AT + " DESC LIMIT 1");
+                    null, null, null,
+                    LoginTable.COLUMN_CREATED_AT + " DESC LIMIT 1");
             result = cursor.getCount() > 0;
             while (cursor.moveToNext()) {
                 login.setId(cursor.getLong(0));
@@ -196,16 +188,16 @@ public class DatabaseProviderHelper {
         return false;
     }
 
-    public String getLatestTransactionPubDateByGroupId(String groupId){
+    public String getLatestTransactionPubDateByGroupId(String groupId) {
         String result = null;
-        final String[] projection = {TransactionTable.TABLE_NAME+ "." + TransactionTable.COLUMN_PUBLISHED_AT};
-        final String selection = GroupTable.TABLE_NAME+"."+GroupTable.COLUMN_GROUP_ID + " = ?";
+        final String[] projection = {TransactionTable.TABLE_NAME + "." + TransactionTable.COLUMN_PUBLISHED_AT};
+        final String selection = GroupTable.TABLE_NAME + "." + GroupTable.COLUMN_GROUP_ID + " = ?";
         final String[] selectionArgs = {groupId};
         final Cursor cursor = contentResolver.query(DatabaseProvider.CONTENT_GROUP_TRANSACTION_JOIN_URI,
-            projection, selection, selectionArgs,
-            TransactionTable.COLUMN_PUBLISHED_AT + " DESC LIMIT 1");
+                projection, selection, selectionArgs,
+                TransactionTable.COLUMN_PUBLISHED_AT + " DESC LIMIT 1");
         Log.d(TAG, "LatestTransaction Count: " + cursor.getCount());
-        if(cursor.moveToFirst()){
+        if (cursor.moveToFirst()) {
             result = cursor.getString(0);
         }
         return result;
@@ -213,20 +205,20 @@ public class DatabaseProviderHelper {
 
     public List<Group> removeExistingGroupIds(JSONArray groupIds) {
         List<Group> existingGroups = new ArrayList<>();
-        for(int i = groupIds.length()-1; i>=0 ;i--){
+        for (int i = groupIds.length() - 1; i >= 0; i--) {
             final Group group = new Group();
-            final String[] projection = { GroupTable.TABLE_NAME+".*"};
+            final String[] projection = {GroupTable.TABLE_NAME + ".*"};
             final String selection = GroupTable.COLUMN_GROUP_ID + " = ?";
             String groupId = null;
             try {
-                groupId = (String)groupIds.get(i);
+                groupId = (String) groupIds.get(i);
             } catch (JSONException e) {
                 e.printStackTrace();
             }
             final String[] selectionArgs = {groupId};
             final Cursor cursor = contentResolver.query(DatabaseProvider.CONTENT_GROUP_URI, projection, selection, selectionArgs, null);
             group.setId(-1);
-            if(cursor.moveToFirst()) {
+            if (cursor.moveToFirst()) {
                 group.setId(cursor.getLong(cursor.getColumnIndexOrThrow(GroupTable.COLUMN_ID)));
                 group.setGroupId(cursor.getString(cursor.getColumnIndexOrThrow(GroupTable.COLUMN_GROUP_ID)));
                 group.setName(cursor.getString(cursor.getColumnIndexOrThrow(GroupTable.COLUMN_NAME)));
@@ -235,12 +227,21 @@ public class DatabaseProviderHelper {
                 int synced = cursor.getInt(cursor.getColumnIndexOrThrow(GroupTable.COLUMN_SYNCHRONIZED));
                 group.setSync(synced > 0);
             }
-            if(group.getId() != -1){
-                Log.d(TAG, "Removing groupId: "+ group);
+            if (group.getId() != -1) {
+                Log.d(TAG, "Removing groupId: " + group);
                 existingGroups.add(group);
                 groupIds.remove(i);
             }
         }
         return existingGroups;
+    }
+
+    public void savePayment(Payment payment, Date creationTimestmap) {
+        final ContentValues paymentContent = new ContentValues();
+        paymentContent.put(PaymentTable.COLUMN_AMOUNT, payment.getAmount());
+        paymentContent.put(PaymentTable.COLUMN_FROM_USER, payment.getFrom().getId());
+        paymentContent.put(PaymentTable.COLUMN_TO_USER, payment.getTo().getId());
+        paymentContent.put(PaymentTable.COLUMN_CREATED_AT, formatDate(creationTimestmap));
+        contentResolver.insert(DatabaseProvider.CONTENT_PAYMENT_URI, paymentContent);
     }
 }

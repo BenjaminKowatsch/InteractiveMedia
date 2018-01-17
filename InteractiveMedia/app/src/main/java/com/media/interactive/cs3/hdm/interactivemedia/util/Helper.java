@@ -35,12 +35,12 @@ public class Helper {
         return true;
     }
 
-    public static String GetDateTime() {
+    public static String getDateTime() {
         final Date date = new Date(System.currentTimeMillis());
-        return FormatDate(date);
+        return formatDate(date);
     }
 
-    public static String FormatDate(Date date){
+    public static String formatDate(Date date){
         if(date != null){
             return DATE_FORMAT.format(date);
         }

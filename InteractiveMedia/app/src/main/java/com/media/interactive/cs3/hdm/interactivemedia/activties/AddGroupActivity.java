@@ -4,9 +4,7 @@ import android.app.AlertDialog;
 import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.DialogInterface;
-import android.database.Cursor;
 import android.graphics.Color;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
 import android.support.v7.widget.DefaultItemAnimator;
@@ -34,7 +32,6 @@ import com.media.interactive.cs3.hdm.interactivemedia.RestRequestQueue;
 import com.media.interactive.cs3.hdm.interactivemedia.authorizedrequests.AuthorizedJsonObjectRequest;
 import com.media.interactive.cs3.hdm.interactivemedia.contentprovider.DatabaseProvider;
 import com.media.interactive.cs3.hdm.interactivemedia.contentprovider.tables.GroupTable;
-import com.media.interactive.cs3.hdm.interactivemedia.contentprovider.tables.GroupUserTable;
 import com.media.interactive.cs3.hdm.interactivemedia.contentprovider.tables.UserTable;
 import com.media.interactive.cs3.hdm.interactivemedia.data.DatabaseProviderHelper;
 import com.media.interactive.cs3.hdm.interactivemedia.data.Group;
@@ -252,7 +249,7 @@ public class AddGroupActivity extends ImagePickerActivity implements View.OnClic
         // Save into database as unsynchronized group
         toAdd = new Group();
         toAdd.setName(groupName.getText().toString());
-        toAdd.setCreatedAt(Helper.GetDateTime());
+        toAdd.setCreatedAt(Helper.getDateTime());
         toAdd.setSync(false);
         toAdd.setUsers(userList);
 
