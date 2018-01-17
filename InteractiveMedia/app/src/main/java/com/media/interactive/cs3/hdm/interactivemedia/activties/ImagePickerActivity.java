@@ -80,6 +80,9 @@ public class ImagePickerActivity extends AppCompatActivity {
     protected ImageView imageView;
     private boolean readExternalStoragePermissionGranted = false;
     private TextRecognizer detector;
+    private EditText dateTextField = null;
+    private EditText dateTimeTextField = null;
+    private EditText amountTextField = null;
     private Date recognizedDate = null;
     private Double recognizedAmount = null;
     private boolean ocrEnable = false;
@@ -181,12 +184,12 @@ public class ImagePickerActivity extends AppCompatActivity {
         if(ocrEnable) {
             recognizedAmount = null;
             recognizedDate = null;
+            final SimpleDateFormat sdfDate = new SimpleDateFormat("dd.MM.yyyy");
+            final SimpleDateFormat sdfTime = new SimpleDateFormat("hh:mm");
             if (detector.isOperational() && bitmap != null) {
                 final Frame frame = new Frame.Builder().setBitmap(bitmap).build();
                 final SparseArray<TextBlock> textBlocks = detector.detect(frame);
 
-                final SimpleDateFormat sdfDate = new SimpleDateFormat("dd.MM.yyyy");
-                final SimpleDateFormat sdfTime = new SimpleDateFormat("hh:mm");
                 final List<Double> parsedNumbers = new ArrayList<>();
                 Date date = null;
                 Date time = null;
@@ -261,6 +264,17 @@ public class ImagePickerActivity extends AppCompatActivity {
             }
             Log.d(TAG, "Possible price: " + recognizedAmount);
             Log.d(TAG, "Possible date: " + recognizedDate);
+            if(recognizedAmount == null && recognizedDate == null){
+                makeToast("Could not recognize any price or date.\nPlease try again.");
+            }
+            if(recognizedDate != null && dateTextField != null && dateTimeTextField != null) {
+                dateTextField.setText(sdfDate.format(recognizedDate));
+                dateTimeTextField.setText(sdfTime.format(recognizedDate));
+            }
+            if(recognizedAmount != null && amountTextField != null){
+                amountTextField.setText(String.valueOf(recognizedAmount));
+            }
+
         }
     }
 
@@ -522,5 +536,17 @@ public class ImagePickerActivity extends AppCompatActivity {
 
     public void setImageFilename(String imageFilename) {
         this.imageFilename = imageFilename;
+    }
+
+    protected void setDateTextField(EditText dateTextField) {
+        this.dateTextField = dateTextField;
+    }
+
+    protected void setAmountTextField(EditText amountTextField) {
+        this.amountTextField = amountTextField;
+    }
+
+    protected void setDateTimeTextField(EditText dateTimeTextField) {
+        this.dateTimeTextField = dateTimeTextField;
     }
 }
