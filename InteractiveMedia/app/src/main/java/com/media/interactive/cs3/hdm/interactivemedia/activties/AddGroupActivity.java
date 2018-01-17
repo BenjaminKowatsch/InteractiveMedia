@@ -154,7 +154,7 @@ public class AddGroupActivity extends ImagePickerActivity implements View.OnClic
             }
         });
 
-        initImagePickerActivity(R.id.et_group_image, null);
+        initImagePickerActivity(R.id.et_group_image, null,false);
 
         // Get email of current user
         final User admin = new User();

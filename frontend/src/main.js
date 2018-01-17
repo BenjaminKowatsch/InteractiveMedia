@@ -24,7 +24,10 @@ import App from './app'
 
 import login from './pages/login.vue'
 import overview from './pages/overview.vue'
+import adminProfile from './pages/adminProfile.vue'
+import about from './pages/about.vue'
 import notFound from './pages/notFound.vue'
+import noPermission from './pages/noPermission.vue'
 
 // Import Cookie JS
 import Cookie from './js/Cookie.js'
@@ -74,11 +77,10 @@ var onLoadingFinished = function() {
         transitionOnLoad: true,
         routes: [
             { path: "/", name: "login", component: login },
-            {
-                path: '/overview',
-                name: "overview",
-                component: overview
-            },
+            { path: '/overview', name: "overview", component: overview },
+            { path: "/admin", name: "admin", component: adminProfile },
+            { path: "/about", name: "about", component: about },
+            { path: "/noPermission", name: "noPermission", component: noPermission },
             { path: '*', component: notFound },
             { path: '/*/', component: notFound },
 

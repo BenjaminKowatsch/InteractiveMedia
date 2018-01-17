@@ -1,51 +1,44 @@
-<!-- TEMPLATE for emotion overview with moodslider
-  * Name:        Overview VUE
-  * Author:      Daniel Bruckner, Isabeau Schmidt-Nunez
-  * Comments:    Isabeau Schmidt-Nunez
-  * Description: View to slide the level of one's actual emotion in the process of entering one's daily emotion
+<!-- TEMPLATE for dashboard overview
+  * Description: Displays all content for monitoring. Fetch all data from backend and pass to other componens
  -->
 
 <template>
+<div>
+  <v-container fluid grid-list-md text-xs-center>
+    <v-layout row wrap>
+    <v-flex xs12 sm12 md12 lg6 xl6>
+        <v-btn large @click="showUserTable = toggleState(showUserTable)">Overview Users</v-btn>
+        <user-table-vuetify v-if="usersLoaded && showUserTable" :users="users"></user-table-vuetify>
+    </v-flex>
+    <v-flex xs12 sm12 md12 lg6 xl6>
+        <v-btn  large @click="showGroupTable = toggleState(showGroupTable)">Overview Groups</v-btn>
+        <group-table-vuetify v-if="groupsLoaded && showGroupTable" :groups="groups"></group-table-vuetify>
+    </v-flex>
+    <v-flex xs12 sm12 md12 lg6 xl6>
+        <v-btn  large @click="showLoginTypeChart = toggleState(showLoginTypeChart)">Logintypes</v-btn>
+        <p></p>
+        <login-type-chart v-if="usersLoaded && showLoginTypeChart" :passwordUsers="passwordUsers" :facebookUsers="facebookUsers" :googleUsers="googleUsers"></login-type-chart>
+    </v-flex>
+    </v-layout>
+</v-container>
 
-  <v-container>
+<!--         <input type="button" v-on:click="createDummyGroup()" value="AddDummyGroup"/>
+        <input type="button" v-on:click="showGroupUserChart = toggleState(showGroupUserChart)" value="Show User and Groups Chart"/>
 
-  <v-container fluid fill-height >
-                  <input type="button" v-on:click="createDummyGroup()" value="AddDummyGroup"/>
-              <input type="button" v-on:click="showGroupUserChart = toggleState(showGroupUserChart)" value="Show User and Groups Chart"/>
-
-              <input type="button" v-on:click="showLoginTypeChart = toggleState(showLoginTypeChart)" value="Show Logintype Chart"/>
-              <input type="button"  v-on:click="logout()" value="Logout"/>
-    
-    <v-layout justify-center align-center> 
-
-    <br>
-    <br>
-      <div>
-        <user-table v-if="usersLoaded" :users="users"></user-table>
-        <group-table v-if="groupsLoaded" :groups="groups"></group-table>
-      </div>
-
-      <br> 
-      
-      <div>
-        <div class="groupUserChart">
-          <div v-if="showGroupUserChart && groupsLoaded && usersLoaded">
-            <group-user-chart :groupCount="groupCount" :userCount="userCount"></group-user-chart>
-          </div>
-        </div>                    
-        <div class="loginTypeChart">
+        <input type="button" v-on:click="showLoginTypeChart = toggleState(showLoginTypeChart)" value="Show Logintype Chart"/>
+        <input type="button"  v-on:click="logout()" value="Logout"/> -->
+                    
+<!--         <div class="loginTypeChart">
           <div v-if="usersLoaded && showLoginTypeChart">
             <login-type-chart :passwordUsers="passwordUsers" :facebookUsers="facebookUsers" :googleUsers="googleUsers"></login-type-chart>
           </div> 
-        </div>              
+        </div>     -->          
 <!--       <div class="version" v-if="version">
         <p>Debts² admin panel version informations: 
           {{version.name}}  {{version.version}}
         </p>
       </div> -->
- 
-    </container>
-  </v-container>
+ </div>
 </template>
 
 <script>
@@ -53,19 +46,19 @@ import Mixins from "../mixins.js";
 import axios from "axios";
 import Cookie from "../js/Cookie.js";
 import Config from "../js/Config.js";
-import GroupUserChart from "@/components/GroupUserChart.js";
 import LoginTypeChart from "@/components/LoginTypeChart.js";
-import UserTable from "@/components/UserTable.vue";
-import GroupTable from "@/components/GroupTable.vue";
+import UserTableVuetify from "@/components/UserTableVuetify.vue";
+import GroupTableVuetify from "@/components/GroupTableVuetify.vue";
+
+
 
 export default {
   name: "overview",
   mixins: [Mixins],
   components: {
-    GroupUserChart,
     LoginTypeChart,
-    UserTable,
-    GroupTable
+    UserTableVuetify,
+    GroupTableVuetify
   },
   
   data() {
@@ -83,10 +76,11 @@ export default {
       passwordUsers: "",
       facebookUsers: "",
       googleUsers: "",
-      showGroupUserChart: false,
-      showLoginTypeChart: false,
+      showLoginTypeChart: true,
+      showUserTable: true,
+      showGroupTable: true,
       groupsLoaded: false,
-      usersLoaded: false,
+      usersLoaded: false
     };
   },
 
@@ -116,7 +110,7 @@ export default {
 
   methods: {
     /*     Create a dummy group for testpurpose. After creating, page has to be reloaded to see group*/
-    createDummyGroup: function() {
+    /* createDummyGroup: function() {
       axios
         .post(
           Config.webServiceURL + "/v1/groups",
@@ -135,7 +129,7 @@ export default {
         .catch(function(error) {
           console.log(error);
         });
-    },
+    }, */
 
     authorizeAdmin: function() {
       axios
@@ -280,7 +274,7 @@ export default {
     },
 
     //Logout the current user
-    logout: function() {
+  /*   logout: function() {
       let accessToken = this.authToken;
 
       //Check for existing accessToken
@@ -302,7 +296,7 @@ export default {
             console.log(JSON.stringify(e));
           });
       });
-    }
+    } */
   }
 };
 </script>

@@ -73,7 +73,7 @@
 
 /**
  * @apiDefine successBodySuccess
-    @apiSuccess (Success) {boolean} success Request successful
+    @apiSuccess (Success) {string} success Request successful
  */
 /**
  * @apiDefine successBodyAuthtype

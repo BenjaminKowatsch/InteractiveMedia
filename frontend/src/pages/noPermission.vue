@@ -1,13 +1,13 @@
-<!-- TEMPLATE for not found error page
-  * Description: Displays a 404 error if a not available route is adressed
+<!-- TEMPLATE for no permission error page
+  * Description: Displays a 401 error "permission denied" if an unauthorised user try to access a login protected ressource
  -->
 <template>
     <v-container fluid fill-height>
     <v-layout  justify-center align-center> 
             <span class="text-md-center">
-            <h1>404 Error</h1>
+            <h1>401 Error</h1>
 
-            <p>The resource could not be found.</p>
+            <p>Permission denied.</p>
             
             <v-btn :to="{path:'/overview'}">Back</v-btn>
 
@@ -15,5 +15,3 @@
             </v-layout>
             </v-container>
 </template>
-
-

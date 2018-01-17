@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Context;
+import android.content.Intent;
 import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.util.Log;
@@ -28,6 +29,7 @@ import com.media.interactive.cs3.hdm.interactivemedia.RestRequestQueue;
 import com.media.interactive.cs3.hdm.interactivemedia.authorizedrequests.AuthorizedJsonObjectRequest;
 import com.media.interactive.cs3.hdm.interactivemedia.contentprovider.DatabaseProvider;
 import com.media.interactive.cs3.hdm.interactivemedia.contentprovider.tables.LoginTable;
+import com.media.interactive.cs3.hdm.interactivemedia.notification.DeleteInstanceIDService;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -51,7 +53,6 @@ public class Login {
     private UserType userType = null;
     private String accessToken = null;
     private List<CallbackListener<JSONObject, Exception>> onUserDataSetList = null;
-
     private DatabaseProviderHelper helper;
     private ContentResolver contentResolver = null;
 
@@ -71,6 +72,80 @@ public class Login {
         userType = null;
         accessToken = null;
         onUserDataSetList = new ArrayList<>();
+    }
+
+    public void updateFcmToken(final Context context) {
+        final String url = context.getResources().getString(R.string.web_service_url).concat("/v1/users/user/fcmtoken");
+        final JSONObject data = new JSONObject();
+        try {
+            data.put("fcmToken", user.getFcmToken());
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        final AuthorizedJsonObjectRequest jsonObjectRequest = new AuthorizedJsonObjectRequest(
+            Request.Method.PUT, url, data, new Response.Listener<JSONObject>() {
+            @Override
+            public void onResponse(final JSONObject response) {
+                try {
+                    final boolean success = response.getBoolean("success");
+                    if (success) {
+                        Log.d(TAG, "Updated fcmToken");
+                        sendDummyPushNotification(context);
+                    }
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                Log.e(TAG, "Error while setting user data.");
+            }
+        });
+        jsonObjectRequest.setShouldCache(false);
+        RestRequestQueue.getInstance(context).addToRequestQueue(jsonObjectRequest);
+    }
+
+    private void sendDummyPushNotification(final Context context) {
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    Thread.sleep(5000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+
+                final String url = context.getResources().getString(R.string.web_service_url).concat("/v1/test/notification/user");
+                final JSONObject data = new JSONObject();
+                try {
+                    data.put("dryRun", false);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+                final AuthorizedJsonObjectRequest jsonObjectRequest = new AuthorizedJsonObjectRequest(
+                    Request.Method.POST, url, data, new Response.Listener<JSONObject>() {
+                    @Override
+                    public void onResponse(final JSONObject response) {
+                        try {
+                            final boolean success = response.getBoolean("success");
+                            if (success) {
+                                Log.d(TAG, "Successfully send a push notification");
+                            }
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }, new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        Log.e(TAG, "Error while setting user data.");
+                    }
+                });
+                jsonObjectRequest.setShouldCache(false);
+                RestRequestQueue.getInstance(context).addToRequestQueue(jsonObjectRequest);
+            }
+        }).start();
     }
 
     public String getHashedPassword() {
@@ -101,7 +176,7 @@ public class Login {
         this.userType = userType;
     }
 
-    public void initUserData(final Context context) {
+    public void initUserData(final Context context, final JSONObject loginResponse, final CallbackListener<JSONObject, Exception> callbackListener) {
         final String url = context.getResources().getString(R.string.web_service_url).concat("/v1/users/user");
         Log.d(TAG, "Get: " + url);
         final AuthorizedJsonObjectRequest jsonObjectRequest = new AuthorizedJsonObjectRequest(
@@ -120,6 +195,14 @@ public class Login {
                         } catch (JSONException e) {
                             Log.d(TAG, "Username is not set.");
                         }
+                        if(payload.has("fcmToken")){
+
+                        } else {
+                            // Delete current local FcmToken
+                            final Intent deleteTokenIntent = new Intent(context, DeleteInstanceIDService.class);
+                            context.startService(deleteTokenIntent);
+                        }
+
                         user.setUserId(payload.getString("userId"));
                         JSONArray groupIds = null;
                         try {
@@ -128,11 +211,11 @@ public class Login {
                             Log.d(TAG, "No imageUrl exists for this user");
                         }
                         try {
-                            user.setImageUrl(payload.getString("imageUrl"));
                             groupIds = payload.getJSONArray("groupIds");
                         } catch (JSONException e) {
                             Log.d(TAG, "No groups exist for this user");
                         }
+                        callbackListener.onSuccess(loginResponse);
                         if (groupIds != null && groupIds.length() > 0) {
                             Log.d(TAG, "Before Removal: " + groupIds.length() + " " + groupIds.toString());
                             List<Group> existingGroups = helper.removeExistingGroupIds(groupIds);
@@ -281,7 +364,7 @@ public class Login {
         }
     }
 
-    public boolean loginResponseHandler(Context context, JSONObject response) {
+    public boolean loginResponseHandler(Context context, JSONObject response, CallbackListener<JSONObject, Exception> callbackListener) {
         boolean result = false;
         Log.d("User: ", "loginResponseHandler: Thread Id: "
             + android.os.Process.getThreadPriority(android.os.Process.myTid()));
@@ -305,7 +388,7 @@ public class Login {
             e.printStackTrace();
             result = false;
         }
-        initUserData(context);
+        initUserData(context, response, callbackListener);
         return result;
     }
 
@@ -382,8 +465,7 @@ public class Login {
             Request.Method.POST, url, data, new Response.Listener<JSONObject>() {
             @Override
             public void onResponse(JSONObject response) {
-                loginResponseHandler(context, response);
-                callbackListener.onSuccess(response);
+                loginResponseHandler(context, response, callbackListener);
             }
         }, new Response.ErrorListener() {
             @Override
@@ -473,8 +555,7 @@ public class Login {
             Request.Method.POST, url, data, new Response.Listener<JSONObject>() {
             @Override
             public void onResponse(JSONObject response) {
-                loginResponseHandler(context, response);
-                callbackListener.onSuccess(response);
+                loginResponseHandler(context, response, callbackListener);
             }
         }, new Response.ErrorListener() {
             @Override
@@ -513,9 +594,7 @@ public class Login {
             Request.Method.POST, url, data, new Response.Listener<JSONObject>() {
             @Override
             public void onResponse(JSONObject response) {
-                loginResponseHandler(context, response);
-                initUserData(context);
-                callbackListener.onSuccess(response);
+                loginResponseHandler(context, response, callbackListener);
             }
         }, new Response.ErrorListener() {
             @Override
@@ -546,9 +625,7 @@ public class Login {
             Request.Method.POST, url, data, new Response.Listener<JSONObject>() {
             @Override
             public void onResponse(JSONObject response) {
-                loginResponseHandler(context, response);
-                initUserData(context);
-                callbackListener.onSuccess(response);
+                loginResponseHandler(context, response, callbackListener);
             }
         }, new Response.ErrorListener() {
             @Override
@@ -648,4 +725,5 @@ public class Login {
     public void removeOnUserDataSetListener(CallbackListener<JSONObject, Exception> onUserDataSet) {
         this.onUserDataSetList.remove(onUserDataSet);
     }
+
 }

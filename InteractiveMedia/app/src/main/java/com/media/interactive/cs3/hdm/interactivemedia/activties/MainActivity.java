@@ -7,12 +7,16 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.google.firebase.iid.FirebaseInstanceId;
 import com.media.interactive.cs3.hdm.interactivemedia.CallbackListener;
 import com.media.interactive.cs3.hdm.interactivemedia.R;
 import com.media.interactive.cs3.hdm.interactivemedia.contentprovider.DatabaseHelper;
 import com.media.interactive.cs3.hdm.interactivemedia.data.Login;
+import com.media.interactive.cs3.hdm.interactivemedia.notification.DeleteInstanceIDService;
 
 import org.json.JSONObject;
+
+import java.io.IOException;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -21,7 +25,7 @@ public class MainActivity extends AppCompatActivity {
     private String hasRun;
     private SharedPreferences sharedPreferences;
     private DatabaseHelper databaseHelper;
-
+    private Boolean transactionReload = null;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -34,6 +38,8 @@ public class MainActivity extends AppCompatActivity {
         appTag = getResources().getString(R.string.app_tag);
         hasRun = getResources().getString(R.string.has_run);
         sharedPreferences = getSharedPreferences(appTag, MODE_PRIVATE);
+
+        transactionReload = getIntent().getExtras().getBoolean("transactionReload");
 
         Log.e(TAG, "Exceptionally Thread Id: " + android.os.Process.getThreadPriority(android.os.Process.myTid()));
     }
@@ -48,6 +54,10 @@ public class MainActivity extends AppCompatActivity {
                     // This is not the first run
                     Log.d(TAG, "Launching Home Activity");
                     final Intent intent = new Intent(MainActivity.this, HomeActivity.class);
+                    if(transactionReload != null && transactionReload){
+                        Log.d(TAG, "transactionReload set");
+                        intent.putExtra("transactionReload",true);
+                    }
                     intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
                     startActivity(intent);
                 } else {

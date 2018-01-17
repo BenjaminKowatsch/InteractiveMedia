@@ -159,7 +159,10 @@ public class AddTransactionActivity extends ImagePickerActivity {
         userAdapter = initializeUserAdapter();
         userSelection.setAdapter(userAdapter);
 
-        initImagePickerActivity(R.id.iv_transaction_image, null);
+        initImagePickerActivity(R.id.iv_transaction_image, null,true);
+        setDateTextField(dateEditText);
+        setDateTimeTextField(timeEditText);
+        setAmountTextField(amountEditText);
     }
 
     private void calculateSplit(Transaction saved) {

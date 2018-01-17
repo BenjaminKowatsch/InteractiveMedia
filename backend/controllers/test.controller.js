@@ -30,12 +30,12 @@ module.exports.sendPushNotificationToUser = function(req, res) {
     const fcmTokens = result.payload;
     winston.debug('fcmTokens', fcmTokens);
 
-    const data = {hello: 'world'};
-    const notification = {
+    const data = {
       title: 'Hello world',
       icon: 'ic_launcher',
       body: 'This is a brand new notification, sent at ' + new Date()
     };
+    const notification = {};
     return pushNotificationService.sendfcm(fcmTokens, data, notification, dryRun);
   })
   .then(fcmResult => {
