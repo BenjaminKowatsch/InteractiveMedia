@@ -10,10 +10,16 @@ import com.media.interactive.cs3.hdm.interactivemedia.contentprovider.tables.Gro
 import com.media.interactive.cs3.hdm.interactivemedia.contentprovider.tables.GroupTransactionTable;
 import com.media.interactive.cs3.hdm.interactivemedia.contentprovider.tables.GroupUserTable;
 import com.media.interactive.cs3.hdm.interactivemedia.contentprovider.tables.LoginTable;
+import com.media.interactive.cs3.hdm.interactivemedia.contentprovider.tables.PaymentTable;
 import com.media.interactive.cs3.hdm.interactivemedia.contentprovider.tables.TransactionTable;
 import com.media.interactive.cs3.hdm.interactivemedia.contentprovider.tables.UserTable;
+import com.media.interactive.cs3.hdm.interactivemedia.data.Debt;
 import com.media.interactive.cs3.hdm.interactivemedia.data.Group;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import static com.media.interactive.cs3.hdm.interactivemedia.contentprovider.tables.DebtTable.extractDebtFromCurrentPosition;
 import static com.media.interactive.cs3.hdm.interactivemedia.contentprovider.tables.GroupTable.extractGroupFromCurrentPosition;
 import static com.media.interactive.cs3.hdm.interactivemedia.contentprovider.tables.UserTable.extractUserFromCurrentPosition;
 
@@ -43,6 +49,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public void onCreate(SQLiteDatabase db) {
         db.execSQL(LoginTable.DATABASE_DROP);
         db.execSQL(GroupTable.DATABASE_DROP);
+        db.execSQL(PaymentTable.DATABASE_DROP);
         db.execSQL(UserTable.DATABASE_DROP);
         db.execSQL(TransactionTable.DATABASE_DROP);
         db.execSQL(DebtTable.DATABASE_DROP);
@@ -58,6 +65,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         UserTable.onCreate(db);
         TransactionTable.onCreate(db);
         DebtTable.onCreate(db);
+        PaymentTable.onCreate(db);
         GroupTransactionTable.onCreate(db);
         GroupUserTable.onCreate(db);
     }
@@ -79,8 +87,20 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         db.delete("login", null, null);
     }
 
+    public List<Debt> getAllDebts() {
+        final SQLiteDatabase db = this.getReadableDatabase();
+        final String query = "SELECT * FROM " + DebtTable.TABLE_NAME;
+        final Cursor debtData = db.rawQuery(query, new String[]{});
+        List<Debt> out = new ArrayList<>();
+        while (debtData.moveToNext()) {
+            out.add(extractDebtFromCurrentPosition(debtData));
+        }
+        debtData.close();
+        return out;
+    }
+
     public Group getGroupWithUsers(long groupId) {
-        final SQLiteDatabase db = this.getWritableDatabase();
+        final SQLiteDatabase db = this.getReadableDatabase();
         final String query = "SELECT *"
                 + " FROM " + GroupTable.TABLE_NAME
                 + " WHERE " + GroupTable.COLUMN_ID + " =  ?";
@@ -98,7 +118,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     }
 
     public Cursor getUsersForGroup(long groupId) {
-        final SQLiteDatabase db = this.getWritableDatabase();
+        final SQLiteDatabase db = this.getReadableDatabase();
         final String subQuery = "SELECT " + GroupUserTable.COLUMN_USER_ID + " FROM "
                 + GroupUserTable.TABLE_NAME
                 + " WHERE " + GroupUserTable.COLUMN_GROUP_ID + " = ?";
@@ -106,7 +126,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 + " WHERE " + UserTable.COLUMN_ID + " IN (" + subQuery + " )";
         final Cursor cursor = db.rawQuery(query, new String[]{"" + groupId});
         return cursor;
-
     }
 
 }
