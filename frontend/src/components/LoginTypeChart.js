@@ -27,7 +27,6 @@ export default Pie.extend({
 
         //ToDo: Integrate Options
         //Resolve promise to render chart with desired counts
-        console.log("Usercount in LoginTypeChart " + this.userCount)
 
         this.renderChart({
             labels: ['Password', 'Facebook', 'Google'],

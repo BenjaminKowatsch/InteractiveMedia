@@ -19,6 +19,11 @@
         <p></p>
         <login-type-chart v-if="usersLoaded && showLoginTypeChart" :passwordUsers="passwordUsers" :facebookUsers="facebookUsers" :googleUsers="googleUsers"></login-type-chart>
     </v-flex>
+    <v-flex xs12 sm12 md12 lg6 xl6>
+        <v-btn  large @click="showTransactionAmountChart = toggleState(showTransactionAmountChart)">TOP 3 Groups</v-btn>
+        <p></p>
+        <transaction-amout-chart v-if="amountsCalculated && showTransactionAmountChart" :transactionGroups="transactionGroups"></transaction-amout-chart>
+    </v-flex>
     </v-layout>
 </v-container>
 
@@ -47,6 +52,7 @@ import axios from "axios";
 import Cookie from "../js/Cookie.js";
 import Config from "../js/Config.js";
 import LoginTypeChart from "@/components/LoginTypeChart.js";
+import TransactionAmoutChart from "@/components/TransactionAmountChart.js";
 import UserTableVuetify from "@/components/UserTableVuetify.vue";
 import GroupTableVuetify from "@/components/GroupTableVuetify.vue";
 
@@ -58,7 +64,8 @@ export default {
   components: {
     LoginTypeChart,
     UserTableVuetify,
-    GroupTableVuetify
+    GroupTableVuetify,
+    TransactionAmoutChart
   },
   
   data() {
@@ -76,11 +83,15 @@ export default {
       passwordUsers: "",
       facebookUsers: "",
       googleUsers: "",
+      transactionGroups: "",
+      transactionsGroupsCount: 0,      
       showLoginTypeChart: true,
+      showTransactionAmountChart: true,
       showUserTable: true,
       showGroupTable: true,
       groupsLoaded: false,
-      usersLoaded: false
+      usersLoaded: false,
+      amountsCalculated: false
     };
   },
 
@@ -153,9 +164,13 @@ export default {
         .then(response => {
           this.groups = response.data.payload;
           this.groupCount = this.groups.length;
-          // this.groupCountLoaded = true;
           console.log("Anzahl Gruppen: " + this.groupCount);
+          this.transactionGroups = this.groups.filter(this.filter_transactionGroups)  
+          console.log("Anzahl Gruppen mit Transaktionen: " + this.transactionGroups.length)
           this.groupsLoaded = true;
+          console.log(JSON.stringify(this.transactionGroups))
+          this.prepareTransactionAmouts()
+
           // console.log("Existing Groups: " + JSON.stringify(this.groups));
         })
         .catch(e => {
@@ -164,6 +179,75 @@ export default {
         });
     },
 
+    prepareTransactionAmouts: function(){
+  
+      for(var i = 0; i < this.transactionGroups.length; i++){
+
+      var groupId = this.transactionGroups[i].groupId;
+
+      Promise.all([this.calculateTransactionAmouts(groupId)]).then(promiseData => {
+        this.transactionGroups = promiseData[0];
+        this.transactionsGroupsCount ++ 
+        this.transactionGroups.sort(this.GetSortOrder("totalAmount"))
+
+        console.log("In caluculate after sort: ")
+        console.log(JSON.stringify(this.transactionGroups))
+        console.log(this.transactionsGroupsCount)
+        console.log("Transaktionsgruppen: ")
+        console.log(this.transactionGroups.length)
+        if(this.transactionsGroupsCount == this.transactionGroups.length){
+          console.log("Groupcount after for iterate")
+          console.log(this.transactionsGroupsCount)
+          this.amountsCalculated = true
+          console.log(this.amountsCalculated)
+        }   
+
+        })
+       
+    }
+    
+},
+
+    calculateTransactionAmouts: function(groupId){
+    return new Promise((resolve, reject) => {
+      var transactions = []
+      var amount = null
+          axios
+            .get(Config.webServiceURL + "/v1/admin/groups/" + groupId, {
+              headers: { Authorization: "0 " + this.authToken }
+            })
+            .then(response => {
+                        console.log("Desired Group: " + JSON.stringify(response.data.payload));
+                transactions = response.data.payload.transactions;
+                for(let j = 0; j < transactions.length; j++){
+                  amount += transactions[j].amount
+                  this.transactionGroups[this.transactionsGroupsCount].totalAmount = amount
+                  console.log("Calculating totalAmout..." + this.transactionGroups[this.transactionsGroupsCount].totalAmount)
+                  resolve(this.transactionGroups)
+                }
+              
+                //this.transactionGroups[i].totalAmout = amount  
+
+              // console.log("Existing Groups: " + JSON.stringify(this.groups));
+            })
+            .catch(e => {
+              console.log("Errors get groupids: " + e);
+              reject(e)
+            });     
+          })
+
+},
+
+ GetSortOrder: function(prop) {  
+    return function(a, b) {  
+        if (a[prop] < b[prop]) {  
+            return 1;  
+        } else if (a[prop] < b[prop]) {  
+            return -1;  
+        }  
+        return 0;  
+    }  
+},  
     getGroupById: function(id) {
       axios
         .get(Config.webServiceURL + "/v1/admin/groups/" + id, {
@@ -246,6 +330,10 @@ export default {
         }
       }
       return count;
+    },
+    //filters groups for transactions
+    filter_transactionGroups: function(groups) {
+      return groups.countTransactions > 0;
     },
 
     //filters users object for loginType = Password
