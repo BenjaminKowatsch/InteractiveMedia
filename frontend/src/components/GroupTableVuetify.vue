@@ -68,8 +68,8 @@ import Config from "../js/Config.js";
 
     mounted: function(){
       this.amounts = []
-      this.getTransactions()
-     // this.createTransaction()
+     // this.getTransactions()
+      //this.createTransaction()
       
 
         
@@ -79,10 +79,10 @@ import Config from "../js/Config.js";
 
       createTransaction: function(){
 
-        let groupId = "255eeb12-0260-4654-9aae-e94905361d78"
+        let groupId = "2a231e04-c44e-47b8-9076-46ee31d83a1c"
         var transaction = {
-          "amount": 1125.00,
-          "infoName": "A very expensive TV",
+          "amount": 400,
+          "infoName": "A very expensive Bath",
           "infoLocation": {
             "longitude": null,
             "latitude": null
