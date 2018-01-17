@@ -162,7 +162,7 @@ public class Transaction {
                 ", imageUrl='" + imageUrl + '\'' +
                 ", location=" + location +
                 ", amount=" + amount +
-                ", groupId='" + getGroupId() + '\'' +
+                ", groupId='" + (group == null ? "null" : getGroupId()) + '\'' +
                 ", synched=" + synched +
                 ", publishedAt=" + publishedAt +
                 '}';
@@ -174,8 +174,13 @@ public class Transaction {
         result.put("amount", amount);
 
         final JSONObject infoLocation = new JSONObject();
-        infoLocation.put("latitude", location.latitude);
-        infoLocation.put("longitude", location.longitude);
+        if (location != null) {
+            infoLocation.put("latitude", location.latitude);
+            infoLocation.put("longitude", location.longitude);
+        } else {
+            infoLocation.put("latitude", null);
+            infoLocation.put("longitude", null);
+        }
         result.put("infoLocation", infoLocation);
 
         result.put("infoImageUrl", imageUrl != null ? imageUrl : JSONObject.NULL);
