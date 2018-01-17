@@ -38,8 +38,6 @@ import com.media.interactive.cs3.hdm.interactivemedia.data.Group;
 import com.media.interactive.cs3.hdm.interactivemedia.data.Login;
 import com.media.interactive.cs3.hdm.interactivemedia.data.MoneyTextWatcher;
 import com.media.interactive.cs3.hdm.interactivemedia.data.Transaction;
-import com.media.interactive.cs3.hdm.interactivemedia.data.settlement.PairBasedSettlement;
-import com.media.interactive.cs3.hdm.interactivemedia.util.TransactionSplittingTask;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -132,7 +130,6 @@ public class AddTransactionActivity extends ImagePickerActivity {
             @Override
             public void onClick(View view) {
                 final Transaction saved = createAndSaveTransaction(view);
-                calculateSplit(saved);
             }
         });
         final Button cancel = findViewById(R.id.bn_add_transaction_cancel);
@@ -163,13 +160,6 @@ public class AddTransactionActivity extends ImagePickerActivity {
         setDateTextField(dateEditText);
         setDateTimeTextField(timeEditText);
         setAmountTextField(amountEditText);
-    }
-
-    private void calculateSplit(Transaction saved) {
-        DatabaseProviderHelper helper = new DatabaseProviderHelper(this.getContentResolver());
-        TransactionSplittingTask task = new TransactionSplittingTask(helper,
-                new DatabaseHelper(this.getApplicationContext()), new PairBasedSettlement());
-        task.execute(saved);
     }
 
     private Group loadGroup() {

@@ -3,7 +3,6 @@ package com.media.interactive.cs3.hdm.interactivemedia.util;
 import android.os.AsyncTask;
 import android.util.Log;
 
-import com.media.interactive.cs3.hdm.interactivemedia.contentprovider.DatabaseHelper;
 import com.media.interactive.cs3.hdm.interactivemedia.data.DatabaseProviderHelper;
 import com.media.interactive.cs3.hdm.interactivemedia.data.Debt;
 import com.media.interactive.cs3.hdm.interactivemedia.data.Transaction;
@@ -17,21 +16,24 @@ import java.util.List;
 public class TransactionSplittingTask extends AsyncTask<Transaction, Void, Boolean> {
     private static final String TAG = TransactionSplittingTask.class.getSimpleName();
 
-    private final DatabaseProviderHelper databaseProviderHelper;
-    private final DatabaseHelper databaseHelper;
+    private final DatabaseProviderHelper helper;
 
     private final Settlement settlementMethod;
 
-    public TransactionSplittingTask(DatabaseProviderHelper databaseProviderHelper, DatabaseHelper databaseHelper, Settlement settlementMethod) {
+    public TransactionSplittingTask(DatabaseProviderHelper helper, Settlement settlementMethod) {
         super();
-        this.databaseProviderHelper = databaseProviderHelper;
-        this.databaseHelper = databaseHelper;
+        this.helper = helper;
         this.settlementMethod = settlementMethod;
     }
 
     @Override
     protected Boolean doInBackground(Transaction... transactions) {
         for (Transaction transaction : transactions) {
+            try {
+                helper.completeTransaction(transaction);
+            } catch (Exception e) {
+                Log.e(TAG, "An error occured in completing transaction " + transaction, e);
+            }
             List<Debt> debts;
             try {
                 debts = transaction.split();
@@ -44,7 +46,7 @@ public class TransactionSplittingTask extends AsyncTask<Transaction, Void, Boole
             }
             for (Debt debt : debts) {
                 try {
-                    databaseProviderHelper.saveDebt(debt);
+                    helper.saveDebt(debt);
                 } catch (Exception e) {
                     Log.e(TAG, "An error occurred in saving debt " + debt, e);
                     return false;
@@ -52,7 +54,7 @@ public class TransactionSplittingTask extends AsyncTask<Transaction, Void, Boole
             }
             List<Debt> allDebts;
             try {
-                allDebts = databaseHelper.getAllDebts();
+                allDebts = helper.getAllDebts();
             } catch (Exception e) {
                 Log.e(TAG, "An error occurred in loading all debts", e);
                 return false;
@@ -67,7 +69,7 @@ public class TransactionSplittingTask extends AsyncTask<Transaction, Void, Boole
             final Date paymentGenerationTimestamp = new Date(System.currentTimeMillis());
             for (Payment payment : payments) {
                 try {
-                    databaseProviderHelper.savePayment(payment, paymentGenerationTimestamp, transaction.getGroup().getId());
+                    helper.savePayment(payment, paymentGenerationTimestamp, transaction.getGroup().getId());
                 } catch (Exception e) {
                     Log.e(TAG, "An error occurred in saving payment " + payment, e);
                     return false;

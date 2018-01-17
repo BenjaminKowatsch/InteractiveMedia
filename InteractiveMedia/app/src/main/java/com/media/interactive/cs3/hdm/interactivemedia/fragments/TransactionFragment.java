@@ -50,6 +50,7 @@ public class TransactionFragment extends ListFragment implements LoaderManager.L
     private ContentResolver contentResolver;
     private SimpleCursorAdapter groupAdapter;
     private SimpleCursorAdapter paymentListAdapter;
+    private ListView paymentListView;
     private static final int CURSOR_LOADER_TRANSACTIONS_NAME = 0;
     private static final String TRANSACTION_NAME_FILTER = "transactionName";
 
@@ -103,6 +104,7 @@ public class TransactionFragment extends ListFragment implements LoaderManager.L
 
         paymentListAdapter = initPaymentListAdapter();
         initOrRestartLoaderWithGroupId();
+
     }
 
     private SimpleCursorAdapter initPaymentListAdapter() {
@@ -115,7 +117,7 @@ public class TransactionFragment extends ListFragment implements LoaderManager.L
         final int[] to = new int[]{R.id.payment_amount, R.id.payment_from, R.id.payment_to};
         final SimpleCursorAdapter adapter = new SimpleCursorAdapter(this.getContext(),
                 R.layout.payment, payments, columns, to, 0);
-        adapter.setViewResource(R.id.payment_list);
+        //adapter.setViewResource(R.id.payment_list);
         return adapter;
     }
 
@@ -175,11 +177,16 @@ public class TransactionFragment extends ListFragment implements LoaderManager.L
 
             @Override
             public void onNothingSelected(AdapterView<?> adapterView) {
-
                 initOrRestartLoaderWithGroupId();
             }
         });
         initOrRestartLoaderWithGroupId();
+        paymentListView = transactionListFragment.findViewById(R.id.payment_list);
+        if(paymentListView == null) {
+            Log.e(TAG, "PaymentList is null");
+        } else {
+            paymentListView.setAdapter(paymentListAdapter);
+        }
         return transactionListFragment;
     }
 

@@ -14,13 +14,8 @@ import com.media.interactive.cs3.hdm.interactivemedia.contentprovider.tables.Log
 import com.media.interactive.cs3.hdm.interactivemedia.contentprovider.tables.PaymentTable;
 import com.media.interactive.cs3.hdm.interactivemedia.contentprovider.tables.TransactionTable;
 import com.media.interactive.cs3.hdm.interactivemedia.contentprovider.tables.UserTable;
-import com.media.interactive.cs3.hdm.interactivemedia.data.Debt;
 import com.media.interactive.cs3.hdm.interactivemedia.data.Group;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import static com.media.interactive.cs3.hdm.interactivemedia.contentprovider.tables.DebtTable.extractDebtFromCurrentPosition;
 import static com.media.interactive.cs3.hdm.interactivemedia.contentprovider.tables.GroupTable.extractGroupFromCurrentPosition;
 import static com.media.interactive.cs3.hdm.interactivemedia.contentprovider.tables.UserTable.extractUserFromCurrentPosition;
 
@@ -90,18 +85,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         db.delete("login", null, null);
     }
 
-    public List<Debt> getAllDebts() {
-        final SQLiteDatabase db = this.getReadableDatabase();
-        final String query = "SELECT * FROM " + DebtTable.TABLE_NAME;
-        final Cursor debtData = db.rawQuery(query, new String[]{});
-        List<Debt> out = new ArrayList<>();
-        while (debtData.moveToNext()) {
-            out.add(extractDebtFromCurrentPosition(debtData));
-        }
-        debtData.close();
-        return out;
-    }
-
     public Group getGroupWithUsers(String groupId) {
         final SQLiteDatabase db = this.getReadableDatabase();
         final String query = "SELECT *"
@@ -142,8 +125,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 + ", " + buildAlias(fromUserTable, PAYMENT_USER_JOIN_COLUMN_FROM_USER)
                 + ", " + buildAlias(toUserTable, PAYMENT_USER_JOIN_COLUMN_TO_USER)
                 + " FROM " + PaymentTable.TABLE_NAME + " "
-                + getUserNameLeftJoinString(fromUserTable)
-                + getUserNameLeftJoinString(toUserTable)
+                + getUserNameLeftJoinString(fromUserTable, PaymentTable.COLUMN_FROM_USER)
+                + getUserNameLeftJoinString(toUserTable, PaymentTable.COLUMN_TO_USER)
                 + "\nWHERE " + PaymentTable.TABLE_NAME + "." + PaymentTable.COLUMN_CREATED_AT
                 + " = " + subQuery;
         return db.rawQuery(query, new String[]{"" + groupId});
@@ -156,9 +139,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     }
 
     @NonNull
-    private String getUserNameLeftJoinString(String fromUserTable) {
+    private String getUserNameLeftJoinString(String fromUserTable, String column) {
         return "\nleft join " + UserTable.TABLE_NAME + " " + fromUserTable + " ON (" + PaymentTable.TABLE_NAME
-                + "." + PaymentTable.COLUMN_FROM_USER + " = " + fromUserTable + "." + UserTable.COLUMN_ID + ") ";
+                + "." + column + " = " + fromUserTable + "." + UserTable.COLUMN_ID + ") ";
     }
 
 }

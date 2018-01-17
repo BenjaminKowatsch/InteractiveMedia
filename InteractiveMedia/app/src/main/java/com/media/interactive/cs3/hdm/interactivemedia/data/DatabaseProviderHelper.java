@@ -4,6 +4,7 @@ import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.database.Cursor;
 import android.net.Uri;
+import android.support.annotation.NonNull;
 import android.util.Log;
 
 import com.google.android.gms.maps.model.LatLng;
@@ -16,7 +17,9 @@ import com.media.interactive.cs3.hdm.interactivemedia.contentprovider.tables.Log
 import com.media.interactive.cs3.hdm.interactivemedia.contentprovider.tables.PaymentTable;
 import com.media.interactive.cs3.hdm.interactivemedia.contentprovider.tables.TransactionTable;
 import com.media.interactive.cs3.hdm.interactivemedia.contentprovider.tables.UserTable;
+import com.media.interactive.cs3.hdm.interactivemedia.data.settlement.PairBasedSettlement;
 import com.media.interactive.cs3.hdm.interactivemedia.data.settlement.Payment;
+import com.media.interactive.cs3.hdm.interactivemedia.util.TransactionSplittingTask;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -28,6 +31,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import static com.media.interactive.cs3.hdm.interactivemedia.contentprovider.tables.DebtTable.extractDebtFromCurrentPosition;
 import static com.media.interactive.cs3.hdm.interactivemedia.util.Helper.formatDate;
 
 /**
@@ -127,10 +131,12 @@ public class DatabaseProviderHelper {
             transaction.setInfoName(transactionObject.getString("infoName"));
 
             final JSONObject infoLocation = transactionObject.getJSONObject("infoLocation");
-            final double lat = infoLocation.getDouble("latitude");
-            final double lng = infoLocation.getDouble("longitude");
-            final LatLng location = new LatLng(lat, lng);
-            transaction.setLocation(location);
+            if (!infoLocation.isNull("latitude") && !infoLocation.isNull("longitude")) {
+                final double lat = infoLocation.getDouble("latitude");
+                final double lng = infoLocation.getDouble("longitude");
+                final LatLng location = new LatLng(lat, lng);
+                transaction.setLocation(location);
+            }
             final SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
             try {
                 transaction.setDateTime(sdf.parse(transactionObject.getString("infoCreatedAt")));
@@ -152,12 +158,36 @@ public class DatabaseProviderHelper {
         if (id != null) {
             ContentValues transactionGroupContent = new ContentValues();
             final int transactionId = Integer.parseInt(id.getLastPathSegment());
+            transaction.setId(transactionId);
             transactionGroupContent.put(GroupTransactionTable.COLUMN_TRANSACTION_ID, transactionId);
             transactionGroupContent.put(GroupTransactionTable.COLUMN_GROUP_ID, transaction.getGroupId());
             contentResolver.insert(DatabaseProvider.CONTENT_GROUP_TRANSACTION_URI, transactionGroupContent);
         }
         contentResolver.notifyChange(DatabaseProvider.CONTENT_GROUP_USER_TRANSACTION_JOIN_URI, null);
+        calculateSplit(transaction);
     }
+
+    private void calculateSplit(Transaction saved) {
+        TransactionSplittingTask task = new TransactionSplittingTask(this, new PairBasedSettlement());
+        task.execute(saved);
+    }
+
+    public List<Debt> getAllDebts() {
+        final String[] projection = {DebtTable.COLUMN_ID, DebtTable.COLUMN_AMOUNT,
+                DebtTable.COLUMN_FROM_USER, DebtTable.COLUMN_TO_USER, DebtTable.COLUMN_TRANSACTION_ID};
+        final Cursor query = contentResolver.query(DatabaseProvider.CONTENT_DEBT_URI, projection,
+                null, null, null);
+        List<Debt> out = new ArrayList<>();
+        if (query != null) {
+            while (query.moveToNext()) {
+                out.add(extractDebtFromCurrentPosition(query));
+            }
+        } else {
+            Log.e(TAG, "Query for getting all debts was null!");
+        }
+        return out;
+    }
+
 
     public void saveDebt(Debt debt) {
         final ContentValues debtContent = new ContentValues();
@@ -244,5 +274,50 @@ public class DatabaseProviderHelper {
         paymentContent.put(PaymentTable.COLUMN_CREATED_AT, formatDate(creationTimestmap));
         paymentContent.put(PaymentTable.COLUMN_GROUP_ID, groupId);
         contentResolver.insert(DatabaseProvider.CONTENT_PAYMENT_URI, paymentContent);
+    }
+
+    public void completeTransaction(Transaction transaction) {
+        if (transaction.getGroup() == null) {
+            transaction.setGroup(loadGroupForTransaction(transaction));
+        }
+        if (transaction.getGroup().getUsers().isEmpty()) {
+            transaction.getGroup().getUsers().addAll(loadUsersForGroup(transaction.getGroup()));
+        }
+    }
+
+    @NonNull
+    private List<User> loadUsersForGroup(Group group) {
+        final String[] projection = {UserTable.TABLE_NAME + ".*"};
+        final String selection = GroupTable.TABLE_NAME + "." + GroupTable.COLUMN_ID + " = ?";
+        final String[] selectionArgs = {"" + group.getId()};
+        final Cursor cursor = contentResolver.query(DatabaseProvider.CONTENT_GROUP_USER_URI,
+                projection, selection, selectionArgs, null);
+        if (cursor != null) {
+            List<User> out = new ArrayList<>();
+            while (cursor.moveToNext()) {
+                out.add(UserTable.extractUserFromCurrentPosition(cursor));
+            }
+            return out;
+        } else {
+            return new ArrayList<>();
+        }
+    }
+
+    private Group loadGroupForTransaction(Transaction transaction) {
+        final String[] projection = {GroupTable.TABLE_NAME + ".*"};
+        final String selection = TransactionTable.TABLE_NAME + "." + TransactionTable.COLUMN_ID + " = ?";
+        final String[] selectionArgs = {"" + transaction.getId()};
+        final Cursor cursor = contentResolver.query(DatabaseProvider.CONTENT_GROUP_TRANSACTION_JOIN_URI,
+                projection, selection, selectionArgs, null);
+        if (cursor != null) {
+            final boolean hadFirst = cursor.moveToFirst();
+            if (hadFirst) {
+                return GroupTable.extractGroupFromCurrentPosition(cursor);
+            } else {
+                return null;
+            }
+        } else {
+            return null;
+        }
     }
 }
