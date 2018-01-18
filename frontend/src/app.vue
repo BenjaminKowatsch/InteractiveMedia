@@ -5,9 +5,10 @@
    <v-app id="inspire" :dark="isDark">
       <v-navigation-drawer
       clipped
-      absolute
+      fixed
       v-model="drawer"
       disable-resize-watcher="true"
+      disable-route-watcher="true"
       app>
 
         <v-list>

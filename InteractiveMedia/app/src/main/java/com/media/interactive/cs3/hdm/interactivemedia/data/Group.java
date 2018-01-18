@@ -23,8 +23,7 @@ public class Group {
     private boolean sync;
 
     public Group(String name, String imageUrl, String groupId, String createdAt, boolean sync) {
-        this.users = createUsers();
-        this.transactions = createTransactions();
+        this();
         this.name = name;
         this.imageUrl = imageUrl;
         this.groupId = groupId;
@@ -33,18 +32,10 @@ public class Group {
     }
 
     public Group(){
-        this.users = createUsers();
-        this.transactions = createTransactions();
+        this.users = new ArrayList<>();
+        this.transactions = new ArrayList<>();
     }
 
-
-    private List<User> createUsers(){
-        return new ArrayList<User>();
-    }
-
-    private List<Transaction> createTransactions(){
-        return new ArrayList<Transaction>();
-    }
 
     public long getId() {
         return id;
@@ -138,5 +129,23 @@ public class Group {
             transactionsArray.put(i, users.get(i).toJson());
         }
         return object;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        Group group = (Group) o;
+
+        if (sync != group.sync) return false;
+        return groupId != null ? groupId.equals(group.groupId) : group.groupId == null;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = groupId != null ? groupId.hashCode() : 0;
+        result = 31 * result + (sync ? 1 : 0);
+        return result;
     }
 }

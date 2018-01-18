@@ -6,14 +6,14 @@ const https = require('https');
 const querystring = require('querystring');
 const GoogleAuth = require('google-auth-library');
 
-const config = require('./config');
+const config = require('../config/settings.config');
 const uuidService = require('../services/uuid.service');
 const tokenService = require('../services/token.service');
 const emailService = require('../services/email.service');
 const database = require('../modules/database.module');
-const ERROR = require('../config.error');
-const ROLES = require('../config.roles');
-const AUTH_TYPE = require('../config.authType');
+const ERROR = require('../config/error.config');
+const ROLES = require('../config/roles.config');
+const AUTH_TYPE = require('../config/authType.config');
 
 const MONGO_ERRCODE = {
   'DUPLICATEKEY': 11000
@@ -661,6 +661,12 @@ function checkIfUpdateOneWasSuccessful(resultRaw) {
     const result = JSON.parse(resultRaw);
     if (result && result.n === 1 && result.nModified === 1 && result.ok === 1) {
       resolve(result);
+    } else if (result && result.n === 0 && result.nModified === 0 && result.ok === 1) {
+      // no error during update but nothing modified because document was not found
+      let errorToReturn = {isSelfProvided: true};
+      errorToReturn.message = 'resource not found';
+      errorToReturn.errorCode = ERROR.RESOURCE_NOT_FOUND;
+      reject(errorToReturn);
     } else {
       let errorToReturn = {isSelfProvided: true};
       errorToReturn.message = 'database error';

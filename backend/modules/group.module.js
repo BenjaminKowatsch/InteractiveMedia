@@ -1,11 +1,11 @@
 'use strict';
 
 const winston = require('winston');
-const config = require('./config');
+const config = require('../config/settings.config');
 const uuidService = require('../services/uuid.service');
 const database = require('../modules/database.module');
 const tokenService = require('../services/token.service');
-const ERROR = require('../config.error');
+const ERROR = require('../config/error.config');
 
 /**
  * @param  {String} authToken auth token of user

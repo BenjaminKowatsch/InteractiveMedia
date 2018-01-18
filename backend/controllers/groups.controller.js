@@ -5,15 +5,15 @@ const winston = require('winston');
 const group = require('../modules/group.module');
 const user = require('../modules/user.module');
 const database = require('../modules/database.module');
-const ERROR = require('../config.error');
+const ERROR = require('../config/error.config');
 
 const validateJsonService = require('../services/validateJson.service');
 const httpResponseService = require('../services/httpResponse.service');
 const pushNotificationService = require('../services/pushNotification.service');
 
 const jsonSchema = {
-  groupPayload: require('../JSONSchema/groupPayload.json'),
-  transactionPayload: require('../JSONSchema/transactionPayload.json')
+  groupPayload: require('../jsonSchema/groupPayload.json'),
+  transactionPayload: require('../jsonSchema/transactionPayload.json')
 };
 
 module.exports.createNewGroup = function(req, res) {

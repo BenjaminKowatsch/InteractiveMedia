@@ -2,26 +2,17 @@ package com.media.interactive.cs3.hdm.interactivemedia.activties;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.database.Cursor;
-import android.os.Build;
 import android.os.Bundle;
-import android.support.annotation.RequiresApi;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.widget.Toast;
 
-import com.google.firebase.iid.FirebaseInstanceId;
 import com.media.interactive.cs3.hdm.interactivemedia.CallbackListener;
 import com.media.interactive.cs3.hdm.interactivemedia.R;
 import com.media.interactive.cs3.hdm.interactivemedia.contentprovider.DatabaseHelper;
-import com.media.interactive.cs3.hdm.interactivemedia.contentprovider.DummyDataAdder;
-import com.media.interactive.cs3.hdm.interactivemedia.data.Hash;
 import com.media.interactive.cs3.hdm.interactivemedia.data.Login;
-import com.media.interactive.cs3.hdm.interactivemedia.notification.DeleteInstanceIDService;
 
 import org.json.JSONObject;
-
-import java.io.IOException;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -36,7 +27,6 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         databaseHelper = new DatabaseHelper(this);
 
-        //databaseHelper.deleteAllUsers();
         //databaseHelper.resetDatabase();
 
         Login.getInstance().clear();
@@ -49,6 +39,8 @@ public class MainActivity extends AppCompatActivity {
 
         Log.e(TAG, "Exceptionally Thread Id: " + android.os.Process.getThreadPriority(android.os.Process.myTid()));
     }
+
+
 
     private void launchNextActivity() {
         Login.getInstance().login(MainActivity.this, new CallbackListener<JSONObject, Exception>() {

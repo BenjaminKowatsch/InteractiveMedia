@@ -4,7 +4,6 @@ import android.app.DatePickerDialog;
 import android.app.TimePickerDialog;
 import android.content.Intent;
 import android.database.Cursor;
-import android.location.Location;
 import android.os.Bundle;
 import android.text.InputType;
 import android.util.Log;
@@ -30,10 +29,12 @@ import com.media.interactive.cs3.hdm.interactivemedia.CallbackListener;
 import com.media.interactive.cs3.hdm.interactivemedia.R;
 import com.media.interactive.cs3.hdm.interactivemedia.RestRequestQueue;
 import com.media.interactive.cs3.hdm.interactivemedia.authorizedrequests.AuthorizedJsonObjectRequest;
+import com.media.interactive.cs3.hdm.interactivemedia.contentprovider.DatabaseHelper;
 import com.media.interactive.cs3.hdm.interactivemedia.contentprovider.DatabaseProvider;
 import com.media.interactive.cs3.hdm.interactivemedia.contentprovider.tables.GroupTable;
 import com.media.interactive.cs3.hdm.interactivemedia.contentprovider.tables.UserTable;
 import com.media.interactive.cs3.hdm.interactivemedia.data.DatabaseProviderHelper;
+import com.media.interactive.cs3.hdm.interactivemedia.data.Group;
 import com.media.interactive.cs3.hdm.interactivemedia.data.Login;
 import com.media.interactive.cs3.hdm.interactivemedia.data.MoneyTextWatcher;
 import com.media.interactive.cs3.hdm.interactivemedia.data.Transaction;
@@ -114,6 +115,7 @@ public class AddTransactionActivity extends ImagePickerActivity {
     userSelection = findViewById(R.id.s_add_transaction_user);
     EditText amountEditText = findViewById(R.id.et_add_transaction_amount);
     amountEditText.addTextChangedListener(new MoneyTextWatcher(amountEditText, CURRENCY_FORMAT));
+        group = loadGroup();
 
     helper = new DatabaseProviderHelper(getContentResolver());
 
@@ -154,6 +156,15 @@ public class AddTransactionActivity extends ImagePickerActivity {
     userAdapter = initializeUserAdapter();
     userSelection.setAdapter(userAdapter);
 
+    private Group loadGroup() {
+        final String groupId = getIntent().getStringExtra(GROUP_TO_ADD_TO);
+        if (groupId == null) {
+            Log.e(this.getClass().getSimpleName(), "Intent is missing id of group");
+            return null;
+        } else {
+            return new DatabaseHelper(this).getGroupWithUsers(groupId);
+        }
+    }
 
     final UUID randomUUID = UUID.randomUUID();
     final String randomFilename = randomUUID.toString() + ".png";

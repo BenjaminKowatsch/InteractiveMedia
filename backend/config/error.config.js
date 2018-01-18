@@ -23,4 +23,5 @@ module.exports = {
     INVALID_CREATE_TRANSACTION_VALUES: 'invalid create transaction values',
     INVALID_DATE_FORMAT: 'invalid date format',
     NO_USERS: 'no users',
+    RESOURCE_NOT_FOUND: 'resource not found',
   };

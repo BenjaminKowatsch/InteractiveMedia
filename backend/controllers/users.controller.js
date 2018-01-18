@@ -3,18 +3,18 @@
 const winston = require('winston');
 
 const user = require('../modules/user.module');
-const ROLES = require('../config.roles');
-const ERROR = require('../config.error');
-const AUTH_TYPE = require('../config.authType');
+const ROLES = require('../config/roles.config');
+const ERROR = require('../config/error.config');
+const AUTH_TYPE = require('../config/authType.config');
 
 const validateJsonService = require('../services/validateJson.service');
 const httpResponseService = require('../services/httpResponse.service');
 
 const jsonSchema = {
-  registerUserPayload: require('../JSONSchema/registerUserPayload.json'),
-  loginUserExternalPayload: require('../JSONSchema/loginUserExternalPayload.json'),
-  loginUserPasswordPayload: require('../JSONSchema/loginUserPasswordPayload.json'),
-  updateUserPayload: require('../JSONSchema/updateUserPayload.json')
+  registerUserPayload: require('../jsonSchema/registerUserPayload.json'),
+  loginUserExternalPayload: require('../jsonSchema/loginUserExternalPayload.json'),
+  loginUserPasswordPayload: require('../jsonSchema/loginUserPasswordPayload.json'),
+  updateUserPayload: require('../jsonSchema/updateUserPayload.json')
 };
 
 exports.registerNewUser = function(req, res) {
@@ -205,6 +205,7 @@ exports.updateUser = function(req, res) {
         statusCode = 400;
         break;
       case ERROR.UNKNOWN_USER:
+      case ERROR.RESOURCE_NOT_FOUND:
         statusCode = 500;
         errorResult.responseData.dataPath = 'user';
         errorResult.responseData.message = 'internal server error';

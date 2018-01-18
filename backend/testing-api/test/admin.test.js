@@ -451,5 +451,420 @@ describe('Admin', () => {
             });
       });
     });
+
+    describe('update user', () => {
+      describe('all attributes', function() {
+        let adminToken;
+        let tokens = {};
+        let userIds = {};
+        let constantUserData = {};
+
+        before('reset db', done => {
+          databaseHelper.promiseResetDB().then(() => {done();})
+            .catch((err) => {console.error('Error add admin');});
+        });
+
+        before('login admin', done => {
+          chai.request(HOST).post(URL.BASE_USER + '/login?type=0')
+              .send({username: adminData.username, password: adminData.password})
+          .then(res => {
+              adminToken = res.body.payload.accessToken;
+              done();
+            }).catch((err) => {console.error('Error add admin');});
+        });
+
+        before('register user 0', done => {
+          registerUser(0).then(res => {
+            tokens[0] = res.body.payload.accessToken;
+            done();
+          }).catch((error) => {console.log('Register User Error: ' + error);});
+        });
+
+        before('get userId of user_0', done => {
+          chai.request(HOST)
+          .get(URL.BASE_USER  + '/user')
+          .set('Authorization', '0 ' + tokens[0])
+          .then(res => {
+            userIds[0] = res.body.payload.userId;
+            done();
+          }).catch(error => {console.error('Unable to get userId of user_0');});
+        });
+
+        it('should get original user data of user_0 by id', () => {
+          return chai.request(HOST)
+          .get(URL.BASE_ADMIN + '/users/' + userIds[0])
+          .set('Authorization', '0 ' + adminToken)
+          .then(res => {
+            expect(res).to.have.status(200);
+            expect(res).to.be.json;
+            expect(res.body).to.be.an('object');
+            expect(res.body.success).to.be.true;
+            expect(res.body.payload).to.be.an('object');
+            expect(res.body.payload.username).to.equal(userData.users.valid[0].username);
+            expect(res.body.payload.email).to.equal(userData.users.valid[0].email);
+            expect(res.body.payload._id).to.be.undefined;
+            expect(res.body.payload.groupIds).to.be.undefined;
+            expect(res.body.payload.userId).to.equal(userIds[0]);
+            expect(res.body.payload.role).to.equal('user');
+            expect(res.body.payload.imageUrl).to.equal(userData.users.valid[0].imageUrl);
+            constantUserData.groupIds = res.body.payload.groupIds;
+          });
+        });
+
+        it('should update user_0', function() {
+          return chai.request(HOST)
+          .put(URL.BASE_ADMIN  + '/users/' + userIds[0])
+          .set('Authorization', '0 ' + adminToken)
+          .send(userData.users.updateAsAdmin.valid.allFields)
+          .then(res => {
+            expect(res).to.have.status(200);
+            expect(res).to.be.json;
+            expect(res.body).to.be.an('object');
+            expect(res.body.success).to.be.true;
+          });
+        });
+
+        it('should get the updated user data of user_0 by id', function() {
+          return chai.request(HOST)
+          .get(URL.BASE_ADMIN + '/users/' + userIds[0])
+          .set('Authorization', '0 ' + adminToken)
+          .then(res => {
+            expect(res).to.have.status(200);
+            expect(res).to.be.json;
+            expect(res.body).to.be.an('object');
+            expect(res.body.success).to.be.true;
+            expect(res.body.payload).to.be.an('object');
+            expect(res.body.payload.username).to.equal(userData.users.updateAsAdmin.valid.allFields.username);
+            expect(res.body.payload.email).to.equal(userData.users.updateAsAdmin.valid.allFields.email);
+            expect(res.body.payload._id).to.be.undefined;
+            expect(res.body.payload.groupIds).to.equal(constantUserData.groupIds);
+            expect(res.body.payload.userId).to.equal(userIds[0]);
+            expect(res.body.payload.role).to.equal(userData.users.updateAsAdmin.valid.allFields.role);
+            expect(res.body.payload.imageUrl).to.equal(userData.users.updateAsAdmin.valid.allFields.imageUrl);
+          });
+        });
+      });
+
+      describe('one attribute', function() {
+        let adminToken;
+        let tokens = {};
+        let userIds = {};
+        let constantUserData = {};
+
+        before('reset db', done => {
+          databaseHelper.promiseResetDB().then(() => {done();})
+            .catch((err) => {console.error('Error add admin');});
+        });
+
+        before('login admin', done => {
+          chai.request(HOST).post(URL.BASE_USER + '/login?type=0')
+              .send({username: adminData.username, password: adminData.password})
+          .then(res => {
+              adminToken = res.body.payload.accessToken;
+              done();
+            }).catch((err) => {console.error('Error add admin');});
+        });
+
+        before('register user 0', done => {
+          registerUser(0).then(res => {
+            tokens[0] = res.body.payload.accessToken;
+            done();
+          }).catch((error) => {console.log('Register User Error: ' + error);});
+        });
+
+        before('get userId of user_0', done => {
+          chai.request(HOST)
+          .get(URL.BASE_USER  + '/user')
+          .set('Authorization', '0 ' + tokens[0])
+          .then(res => {
+            userIds[0] = res.body.payload.userId;
+            done();
+          }).catch(error => {console.error('Unable to get userId of user_0');});
+        });
+
+        it('should get original user data of user_0 by id', () => {
+          return chai.request(HOST)
+          .get(URL.BASE_ADMIN + '/users/' + userIds[0])
+          .set('Authorization', '0 ' + adminToken)
+          .then(res => {
+            expect(res).to.have.status(200);
+            expect(res).to.be.json;
+            expect(res.body).to.be.an('object');
+            expect(res.body.success).to.be.true;
+            expect(res.body.payload).to.be.an('object');
+            expect(res.body.payload.username).to.equal(userData.users.valid[0].username);
+            expect(res.body.payload.email).to.equal(userData.users.valid[0].email);
+            expect(res.body.payload._id).to.be.undefined;
+            expect(res.body.payload.groupIds).to.be.undefined;
+            expect(res.body.payload.userId).to.equal(userIds[0]);
+            expect(res.body.payload.role).to.equal('user');
+            expect(res.body.payload.imageUrl).to.equal(userData.users.valid[0].imageUrl);
+            constantUserData.groupIds = res.body.payload.groupIds;
+          });
+        });
+
+        it('should update user_0', function() {
+          return chai.request(HOST)
+          .put(URL.BASE_ADMIN  + '/users/' + userIds[0])
+          .set('Authorization', '0 ' + adminToken)
+          .send(userData.users.updateAsAdmin.valid.oneFieldUsername)
+          .then(res => {
+            expect(res).to.have.status(200);
+            expect(res).to.be.json;
+            expect(res.body).to.be.an('object');
+            expect(res.body.success).to.be.true;
+          });
+        });
+
+        it('should get the updated user data of user_0', function() {
+          return chai.request(HOST)
+          .get(URL.BASE_ADMIN + '/users/' + userIds[0])
+          .set('Authorization', '0 ' + adminToken)
+          .then(res => {
+            expect(res).to.have.status(200);
+            expect(res).to.be.json;
+            expect(res.body).to.be.an('object');
+            expect(res.body.success).to.be.true;
+            expect(res.body.payload).to.be.an('object');
+            expect(res.body.payload.username).to.equal(userData.users.updateAsAdmin.valid.oneFieldUsername.username);
+            expect(res.body.payload.email).to.equal(userData.users.valid[0].email);
+            expect(res.body.payload._id).to.be.undefined;
+            expect(res.body.payload.groupIds).to.equal(constantUserData.groupIds);
+            expect(res.body.payload.userId).to.equal(userIds[0]);
+            expect(res.body.payload.role).to.equal('user');
+            expect(res.body.payload.imageUrl).to.equal(userData.users.valid[0].imageUrl);
+          });
+        });
+      });
+
+      describe('with error', function() {
+        let adminToken;
+        let tokens = {};
+        let userIds = {};
+        let constantUserData = {};
+
+        before('reset db', done => {
+          databaseHelper.promiseResetDB().then(() => {done();})
+            .catch((err) => {console.error('Error add admin');});
+        });
+
+        before('login admin', done => {
+          chai.request(HOST).post(URL.BASE_USER + '/login?type=0')
+              .send({username: adminData.username, password: adminData.password})
+          .then(res => {
+              adminToken = res.body.payload.accessToken;
+              done();
+            }).catch((err) => {console.error('Error add admin');});
+        });
+
+        before('register user 0', done => {
+          registerUser(0).then(res => {
+            tokens[0] = res.body.payload.accessToken;
+            done();
+          }).catch((error) => {console.log('Register User Error: ' + error);});
+        });
+
+        before('get userId of user_0', done => {
+          chai.request(HOST)
+          .get(URL.BASE_USER  + '/user')
+          .set('Authorization', '0 ' + tokens[0])
+          .then(res => {
+            userIds[0] = res.body.payload.userId;
+            done();
+          }).catch(error => {console.error('Unable to get userId of user_0');});
+        });
+
+        it('should fail to update due to missing payload', function() {
+          return chai.request(HOST)
+          .put(URL.BASE_ADMIN  + '/users/' + userIds[0])
+          .set('Authorization', '0 ' + adminToken)
+          .then(res => {
+            expect(res).to.have.status(400);
+            expect(res).to.be.json;
+            expect(res.body).to.be.an('object');
+            expect(res.body.success).to.be.false;
+            expect(res.body.payload).to.be.an('object');
+            expect(res.body.payload.dataPath).to.equal('validation');
+            expect(res.body.payload.message).to.equal('invalid body');
+          });
+        });
+
+        it('should fail to update userId', function() {
+          return chai.request(HOST)
+          .put(URL.BASE_ADMIN  + '/users/' + userIds[0])
+          .set('Authorization', '0 ' + adminToken)
+          .send(userData.users.updateAsAdmin.invalid.updateUserId)
+          .then(res => {
+            expect(res).to.have.status(400);
+            expect(res).to.be.json;
+            expect(res.body).to.be.an('object');
+            expect(res.body.success).to.be.false;
+            expect(res.body.payload).to.be.an('object');
+            expect(res.body.payload.dataPath).to.equal('validation');
+            expect(res.body.payload.message).to.equal('invalid body');
+          });
+        });
+
+        it('should fail to update groupd ids', function() {
+          return chai.request(HOST)
+          .put(URL.BASE_ADMIN  + '/users/' + userIds[0])
+          .set('Authorization', '0 ' + adminToken)
+          .send(userData.users.updateAsAdmin.invalid.updateGroupIds)
+          .then(res => {
+            expect(res).to.have.status(400);
+            expect(res).to.be.json;
+            expect(res.body).to.be.an('object');
+            expect(res.body.success).to.be.false;
+            expect(res.body.payload).to.be.an('object');
+            expect(res.body.payload.dataPath).to.equal('validation');
+            expect(res.body.payload.message).to.equal('invalid body');
+          });
+        });
+
+        it('should fail to update internal id', function() {
+          return chai.request(HOST)
+          .put(URL.BASE_ADMIN  + '/users/' + userIds[0])
+          .set('Authorization', '0 ' + adminToken)
+          .send(userData.users.updateAsAdmin.invalid.updateInternalId)
+          .then(res => {
+            expect(res).to.have.status(400);
+            expect(res).to.be.json;
+            expect(res.body).to.be.an('object');
+            expect(res.body.success).to.be.false;
+            expect(res.body.payload).to.be.an('object');
+            expect(res.body.payload.dataPath).to.equal('validation');
+            expect(res.body.payload.message).to.equal('invalid body');
+          });
+        });
+
+        it('should fail to update authType', function() {
+          return chai.request(HOST)
+          .put(URL.BASE_ADMIN  + '/users/' + userIds[0])
+          .set('Authorization', '0 ' + adminToken)
+          .send(userData.users.updateAsAdmin.invalid.updateAuthType)
+          .then(res => {
+            expect(res).to.have.status(400);
+            expect(res).to.be.json;
+            expect(res.body).to.be.an('object');
+            expect(res.body.success).to.be.false;
+            expect(res.body.payload).to.be.an('object');
+            expect(res.body.payload.dataPath).to.equal('validation');
+            expect(res.body.payload.message).to.equal('invalid body');
+          });
+        });
+
+        it('should fail to update username with null', function() {
+          return chai.request(HOST)
+          .put(URL.BASE_ADMIN  + '/users/' + userIds[0])
+          .set('Authorization', '0 ' + adminToken)
+          .send(userData.users.updateAsAdmin.invalid.updateUsernameNull)
+          .then(res => {
+            expect(res).to.have.status(400);
+            expect(res).to.be.json;
+            expect(res.body).to.be.an('object');
+            expect(res.body.success).to.be.false;
+            expect(res.body.payload).to.be.an('object');
+            expect(res.body.payload.dataPath).to.equal('validation');
+            expect(res.body.payload.message).to.equal('invalid body');
+          });
+        });
+
+        it('should fail to update password with null', function() {
+          return chai.request(HOST)
+          .put(URL.BASE_ADMIN  + '/users/' + userIds[0])
+          .set('Authorization', '0 ' + adminToken)
+          .send(userData.users.updateAsAdmin.invalid.updatePasswordNull)
+          .then(res => {
+            expect(res).to.have.status(400);
+            expect(res).to.be.json;
+            expect(res.body).to.be.an('object');
+            expect(res.body.success).to.be.false;
+            expect(res.body.payload).to.be.an('object');
+            expect(res.body.payload.dataPath).to.equal('validation');
+            expect(res.body.payload.message).to.equal('invalid body');
+          });
+        });
+
+        it('should fail to update email with null', function() {
+          return chai.request(HOST)
+          .put(URL.BASE_ADMIN  + '/users/' + userIds[0])
+          .set('Authorization', '0 ' + adminToken)
+          .send(userData.users.updateAsAdmin.invalid.updateEmailNull)
+          .then(res => {
+            expect(res).to.have.status(400);
+            expect(res).to.be.json;
+            expect(res.body).to.be.an('object');
+            expect(res.body.success).to.be.false;
+            expect(res.body.payload).to.be.an('object');
+            expect(res.body.payload.dataPath).to.equal('validation');
+            expect(res.body.payload.message).to.equal('invalid body');
+          });
+        });
+
+        it('should fail to update role with invalid value', function() {
+          return chai.request(HOST)
+          .put(URL.BASE_ADMIN  + '/users/' + userIds[0])
+          .set('Authorization', '0 ' + adminToken)
+          .send(userData.users.updateAsAdmin.invalid.updateInvalidRole)
+          .then(res => {
+            expect(res).to.have.status(400);
+            expect(res).to.be.json;
+            expect(res.body).to.be.an('object');
+            expect(res.body.success).to.be.false;
+            expect(res.body.payload).to.be.an('object');
+            expect(res.body.payload.dataPath).to.equal('validation');
+            expect(res.body.payload.message).to.equal('invalid body');
+          });
+        });
+
+        it('should fail to update unknown field', function() {
+          return chai.request(HOST)
+          .put(URL.BASE_ADMIN  + '/users/' + userIds[0])
+          .set('Authorization', '0 ' + adminToken)
+          .send(userData.users.updateAsAdmin.invalid.updateUnknownField)
+          .then(res => {
+            expect(res).to.have.status(400);
+            expect(res).to.be.json;
+            expect(res.body).to.be.an('object');
+            expect(res.body.success).to.be.false;
+            expect(res.body.payload).to.be.an('object');
+            expect(res.body.payload.dataPath).to.equal('validation');
+            expect(res.body.payload.message).to.equal('invalid body');
+          });
+        });
+
+        it('should fail to update with normal user', () => {
+          return chai.request(HOST)
+          .put(URL.BASE_ADMIN  + '/users/' + userIds[0])
+          .set('Authorization', '0 ' + tokens[0])
+          .send(userData.users.updateAsAdmin.valid.allFields)
+          .then(res => {
+            expect(res).to.have.status(403);
+            expect(res).to.be.json;
+            expect(res.body).to.be.an('object');
+            expect(res.body.success).to.be.false;
+            expect(res.body.payload).to.be.an('object');
+            expect(res.body.payload.dataPath).to.be.equal('authorization');
+            expect(res.body.payload.message).to.be.equal('user is not authorized');
+          });
+        });
+
+        it('should fail to update with unknown userId', () => {
+          return chai.request(HOST)
+          .put(URL.BASE_ADMIN + '/users/' + 'XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX')
+          .set('Authorization', '0 ' + adminToken)
+          .send(userData.users.updateAsAdmin.valid.allFields)
+          .then(res => {
+            expect(res).to.have.status(404);
+            expect(res).to.be.json;
+            expect(res.body).to.be.an('object');
+            expect(res.body.success).to.be.false;
+            expect(res.body.payload).to.be.an('object');
+            expect(res.body.payload.dataPath).to.be.equal('user');
+            expect(res.body.payload.message).to.be.equal('user not found');
+          });
+        });
+      });
+    });
   });
 });

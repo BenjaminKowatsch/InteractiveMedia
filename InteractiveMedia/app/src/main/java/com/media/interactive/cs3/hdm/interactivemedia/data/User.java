@@ -1,10 +1,6 @@
 package com.media.interactive.cs3.hdm.interactivemedia.data;
 
-import org.json.JSONException;
 import org.json.JSONObject;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Created by benny on 04.01.18.
@@ -115,5 +111,20 @@ public class User {
     public JSONObject toJson() {
         // TODO: Implement method
         return null;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        User user = (User) o;
+
+        return userId != null ? userId.equals(user.userId) : user.userId == null;
+    }
+
+    @Override
+    public int hashCode() {
+        return userId != null ? userId.hashCode() : 0;
     }
 }

@@ -12,13 +12,17 @@ const versionController = require('../controllers/version.controller');
  * @apiVersion  0.1.0
  *
  * @apiSuccess (SuccessCode) {200} Success Request successful
- * @apiSuccess (Success) {String} version Current version
- * @apiSuccess (Success) {String} name Name of the app
+ * @apiUse successBodySuccess
+ * @apiSuccess (Success) {String} payload[version] Current version
+ * @apiSuccess (Success) {String} payload[name] Name of the app
  *
  * @apiSuccessExample {json} Success-Response:
    {
-       "name": "Backend",
-       "version": "0.0.1"
+        "success": true,
+        "payload": {
+            "name": "Backend",
+            "version": "0.1.0"
+        }
    }
  *
  */

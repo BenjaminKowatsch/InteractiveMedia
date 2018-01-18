@@ -12,7 +12,7 @@
  */
 /**
  * @apiDefine paramUsernameOptional
-    @apiParam (Parameter) {string} username Username. Optional. "null" is allowed.
+    @apiParam (Parameter) {string} username Username. Optional.
  */
 /**
  * @apiDefine paramHashedPassword
@@ -20,7 +20,7 @@
  */
 /**
  * @apiDefine paramHashedPasswordOptional
-    @apiParam (Parameter) {string} password Hash of a password. Optional. "null" is allowed.
+    @apiParam (Parameter) {string} password Hash of a password. Optional.
  */
 /**
  * @apiDefine paramAuthtype
@@ -32,11 +32,15 @@
  */
 /**
  * @apiDefine paramEmailOptional
-    @apiParam (Parameter) {string} email Email of user. Optional. "null" is allowed.
+    @apiParam (Parameter) {string} email Email of user. Optional.
  */
 /**
  * @apiDefine paramFcmTokenOptional
     @apiParam (Parameter) {string} fcmToken Firebase cloud messaging token of user. Optional. "null" is allowed.
+ */
+/**
+ * @apiDefine paramRoleOptional
+    @apiParam (Parameter) {string} role Role of user. Optional. "user" and "admin" is allowed.
  */
 /**
  * @apiDefine paramImageUrlRequiredButNull
@@ -274,6 +278,22 @@
         "password": "hashedPassword",
         "imageUrl": "http://new.example.com/image.jpg",
         "fcmToken": "cUf35139J8U:APA91bH6pkjWHRAUAW52QGQV6tR8SQdbpJK20QitJrAyWfX22VP4G0OUL-cwnXQob507qnBILDkZaoY0IW3eAvAevjM5dgCTbL297n1pbXoEHLzNDKV-86xJkle0TR6RBi8fA3BzEEOr"
+    }
+    @apiParamExample {JSON} Update at least one attribute
+    {
+        "fcmToken": "cUf35139J8U:APA91bH6pkjWHRAUAW52QGQV6tR8SQdbpJK20QitJrAyWfX22VP4G0OUL-cwnXQob507qnBILDkZaoY0IW3eAvAevjM5dgCTbL297n1pbXoEHLzNDKV-86xJkle0TR6RBi8fA3BzEEOr"
+    }
+ */
+/**
+ * @apiDefine paramExampleAdminUserUpdate
+    @apiParamExample {JSON} Update all attributes
+    {
+        "username": "new user name",
+        "email": "new.alex@alex.de",
+        "password": "hashedPassword",
+        "imageUrl": "http://new.example.com/image.jpg",
+        "fcmToken": "cUf35139J8U:APA91bH6pkjWHRAUAW52QGQV6tR8SQdbpJK20QitJrAyWfX22VP4G0OUL-cwnXQob507qnBILDkZaoY0IW3eAvAevjM5dgCTbL297n1pbXoEHLzNDKV-86xJkle0TR6RBi8fA3BzEEOr",
+        "role": "user"
     }
     @apiParamExample {JSON} Update at least one attribute
     {

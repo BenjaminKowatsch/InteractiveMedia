@@ -1,9 +1,9 @@
 'use strict';
 
 const winston = require('winston');
-const config = require('../modules/config');
+const config = require('../config/settings.config');
 const Minio = require('minio');
-const ERROR = require('../config.error');
+const ERROR = require('../config/error.config');
 
 const minioClient = new Minio.Client({
   endPoint: config.minioEndpoint,

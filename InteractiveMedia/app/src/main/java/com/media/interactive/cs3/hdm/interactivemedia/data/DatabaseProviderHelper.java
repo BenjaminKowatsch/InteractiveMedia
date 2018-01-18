@@ -4,18 +4,24 @@ import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
-import android.location.Location;
 import android.net.Uri;
+import android.support.annotation.NonNull;
 import android.util.Log;
 
+import com.google.android.gms.maps.model.LatLng;
 import com.media.interactive.cs3.hdm.interactivemedia.R;
 import com.media.interactive.cs3.hdm.interactivemedia.contentprovider.DatabaseProvider;
+import com.media.interactive.cs3.hdm.interactivemedia.contentprovider.tables.DebtTable;
 import com.media.interactive.cs3.hdm.interactivemedia.contentprovider.tables.GroupTable;
 import com.media.interactive.cs3.hdm.interactivemedia.contentprovider.tables.GroupTransactionTable;
 import com.media.interactive.cs3.hdm.interactivemedia.contentprovider.tables.GroupUserTable;
 import com.media.interactive.cs3.hdm.interactivemedia.contentprovider.tables.LoginTable;
+import com.media.interactive.cs3.hdm.interactivemedia.contentprovider.tables.PaymentTable;
 import com.media.interactive.cs3.hdm.interactivemedia.contentprovider.tables.TransactionTable;
 import com.media.interactive.cs3.hdm.interactivemedia.contentprovider.tables.UserTable;
+import com.media.interactive.cs3.hdm.interactivemedia.data.settlement.PairBasedSettlement;
+import com.media.interactive.cs3.hdm.interactivemedia.data.settlement.Payment;
+import com.media.interactive.cs3.hdm.interactivemedia.util.TransactionSplittingTask;
 import com.media.interactive.cs3.hdm.interactivemedia.util.Helper;
 
 import org.json.JSONArray;
@@ -25,7 +31,11 @@ import org.json.JSONObject;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+
+import static com.media.interactive.cs3.hdm.interactivemedia.contentprovider.tables.DebtTable.extractDebtFromCurrentPosition;
+import static com.media.interactive.cs3.hdm.interactivemedia.util.Helper.formatDate;
 
 /**
  * Created by benny on 08.01.18.
@@ -253,6 +263,9 @@ public class DatabaseProviderHelper {
     if (1 == userCursor.getCount()) {
       userCursor.moveToNext();
       return userCursor.getLong(0);
+        calculateSplit(transactions.toArray(new Transaction[]{}));
+            saveTransactionImpl(transaction);
+            transactions.add(transaction);
     }
     return -1;
   }
@@ -264,6 +277,20 @@ public class DatabaseProviderHelper {
     final Cursor query = contentResolver.query(DatabaseProvider.CONTENT_USER_URI, projection, selection, selectionArgs, null);
     if (query.getCount() == 1 && query.moveToFirst()) {
       return query.getString(query.getColumnIndex(UserTable.COLUMN_USERNAME));
+        calculateSplit(transaction);
+        saveTransactionImpl(transaction);
+    private void saveTransactionImpl(Transaction transaction) {
+        final ContentValues transactionContent = transaction.toContentValues();
+        final Uri id = contentResolver.insert(DatabaseProvider.CONTENT_TRANSACTION_URI, transactionContent);
+        if (id != null) {
+            ContentValues transactionGroupContent = new ContentValues();
+            final int transactionId = Integer.parseInt(id.getLastPathSegment());
+            transaction.setId(transactionId);
+            transactionGroupContent.put(GroupTransactionTable.COLUMN_TRANSACTION_ID, transactionId);
+            transactionGroupContent.put(GroupTransactionTable.COLUMN_GROUP_ID, transaction.getGroupId());
+            contentResolver.insert(DatabaseProvider.CONTENT_GROUP_TRANSACTION_URI, transactionGroupContent);
+        }
+        contentResolver.notifyChange(DatabaseProvider.CONTENT_GROUP_USER_TRANSACTION_JOIN_URI, null);
     }
     return null;
   }
@@ -290,6 +317,9 @@ public class DatabaseProviderHelper {
       transaction.setSplit(cursor.getString(cursor.getColumnIndexOrThrow(TransactionTable.COLUMN_SPLIT)));
       transaction.setGroupId(cursor.getString(cursor.getColumnIndexOrThrow(GroupTable.COLUMN_GROUP_ID)));
       result.add(transaction);
+    private void calculateSplit(Transaction... saved) {
+        TransactionSplittingTask task = new TransactionSplittingTask(this, new PairBasedSettlement());
+        task.execute(saved);
     }
 
     return result;
@@ -326,6 +356,14 @@ public class DatabaseProviderHelper {
       final User user = new User();
       user.setEmail(cursor.getString(cursor.getColumnIndexOrThrow(UserTable.COLUMN_EMAIL)));
       group.getUsers().add(user);
+    public void saveDebt(Debt debt) {
+        final ContentValues debtContent = new ContentValues();
+        debtContent.put(DebtTable.COLUMN_TRANSACTION_ID, debt.getTransactionId());
+        debtContent.put(DebtTable.COLUMN_AMOUNT, debt.getAmount());
+        debtContent.put(DebtTable.COLUMN_FROM_USER, debt.getDebtorId());
+        debtContent.put(DebtTable.COLUMN_TO_USER, debt.getCreditorId());
+        final Uri insert = contentResolver.insert(DatabaseProvider.CONTENT_DEBT_URI, debtContent);
+        Log.d(TAG, "Inserted debt " + debt + " at " + insert);
     }
 
     return result;
@@ -398,4 +436,81 @@ public class DatabaseProviderHelper {
     }
     return existingGroups;
   }
+
+    public void savePayment(Payment payment, Date creationTimestmap, long groupId) {
+        final ContentValues paymentContent = new ContentValues();
+        paymentContent.put(PaymentTable.COLUMN_AMOUNT, payment.getAmount());
+        paymentContent.put(PaymentTable.COLUMN_FROM_USER, payment.getFromUserId());
+        paymentContent.put(PaymentTable.COLUMN_TO_USER, payment.getToUserId());
+        paymentContent.put(PaymentTable.COLUMN_CREATED_AT, formatDate(creationTimestmap));
+        paymentContent.put(PaymentTable.COLUMN_GROUP_ID, groupId);
+        final Uri insert = contentResolver.insert(DatabaseProvider.CONTENT_PAYMENT_URI, paymentContent);
+        Log.d(TAG, "Inserted payment " + insert);
+    }
+
+    public void completeTransaction(Transaction transaction) {
+        if (transaction.getGroup() == null) {
+            transaction.setGroup(loadGroupForTransaction(transaction));
+        }
+        if (transaction.getGroup().getUsers().isEmpty()) {
+            transaction.getGroup().getUsers().addAll(loadUsersForGroup(transaction.getGroup()));
+        }
+    }
+
+    @NonNull
+    private List<User> loadUsersForGroup(Group group) {
+        final String[] projection = {UserTable.TABLE_NAME + ".*"};
+        final String selection = GroupTable.TABLE_NAME + "." + GroupTable.COLUMN_ID + " = ?";
+        final String[] selectionArgs = {"" + group.getId()};
+        final Cursor cursor = contentResolver.query(DatabaseProvider.CONTENT_GROUP_USER_JOIN_URI,
+                projection, selection, selectionArgs, null);
+        if (cursor != null) {
+            List<User> out = new ArrayList<>();
+            while (cursor.moveToNext()) {
+                out.add(UserTable.extractUserFromCurrentPosition(cursor));
+            }
+            return out;
+        } else {
+            return new ArrayList<>();
+        }
+    }
+
+    private Group loadGroupForTransaction(Transaction transaction) {
+        final String[] projection = {GroupTable.TABLE_NAME + ".*"};
+        final String selection = TransactionTable.TABLE_NAME + "." + TransactionTable.COLUMN_ID + " = ?";
+        final String[] selectionArgs = {"" + transaction.getId()};
+        final Cursor cursor = contentResolver.query(DatabaseProvider.CONTENT_GROUP_TRANSACTION_JOIN_URI,
+                projection, selection, selectionArgs, null);
+        if (cursor != null) {
+            final boolean hadFirst = cursor.moveToFirst();
+            if (hadFirst) {
+                return GroupTable.extractGroupFromCurrentPosition(cursor);
+            } else {
+                return null;
+            }
+        } else {
+            return null;
+        }
+    }
+
+    public List<Debt> getAllDebtsForGroup(String id) {
+        final String[] projection = {DebtTable.COLUMN_ID, DebtTable.COLUMN_AMOUNT,
+                DebtTable.COLUMN_FROM_USER, DebtTable.COLUMN_TO_USER,
+                DebtTable.TABLE_NAME + "." + DebtTable.COLUMN_TRANSACTION_ID,
+                GroupTransactionTable.TABLE_NAME + "." + GroupTransactionTable.COLUMN_GROUP_ID};
+        final String selection = GroupTransactionTable.COLUMN_GROUP_ID + " = ?";
+        final String[] selectionArgs = new String[]{id};
+        final Cursor query = contentResolver.query(DatabaseProvider.CONTENT_GROUP_ID_DEBT_JOIN_URI, projection,
+                selection, selectionArgs, null);
+        List<Debt> out = new ArrayList<>();
+        if (query != null) {
+            while (query.moveToNext()) {
+                out.add(extractDebtFromCurrentPosition(query));
+            }
+        } else {
+            Log.e(TAG, "Query for getting all debts was null!");
+        }
+        return out;
+    }
+
 }

@@ -1,6 +1,10 @@
 package com.media.interactive.cs3.hdm.interactivemedia.contentprovider.tables;
 
+import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.support.annotation.NonNull;
+
+import com.media.interactive.cs3.hdm.interactivemedia.data.Group;
 
 /**
  * Created by benny on 20.11.17.
@@ -36,18 +40,35 @@ public class GroupTable {
 
     public static final String DATABASE_CREATE =
 
-        "create table if not exists "+ TABLE_NAME +"(" +
-                COLUMN_ID+" integer unique primary key AUTOINCREMENT," +
-                COLUMN_NAME+" TEXT NOT NULL," +
-                COLUMN_IMAGE_URL+" TEXT," +
-                COLUMN_CREATED_AT+" TIMESTAMP DEFAULT CURRENT_TIMESTAMP," +
-                COLUMN_GROUP_ID +" TEXT," +
-                COLUMN_SYNCHRONIZED +" INTEGER NOT NULL)";
+            "create table if not exists " + TABLE_NAME + "(" +
+                    COLUMN_ID + " integer unique primary key AUTOINCREMENT," +
+                    COLUMN_NAME + " TEXT NOT NULL," +
+                    COLUMN_IMAGE_URL + " TEXT," +
+                    COLUMN_CREATED_AT + " TIMESTAMP DEFAULT CURRENT_TIMESTAMP," +
+                    COLUMN_GROUP_ID + " TEXT," +
+                    COLUMN_SYNCHRONIZED + " INTEGER NOT NULL)";
 
 
     public static final String DATABASE_DROP = "drop table if exists " + TABLE_NAME;
 
     public static void onCreate(SQLiteDatabase database) {
         database.execSQL(DATABASE_CREATE);
+    }
+
+    @NonNull
+    /**
+     * Extract Group out of this cursor. May throw exceptions if any column is missing in cursor.
+     * Does not explicitly check for cursor contents. Does neither add users nor transactions to group!
+     */
+    public static Group extractGroupFromCurrentPosition(Cursor cur) {
+        final String name = cur.getString(cur.getColumnIndex(COLUMN_NAME));
+        final String imageUrl = cur.getString(cur.getColumnIndex(COLUMN_IMAGE_URL));
+        final String groupId = cur.getString(cur.getColumnIndex(COLUMN_GROUP_ID));
+        final String createdAt = cur.getString(cur.getColumnIndex(COLUMN_CREATED_AT));
+        final boolean synch = cur.getInt(cur.getColumnIndex(COLUMN_SYNCHRONIZED)) == 1;
+        final long id = cur.getLong(cur.getColumnIndex(COLUMN_ID));
+        final Group group = new Group(name, imageUrl, groupId, createdAt, synch);
+        group.setId(id);
+        return group;
     }
 }
