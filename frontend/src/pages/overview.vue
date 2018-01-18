@@ -83,8 +83,7 @@ export default {
       passwordUsers: "",
       facebookUsers: "",
       googleUsers: "",
-      transactionGroups: "",
-      transactionsGroupsCount: 0,      
+      transactionGroups: "",      
       showLoginTypeChart: true,
       showTransactionAmountChart: true,
       showUserTable: true,
@@ -179,64 +178,31 @@ export default {
         });
     },
 
-    prepareTransactionAmouts: function(){
-  
-      for(var i = 0; i < this.transactionGroups.length; i++){
+    prepareTransactionAmouts() {
+        return Promise.all(this.transactionGroups.map((group, i) => 
+        		this.calculateTransactionAmounts(group.groupId)
+            .then(promiseData => group.totalAmount = promiseData)
+        )).then(results => {
+            console.log("Unsorted Transactiongroups")
+            console.log(JSON.stringify(this.transactionGroups))
+            this.transactionGroups.sort(this.GetSortOrder("totalAmount"));
+            console.log("Sorted Transactiongroups")
+            console.log(JSON.stringify(this.transactionGroups))
+            this.amountsCalculated = true;
+        });
+    },
 
-      var groupId = this.transactionGroups[i].groupId;
-
-      Promise.all([this.calculateTransactionAmouts(groupId)]).then(promiseData => {
-        this.transactionGroups = promiseData[0];
-        this.transactionsGroupsCount ++ 
-        this.transactionGroups.sort(this.GetSortOrder("totalAmount"))
-
-        console.log("In caluculate after sort: ")
-        console.log(JSON.stringify(this.transactionGroups))
-        console.log(this.transactionsGroupsCount)
-        console.log("Transaktionsgruppen: ")
-        console.log(this.transactionGroups.length)
-        if(this.transactionsGroupsCount == this.transactionGroups.length){
-          console.log("Groupcount after for iterate")
-          console.log(this.transactionsGroupsCount)
-          this.amountsCalculated = true
-          console.log(this.amountsCalculated)
-        }   
-
+    calculateTransactionAmounts(groupId) {
+        return axios.get(Config.webServiceURL + "/v1/admin/groups/" + groupId, {
+            headers: {
+                Authorization: "0 " + this.authToken
+            }
         })
-       
-    }
-    
-},
+        .then(response => 
+        		response.data.payload.transactions.reduce((total, { amount }) => total + amount, 0)
+        );
+    },
 
-    calculateTransactionAmouts: function(groupId){
-    return new Promise((resolve, reject) => {
-      var transactions = []
-      var amount = null
-          axios
-            .get(Config.webServiceURL + "/v1/admin/groups/" + groupId, {
-              headers: { Authorization: "0 " + this.authToken }
-            })
-            .then(response => {
-                        console.log("Desired Group: " + JSON.stringify(response.data.payload));
-                transactions = response.data.payload.transactions;
-                for(let j = 0; j < transactions.length; j++){
-                  amount += transactions[j].amount
-                  this.transactionGroups[this.transactionsGroupsCount].totalAmount = amount
-                  console.log("Calculating totalAmout..." + this.transactionGroups[this.transactionsGroupsCount].totalAmount)
-                  resolve(this.transactionGroups)
-                }
-              
-                //this.transactionGroups[i].totalAmout = amount  
-
-              // console.log("Existing Groups: " + JSON.stringify(this.groups));
-            })
-            .catch(e => {
-              console.log("Errors get groupids: " + e);
-              reject(e)
-            });     
-          })
-
-},
 
  GetSortOrder: function(prop) {  
     return function(a, b) {  

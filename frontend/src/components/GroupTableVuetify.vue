@@ -79,9 +79,9 @@ import Config from "../js/Config.js";
 
       createTransaction: function(){
 
-        let groupId = "2a231e04-c44e-47b8-9076-46ee31d83a1c"
+        let groupId = "82471021-a2bf-4590-9d00-c06ed12a2efb"
         var transaction = {
-          "amount": 400,
+          "amount": 1500,
           "infoName": "A very expensive Bath",
           "infoLocation": {
             "longitude": null,
