@@ -102,6 +102,10 @@
           "imageUrl": "http://new.example.com/image.jpg",
           "authType": 1
         },
+        "updateRole": {
+          "imageUrl": "http://new.example.com/image.jpg",
+          "role": "admin"
+        },
         "updateUnknownField": {
           "imageUrl": "http://new.example.com/image.jpg",
           "unknownField": "value of unknown filed"

@@ -17,15 +17,15 @@ const statusRoutes = require('./routes/status.routes');
 const testRoutes = require('./routes/test.routes');
 const adminRoutes = require('./routes/admin.routes');
 
-const config = require('./modules/config');
 const user = require('./modules/user.module');
 const database = require('./modules/database.module');
 const objectstore = require('./modules/objectstore.module');
 
 const pushNotificationService = require('./services/pushNotification.service');
 
-const ERROR = require('./config.error');
-const ROLES = require('./config.roles');
+const config = require('./config/settings.config');
+const ERROR = require('./config/error.config');
+const ROLES = require('./config/roles.config');
 
 const MONGO_DB_CONNECTION_ERROR_CODE = 10;
 

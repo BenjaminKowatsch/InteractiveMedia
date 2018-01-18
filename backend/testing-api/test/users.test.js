@@ -887,6 +887,22 @@ describe('User-Controller', () => {
         });
       });
 
+      it('should fail to update role', function() {
+        return chai.request(HOST)
+        .put(URL.BASE_USER  + '/user')
+        .set('Authorization', '0 ' + token)
+        .send(testData.users.update.invalid.updateRole)
+        .then(res => {
+          expect(res).to.have.status(400);
+          expect(res).to.be.json;
+          expect(res.body).to.be.an('object');
+          expect(res.body.success).to.be.false;
+          expect(res.body.payload).to.be.an('object');
+          expect(res.body.payload.dataPath).to.equal('validation');
+          expect(res.body.payload.message).to.equal('invalid body');
+        });
+      });
+
       it('should fail to update unknown field', function() {
         return chai.request(HOST)
         .put(URL.BASE_USER  + '/user')

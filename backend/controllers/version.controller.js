@@ -5,5 +5,9 @@ const httpResponseService = require('../services/httpResponse.service');
 
 exports.getVersion = function(req, res) {
   const currentAppVersion = appVersionService.getAppVersion();
-  httpResponseService.send(res, 200, currentAppVersion);
+  const responseData = {
+    'success': true,
+    'payload': currentAppVersion
+  };
+  httpResponseService.send(res, 200, responseData);
 };

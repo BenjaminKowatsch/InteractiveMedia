@@ -2,8 +2,8 @@
 
 const winston = require('winston');
 const fcm = require('node-gcm');
-const config = require('../modules/config');
-const ERROR = require('../config.error');
+const config = require('../config/settings.config');
+const ERROR = require('../config/error.config');
 
 let sender;
 

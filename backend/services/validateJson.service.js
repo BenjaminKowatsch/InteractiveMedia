@@ -2,7 +2,7 @@
 
 const tv4 = require('tv4');
 const winston = require('winston');
-const ERROR = require('../config.error');
+const ERROR = require('../config/error.config');
 
 /**
  * Function to validate the request data with a JSON schema.
