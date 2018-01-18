@@ -832,6 +832,38 @@ describe('Admin', () => {
             expect(res.body.payload.message).to.equal('invalid body');
           });
         });
+
+        it('should fail to update with normal user', () => {
+          return chai.request(HOST)
+          .put(URL.BASE_ADMIN  + '/users/' + userIds[0])
+          .set('Authorization', '0 ' + tokens[0])
+          .send(userData.users.updateAsAdmin.valid.allFields)
+          .then(res => {
+            expect(res).to.have.status(403);
+            expect(res).to.be.json;
+            expect(res.body).to.be.an('object');
+            expect(res.body.success).to.be.false;
+            expect(res.body.payload).to.be.an('object');
+            expect(res.body.payload.dataPath).to.be.equal('authorization');
+            expect(res.body.payload.message).to.be.equal('user is not authorized');
+          });
+        });
+
+        it('should fail to update with unknown userId', () => {
+          return chai.request(HOST)
+          .put(URL.BASE_ADMIN + '/users/' + 'XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX')
+          .set('Authorization', '0 ' + adminToken)
+          .send(userData.users.updateAsAdmin.valid.allFields)
+          .then(res => {
+            expect(res).to.have.status(404);
+            expect(res).to.be.json;
+            expect(res.body).to.be.an('object');
+            expect(res.body.success).to.be.false;
+            expect(res.body.payload).to.be.an('object');
+            expect(res.body.payload.dataPath).to.be.equal('user');
+            expect(res.body.payload.message).to.be.equal('user not found');
+          });
+        });
       });
     });
   });
