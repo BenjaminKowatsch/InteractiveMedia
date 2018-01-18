@@ -10,9 +10,10 @@ import com.media.interactive.cs3.hdm.interactivemedia.data.Transaction;
 import com.media.interactive.cs3.hdm.interactivemedia.data.settlement.Payment;
 import com.media.interactive.cs3.hdm.interactivemedia.data.settlement.Settlement;
 
-import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 
 public class TransactionSplittingTask extends AsyncTask<Transaction, Void, Boolean> {
@@ -30,7 +31,7 @@ public class TransactionSplittingTask extends AsyncTask<Transaction, Void, Boole
 
     @Override
     protected Boolean doInBackground(Transaction... transactions) {
-        List<Group> groupsInTransactions = new ArrayList<>();
+        Set<Group> groupsInTransactions = new HashSet<>();
         for (Transaction transaction : transactions) {
             try {
                 helper.completeTransaction(transaction);
@@ -61,7 +62,7 @@ public class TransactionSplittingTask extends AsyncTask<Transaction, Void, Boole
         for(Group group: groupsInTransactions) {
             List<Debt> allDebts;
             try {
-                allDebts = helper.getAllDebtsForGroup(group.getId());
+                allDebts = helper.getAllDebtsForGroup(group.getGroupId());
             } catch (Exception e) {
                 Log.e(TAG, "An error occurred in loading all debts", e);
                 return false;

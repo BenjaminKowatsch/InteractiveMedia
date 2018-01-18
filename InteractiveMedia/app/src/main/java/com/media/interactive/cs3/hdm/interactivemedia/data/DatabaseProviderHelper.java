@@ -31,7 +31,6 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import static android.database.DatabaseUtils.dumpCursorToString;
 import static com.media.interactive.cs3.hdm.interactivemedia.contentprovider.tables.DebtTable.extractDebtFromCurrentPosition;
 import static com.media.interactive.cs3.hdm.interactivemedia.util.Helper.formatDate;
 
@@ -315,15 +314,15 @@ public class DatabaseProviderHelper {
         }
     }
 
-    public List<Debt> getAllDebtsForGroup(long id) {
+    public List<Debt> getAllDebtsForGroup(String id) {
         final String[] projection = {DebtTable.COLUMN_ID, DebtTable.COLUMN_AMOUNT,
                 DebtTable.COLUMN_FROM_USER, DebtTable.COLUMN_TO_USER,
-                DebtTable.TABLE_NAME + "." + DebtTable.COLUMN_TRANSACTION_ID};
-        final String selection = GroupTransactionTable.COLUMN_GROUP_ID + "=?";
-        final String[] selectionArgs = new String[]{"" + id};
+                DebtTable.TABLE_NAME + "." + DebtTable.COLUMN_TRANSACTION_ID,
+                GroupTransactionTable.TABLE_NAME + "." + GroupTransactionTable.COLUMN_GROUP_ID};
+        final String selection = GroupTransactionTable.COLUMN_GROUP_ID + " = ?";
+        final String[] selectionArgs = new String[]{id};
         final Cursor query = contentResolver.query(DatabaseProvider.CONTENT_GROUP_ID_DEBT_JOIN_URI, projection,
                 selection, selectionArgs, null);
-        Log.d(TAG, dumpCursorToString(query));
         List<Debt> out = new ArrayList<>();
         if (query != null) {
             while (query.moveToNext()) {
