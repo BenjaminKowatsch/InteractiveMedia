@@ -918,6 +918,54 @@ describe('User-Controller', () => {
           expect(res.body.payload.message).to.equal('invalid body');
         });
       });
+
+      it('should fail to update username with null', function() {
+        return chai.request(HOST)
+        .put(URL.BASE_USER  + '/user')
+        .set('Authorization', '0 ' + token)
+        .send(testData.users.update.invalid.updateUsernameNull)
+        .then(res => {
+          expect(res).to.have.status(400);
+          expect(res).to.be.json;
+          expect(res.body).to.be.an('object');
+          expect(res.body.success).to.be.false;
+          expect(res.body.payload).to.be.an('object');
+          expect(res.body.payload.dataPath).to.equal('validation');
+          expect(res.body.payload.message).to.equal('invalid body');
+        });
+      });
+
+      it('should fail to update password with null', function() {
+        return chai.request(HOST)
+        .put(URL.BASE_USER  + '/user')
+        .set('Authorization', '0 ' + token)
+        .send(testData.users.update.invalid.updatePasswordNull)
+        .then(res => {
+          expect(res).to.have.status(400);
+          expect(res).to.be.json;
+          expect(res.body).to.be.an('object');
+          expect(res.body.success).to.be.false;
+          expect(res.body.payload).to.be.an('object');
+          expect(res.body.payload.dataPath).to.equal('validation');
+          expect(res.body.payload.message).to.equal('invalid body');
+        });
+      });
+
+      it('should fail to update email with null', function() {
+        return chai.request(HOST)
+        .put(URL.BASE_USER  + '/user')
+        .set('Authorization', '0 ' + token)
+        .send(testData.users.update.invalid.updateEmailNull)
+        .then(res => {
+          expect(res).to.have.status(400);
+          expect(res).to.be.json;
+          expect(res.body).to.be.an('object');
+          expect(res.body.success).to.be.false;
+          expect(res.body.payload).to.be.an('object');
+          expect(res.body.payload.dataPath).to.equal('validation');
+          expect(res.body.payload.message).to.equal('invalid body');
+        });
+      });
     });
   });
 });

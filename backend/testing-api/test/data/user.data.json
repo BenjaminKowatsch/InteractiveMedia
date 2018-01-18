@@ -109,6 +109,18 @@
         "updateUnknownField": {
           "imageUrl": "http://new.example.com/image.jpg",
           "unknownField": "value of unknown filed"
+        },
+        "updateUsernameNull": {
+          "imageUrl": "http://new.example.com/image.jpg",
+          "username": null
+        },
+        "updatePasswordNull": {
+          "imageUrl": "http://new.example.com/image.jpg",
+          "password": null
+        },
+        "updateEmailNull": {
+          "imageUrl": "http://new.example.com/image.jpg",
+          "email": null
         }
       }
     }

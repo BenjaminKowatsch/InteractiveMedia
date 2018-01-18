@@ -12,7 +12,7 @@
  */
 /**
  * @apiDefine paramUsernameOptional
-    @apiParam (Parameter) {string} username Username. Optional. "null" is allowed.
+    @apiParam (Parameter) {string} username Username. Optional.
  */
 /**
  * @apiDefine paramHashedPassword
@@ -20,7 +20,7 @@
  */
 /**
  * @apiDefine paramHashedPasswordOptional
-    @apiParam (Parameter) {string} password Hash of a password. Optional. "null" is allowed.
+    @apiParam (Parameter) {string} password Hash of a password. Optional.
  */
 /**
  * @apiDefine paramAuthtype
@@ -32,7 +32,7 @@
  */
 /**
  * @apiDefine paramEmailOptional
-    @apiParam (Parameter) {string} email Email of user. Optional. "null" is allowed.
+    @apiParam (Parameter) {string} email Email of user. Optional.
  */
 /**
  * @apiDefine paramFcmTokenOptional
