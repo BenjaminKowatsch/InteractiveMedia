@@ -76,7 +76,7 @@ module.exports.getUserById = function(req, res) {
     let responseData = {payload: {}};
     responseData.success = true;
     responseData.payload = userResult.payload;
-    httpResponseService.send(res, 200, userResult);
+    httpResponseService.send(res, 200, responseData);
   }).catch(errorResult => {
     winston.error(errorResult.errorCode);
     let statusCode = 418;
