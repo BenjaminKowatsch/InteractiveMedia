@@ -172,23 +172,6 @@ public class DatabaseProviderHelper {
         task.execute(saved);
     }
 
-    public List<Debt> getAllDebts() {
-        final String[] projection = {DebtTable.COLUMN_ID, DebtTable.COLUMN_AMOUNT,
-                DebtTable.COLUMN_FROM_USER, DebtTable.COLUMN_TO_USER, DebtTable.COLUMN_TRANSACTION_ID};
-        final Cursor query = contentResolver.query(DatabaseProvider.CONTENT_DEBT_URI, projection,
-                null, null, null);
-        List<Debt> out = new ArrayList<>();
-        if (query != null) {
-            while (query.moveToNext()) {
-                out.add(extractDebtFromCurrentPosition(query));
-            }
-        } else {
-            Log.e(TAG, "Query for getting all debts was null!");
-        }
-        return out;
-    }
-
-
     public void saveDebt(Debt debt) {
         final ContentValues debtContent = new ContentValues();
         debtContent.put(DebtTable.COLUMN_TRANSACTION_ID, debt.getTransactionId());
@@ -320,4 +303,25 @@ public class DatabaseProviderHelper {
             return null;
         }
     }
+
+    public List<Debt> getAllDebtsForGroup(long id) {
+        final String[] projection = {DebtTable.COLUMN_ID, DebtTable.COLUMN_AMOUNT,
+                DebtTable.COLUMN_FROM_USER, DebtTable.COLUMN_TO_USER,
+                DebtTable.TABLE_NAME + "." + DebtTable.COLUMN_TRANSACTION_ID,
+                GroupTransactionTable.COLUMN_GROUP_ID};
+        final String selection = GroupTransactionTable.COLUMN_GROUP_ID + "=?";
+        final String[] selectionArgs = new String[]{"" + id};
+        final Cursor query = contentResolver.query(DatabaseProvider.CONTENT_GROUP_ID_DEBT_URI, projection,
+                selection, selectionArgs, null);
+        List<Debt> out = new ArrayList<>();
+        if (query != null) {
+            while (query.moveToNext()) {
+                out.add(extractDebtFromCurrentPosition(query));
+            }
+        } else {
+            Log.e(TAG, "Query for getting all debts was null!");
+        }
+        return out;
+    }
+
 }

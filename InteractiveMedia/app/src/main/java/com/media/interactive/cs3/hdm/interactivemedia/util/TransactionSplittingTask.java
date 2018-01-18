@@ -54,7 +54,7 @@ public class TransactionSplittingTask extends AsyncTask<Transaction, Void, Boole
             }
             List<Debt> allDebts;
             try {
-                allDebts = helper.getAllDebts();
+                allDebts = helper.getAllDebtsForGroup(transaction.getGroup().getId());
             } catch (Exception e) {
                 Log.e(TAG, "An error occurred in loading all debts", e);
                 return false;

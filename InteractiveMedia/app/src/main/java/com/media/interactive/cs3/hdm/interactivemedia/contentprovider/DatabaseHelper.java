@@ -121,6 +121,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         final String subQuery = "(SELECT " + "MAX(t." + PaymentTable.COLUMN_CREATED_AT + ") FROM " +
                 PaymentTable.TABLE_NAME + " t WHERE t." + PaymentTable.COLUMN_GROUP_ID + " = ?" + ")";
         final String query = "SELECT " + PaymentTable.TABLE_NAME + "." + PaymentTable.COLUMN_ID
+                + ", " + PaymentTable.TABLE_NAME + "." + PaymentTable.COLUMN_CREATED_AT
                 + ", " + PaymentTable.TABLE_NAME + "." + PaymentTable.COLUMN_AMOUNT
                 + ", " + buildAlias(fromUserTable, PAYMENT_USER_JOIN_COLUMN_FROM_USER)
                 + ", " + buildAlias(toUserTable, PAYMENT_USER_JOIN_COLUMN_TO_USER)
@@ -133,15 +134,15 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     }
 
     @NonNull
-    private String buildAlias(String fromUserTable, String columnName) {
-        return fromUserTable + "." +
+    private String buildAlias(String tableAlias, String columnName) {
+        return tableAlias + "." +
                 UserTable.COLUMN_USERNAME + " " + columnName;
     }
 
     @NonNull
-    private String getUserNameLeftJoinString(String fromUserTable, String column) {
-        return "\nleft join " + UserTable.TABLE_NAME + " " + fromUserTable + " ON (" + PaymentTable.TABLE_NAME
-                + "." + column + " = " + fromUserTable + "." + UserTable.COLUMN_ID + ") ";
+    private String getUserNameLeftJoinString(String tableAlias, String column) {
+        return "\nleft join " + UserTable.TABLE_NAME + " " + tableAlias + " ON (" + PaymentTable.TABLE_NAME
+                + "." + column + " = " + tableAlias + "." + UserTable.COLUMN_ID + ") ";
     }
 
 }
