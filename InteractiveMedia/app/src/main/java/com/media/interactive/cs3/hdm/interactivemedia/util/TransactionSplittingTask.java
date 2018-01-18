@@ -5,10 +5,12 @@ import android.util.Log;
 
 import com.media.interactive.cs3.hdm.interactivemedia.data.DatabaseProviderHelper;
 import com.media.interactive.cs3.hdm.interactivemedia.data.Debt;
+import com.media.interactive.cs3.hdm.interactivemedia.data.Group;
 import com.media.interactive.cs3.hdm.interactivemedia.data.Transaction;
 import com.media.interactive.cs3.hdm.interactivemedia.data.settlement.Payment;
 import com.media.interactive.cs3.hdm.interactivemedia.data.settlement.Settlement;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -28,6 +30,7 @@ public class TransactionSplittingTask extends AsyncTask<Transaction, Void, Boole
 
     @Override
     protected Boolean doInBackground(Transaction... transactions) {
+        List<Group> groupsInTransactions = new ArrayList<>();
         for (Transaction transaction : transactions) {
             try {
                 helper.completeTransaction(transaction);
@@ -52,9 +55,12 @@ public class TransactionSplittingTask extends AsyncTask<Transaction, Void, Boole
                     return false;
                 }
             }
+            groupsInTransactions.add(transaction.getGroup());
+        }
+        for(Group group: groupsInTransactions) {
             List<Debt> allDebts;
             try {
-                allDebts = helper.getAllDebtsForGroup(transaction.getGroup().getId());
+                allDebts = helper.getAllDebtsForGroup(group.getId());
             } catch (Exception e) {
                 Log.e(TAG, "An error occurred in loading all debts", e);
                 return false;
@@ -69,7 +75,7 @@ public class TransactionSplittingTask extends AsyncTask<Transaction, Void, Boole
             final Date paymentGenerationTimestamp = new Date(System.currentTimeMillis());
             for (Payment payment : payments) {
                 try {
-                    helper.savePayment(payment, paymentGenerationTimestamp, transaction.getGroup().getId());
+                    helper.savePayment(payment, paymentGenerationTimestamp, group.getId());
                 } catch (Exception e) {
                     Log.e(TAG, "An error occurred in saving payment " + payment, e);
                     return false;

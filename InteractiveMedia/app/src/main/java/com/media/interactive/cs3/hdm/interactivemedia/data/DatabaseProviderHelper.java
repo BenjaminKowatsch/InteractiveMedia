@@ -123,6 +123,7 @@ public class DatabaseProviderHelper {
     }
 
     public void addTransactions(JSONArray jsonArray, Group group) throws JSONException {
+        List<Transaction> transactions = new ArrayList<>();
         for (int i = 0; i < jsonArray.length(); i++) {
             final JSONObject transactionObject = (JSONObject) jsonArray.get(i);
             final Transaction transaction = new Transaction();
@@ -148,11 +149,19 @@ public class DatabaseProviderHelper {
             transaction.setPaidByUserId(transactionObject.getString("paidBy"));
             transaction.setSplit(transactionObject.getString("split"));
             Log.d(TAG, "Saving Transaction: " + transaction.toString());
-            saveTransaction(transaction);
+            //using impl and then add them to task in batches to optimize resolving speed
+            saveTransactionImpl(transaction);
+            transactions.add(transaction);
         }
+        calculateSplit(transactions.toArray(new Transaction[]{}));
     }
 
     public void saveTransaction(Transaction transaction) {
+        saveTransactionImpl(transaction);
+        calculateSplit(transaction);
+    }
+
+    private void saveTransactionImpl(Transaction transaction) {
         final ContentValues transactionContent = transaction.toContentValues();
         final Uri id = contentResolver.insert(DatabaseProvider.CONTENT_TRANSACTION_URI, transactionContent);
         if (id != null) {
@@ -164,10 +173,9 @@ public class DatabaseProviderHelper {
             contentResolver.insert(DatabaseProvider.CONTENT_GROUP_TRANSACTION_URI, transactionGroupContent);
         }
         contentResolver.notifyChange(DatabaseProvider.CONTENT_GROUP_USER_TRANSACTION_JOIN_URI, null);
-        calculateSplit(transaction);
     }
 
-    private void calculateSplit(Transaction saved) {
+    private void calculateSplit(Transaction... saved) {
         TransactionSplittingTask task = new TransactionSplittingTask(this, new PairBasedSettlement());
         task.execute(saved);
     }
@@ -273,7 +281,7 @@ public class DatabaseProviderHelper {
         final String[] projection = {UserTable.TABLE_NAME + ".*"};
         final String selection = GroupTable.TABLE_NAME + "." + GroupTable.COLUMN_ID + " = ?";
         final String[] selectionArgs = {"" + group.getId()};
-        final Cursor cursor = contentResolver.query(DatabaseProvider.CONTENT_GROUP_USER_URI,
+        final Cursor cursor = contentResolver.query(DatabaseProvider.CONTENT_GROUP_USER_JOIN_URI,
                 projection, selection, selectionArgs, null);
         if (cursor != null) {
             List<User> out = new ArrayList<>();
