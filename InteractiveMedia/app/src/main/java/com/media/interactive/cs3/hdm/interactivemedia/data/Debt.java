@@ -43,4 +43,14 @@ public class Debt {
     public long getTransactionId() {
         return transactionId;
     }
+
+    @Override
+    public String toString() {
+        return "Debt{" +
+                "creditorId=" + creditorId +
+                ", debtorId=" + debtorId +
+                ", amount=" + amount +
+                ", transactionId=" + transactionId +
+                '}';
+    }
 }

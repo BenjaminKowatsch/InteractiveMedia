@@ -31,6 +31,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import static android.database.DatabaseUtils.dumpCursorToString;
 import static com.media.interactive.cs3.hdm.interactivemedia.contentprovider.tables.DebtTable.extractDebtFromCurrentPosition;
 import static com.media.interactive.cs3.hdm.interactivemedia.util.Helper.formatDate;
 
@@ -186,7 +187,8 @@ public class DatabaseProviderHelper {
         debtContent.put(DebtTable.COLUMN_AMOUNT, debt.getAmount());
         debtContent.put(DebtTable.COLUMN_FROM_USER, debt.getDebtorId());
         debtContent.put(DebtTable.COLUMN_TO_USER, debt.getCreditorId());
-        contentResolver.insert(DatabaseProvider.CONTENT_DEBT_URI, debtContent);
+        final Uri insert = contentResolver.insert(DatabaseProvider.CONTENT_DEBT_URI, debtContent);
+        Log.d(TAG, "Inserted debt " + debt + " at " + insert);
     }
 
     public boolean checkForCachedCredentials(Login login) {
@@ -264,7 +266,8 @@ public class DatabaseProviderHelper {
         paymentContent.put(PaymentTable.COLUMN_TO_USER, payment.getToUserId());
         paymentContent.put(PaymentTable.COLUMN_CREATED_AT, formatDate(creationTimestmap));
         paymentContent.put(PaymentTable.COLUMN_GROUP_ID, groupId);
-        contentResolver.insert(DatabaseProvider.CONTENT_PAYMENT_URI, paymentContent);
+        final Uri insert = contentResolver.insert(DatabaseProvider.CONTENT_PAYMENT_URI, paymentContent);
+        Log.d(TAG, "Inserted payment " + insert);
     }
 
     public void completeTransaction(Transaction transaction) {
@@ -315,12 +318,12 @@ public class DatabaseProviderHelper {
     public List<Debt> getAllDebtsForGroup(long id) {
         final String[] projection = {DebtTable.COLUMN_ID, DebtTable.COLUMN_AMOUNT,
                 DebtTable.COLUMN_FROM_USER, DebtTable.COLUMN_TO_USER,
-                DebtTable.TABLE_NAME + "." + DebtTable.COLUMN_TRANSACTION_ID,
-                GroupTransactionTable.COLUMN_GROUP_ID};
+                DebtTable.TABLE_NAME + "." + DebtTable.COLUMN_TRANSACTION_ID};
         final String selection = GroupTransactionTable.COLUMN_GROUP_ID + "=?";
         final String[] selectionArgs = new String[]{"" + id};
-        final Cursor query = contentResolver.query(DatabaseProvider.CONTENT_GROUP_ID_DEBT_URI, projection,
+        final Cursor query = contentResolver.query(DatabaseProvider.CONTENT_GROUP_ID_DEBT_JOIN_URI, projection,
                 selection, selectionArgs, null);
+        Log.d(TAG, dumpCursorToString(query));
         List<Debt> out = new ArrayList<>();
         if (query != null) {
             while (query.moveToNext()) {

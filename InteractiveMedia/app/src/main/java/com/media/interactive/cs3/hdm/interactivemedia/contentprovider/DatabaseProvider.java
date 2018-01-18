@@ -60,7 +60,7 @@ public class DatabaseProvider extends android.content.ContentProvider {
             + AUTHORITY + "/" + GroupTransactionTable.TABLE_NAME);
     public static final Uri CONTENT_GROUP_USER_URI = Uri.parse("content://"
             + AUTHORITY + "/" + GroupUserTable.TABLE_NAME);
-    public static final Uri CONTENT_GROUP_ID_DEBT_URI = Uri.parse("content://"
+    public static final Uri CONTENT_GROUP_ID_DEBT_JOIN_URI = Uri.parse("content://"
             + AUTHORITY + "/" + GROUP_ID_DEBT_JOIN_TABLE);
     public static final Uri CONTENT_PAYMENT_URI = Uri.parse("content://"
             + AUTHORITY + "/" + PaymentTable.TABLE_NAME);

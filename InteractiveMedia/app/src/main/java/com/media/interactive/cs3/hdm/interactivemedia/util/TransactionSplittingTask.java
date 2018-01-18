@@ -57,6 +57,7 @@ public class TransactionSplittingTask extends AsyncTask<Transaction, Void, Boole
             }
             groupsInTransactions.add(transaction.getGroup());
         }
+        Log.d(TAG, "Groups in transaction: " + groupsInTransactions);
         for(Group group: groupsInTransactions) {
             List<Debt> allDebts;
             try {
@@ -65,6 +66,7 @@ public class TransactionSplittingTask extends AsyncTask<Transaction, Void, Boole
                 Log.e(TAG, "An error occurred in loading all debts", e);
                 return false;
             }
+            Log.d(TAG, "Loaded " + allDebts.size() + " debts for group " + group);
             List<Payment> payments;
             try {
                 payments = settlementMethod.settle(allDebts);
@@ -72,6 +74,7 @@ public class TransactionSplittingTask extends AsyncTask<Transaction, Void, Boole
                 Log.e(TAG, "An error occurred in settling all debts", e);
                 return false;
             }
+            Log.d(TAG, "Created " + payments.size() + " payments for debts of group " + group);
             final Date paymentGenerationTimestamp = new Date(System.currentTimeMillis());
             for (Payment payment : payments) {
                 try {
