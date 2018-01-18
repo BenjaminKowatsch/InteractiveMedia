@@ -8,7 +8,7 @@
     <v-layout row wrap>
     <v-flex xs12 sm12 md12 lg6 xl6>
         <v-btn large @click="showUserTable = toggleState(showUserTable)">Overview Users</v-btn>
-        <user-table-vuetify v-if="usersLoaded && showUserTable" :users="users"></user-table-vuetify>
+        <user-table-vuetify v-if="usersLoaded && showUserTable" :users="users" :authToken="authToken"></user-table-vuetify>
     </v-flex>
     <v-flex xs12 sm12 md12 lg6 xl6>
         <v-btn  large @click="showGroupTable = toggleState(showGroupTable)">Overview Groups</v-btn>
