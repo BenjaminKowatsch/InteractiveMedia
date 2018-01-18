@@ -661,6 +661,12 @@ function checkIfUpdateOneWasSuccessful(resultRaw) {
     const result = JSON.parse(resultRaw);
     if (result && result.n === 1 && result.nModified === 1 && result.ok === 1) {
       resolve(result);
+    } else if (result && result.n === 0 && result.nModified === 0 && result.ok === 1) {
+      // no error during update but nothing modified because document was not found
+      let errorToReturn = {isSelfProvided: true};
+      errorToReturn.message = 'resource not found';
+      errorToReturn.errorCode = ERROR.RESOURCE_NOT_FOUND;
+      reject(errorToReturn);
     } else {
       let errorToReturn = {isSelfProvided: true};
       errorToReturn.message = 'database error';

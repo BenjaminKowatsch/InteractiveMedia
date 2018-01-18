@@ -147,4 +147,44 @@ router.get('/users', authenticationService.isAuthenticated, authorizationService
 router.get('/users/:userId', authenticationService.isAuthenticated, authorizationService.isAuthorizedAdmin,
     adminController.getUserById);
 
+/**
+ * @api {PUT} /v1/admin/users/:userId Update user by id
+ * @apiName PutUserById
+ * @apiGroup admin
+ * @apiVersion 0.1.0
+ * @apiPermission admin
+ * @apiDescription Update user. Empty request body is not allowed.
+ *
+ * @apiUse paramUrlUserId
+ *
+ * @apiUse headerAuthorization
+ * @apiUse headerExampleAuthorization
+ *
+ * @apiUse paramUsernameOptional
+ * @apiUse paramHashedPasswordOptional
+ * @apiUse paramEmailOptional
+ * @apiUse paramImageUrlOptional
+ * @apiUse paramFcmTokenOptional
+ * @apiUse paramRoleOptional
+ *
+ * @apiUse paramExampleAdminUserUpdate
+ *
+ * @apiUse successBodySuccess
+ * @apiSuccess (SuccessCode) {200} Success Update successful
+ *
+ * @apiUse successExampleSuccess
+ *
+ * @apiUse error400InvalidBody
+ * @apiUse error401Unauthorized
+ * @apiUse error403Forbidden
+ * @apiUse error404UnknownId
+ * @apiUse error418UncaughtError
+ * @apiUse error500DatabaseError
+ * @apiUse errorBodyCommonStructure
+ *
+ * @apiUse errorExampleCommon
+ */
+router.put('/users/:userId', authenticationService.isAuthenticated, authorizationService.isAuthorizedAdmin,
+    adminController.updateUserById);
+
 module.exports = router;
