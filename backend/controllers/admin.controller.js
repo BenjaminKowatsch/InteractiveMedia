@@ -115,7 +115,9 @@ module.exports.updateUserById = function(req, res) {
         statusCode = 400;
         break;
       case ERROR.UNKNOWN_USER:
+      case ERROR.RESOURCE_NOT_FOUND:
         statusCode = 404;
+        errorResult.responseData.payload.message = 'user not found';
         break;
       case ERROR.DB_ERROR:
         statusCode = 500;

@@ -205,6 +205,7 @@ exports.updateUser = function(req, res) {
         statusCode = 400;
         break;
       case ERROR.UNKNOWN_USER:
+      case ERROR.RESOURCE_NOT_FOUND:
         statusCode = 500;
         errorResult.responseData.dataPath = 'user';
         errorResult.responseData.message = 'internal server error';
