@@ -12,21 +12,26 @@
     </v-flex>
     <v-flex xs12 sm12 md12 lg6 xl6>
         <v-btn  large @click="showGroupTable = toggleState(showGroupTable)">Overview Groups</v-btn>
-        <group-table-vuetify v-if="groupsLoaded && showGroupTable" :groups="groups"></group-table-vuetify>
+        <group-table-vuetify v-if="groupsLoaded && showGroupTable" :groups="groups" :authToken="authToken"></group-table-vuetify>
     </v-flex>
     <v-flex xs12 sm12 md12 lg6 xl6>
         <v-btn  large @click="showLoginTypeChart = toggleState(showLoginTypeChart)">Logintypes</v-btn>
         <p></p>
         <login-type-chart v-if="usersLoaded && showLoginTypeChart" :passwordUsers="passwordUsers" :facebookUsers="facebookUsers" :googleUsers="googleUsers"></login-type-chart>
     </v-flex>
+    <v-flex xs12 sm12 md12 lg6 xl6>
+        <v-btn  large @click="showTransactionAmountChart = toggleState(showTransactionAmountChart)">TOP 3 Groups</v-btn>
+        <p></p>
+        <transaction-amout-chart v-if="amountsCalculated && showTransactionAmountChart" :transactionGroups="transactionGroups"></transaction-amout-chart>
+    </v-flex>
     </v-layout>
 </v-container>
 
-<!--         <input type="button" v-on:click="createDummyGroup()" value="AddDummyGroup"/>
-        <input type="button" v-on:click="showGroupUserChart = toggleState(showGroupUserChart)" value="Show User and Groups Chart"/>
+       <input type="button" v-on:click="createDummyGroup()" value="AddDummyGroup"/>
+  <!--       <input type="button" v-on:click="showGroupUserChart = toggleState(showGroupUserChart)" value="Show User and Groups Chart"/>
 
         <input type="button" v-on:click="showLoginTypeChart = toggleState(showLoginTypeChart)" value="Show Logintype Chart"/>
-        <input type="button"  v-on:click="logout()" value="Logout"/> -->
+        <input type="button"  v-on:click="logout()" value="Logout"/>  -->
                     
 <!--         <div class="loginTypeChart">
           <div v-if="usersLoaded && showLoginTypeChart">
@@ -47,6 +52,7 @@ import axios from "axios";
 import Cookie from "../js/Cookie.js";
 import Config from "../js/Config.js";
 import LoginTypeChart from "@/components/LoginTypeChart.js";
+import TransactionAmoutChart from "@/components/TransactionAmountChart.js";
 import UserTableVuetify from "@/components/UserTableVuetify.vue";
 import GroupTableVuetify from "@/components/GroupTableVuetify.vue";
 
@@ -58,7 +64,8 @@ export default {
   components: {
     LoginTypeChart,
     UserTableVuetify,
-    GroupTableVuetify
+    GroupTableVuetify,
+    TransactionAmoutChart
   },
   
   data() {
@@ -76,11 +83,14 @@ export default {
       passwordUsers: "",
       facebookUsers: "",
       googleUsers: "",
+      transactionGroups: "",      
       showLoginTypeChart: true,
+      showTransactionAmountChart: true,
       showUserTable: true,
       showGroupTable: true,
       groupsLoaded: false,
-      usersLoaded: false
+      usersLoaded: false,
+      amountsCalculated: false
     };
   },
 
@@ -110,7 +120,7 @@ export default {
 
   methods: {
     /*     Create a dummy group for testpurpose. After creating, page has to be reloaded to see group*/
-    /* createDummyGroup: function() {
+    createDummyGroup: function() {
       axios
         .post(
           Config.webServiceURL + "/v1/groups",
@@ -129,7 +139,7 @@ export default {
         .catch(function(error) {
           console.log(error);
         });
-    }, */
+    },
 
     authorizeAdmin: function() {
       axios
@@ -153,9 +163,13 @@ export default {
         .then(response => {
           this.groups = response.data.payload;
           this.groupCount = this.groups.length;
-          // this.groupCountLoaded = true;
           console.log("Anzahl Gruppen: " + this.groupCount);
+          this.transactionGroups = this.groups.filter(this.filter_transactionGroups)  
+          console.log("Anzahl Gruppen mit Transaktionen: " + this.transactionGroups.length)
           this.groupsLoaded = true;
+          console.log(JSON.stringify(this.transactionGroups))
+          this.prepareTransactionAmouts()
+
           // console.log("Existing Groups: " + JSON.stringify(this.groups));
         })
         .catch(e => {
@@ -164,6 +178,42 @@ export default {
         });
     },
 
+    prepareTransactionAmouts() {
+        return Promise.all(this.transactionGroups.map((group, i) => 
+        		this.calculateTransactionAmounts(group.groupId)
+            .then(promiseData => group.totalAmount = promiseData)
+        )).then(results => {
+            console.log("Unsorted Transactiongroups")
+            console.log(JSON.stringify(this.transactionGroups))
+            this.transactionGroups.sort(this.GetSortOrder("totalAmount"));
+            console.log("Sorted Transactiongroups")
+            console.log(JSON.stringify(this.transactionGroups))
+            this.amountsCalculated = true;
+        });
+    },
+
+    calculateTransactionAmounts(groupId) {
+        return axios.get(Config.webServiceURL + "/v1/admin/groups/" + groupId, {
+            headers: {
+                Authorization: "0 " + this.authToken
+            }
+        })
+        .then(response => 
+        		response.data.payload.transactions.reduce((total, { amount }) => total + amount, 0)
+        );
+    },
+
+
+ GetSortOrder: function(prop) {  
+    return function(a, b) {  
+        if (a[prop] < b[prop]) {  
+            return 1;  
+        } else if (a[prop] < b[prop]) {  
+            return -1;  
+        }  
+        return 0;  
+    }  
+},  
     getGroupById: function(id) {
       axios
         .get(Config.webServiceURL + "/v1/admin/groups/" + id, {
@@ -246,6 +296,10 @@ export default {
         }
       }
       return count;
+    },
+    //filters groups for transactions
+    filter_transactionGroups: function(groups) {
+      return groups.countTransactions > 0;
     },
 
     //filters users object for loginType = Password
