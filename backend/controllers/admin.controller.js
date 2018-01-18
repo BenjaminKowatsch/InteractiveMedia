@@ -5,8 +5,12 @@ const config = require('../config/settings.config');
 const user = require('../modules/user.module');
 const group = require('../modules/group.module');
 const httpResponseService = require('../services/httpResponse.service');
+const validateJsonService = require('../services/validateJson.service');
 const ERROR = require('../config/error.config');
 const ROLES = require('../config/roles.config');
+const jsonSchema = {
+  updateUserPayload: require('../jsonSchema/updateUserPayload.json')
+};
 
 module.exports.getAllGroups = function(req, res) {
   group.getAllGroups().then(groupResult => {
@@ -81,6 +85,35 @@ module.exports.getUserById = function(req, res) {
     winston.error(errorResult.errorCode);
     let statusCode = 418;
     switch (errorResult.errorCode) {
+      case ERROR.UNKNOWN_USER:
+        statusCode = 404;
+        break;
+      case ERROR.DB_ERROR:
+        statusCode = 500;
+        break;
+    }
+    httpResponseService.send(res, statusCode, errorResult.responseData);
+  });
+};
+
+module.exports.updateUserById = function(req, res) {
+  const userId = req.params.userId;
+  validateJsonService.againstSchema(req.body, jsonSchema.updateUserPayload)
+  .then(() => {
+    return user.updateUser(userId, req.body);
+  })
+  .then(updateResult => {
+    let responseData = {payload: {}};
+    responseData.success = true;
+    responseData.payload = {};
+    httpResponseService.send(res, 200, responseData);
+  }).catch(errorResult => {
+    winston.error(errorResult.errorCode);
+    let statusCode = 418;
+    switch (errorResult.errorCode) {
+      case ERROR.INVALID_REQUEST_BODY:
+        statusCode = 400;
+        break;
       case ERROR.UNKNOWN_USER:
         statusCode = 404;
         break;
