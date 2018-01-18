@@ -457,8 +457,8 @@ describe('Admin', () => {
         let adminToken;
         let tokens = {};
         let userIds = {};
-        let groupId;
         let constantUserData = {};
+
         before('reset db', done => {
           databaseHelper.promiseResetDB().then(() => {done();})
             .catch((err) => {console.error('Error add admin');});
@@ -504,11 +504,10 @@ describe('Admin', () => {
             expect(res.body.payload.email).to.equal(userData.users.valid[0].email);
             expect(res.body.payload._id).to.be.undefined;
             expect(res.body.payload.groupIds).to.be.undefined;
-            expect(res.body.payload.userId).to.have.lengthOf(36).and.to.be.a('string');
+            expect(res.body.payload.userId).to.equal(userIds[0]);
             expect(res.body.payload.role).to.equal('user');
             expect(res.body.payload.imageUrl).to.equal(userData.users.valid[0].imageUrl);
             constantUserData.groupIds = res.body.payload.groupIds;
-            constantUserData.userId = res.body.payload.userId;
           });
         });
 
@@ -539,7 +538,7 @@ describe('Admin', () => {
             expect(res.body.payload.email).to.equal(userData.users.updateAsAdmin.valid.allFields.email);
             expect(res.body.payload._id).to.be.undefined;
             expect(res.body.payload.groupIds).to.equal(constantUserData.groupIds);
-            expect(res.body.payload.userId).to.equal(constantUserData.userId);
+            expect(res.body.payload.userId).to.equal(userIds[0]);
             expect(res.body.payload.role).to.equal(userData.users.updateAsAdmin.valid.allFields.role);
             expect(res.body.payload.imageUrl).to.equal(userData.users.updateAsAdmin.valid.allFields.imageUrl);
           });
@@ -550,7 +549,6 @@ describe('Admin', () => {
         let adminToken;
         let tokens = {};
         let userIds = {};
-        let groupId;
         let constantUserData = {};
 
         before('reset db', done => {
@@ -598,11 +596,10 @@ describe('Admin', () => {
             expect(res.body.payload.email).to.equal(userData.users.valid[0].email);
             expect(res.body.payload._id).to.be.undefined;
             expect(res.body.payload.groupIds).to.be.undefined;
-            expect(res.body.payload.userId).to.have.lengthOf(36).and.to.be.a('string');
+            expect(res.body.payload.userId).to.equal(userIds[0]);
             expect(res.body.payload.role).to.equal('user');
             expect(res.body.payload.imageUrl).to.equal(userData.users.valid[0].imageUrl);
             constantUserData.groupIds = res.body.payload.groupIds;
-            constantUserData.userId = res.body.payload.userId;
           });
         });
 
@@ -633,7 +630,7 @@ describe('Admin', () => {
             expect(res.body.payload.email).to.equal(userData.users.valid[0].email);
             expect(res.body.payload._id).to.be.undefined;
             expect(res.body.payload.groupIds).to.equal(constantUserData.groupIds);
-            expect(res.body.payload.userId).to.equal(constantUserData.userId);
+            expect(res.body.payload.userId).to.equal(userIds[0]);
             expect(res.body.payload.role).to.equal('user');
             expect(res.body.payload.imageUrl).to.equal(userData.users.valid[0].imageUrl);
           });
@@ -644,7 +641,6 @@ describe('Admin', () => {
         let adminToken;
         let tokens = {};
         let userIds = {};
-        let groupId;
         let constantUserData = {};
 
         before('reset db', done => {
