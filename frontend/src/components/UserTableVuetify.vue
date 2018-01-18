@@ -98,51 +98,60 @@
           Update successful
           <v-btn dark flat @click.native="successFulUpdate = false">X</v-btn>       
     </v-snackbar>
-       <v-snackbar
-          :timeout="3000"
-          :bottom="true"
-          class="red darken-4"
-          v-model="errorInUpdate"
-        >
-          Error in update attempt
-          <v-btn dark flat @click.native="errorInUpdate = false">X</v-btn>       
-    </v-snackbar>
-          <v-dialog v-model="dialogUsername" max-width="500px">
-            <v-card>
-              <v-card-title>
-                <span>Update username to {{username}}?</span>
-                <v-spacer></v-spacer>
-                  <v-btn color="primary" flat @click.stop="updateUser(username), dialogUsername=false">
-                    Submit
-                  </v-btn>
-                  <v-btn color="primary" flat @click.stop="dialogUsername=false, cancelEditUsername(tmp)">Cancel</v-btn>
-              </v-card-title>
-            </v-card>
-          </v-dialog>
-          <v-dialog v-model="dialogEmail" max-width="500px">
-            <v-card>
-              <v-card-title>
-                <span>Update email to {{email}}?</span>
-                <v-spacer></v-spacer>
-                  <v-btn color="primary" flat @click.stop="updateUser(email), dialogEmail=false">
-                    Submit
-                  </v-btn>
-                  <v-btn color="primary" flat @click.stop="dialogEmail=false, cancelEditEmail(tmp)">Cancel</v-btn>
-              </v-card-title>
-            </v-card>
-          </v-dialog>
-          <v-dialog v-model="dialogRole" max-width="500px">
-            <v-card>
-              <v-card-title>
-                <span>Update role to {{role}}?</span>
-                <v-spacer></v-spacer>
-                  <v-btn color="primary" flat @click.stop="updateUser(role), dialogRole=false">
-                    Submit
-                  </v-btn>
-                  <v-btn color="primary" flat @click.stop="dialogRole=false, cancelEditRole(tmp)">Cancel</v-btn>
-              </v-card-title>
-            </v-card>
-          </v-dialog>
+      <v-snackbar
+        :timeout="3000"
+        :bottom="true"
+        class="red darken-4"
+        v-model="errorInUpdate"
+      >
+        Error in update attempt
+       <v-btn dark flat @click.native="errorInUpdate = false">X</v-btn>       
+      </v-snackbar>
+        <v-snackbar
+        :timeout="3000"
+        :bottom="true"
+        class="red darken-4"
+        v-model="dontDoThis"
+      >
+        You really shouldn't do this...
+       <v-btn dark flat @click.native="dontDoThis = false">X</v-btn>       
+      </v-snackbar>
+      <v-dialog v-model="dialogUsername" max-width="500px">
+        <v-card>
+          <v-card-title>
+            <span>Update username to {{username}}?</span>
+            <v-spacer></v-spacer>
+            <v-btn color="primary" flat @click.stop="updateUser(username), dialogUsername=false">
+              Submit
+            </v-btn>
+            <v-btn color="primary" flat @click.stop="dialogUsername=false, cancelEditUsername(tmp)">Cancel</v-btn>
+          </v-card-title>
+        </v-card>
+      </v-dialog>
+      <v-dialog v-model="dialogEmail" max-width="500px">
+        <v-card>
+          <v-card-title>
+            <span>Update email to {{email}}?</span>
+            <v-spacer></v-spacer>
+            <v-btn color="primary" flat @click.stop="updateUser(email), dialogEmail=false">
+              Submit
+            </v-btn>
+            <v-btn color="primary" flat @click.stop="dialogEmail=false, cancelEditEmail(tmp)">Cancel</v-btn>
+          </v-card-title>
+        </v-card>
+      </v-dialog>
+      <v-dialog v-model="dialogRole" max-width="500px">
+        <v-card>
+          <v-card-title>
+            <span>Update role to {{role}}?</span>
+            <v-spacer></v-spacer>
+            <v-btn color="primary" flat @click="updateUser(role), dialogRole=false">
+              Submit
+            </v-btn>
+            <v-btn color="primary" flat @click.stop="dialogRole=false, cancelEditRole(tmp)">Cancel</v-btn>
+          </v-card-title>
+        </v-card>
+      </v-dialog>
   </v-container>
   
 </template>
@@ -182,21 +191,44 @@
         imageUrl: "",
         role: "",
         userId: "",
+        ownUserId: "",        
         successFulUpdate: false,
         errorInUpdate: false,
+        dontDoThis: false,
         dialogUsername: false,
         dialogEmail: false,
         dialogRole: false
       }
     },
 
+
+    mounted: function(){
+
+        this.getOwnId()
+
+    },
+
     methods: {
+
+      //get own userId for comparison if updating user role of his own user 
+      getOwnId: function (){
+
+        axios
+        .get(Config.webServiceURL + "/v1/users/user", {
+          headers: { Authorization: `0 ${this.authToken}` }
+        })
+        .then(response => {
+          this.ownUserId = response.data.payload.userId;
+        })
+        .catch(e => {              
+              console.log("Errors own user request (UserTableVuetify): " + e);           
+            });
+      },
 
       updateUser: function(prop){
 
           console.log("Hello Updatefunction")
           var credentials = ""
-          var currentUserId = this.userId
 
           if(this.isUsername)
           {
@@ -248,27 +280,37 @@
 
           if(this.isRole)
           {
-            this.credentials = { role: prop}
-            console.log(JSON.stringify(this.credentials))
-            this.isRole = false
+            console.log("Own: " + this.ownUserId)
+            console.log("Other: " + this.userId)
+            
+            if(this.userId == this.ownUserId && prop == "user"){
+              this.dontDoThis = true
+              this.cancelEditRole(this.tmp)
+            }
+            else
+            {
+              this.credentials = { role: prop}
+              console.log(JSON.stringify(this.credentials))
+              this.isRole = false
 
-            axios.put(Config.webServiceURL + "/v1/admin/users/" + this.userId, this.credentials, {
-                headers: { Authorization: "0 " + this.authToken }
-              })
-              .then(response => 
-                  console.log(JSON.stringify(response)),               
-                  this.successFulUpdate = true                 
-              ).then(
-                this.saveEditRole(this.tmp)
-              )
-              .catch(e => {
-                console.log("Errors update role: " + e);
-                this.errorInUpdate = true
-                console.log(this.tmpItem)
-                this.tmp.role = this.tmpItem
-              });
-          }
-      },
+              axios.put(Config.webServiceURL + "/v1/admin/users/" + this.userId, this.credentials, {
+                  headers: { Authorization: "0 " + this.authToken }
+                })
+                .then(response => 
+                    console.log(JSON.stringify(response)),               
+                    this.successFulUpdate = true                 
+                ).then(
+                  this.saveEditRole(this.tmp)
+                )
+                .catch(e => {
+                  console.log("Errors update role: " + e);
+                  this.errorInUpdate = true
+                  console.log(this.tmpItem)
+                  this.tmp.role = this.tmpItem
+                });
+              }
+            }
+          },
 
     saveEditUsername(row) {
       row.username = this.username
