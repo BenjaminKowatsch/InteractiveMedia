@@ -33,6 +33,7 @@ import com.media.interactive.cs3.hdm.interactivemedia.contentprovider.tables.Tra
 import com.media.interactive.cs3.hdm.interactivemedia.contentprovider.tables.UserTable;
 import com.media.interactive.cs3.hdm.interactivemedia.data.Login;
 
+import static android.database.DatabaseUtils.dumpCursorToString;
 import static com.media.interactive.cs3.hdm.interactivemedia.activties.AddTransactionActivity.GROUP_CREATED_AT_ADD_TO;
 import static com.media.interactive.cs3.hdm.interactivemedia.activties.AddTransactionActivity.GROUP_TO_ADD_TO;
 
@@ -103,20 +104,28 @@ public class TransactionFragment extends ListFragment implements LoaderManager.L
 
         paymentListAdapter = initPaymentListAdapter();
         initOrRestartLoaderWithGroupId();
-
     }
 
     private SimpleCursorAdapter initPaymentListAdapter() {
-        final Cursor payments = new DatabaseHelper(this.getContext())
-                .getNewestPaymentsWithUserNamesForGroup(getCurrentGroupInternalId());
+        final Cursor payments = getPaymentCoursorForCurrentGroup();
+        Log.d(TAG, dumpCursorToString(payments));
         final String[] columns = new String[]{PaymentTable.COLUMN_AMOUNT,
                 DatabaseHelper.PAYMENT_USER_JOIN_COLUMN_FROM_USER,
                 DatabaseHelper.PAYMENT_USER_JOIN_COLUMN_TO_USER};
         final int[] to = new int[]{R.id.payment_amount, R.id.payment_from, R.id.payment_to};
-        final SimpleCursorAdapter adapter = new SimpleCursorAdapter(this.getContext(),
+        return new SimpleCursorAdapter(this.getContext(),
                 R.layout.payment, payments, columns, to, 0);
-        //adapter.setViewResource(R.id.payment_list);
-        return adapter;
+    }
+
+    private Cursor getPaymentCoursorForCurrentGroup() {
+        return new DatabaseHelper(this.getContext())
+                .getNewestPaymentsWithUserNamesForGroup(getCurrentGroupInternalId());
+    }
+
+    private void refreshPaymentAdapter() {
+        final Cursor cursor = getPaymentCoursorForCurrentGroup();
+        Log.d(TAG, dumpCursorToString(cursor));
+        paymentListAdapter.swapCursor(cursor);
     }
 
     private void initOrRestartLoaderWithGroupId() {
@@ -131,7 +140,10 @@ public class TransactionFragment extends ListFragment implements LoaderManager.L
     public void onResume() {
         super.onResume();
         initOrRestartLoaderWithGroupId();
+        refreshPaymentAdapter();
     }
+
+
 
     private String getCurrentGroupId() {
         return groupAdapter.getCursor().getString(groupAdapter.getCursor().getColumnIndex(GroupTable.COLUMN_GROUP_ID));
@@ -171,11 +183,13 @@ public class TransactionFragment extends ListFragment implements LoaderManager.L
             @Override
             public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
                 initOrRestartLoaderWithGroupId();
+                refreshPaymentAdapter();
             }
 
             @Override
             public void onNothingSelected(AdapterView<?> adapterView) {
                 initOrRestartLoaderWithGroupId();
+                refreshPaymentAdapter();
             }
         });
         initOrRestartLoaderWithGroupId();

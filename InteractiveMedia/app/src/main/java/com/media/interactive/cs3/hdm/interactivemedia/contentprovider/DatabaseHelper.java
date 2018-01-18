@@ -5,6 +5,7 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.support.annotation.NonNull;
+import android.util.Log;
 
 import com.media.interactive.cs3.hdm.interactivemedia.contentprovider.tables.DebtTable;
 import com.media.interactive.cs3.hdm.interactivemedia.contentprovider.tables.GroupTable;
@@ -16,6 +17,7 @@ import com.media.interactive.cs3.hdm.interactivemedia.contentprovider.tables.Tra
 import com.media.interactive.cs3.hdm.interactivemedia.contentprovider.tables.UserTable;
 import com.media.interactive.cs3.hdm.interactivemedia.data.Group;
 
+import static android.database.DatabaseUtils.dumpCursorToString;
 import static com.media.interactive.cs3.hdm.interactivemedia.contentprovider.tables.GroupTable.extractGroupFromCurrentPosition;
 import static com.media.interactive.cs3.hdm.interactivemedia.contentprovider.tables.UserTable.extractUserFromCurrentPosition;
 
@@ -120,28 +122,31 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         final String toUserTable = "u2";
         final String subQuery = "(SELECT " + "MAX(t." + PaymentTable.COLUMN_CREATED_AT + ") FROM " +
                 PaymentTable.TABLE_NAME + " t WHERE t." + PaymentTable.COLUMN_GROUP_ID + " = ?" + ")";
-        final String query = "SELECT " + PaymentTable.TABLE_NAME + "." + PaymentTable.COLUMN_ID
+        final String joinQuery = "SELECT " + PaymentTable.TABLE_NAME + "." + PaymentTable.COLUMN_ID
+                + ", " + PaymentTable.TABLE_NAME + "." + PaymentTable.COLUMN_CREATED_AT
                 + ", " + PaymentTable.TABLE_NAME + "." + PaymentTable.COLUMN_AMOUNT
                 + ", " + buildAlias(fromUserTable, PAYMENT_USER_JOIN_COLUMN_FROM_USER)
                 + ", " + buildAlias(toUserTable, PAYMENT_USER_JOIN_COLUMN_TO_USER)
                 + " FROM " + PaymentTable.TABLE_NAME + " "
                 + getUserNameLeftJoinString(fromUserTable, PaymentTable.COLUMN_FROM_USER)
-                + getUserNameLeftJoinString(toUserTable, PaymentTable.COLUMN_TO_USER)
+                + getUserNameLeftJoinString(toUserTable, PaymentTable.COLUMN_TO_USER);
+        final String query = joinQuery
                 + "\nWHERE " + PaymentTable.TABLE_NAME + "." + PaymentTable.COLUMN_CREATED_AT
                 + " = " + subQuery;
+        Log.d(TAG, dumpCursorToString(db.rawQuery(joinQuery, null)));
         return db.rawQuery(query, new String[]{"" + groupId});
     }
 
     @NonNull
-    private String buildAlias(String fromUserTable, String columnName) {
-        return fromUserTable + "." +
+    private String buildAlias(String tableAlias, String columnName) {
+        return tableAlias + "." +
                 UserTable.COLUMN_USERNAME + " " + columnName;
     }
 
     @NonNull
-    private String getUserNameLeftJoinString(String fromUserTable, String column) {
-        return "\nleft join " + UserTable.TABLE_NAME + " " + fromUserTable + " ON (" + PaymentTable.TABLE_NAME
-                + "." + column + " = " + fromUserTable + "." + UserTable.COLUMN_ID + ") ";
+    private String getUserNameLeftJoinString(String tableAlias, String column) {
+        return "\nleft join " + UserTable.TABLE_NAME + " " + tableAlias + " ON (" + PaymentTable.TABLE_NAME
+                + "." + column + " = " + tableAlias + "." + UserTable.COLUMN_ID + ") ";
     }
 
 }

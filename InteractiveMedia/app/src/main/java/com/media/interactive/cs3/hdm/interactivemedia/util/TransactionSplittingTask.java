@@ -5,12 +5,15 @@ import android.util.Log;
 
 import com.media.interactive.cs3.hdm.interactivemedia.data.DatabaseProviderHelper;
 import com.media.interactive.cs3.hdm.interactivemedia.data.Debt;
+import com.media.interactive.cs3.hdm.interactivemedia.data.Group;
 import com.media.interactive.cs3.hdm.interactivemedia.data.Transaction;
 import com.media.interactive.cs3.hdm.interactivemedia.data.settlement.Payment;
 import com.media.interactive.cs3.hdm.interactivemedia.data.settlement.Settlement;
 
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 
 public class TransactionSplittingTask extends AsyncTask<Transaction, Void, Boolean> {
@@ -28,6 +31,7 @@ public class TransactionSplittingTask extends AsyncTask<Transaction, Void, Boole
 
     @Override
     protected Boolean doInBackground(Transaction... transactions) {
+        Set<Group> groupsInTransactions = new HashSet<>();
         for (Transaction transaction : transactions) {
             try {
                 helper.completeTransaction(transaction);
@@ -52,13 +56,18 @@ public class TransactionSplittingTask extends AsyncTask<Transaction, Void, Boole
                     return false;
                 }
             }
+            groupsInTransactions.add(transaction.getGroup());
+        }
+        Log.d(TAG, "Groups in transaction: " + groupsInTransactions);
+        for(Group group: groupsInTransactions) {
             List<Debt> allDebts;
             try {
-                allDebts = helper.getAllDebts();
+                allDebts = helper.getAllDebtsForGroup(group.getGroupId());
             } catch (Exception e) {
                 Log.e(TAG, "An error occurred in loading all debts", e);
                 return false;
             }
+            Log.d(TAG, "Loaded " + allDebts.size() + " debts for group " + group);
             List<Payment> payments;
             try {
                 payments = settlementMethod.settle(allDebts);
@@ -66,10 +75,11 @@ public class TransactionSplittingTask extends AsyncTask<Transaction, Void, Boole
                 Log.e(TAG, "An error occurred in settling all debts", e);
                 return false;
             }
+            Log.d(TAG, "Created " + payments.size() + " payments for debts of group " + group);
             final Date paymentGenerationTimestamp = new Date(System.currentTimeMillis());
             for (Payment payment : payments) {
                 try {
-                    helper.savePayment(payment, paymentGenerationTimestamp, transaction.getGroup().getId());
+                    helper.savePayment(payment, paymentGenerationTimestamp, group.getId());
                 } catch (Exception e) {
                     Log.e(TAG, "An error occurred in saving payment " + payment, e);
                     return false;

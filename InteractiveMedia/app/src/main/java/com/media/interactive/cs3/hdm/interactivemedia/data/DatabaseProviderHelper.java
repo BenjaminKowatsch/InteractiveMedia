@@ -123,6 +123,7 @@ public class DatabaseProviderHelper {
     }
 
     public void addTransactions(JSONArray jsonArray, Group group) throws JSONException {
+        List<Transaction> transactions = new ArrayList<>();
         for (int i = 0; i < jsonArray.length(); i++) {
             final JSONObject transactionObject = (JSONObject) jsonArray.get(i);
             final Transaction transaction = new Transaction();
@@ -148,11 +149,19 @@ public class DatabaseProviderHelper {
             transaction.setPaidByUserId(transactionObject.getString("paidBy"));
             transaction.setSplit(transactionObject.getString("split"));
             Log.d(TAG, "Saving Transaction: " + transaction.toString());
-            saveTransaction(transaction);
+            //using impl and then add them to task in batches to optimize resolving speed
+            saveTransactionImpl(transaction);
+            transactions.add(transaction);
         }
+        calculateSplit(transactions.toArray(new Transaction[]{}));
     }
 
     public void saveTransaction(Transaction transaction) {
+        saveTransactionImpl(transaction);
+        calculateSplit(transaction);
+    }
+
+    private void saveTransactionImpl(Transaction transaction) {
         final ContentValues transactionContent = transaction.toContentValues();
         final Uri id = contentResolver.insert(DatabaseProvider.CONTENT_TRANSACTION_URI, transactionContent);
         if (id != null) {
@@ -164,30 +173,12 @@ public class DatabaseProviderHelper {
             contentResolver.insert(DatabaseProvider.CONTENT_GROUP_TRANSACTION_URI, transactionGroupContent);
         }
         contentResolver.notifyChange(DatabaseProvider.CONTENT_GROUP_USER_TRANSACTION_JOIN_URI, null);
-        calculateSplit(transaction);
     }
 
-    private void calculateSplit(Transaction saved) {
+    private void calculateSplit(Transaction... saved) {
         TransactionSplittingTask task = new TransactionSplittingTask(this, new PairBasedSettlement());
         task.execute(saved);
     }
-
-    public List<Debt> getAllDebts() {
-        final String[] projection = {DebtTable.COLUMN_ID, DebtTable.COLUMN_AMOUNT,
-                DebtTable.COLUMN_FROM_USER, DebtTable.COLUMN_TO_USER, DebtTable.COLUMN_TRANSACTION_ID};
-        final Cursor query = contentResolver.query(DatabaseProvider.CONTENT_DEBT_URI, projection,
-                null, null, null);
-        List<Debt> out = new ArrayList<>();
-        if (query != null) {
-            while (query.moveToNext()) {
-                out.add(extractDebtFromCurrentPosition(query));
-            }
-        } else {
-            Log.e(TAG, "Query for getting all debts was null!");
-        }
-        return out;
-    }
-
 
     public void saveDebt(Debt debt) {
         final ContentValues debtContent = new ContentValues();
@@ -195,7 +186,8 @@ public class DatabaseProviderHelper {
         debtContent.put(DebtTable.COLUMN_AMOUNT, debt.getAmount());
         debtContent.put(DebtTable.COLUMN_FROM_USER, debt.getDebtorId());
         debtContent.put(DebtTable.COLUMN_TO_USER, debt.getCreditorId());
-        contentResolver.insert(DatabaseProvider.CONTENT_DEBT_URI, debtContent);
+        final Uri insert = contentResolver.insert(DatabaseProvider.CONTENT_DEBT_URI, debtContent);
+        Log.d(TAG, "Inserted debt " + debt + " at " + insert);
     }
 
     public boolean checkForCachedCredentials(Login login) {
@@ -273,7 +265,8 @@ public class DatabaseProviderHelper {
         paymentContent.put(PaymentTable.COLUMN_TO_USER, payment.getToUserId());
         paymentContent.put(PaymentTable.COLUMN_CREATED_AT, formatDate(creationTimestmap));
         paymentContent.put(PaymentTable.COLUMN_GROUP_ID, groupId);
-        contentResolver.insert(DatabaseProvider.CONTENT_PAYMENT_URI, paymentContent);
+        final Uri insert = contentResolver.insert(DatabaseProvider.CONTENT_PAYMENT_URI, paymentContent);
+        Log.d(TAG, "Inserted payment " + insert);
     }
 
     public void completeTransaction(Transaction transaction) {
@@ -290,7 +283,7 @@ public class DatabaseProviderHelper {
         final String[] projection = {UserTable.TABLE_NAME + ".*"};
         final String selection = GroupTable.TABLE_NAME + "." + GroupTable.COLUMN_ID + " = ?";
         final String[] selectionArgs = {"" + group.getId()};
-        final Cursor cursor = contentResolver.query(DatabaseProvider.CONTENT_GROUP_USER_URI,
+        final Cursor cursor = contentResolver.query(DatabaseProvider.CONTENT_GROUP_USER_JOIN_URI,
                 projection, selection, selectionArgs, null);
         if (cursor != null) {
             List<User> out = new ArrayList<>();
@@ -320,4 +313,25 @@ public class DatabaseProviderHelper {
             return null;
         }
     }
+
+    public List<Debt> getAllDebtsForGroup(String id) {
+        final String[] projection = {DebtTable.COLUMN_ID, DebtTable.COLUMN_AMOUNT,
+                DebtTable.COLUMN_FROM_USER, DebtTable.COLUMN_TO_USER,
+                DebtTable.TABLE_NAME + "." + DebtTable.COLUMN_TRANSACTION_ID,
+                GroupTransactionTable.TABLE_NAME + "." + GroupTransactionTable.COLUMN_GROUP_ID};
+        final String selection = GroupTransactionTable.COLUMN_GROUP_ID + " = ?";
+        final String[] selectionArgs = new String[]{id};
+        final Cursor query = contentResolver.query(DatabaseProvider.CONTENT_GROUP_ID_DEBT_JOIN_URI, projection,
+                selection, selectionArgs, null);
+        List<Debt> out = new ArrayList<>();
+        if (query != null) {
+            while (query.moveToNext()) {
+                out.add(extractDebtFromCurrentPosition(query));
+            }
+        } else {
+            Log.e(TAG, "Query for getting all debts was null!");
+        }
+        return out;
+    }
+
 }

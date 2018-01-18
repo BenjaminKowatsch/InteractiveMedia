@@ -130,4 +130,22 @@ public class Group {
         }
         return object;
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        Group group = (Group) o;
+
+        if (sync != group.sync) return false;
+        return groupId != null ? groupId.equals(group.groupId) : group.groupId == null;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = groupId != null ? groupId.hashCode() : 0;
+        result = 31 * result + (sync ? 1 : 0);
+        return result;
+    }
 }
