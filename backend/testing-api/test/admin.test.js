@@ -516,7 +516,7 @@ describe('Admin', () => {
           return chai.request(HOST)
           .put(URL.BASE_ADMIN  + '/users/' + userIds[0])
           .set('Authorization', '0 ' + adminToken)
-          .send(userData.users.update.valid.allFields)
+          .send(userData.users.updateAsAdmin.valid.allFields)
           .then(res => {
             expect(res).to.have.status(200);
             expect(res).to.be.json;
@@ -535,13 +535,13 @@ describe('Admin', () => {
             expect(res.body).to.be.an('object');
             expect(res.body.success).to.be.true;
             expect(res.body.payload).to.be.an('object');
-            expect(res.body.payload.username).to.equal(userData.users.update.valid.allFields.username);
-            expect(res.body.payload.email).to.equal(userData.users.update.valid.allFields.email);
+            expect(res.body.payload.username).to.equal(userData.users.updateAsAdmin.valid.allFields.username);
+            expect(res.body.payload.email).to.equal(userData.users.updateAsAdmin.valid.allFields.email);
             expect(res.body.payload._id).to.be.undefined;
             expect(res.body.payload.groupIds).to.equal(constantUserData.groupIds);
             expect(res.body.payload.userId).to.equal(constantUserData.userId);
-            expect(res.body.payload.role).to.equal('user');
-            expect(res.body.payload.imageUrl).to.equal(userData.users.update.valid.allFields.imageUrl);
+            expect(res.body.payload.role).to.equal(userData.users.updateAsAdmin.valid.allFields.role);
+            expect(res.body.payload.imageUrl).to.equal(userData.users.updateAsAdmin.valid.allFields.imageUrl);
           });
         });
       });
@@ -610,7 +610,7 @@ describe('Admin', () => {
           return chai.request(HOST)
           .put(URL.BASE_ADMIN  + '/users/' + userIds[0])
           .set('Authorization', '0 ' + adminToken)
-          .send(userData.users.update.valid.oneFieldUsername)
+          .send(userData.users.updateAsAdmin.valid.oneFieldUsername)
           .then(res => {
             expect(res).to.have.status(200);
             expect(res).to.be.json;
@@ -629,7 +629,7 @@ describe('Admin', () => {
             expect(res.body).to.be.an('object');
             expect(res.body.success).to.be.true;
             expect(res.body.payload).to.be.an('object');
-            expect(res.body.payload.username).to.equal(userData.users.update.valid.oneFieldUsername.username);
+            expect(res.body.payload.username).to.equal(userData.users.updateAsAdmin.valid.oneFieldUsername.username);
             expect(res.body.payload.email).to.equal(userData.users.valid[0].email);
             expect(res.body.payload._id).to.be.undefined;
             expect(res.body.payload.groupIds).to.equal(constantUserData.groupIds);
@@ -697,7 +697,7 @@ describe('Admin', () => {
           return chai.request(HOST)
           .put(URL.BASE_ADMIN  + '/users/' + userIds[0])
           .set('Authorization', '0 ' + adminToken)
-          .send(userData.users.update.invalid.updateUserId)
+          .send(userData.users.updateAsAdmin.invalid.updateUserId)
           .then(res => {
             expect(res).to.have.status(400);
             expect(res).to.be.json;
@@ -713,7 +713,7 @@ describe('Admin', () => {
           return chai.request(HOST)
           .put(URL.BASE_ADMIN  + '/users/' + userIds[0])
           .set('Authorization', '0 ' + adminToken)
-          .send(userData.users.update.invalid.updateGroupIds)
+          .send(userData.users.updateAsAdmin.invalid.updateGroupIds)
           .then(res => {
             expect(res).to.have.status(400);
             expect(res).to.be.json;
@@ -729,7 +729,7 @@ describe('Admin', () => {
           return chai.request(HOST)
           .put(URL.BASE_ADMIN  + '/users/' + userIds[0])
           .set('Authorization', '0 ' + adminToken)
-          .send(userData.users.update.invalid.updateInternalId)
+          .send(userData.users.updateAsAdmin.invalid.updateInternalId)
           .then(res => {
             expect(res).to.have.status(400);
             expect(res).to.be.json;
@@ -745,7 +745,7 @@ describe('Admin', () => {
           return chai.request(HOST)
           .put(URL.BASE_ADMIN  + '/users/' + userIds[0])
           .set('Authorization', '0 ' + adminToken)
-          .send(userData.users.update.invalid.updateAuthType)
+          .send(userData.users.updateAsAdmin.invalid.updateAuthType)
           .then(res => {
             expect(res).to.have.status(400);
             expect(res).to.be.json;
@@ -757,11 +757,59 @@ describe('Admin', () => {
           });
         });
 
-        it('should fail to update role', function() {
+        it('should fail to update username with null', function() {
           return chai.request(HOST)
           .put(URL.BASE_ADMIN  + '/users/' + userIds[0])
           .set('Authorization', '0 ' + adminToken)
-          .send(userData.users.update.invalid.updateRole)
+          .send(userData.users.updateAsAdmin.invalid.updateUsernameNull)
+          .then(res => {
+            expect(res).to.have.status(400);
+            expect(res).to.be.json;
+            expect(res.body).to.be.an('object');
+            expect(res.body.success).to.be.false;
+            expect(res.body.payload).to.be.an('object');
+            expect(res.body.payload.dataPath).to.equal('validation');
+            expect(res.body.payload.message).to.equal('invalid body');
+          });
+        });
+
+        it('should fail to update password with null', function() {
+          return chai.request(HOST)
+          .put(URL.BASE_ADMIN  + '/users/' + userIds[0])
+          .set('Authorization', '0 ' + adminToken)
+          .send(userData.users.updateAsAdmin.invalid.updatePasswordNull)
+          .then(res => {
+            expect(res).to.have.status(400);
+            expect(res).to.be.json;
+            expect(res.body).to.be.an('object');
+            expect(res.body.success).to.be.false;
+            expect(res.body.payload).to.be.an('object');
+            expect(res.body.payload.dataPath).to.equal('validation');
+            expect(res.body.payload.message).to.equal('invalid body');
+          });
+        });
+
+        it('should fail to update email with null', function() {
+          return chai.request(HOST)
+          .put(URL.BASE_ADMIN  + '/users/' + userIds[0])
+          .set('Authorization', '0 ' + adminToken)
+          .send(userData.users.updateAsAdmin.invalid.updateEmailNull)
+          .then(res => {
+            expect(res).to.have.status(400);
+            expect(res).to.be.json;
+            expect(res.body).to.be.an('object');
+            expect(res.body.success).to.be.false;
+            expect(res.body.payload).to.be.an('object');
+            expect(res.body.payload.dataPath).to.equal('validation');
+            expect(res.body.payload.message).to.equal('invalid body');
+          });
+        });
+
+        it('should fail to update role with invalid value', function() {
+          return chai.request(HOST)
+          .put(URL.BASE_ADMIN  + '/users/' + userIds[0])
+          .set('Authorization', '0 ' + adminToken)
+          .send(userData.users.updateAsAdmin.invalid.updateInvalidRole)
           .then(res => {
             expect(res).to.have.status(400);
             expect(res).to.be.json;
@@ -777,7 +825,7 @@ describe('Admin', () => {
           return chai.request(HOST)
           .put(URL.BASE_ADMIN  + '/users/' + userIds[0])
           .set('Authorization', '0 ' + adminToken)
-          .send(userData.users.update.invalid.updateUnknownField)
+          .send(userData.users.updateAsAdmin.invalid.updateUnknownField)
           .then(res => {
             expect(res).to.have.status(400);
             expect(res).to.be.json;

@@ -9,7 +9,7 @@ const validateJsonService = require('../services/validateJson.service');
 const ERROR = require('../config/error.config');
 const ROLES = require('../config/roles.config');
 const jsonSchema = {
-  updateUserPayload: require('../jsonSchema/updateUserPayload.json')
+  updateUserAsAdminPayload: require('../jsonSchema/updateUserAsAdminPayload.json')
 };
 
 module.exports.getAllGroups = function(req, res) {
@@ -98,7 +98,7 @@ module.exports.getUserById = function(req, res) {
 
 module.exports.updateUserById = function(req, res) {
   const userId = req.params.userId;
-  validateJsonService.againstSchema(req.body, jsonSchema.updateUserPayload)
+  validateJsonService.againstSchema(req.body, jsonSchema.updateUserAsAdminPayload)
   .then(() => {
     return user.updateUser(userId, req.body);
   })

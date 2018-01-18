@@ -123,6 +123,59 @@
           "email": null
         }
       }
+    },
+    "updateAsAdmin": {
+      "valid": {
+        "allFields": {
+          "username": "new user name",
+          "password": "hashedPassword",
+          "email": "new.alex@alex.de",
+          "imageUrl": "http://new.example.com/image.jpg",
+          "fcmToken": "cUf35139J8U:APA91bH6pkjWHRAUAW52QGQV6tR8SQdbpJK20QitJrAyWfX22VP4G0OUL-cwnXQob507qnBILDkZaoY0IW3eAvAevjM5dgCTbL297n1pbXoEHLzNDKV-86xJkle0TR6RBi8fA3BzEEOr",
+          "role": "admin"
+        },
+        "oneFieldUsername": {
+          "username": "Harry Hirsch"
+        }
+      },
+      "invalid": {
+        "updateUserId": {
+          "imageUrl": "http://new.example.com/image.jpg",
+          "userId": "AAAAAAAA-AAAA-AAAA-AAAA-AAAAAAAAAAAA"
+        },
+        "updateGroupIds": {
+          "imageUrl": "http://new.example.com/image.jpg",
+          "groupIds": ["BBBBBBBB-BBBB-BBBB-BBBB-BBBBBBBBBBBB"]
+        },
+        "updateInternalId": {
+          "imageUrl": "http://new.example.com/image.jpg",
+          "_id": "aaaaaaaaaaaaaaaaaaaaaaaa"
+        },
+        "updateAuthType": {
+          "imageUrl": "http://new.example.com/image.jpg",
+          "authType": 1
+        },
+        "updateUnknownField": {
+          "imageUrl": "http://new.example.com/image.jpg",
+          "unknownField": "value of unknown filed"
+        },
+        "updateInvalidRole": {
+          "imageUrl": "http://new.example.com/image.jpg",
+          "role": "XXXX"
+        },
+        "updateUsernameNull": {
+          "imageUrl": "http://new.example.com/image.jpg",
+          "username": null
+        },
+        "updatePasswordNull": {
+          "imageUrl": "http://new.example.com/image.jpg",
+          "password": null
+        },
+        "updateEmailNull": {
+          "imageUrl": "http://new.example.com/image.jpg",
+          "email": null
+        }
+      }
     }
   }
 }

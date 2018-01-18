@@ -153,6 +153,7 @@ router.get('/users/:userId', authenticationService.isAuthenticated, authorizatio
  * @apiGroup admin
  * @apiVersion 0.1.0
  * @apiPermission admin
+ * @apiDescription Update user. Empty request body is not allowed.
  *
  * @apiUse paramUrlUserId
  *
@@ -164,8 +165,9 @@ router.get('/users/:userId', authenticationService.isAuthenticated, authorizatio
  * @apiUse paramEmailOptional
  * @apiUse paramImageUrlOptional
  * @apiUse paramFcmTokenOptional
+ * @apiUse paramRoleOptional
  *
- * @apiUse paramExampleUserUpdate
+ * @apiUse paramExampleAdminUserUpdate
  *
  * @apiUse successBodySuccess
  * @apiSuccess (SuccessCode) {200} Success Update successful
