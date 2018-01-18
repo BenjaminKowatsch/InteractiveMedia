@@ -98,15 +98,6 @@ public class GroupFragment extends ListFragment implements LoaderManager.LoaderC
         helper = new DatabaseProviderHelper(getActivity().getContentResolver());
 
         initOrRestartLoaderWithUserId();
-        List<Group> groups = helper.getUnsyncedGroups(Login.getInstance().getUser().getUserId());
-        Log.d(TAG, "-----------------------------"+ groups.size()+" unsynced groups available ");
-        for(Group group : groups){
-            try {
-                Log.d(TAG, group.toJson().toString());
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
-        }
     }
 
     private void initOrRestartLoaderWithUserId() {

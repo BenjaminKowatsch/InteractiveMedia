@@ -49,6 +49,7 @@ public class TransactionTable {
      */
     public static final String COLUMN_PUBLISHED_AT = "published_at";
 
+    public static final String COLUMN_SPLIT = "split";
 
     public static final String DATABASE_CREATE =
             "create table if not exists " + TABLE_NAME + "("
@@ -61,7 +62,8 @@ public class TransactionTable {
                     + COLUMN_INFO_IMAGE_URL + " TEXT,"
                     + COLUMN_INFO_CREATED_AT + " TIMESTAMP DEFAULT CURRENT_TIMESTAMP,"
                     + COLUMN_SYNCHRONIZED + " INTEGER NOT NULL,"
-                    + COLUMN_PUBLISHED_AT + " TIMESTAMP"
+                    + COLUMN_PUBLISHED_AT + " TIMESTAMP, "
+                    + COLUMN_SPLIT + " TEXT NOT NULL"
                     + ")";
 
     public static final String DATABASE_DROP = "drop table if exists " + TABLE_NAME;

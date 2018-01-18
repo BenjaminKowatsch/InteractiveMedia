@@ -48,6 +48,7 @@ public class Transaction {
         out.put(TransactionTable.COLUMN_AMOUNT, amount);
         out.put(TransactionTable.COLUMN_INFO_NAME, infoName);
         out.put(TransactionTable.COLUMN_PAID_BY, paidBy);
+        out.put(TransactionTable.COLUMN_SPLIT, split);
         out.put(TransactionTable.COLUMN_INFO_IMAGE_URL, imageUrl);
         out.put(TransactionTable.COLUMN_PUBLISHED_AT, Helper.FormatDate(publishedAt));
         out.put(TransactionTable.COLUMN_INFO_LOCATION_LONG, location.getLongitude());
@@ -167,8 +168,8 @@ public class Transaction {
         result.put("amount",amount);
 
         final JSONObject infoLocation = new JSONObject();
-        infoLocation.put("latitude", location.getLatitude());
-        infoLocation.put("longitude", location.getLongitude());
+        infoLocation.put("latitude", location != null ? location.getLatitude() : JSONObject.NULL);
+        infoLocation.put("longitude", location != null ? location.getLongitude() : JSONObject.NULL);
         result.put("infoLocation", infoLocation);
 
         result.put("infoImageUrl", imageUrl != null ? imageUrl : JSONObject.NULL);

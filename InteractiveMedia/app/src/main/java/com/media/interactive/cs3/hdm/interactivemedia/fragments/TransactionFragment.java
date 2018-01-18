@@ -31,8 +31,14 @@ import com.media.interactive.cs3.hdm.interactivemedia.contentprovider.DatabasePr
 import com.media.interactive.cs3.hdm.interactivemedia.contentprovider.tables.GroupTable;
 import com.media.interactive.cs3.hdm.interactivemedia.contentprovider.tables.TransactionTable;
 import com.media.interactive.cs3.hdm.interactivemedia.contentprovider.tables.UserTable;
+import com.media.interactive.cs3.hdm.interactivemedia.data.DatabaseProviderHelper;
+import com.media.interactive.cs3.hdm.interactivemedia.data.Group;
 import com.media.interactive.cs3.hdm.interactivemedia.data.Login;
 import com.media.interactive.cs3.hdm.interactivemedia.data.Transaction;
+
+import org.json.JSONException;
+
+import java.util.List;
 
 import static com.media.interactive.cs3.hdm.interactivemedia.activties.AddTransactionActivity.GROUP_CREATED_AT_ADD_TO;
 import static com.media.interactive.cs3.hdm.interactivemedia.activties.AddTransactionActivity.GROUP_TO_ADD_TO;
@@ -101,6 +107,7 @@ public class TransactionFragment extends ListFragment implements LoaderManager.L
         groupAdapter.getCursor().moveToFirst();
 
         initOrRestartLoaderWithGroupId();
+
     }
 
     private void initOrRestartLoaderWithGroupId() {
@@ -128,7 +135,8 @@ public class TransactionFragment extends ListFragment implements LoaderManager.L
 
         final String[] projection = { GroupTable.TABLE_NAME + ".*"};
         final String sortOrder = GroupTable.TABLE_NAME + "." + GroupTable.COLUMN_CREATED_AT + " DESC";
-        final String selection = UserTable.TABLE_NAME + "." + UserTable.COLUMN_USER_ID + " = ?";
+        final String selection = UserTable.TABLE_NAME + "." + UserTable.COLUMN_USER_ID + " = ? AND "
+            + GroupTable.TABLE_NAME + "." + GroupTable.COLUMN_SYNCHRONIZED + " = 1 ";
         final String[] selectionArgs = {Login.getInstance().getUser().getUserId()};
         final Cursor query = contentResolver.query(DatabaseProvider.CONTENT_GROUP_USER_JOIN_URI, projection, selection, selectionArgs, sortOrder);
 
