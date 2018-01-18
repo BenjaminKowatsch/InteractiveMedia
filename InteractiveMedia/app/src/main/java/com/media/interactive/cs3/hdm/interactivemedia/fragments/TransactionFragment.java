@@ -107,16 +107,18 @@ public class TransactionFragment extends ListFragment implements LoaderManager.L
     }
 
     private SimpleCursorAdapter initPaymentListAdapter() {
-        final Cursor payments = new DatabaseHelper(this.getContext())
-                .getNewestPaymentsWithUserNamesForGroup(getCurrentGroupInternalId());
+        final Cursor payments = getPaymentCoursorForCurrentGroup();
         final String[] columns = new String[]{PaymentTable.COLUMN_AMOUNT,
                 DatabaseHelper.PAYMENT_USER_JOIN_COLUMN_FROM_USER,
                 DatabaseHelper.PAYMENT_USER_JOIN_COLUMN_TO_USER};
         final int[] to = new int[]{R.id.payment_amount, R.id.payment_from, R.id.payment_to};
-        final SimpleCursorAdapter adapter = new SimpleCursorAdapter(this.getContext(),
+        return new SimpleCursorAdapter(this.getContext(),
                 R.layout.payment, payments, columns, to, 0);
-        //adapter.setViewResource(R.id.payment_list);
-        return adapter;
+    }
+
+    private Cursor getPaymentCoursorForCurrentGroup() {
+        return new DatabaseHelper(this.getContext())
+                .getNewestPaymentsWithUserNamesForGroup(getCurrentGroupInternalId());
     }
 
     private void initOrRestartLoaderWithGroupId() {
@@ -131,6 +133,7 @@ public class TransactionFragment extends ListFragment implements LoaderManager.L
     public void onResume() {
         super.onResume();
         initOrRestartLoaderWithGroupId();
+        paymentListAdapter.swapCursor(getPaymentCoursorForCurrentGroup());
     }
 
     private String getCurrentGroupId() {
@@ -171,6 +174,7 @@ public class TransactionFragment extends ListFragment implements LoaderManager.L
             @Override
             public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
                 initOrRestartLoaderWithGroupId();
+                paymentListAdapter.swapCursor(getPaymentCoursorForCurrentGroup());
             }
 
             @Override
