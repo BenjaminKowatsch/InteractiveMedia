@@ -1,6 +1,9 @@
 package com.media.interactive.cs3.hdm.interactivemedia.contentprovider.tables;
 
+import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+
+import com.media.interactive.cs3.hdm.interactivemedia.data.User;
 
 /**
  * Created by benny on 20.11.17.
@@ -40,18 +43,33 @@ public class UserTable {
 
     public static final String DATABASE_CREATE =
 
-        "create table if not exists " + TABLE_NAME + "("
-           + COLUMN_ID + " integer unique primary key AUTOINCREMENT,"
-           + COLUMN_USERNAME + " TEXT,"
-           + COLUMN_IMAGE_URL + " TEXT,"
-           + COLUMN_EMAIL + " TEXT NOT NULL,"
-           + COLUMN_CREATED_AT + " TIMESTAMP DEFAULT CURRENT_TIMESTAMP,"
-           + COLUMN_USER_ID + " TEXT,"
-           + COLUMN_SYNCHRONIZED + " INTEGER NOT NULL)";
+            "create table if not exists " + TABLE_NAME + "("
+                    + COLUMN_ID + " integer unique primary key AUTOINCREMENT,"
+                    + COLUMN_USERNAME + " TEXT,"
+                    + COLUMN_IMAGE_URL + " TEXT,"
+                    + COLUMN_EMAIL + " TEXT NOT NULL,"
+                    + COLUMN_CREATED_AT + " TIMESTAMP DEFAULT CURRENT_TIMESTAMP,"
+                    + COLUMN_USER_ID + " TEXT,"
+                    + COLUMN_SYNCHRONIZED + " INTEGER NOT NULL)";
     public static final String DATABASE_DROP = "drop table if exists " + TABLE_NAME;
 
 
     public static void onCreate(SQLiteDatabase database) {
         database.execSQL(DATABASE_CREATE);
     }
+
+    public static User extractUserFromCurrentPosition(Cursor cur) {
+        final long id = cur.getLong(cur.getColumnIndex(COLUMN_ID));
+        final String name = cur.getString(cur.getColumnIndex(COLUMN_USERNAME));
+        final String email = cur.getString(cur.getColumnIndex(COLUMN_EMAIL));
+        final String userId = cur.getString(cur.getColumnIndex(COLUMN_USER_ID));
+        final String imageUrl = cur.getString(cur.getColumnIndex(COLUMN_IMAGE_URL));
+        final String createdAt = cur.getString(cur.getColumnIndex(COLUMN_CREATED_AT));
+        final boolean synch = cur.getInt(cur.getColumnIndex(COLUMN_SYNCHRONIZED)) == 1;
+        final User user = new User(name, email, userId, imageUrl, synch);
+        user.setCreatedAt(createdAt);
+        user.setId(id);
+        return user;
+    }
+
 }

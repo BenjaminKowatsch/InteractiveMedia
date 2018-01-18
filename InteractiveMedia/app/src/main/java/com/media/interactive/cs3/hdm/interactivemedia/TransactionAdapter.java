@@ -14,15 +14,12 @@ import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.load.model.GlideUrl;
 import com.bumptech.glide.load.model.LazyHeaders;
-import com.media.interactive.cs3.hdm.interactivemedia.contentprovider.DatabaseProvider;
 import com.media.interactive.cs3.hdm.interactivemedia.contentprovider.tables.TransactionTable;
 import com.media.interactive.cs3.hdm.interactivemedia.contentprovider.tables.UserTable;
 import com.media.interactive.cs3.hdm.interactivemedia.data.DatabaseProviderHelper;
 import com.media.interactive.cs3.hdm.interactivemedia.data.Login;
 import com.media.interactive.cs3.hdm.interactivemedia.data.Transaction;
 import com.media.interactive.cs3.hdm.interactivemedia.util.Helper;
-
-import java.sql.Date;
 
 /**
  * Created by benny on 04.01.18.
@@ -59,13 +56,13 @@ public class TransactionAdapter extends CursorAdapter {
         transaction.setInfoName(cursor.getString(cursor.getColumnIndexOrThrow(TransactionTable.COLUMN_INFO_NAME)));
         transaction.setImageUrl(cursor.getString(cursor.getColumnIndexOrThrow(TransactionTable.COLUMN_INFO_IMAGE_URL)));
         transaction.setDateTime(Helper.ParseDateString(cursor.getString(cursor.getColumnIndexOrThrow(TransactionTable.COLUMN_INFO_CREATED_AT))));
-        transaction.setPaidBy(cursor.getString(cursor.getColumnIndexOrThrow(TransactionTable.COLUMN_PAID_BY)));
+        transaction.setPaidByUserId(cursor.getString(cursor.getColumnIndexOrThrow(TransactionTable.COLUMN_PAID_BY)));
         transaction.setAmount(cursor.getDouble(cursor.getColumnIndexOrThrow(TransactionTable.COLUMN_AMOUNT)));
 
         Log.d(Transaction.class.getSimpleName(), transaction.toString());
         // Populate fields with extracted properties
         viewHolder.transactionTitle.setText(transaction.getInfoName());
-        viewHolder.transactionCreationDate.setText(Helper.FormatDate(transaction.getDateTime()));
+        viewHolder.transactionCreationDate.setText(Helper.formatDate(transaction.getDateTime()));
         viewHolder.transactionPaidBy.setText("Paid by: "+cursor.getString(cursor.getColumnIndexOrThrow(UserTable.COLUMN_USERNAME)));
         viewHolder.transactionAmount.setText(String.valueOf(transaction.getAmount()));
 

@@ -221,7 +221,7 @@ public class Login {
                             List<Group> existingGroups = helper.removeExistingGroupIds(groupIds);
                             Log.d(TAG, "After Removal: " + groupIds.length() + " " + groupIds.toString());
                             for (final Group group : existingGroups) {
-                                requestTransactionsByGroupId(context, group.getGroupId(), group.getCreatedAt(), null);
+                                requestTransactionsForGroup(context, group, null);
                             }
                             requestNewGroups(context, groupIds);
                         } else {
@@ -252,8 +252,9 @@ public class Login {
         RestRequestQueue.getInstance(context).addToRequestQueue(jsonObjectRequest);
     }
 
-    public void requestTransactionsByGroupId(Context context, final String groupId, String groupCreatedAt, final CallbackListener<JSONObject, Exception> callback) {
-
+    public void requestTransactionsForGroup(Context context, final Group group, final CallbackListener<JSONObject, Exception> callback) {
+        final String groupCreatedAt = group.getCreatedAt();
+        final String groupId = group.getGroupId();
         String latestPublishedDate = helper.getLatestTransactionPubDateByGroupId(groupId);
         Log.d(TAG, "latest published date: " + latestPublishedDate);
         if (latestPublishedDate == null) {
@@ -270,7 +271,7 @@ public class Login {
                     Log.d(TAG, "TransactionsAfter: " + response);
                     if (success) {
                         final JSONArray payload = response.getJSONArray("payload");
-                        helper.addTransactions(payload, groupId);
+                        helper.addTransactions(payload, group);
                         if (callback != null) {
                             callback.onSuccess(null);
                         }
@@ -336,7 +337,7 @@ public class Login {
                                 }
                                 helper.insertGroupAtDatabase(newGroup);
                                 //Add Transactions
-                                helper.addTransactions(payload.getJSONArray("transactions"), newGroup.getGroupId());
+                                helper.addTransactions(payload.getJSONArray("transactions"), newGroup);
                                 if (groupIds.length() - 1 == atomicInteger.incrementAndGet()) {
                                     for (CallbackListener<JSONObject, Exception> onUserDataSet : onUserDataSetList) {
                                         onUserDataSet.onSuccess(response);

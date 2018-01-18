@@ -13,9 +13,9 @@ import com.media.interactive.cs3.hdm.interactivemedia.contentprovider.tables.Gro
 import com.media.interactive.cs3.hdm.interactivemedia.contentprovider.tables.GroupTransactionTable;
 import com.media.interactive.cs3.hdm.interactivemedia.contentprovider.tables.GroupUserTable;
 import com.media.interactive.cs3.hdm.interactivemedia.contentprovider.tables.LoginTable;
+import com.media.interactive.cs3.hdm.interactivemedia.contentprovider.tables.PaymentTable;
 import com.media.interactive.cs3.hdm.interactivemedia.contentprovider.tables.TransactionTable;
 import com.media.interactive.cs3.hdm.interactivemedia.contentprovider.tables.UserTable;
-import com.media.interactive.cs3.hdm.interactivemedia.data.Transaction;
 
 /**
  * Created by benny on 20.11.17.
@@ -58,6 +58,8 @@ public class DatabaseProvider extends android.content.ContentProvider {
         + AUTHORITY + "/" + GroupTransactionTable.TABLE_NAME);
     public static final Uri CONTENT_GROUP_USER_URI = Uri.parse("content://"
         + AUTHORITY + "/" + GroupUserTable.TABLE_NAME);
+    public static final Uri CONTENT_PAYMENT_URI = Uri.parse("content://"
+            + AUTHORITY + "/" + PaymentTable.TABLE_NAME);
     private static final int DEBT_CODE = 0;
     private static final int GROUP_CODE = 1;
     private static final int LOGIN_CODE = 2;
@@ -68,6 +70,7 @@ public class DatabaseProvider extends android.content.ContentProvider {
     private static final int GROUP_USER_JOIN_CODE = 7;
     private static final int GROUP_TRANSACTION_JOIN_CODE = 8;
     private static final int GROUP_USER_TRANSACTION_JOIN_CODE = 9;
+    private static final int PAYMENT_CODE = 10;
     private static final UriMatcher mUriMatcher = new UriMatcher(UriMatcher.NO_MATCH);
 
     static {
@@ -76,6 +79,7 @@ public class DatabaseProvider extends android.content.ContentProvider {
         mUriMatcher.addURI(AUTHORITY, LoginTable.TABLE_NAME, LOGIN_CODE);
         mUriMatcher.addURI(AUTHORITY, TransactionTable.TABLE_NAME, TRANSACTION_CODE);
         mUriMatcher.addURI(AUTHORITY, UserTable.TABLE_NAME, USER_CODE);
+        mUriMatcher.addURI(AUTHORITY, PaymentTable.TABLE_NAME, PAYMENT_CODE);
 
         mUriMatcher.addURI(AUTHORITY, GROUP_USER_JOIN_TABLE, GROUP_USER_JOIN_CODE);
         mUriMatcher.addURI(AUTHORITY, GROUP_TRANSACTION_JOIN_TABLE, GROUP_TRANSACTION_JOIN_CODE);
@@ -121,6 +125,9 @@ public class DatabaseProvider extends android.content.ContentProvider {
                 break;
             case GROUP_USER_CODE:
                 sqLiteQueryBuilder.setTables(GroupUserTable.TABLE_NAME);
+                break;
+            case PAYMENT_CODE:
+                sqLiteQueryBuilder.setTables(PaymentTable.TABLE_NAME);
                 break;
             case GROUP_USER_JOIN_CODE:
                 sqLiteQueryBuilder.setTables(UserTable.TABLE_NAME
@@ -192,6 +199,9 @@ public class DatabaseProvider extends android.content.ContentProvider {
             case GROUP_USER_CODE:
                 tablename = GroupUserTable.TABLE_NAME;
                 break;
+            case PAYMENT_CODE:
+                tablename = PaymentTable.TABLE_NAME;
+                break;
             default:
                 Log.e(TAG, "Error: Calling insert method at DatabaseProvider with invalid uri.");
                 break;
@@ -227,6 +237,9 @@ public class DatabaseProvider extends android.content.ContentProvider {
             case GROUP_USER_CODE:
                 rowsDeleted = sqLiteDatabase.delete(GroupUserTable.TABLE_NAME, selection, selectionArgs);
                 break;
+            case PAYMENT_CODE:
+                rowsDeleted = sqLiteDatabase.delete(PaymentTable.TABLE_NAME, selection, selectionArgs);
+                break;
             default:
                 Log.e(TAG, "Error: Calling delete method at DatabaseProvider with invalid uri.");
                 break;
@@ -260,6 +273,9 @@ public class DatabaseProvider extends android.content.ContentProvider {
                 break;
             case GROUP_USER_CODE:
                 rowsUpdated = sqLiteDatabase.update(GroupUserTable.TABLE_NAME, values, selection, selectionArgs);
+                break;
+            case PAYMENT_CODE:
+                rowsUpdated = sqLiteDatabase.update(PaymentTable.TABLE_NAME, values, selection, selectionArgs);
                 break;
             default:
                 Log.e(TAG, "Error: Calling update method at DatabaseProvider with invalid uri.");
