@@ -68,24 +68,20 @@ public class TransactionFragment extends ListFragment implements LoaderManager.L
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         inflater.inflate(R.menu.fragment_transaction, menu);
 
-        final MenuItem searchItem = menu.findItem(R.id.menu_item_search);
-
-        final SearchView searchView = (SearchView) searchItem.getActionView();
-        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+        final MenuItem switchItem = menu.findItem(R.id.menu_group_selection);
+        groupSelection = (Spinner) switchItem.getActionView();
+        groupSelection.setAdapter(groupAdapter);
+        groupSelection.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
-            public boolean onQueryTextSubmit(String s) {
-                final Bundle bundle = new Bundle();
-                bundle.putString(TRANSACTION_NAME_FILTER, s);
-                getLoaderManager().restartLoader(CURSOR_LOADER_TRANSACTIONS_NAME, bundle, TransactionFragment.this);
-                return true;
+            public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+                initOrRestartLoaderWithGroupId();
+                refreshPaymentAdapter();
             }
 
             @Override
-            public boolean onQueryTextChange(String s) {
-                final Bundle bundle = new Bundle();
-                bundle.putString(TRANSACTION_NAME_FILTER, s);
-                getLoaderManager().restartLoader(CURSOR_LOADER_TRANSACTIONS_NAME, bundle, TransactionFragment.this);
-                return true;
+            public void onNothingSelected(AdapterView<?> adapterView) {
+                initOrRestartLoaderWithGroupId();
+                refreshPaymentAdapter();
             }
         });
 
@@ -173,21 +169,26 @@ public class TransactionFragment extends ListFragment implements LoaderManager.L
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         transactionListFragment = inflater.inflate(R.layout.fragment_transaction_list, container, false);
-        groupSelection = transactionListFragment.findViewById(R.id.spinner_group_selection);
-        groupSelection.setAdapter(groupAdapter);
-        groupSelection.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+
+        final SearchView searchView = transactionListFragment.findViewById(R.id.transaction_search);
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
-            public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
-                initOrRestartLoaderWithGroupId();
-                refreshPaymentAdapter();
+            public boolean onQueryTextSubmit(String s) {
+                final Bundle bundle = new Bundle();
+                bundle.putString(TRANSACTION_NAME_FILTER, s);
+                getLoaderManager().restartLoader(CURSOR_LOADER_TRANSACTIONS_NAME, bundle, TransactionFragment.this);
+                return true;
             }
 
             @Override
-            public void onNothingSelected(AdapterView<?> adapterView) {
-                initOrRestartLoaderWithGroupId();
-                refreshPaymentAdapter();
+            public boolean onQueryTextChange(String s) {
+                final Bundle bundle = new Bundle();
+                bundle.putString(TRANSACTION_NAME_FILTER, s);
+                getLoaderManager().restartLoader(CURSOR_LOADER_TRANSACTIONS_NAME, bundle, TransactionFragment.this);
+                return true;
             }
         });
+
         initOrRestartLoaderWithGroupId();
         paymentListView = transactionListFragment.findViewById(R.id.payment_list);
         if(paymentListView == null) {
