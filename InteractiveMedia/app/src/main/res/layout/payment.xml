@@ -1,36 +1,41 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="fill_parent"
+    android:layout_width="wrap_content"
     android:layout_height="wrap_content">
 
     <TextView
         android:id="@+id/payment_from_user_name"
-        android:layout_width="wrap_content"
+        android:layout_width="75dp"
         android:layout_height="wrap_content"
         android:layout_alignParentLeft="true"
-        android:hint="From" />
+        android:hint="FromNam"
+        android:textSize="14sp" />
 
     <TextView
         android:id="@+id/payment_direction_indicator"
-        android:layout_width="50dp"
+        android:layout_width="20dp"
         android:layout_height="wrap_content"
         android:layout_toRightOf="@id/payment_from_user_name"
         android:text=" > "
-        android:textAlignment="center" />
+        android:textAlignment="center"
+        android:textSize="14sp" />
 
     <TextView
         android:id="@+id/payment_to_user_name"
-        android:layout_width="wrap_content"
+        android:layout_width="75dp"
         android:layout_height="wrap_content"
         android:layout_toRightOf="@+id/payment_direction_indicator"
-        android:hint="To"/>
+        android:hint="ToName"
+        android:textSize="14sp" />
 
     <TextView
         android:id="@+id/payment_amount"
-        android:layout_marginLeft="10dp"
         android:layout_width="70dp"
         android:layout_height="wrap_content"
+        android:layout_marginLeft="5dp"
+        android:layout_toRightOf="@id/payment_to_user_name"
         android:hint="x.xxx,xx €"
-        android:layout_toRightOf="@id/payment_to_user_name"/>
+        android:textAlignment="textEnd"
+        android:textSize="14sp" />
 
 </RelativeLayout>
