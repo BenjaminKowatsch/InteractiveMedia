@@ -34,6 +34,8 @@ import com.media.interactive.cs3.hdm.interactivemedia.authorizedrequests.Authori
 import com.media.interactive.cs3.hdm.interactivemedia.data.Login;
 import com.media.interactive.cs3.hdm.interactivemedia.fragments.GroupFragment;
 import com.media.interactive.cs3.hdm.interactivemedia.fragments.IMyFragment;
+import com.media.interactive.cs3.hdm.interactivemedia.fragments.MapTransactionFragment;
+import com.media.interactive.cs3.hdm.interactivemedia.fragments.ProfileFragment;
 import com.media.interactive.cs3.hdm.interactivemedia.fragments.TransactionFragment;
 import com.media.interactive.cs3.hdm.interactivemedia.notification.DeleteInstanceIDService;
 
@@ -156,6 +158,17 @@ public class HomeActivity extends AppCompatActivity
                 fab.show();
                 Log.d(TAG, "item with id nav_transactions was selected");
                 fragment = new TransactionFragment();
+                break;
+            case R.id.nav_profile:
+                fab.show();
+                Log.d(TAG, "item with id nav_profile was selected");
+                fragment = new ProfileFragment();
+                break;
+
+            case R.id.nav_map:
+                fab.hide();
+                Log.d(TAG, "item with id nav_map was selected");
+                fragment = new MapTransactionFragment();
                 break;
             case R.id.nav_logout:
                 Login.getInstance().logout(this, new CallbackListener<JSONObject, Exception>() {
