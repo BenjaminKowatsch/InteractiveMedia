@@ -68,8 +68,7 @@ import Config from "../js/Config.js";
 
     mounted: function(){
       this.amounts = []
-     // this.getTransactions()
-      //this.createTransaction()
+     // this.createTransaction()
       
 
         
@@ -79,69 +78,32 @@ import Config from "../js/Config.js";
 
       createTransaction: function(){
 
-        let groupId = "82471021-a2bf-4590-9d00-c06ed12a2efb"
+        let groupId = "98b79ca5-3d1f-466e-a816-1f3fdd3b53a7"
         var transaction = {
-          "amount": 1500,
+          "amount": 900,
           "infoName": "A very expensive Bath",
           "infoLocation": {
             "longitude": null,
             "latitude": null
           },
-          "infoCreatedAt": "2018-01-17T14:25:43.511Z",
+          "infoCreatedAt": "2018-01-19T00:59:43.511Z",
           "infoImageUrl": null,
-          "paidBy": "a1b59571-3d96-4e81-abd4-f2a1119f0fbb",
+          "paidBy": "a17f3942-7633-48c2-844e-b3c8b5a024a1",
           "split": "even"
         };
         axios
           .post(Config.webServiceURL + "/v1/groups/" + groupId + "/transactions", transaction, {
           headers: { Authorization: "0 " + this.authToken }
         })
-          .then(function(response){
-              console.log("Created Transaction: ")
-              console.log(response)
-          })
-          .catch(e => {
-          console.log("Errors in POST TRANSACTION: " + e);
-          console.log(e)
-        });
-      
-          
-      },
-
-      getTransactions: function(){
-
-           // console.log(JSON.stringify(this.groups.data.groupId))
-      for(let i = 0; i < this.groups.length; i++){
-
-        let groupId = this.groups[i].groupId
-        let transactions = ""
-        let amount = 0
-
-        axios
-        .get(Config.webServiceURL + "/v1/admin/groups/" + groupId, {
-          headers: { Authorization: "0 " + this.authToken }
-        })
-        .then(function(response) {
-          console.log("Desired Group: " + JSON.stringify(response.data.payload));
-            transactions = response.data.payload.transactions;
-            if(transactions.length > 0){
-            for(let j = 0; j < transactions.length; j++){
-              amount += transactions[j].amount
-              console.log("Amount of Transaction: " + amount)
-            }
-            this.amounts.push(amount)
-            console.log("Amount of all transactions of group: " )
-            }
+        .then(function(response){
+          console.log("Created Transaction: ")
+          console.log(response)
         })
         .catch(e => {
-          console.log("Errors get groupids: " + e);
-        });     
-   
-      }
-
+          console.log("Errors in POST TRANSACTION: " + e);
+          console.log(e)
+        });       
       },
-
-
     }
   }
 </script>

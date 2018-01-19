@@ -82,7 +82,7 @@
           <strong>Total Users: {{ items.length }}</strong>
           <v-tooltip bottom>
             <v-btn icon slot="activator">
-              <v-icon color="grey lighten-1">fa-question-circle</v-icon>
+              <v-icon>fa-question-circle</v-icon>
             </v-btn>
             <span>Update properties by clicking on them (username, email, role)</span>
           </v-tooltip>
