@@ -656,26 +656,6 @@ module.exports.getAllUsers = function() {
   });
 };
 
-function checkIfUpdateOneWasSuccessful(resultRaw) {
-  return new Promise((resolve, reject) => {
-    const result = JSON.parse(resultRaw);
-    if (result && result.n === 1 && result.nModified === 1 && result.ok === 1) {
-      resolve(result);
-    } else if (result && result.n === 0 && result.nModified === 0 && result.ok === 1) {
-      // no error during update but nothing modified because document was not found
-      let errorToReturn = {isSelfProvided: true};
-      errorToReturn.message = 'resource not found';
-      errorToReturn.errorCode = ERROR.RESOURCE_NOT_FOUND;
-      reject(errorToReturn);
-    } else {
-      let errorToReturn = {isSelfProvided: true};
-      errorToReturn.message = 'database error';
-      errorToReturn.errorCode = ERROR.DB_ERROR;
-      reject(errorToReturn);
-    }
-  });
-}
-
 module.exports.updateUser = function(userId, userData) {
   return new Promise((resolve, reject) => {
     let responseData = {payload: {}};
@@ -687,7 +667,7 @@ module.exports.updateUser = function(userId, userData) {
       const options = {upsert: false};
       return database.collections.users.updateOne(query, update, options);
     })
-    .then(checkIfUpdateOneWasSuccessful)
+    .then(mongoUtilService.checkIfUpdateOneWasSuccessful)
     .then(updateResult => {
       responseData.success = true;
       resolve(responseData);
