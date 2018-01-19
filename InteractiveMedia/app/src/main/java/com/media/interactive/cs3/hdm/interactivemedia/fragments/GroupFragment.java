@@ -26,14 +26,17 @@ import com.media.interactive.cs3.hdm.interactivemedia.GroupAdapter;
 import com.media.interactive.cs3.hdm.interactivemedia.R;
 import com.media.interactive.cs3.hdm.interactivemedia.activties.AddGroupActivity;
 import com.media.interactive.cs3.hdm.interactivemedia.activties.GroupDetailViewActivity;
-import com.media.interactive.cs3.hdm.interactivemedia.contentprovider.DatabaseHelper;
 import com.media.interactive.cs3.hdm.interactivemedia.contentprovider.DatabaseProvider;
 import com.media.interactive.cs3.hdm.interactivemedia.contentprovider.tables.GroupTable;
 import com.media.interactive.cs3.hdm.interactivemedia.contentprovider.tables.UserTable;
+import com.media.interactive.cs3.hdm.interactivemedia.data.DatabaseProviderHelper;
 import com.media.interactive.cs3.hdm.interactivemedia.data.Group;
 import com.media.interactive.cs3.hdm.interactivemedia.data.Login;
 
+import org.json.JSONException;
 import org.json.JSONObject;
+
+import java.util.List;
 
 
 public class GroupFragment extends ListFragment implements LoaderManager.LoaderCallbacks<Cursor>, IMyFragment {
@@ -44,7 +47,7 @@ public class GroupFragment extends ListFragment implements LoaderManager.LoaderC
     private static final int CURSOR_LOADER_USER_ID = 1;
     private AdapterView.OnItemSelectedListener onItemSelectedListener;
     private GroupAdapter groupAdapter;
-    private DatabaseHelper dbHelper;
+    private DatabaseProviderHelper helper;
     private String GROUP_FILTER = "search";
     private String USER_ID_FILTER = "userId";
     private CallbackListener<JSONObject,Exception> userDataCompleted;
@@ -92,8 +95,9 @@ public class GroupFragment extends ListFragment implements LoaderManager.LoaderC
         Log.d(TAG, "onCreate Fragment");
         setHasOptionsMenu(true);
 
-        initOrRestartLoaderWithUserId();
+        helper = new DatabaseProviderHelper(getActivity().getContentResolver());
 
+        initOrRestartLoaderWithUserId();
     }
 
     private void initOrRestartLoaderWithUserId() {

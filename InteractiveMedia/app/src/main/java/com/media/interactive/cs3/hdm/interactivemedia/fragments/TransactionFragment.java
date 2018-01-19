@@ -31,9 +31,15 @@ import com.media.interactive.cs3.hdm.interactivemedia.contentprovider.tables.Gro
 import com.media.interactive.cs3.hdm.interactivemedia.contentprovider.tables.PaymentTable;
 import com.media.interactive.cs3.hdm.interactivemedia.contentprovider.tables.TransactionTable;
 import com.media.interactive.cs3.hdm.interactivemedia.contentprovider.tables.UserTable;
+import com.media.interactive.cs3.hdm.interactivemedia.data.DatabaseProviderHelper;
+import com.media.interactive.cs3.hdm.interactivemedia.data.Group;
 import com.media.interactive.cs3.hdm.interactivemedia.data.Login;
 
 import static android.database.DatabaseUtils.dumpCursorToString;
+import org.json.JSONException;
+
+import java.util.List;
+
 import static com.media.interactive.cs3.hdm.interactivemedia.activties.AddTransactionActivity.GROUP_CREATED_AT_ADD_TO;
 import static com.media.interactive.cs3.hdm.interactivemedia.activties.AddTransactionActivity.GROUP_TO_ADD_TO;
 
@@ -104,6 +110,7 @@ public class TransactionFragment extends ListFragment implements LoaderManager.L
 
         paymentListAdapter = initPaymentListAdapter();
         initOrRestartLoaderWithGroupId();
+
     }
 
     private SimpleCursorAdapter initPaymentListAdapter() {
@@ -161,7 +168,8 @@ public class TransactionFragment extends ListFragment implements LoaderManager.L
 
         final String[] projection = {GroupTable.TABLE_NAME + ".*"};
         final String sortOrder = GroupTable.TABLE_NAME + "." + GroupTable.COLUMN_CREATED_AT + " DESC";
-        final String selection = UserTable.TABLE_NAME + "." + UserTable.COLUMN_USER_ID + " = ?";
+        final String selection = UserTable.TABLE_NAME + "." + UserTable.COLUMN_USER_ID + " = ? AND "
+            + GroupTable.TABLE_NAME + "." + GroupTable.COLUMN_SYNCHRONIZED + " = 1 ";
         final String[] selectionArgs = {Login.getInstance().getUser().getUserId()};
         final Cursor query = contentResolver.query(DatabaseProvider.CONTENT_GROUP_USER_JOIN_URI, projection, selection, selectionArgs, sortOrder);
 
@@ -242,8 +250,10 @@ public class TransactionFragment extends ListFragment implements LoaderManager.L
         }
         final String[] projection = {TransactionTable.TABLE_NAME + ".*", UserTable.TABLE_NAME + "." + UserTable.COLUMN_USERNAME};
         final String sortOrder = TransactionTable.TABLE_NAME + "." + TransactionTable.COLUMN_INFO_CREATED_AT + " DESC";
-        final String selection = GroupTable.TABLE_NAME + "." + GroupTable.COLUMN_GROUP_ID + " = ? AND " + GroupTable.TABLE_NAME + "." + GroupTable.COLUMN_NAME + " like ? ";
-        final String[] selectionArgs = {getCurrentGroupId(), search};
+        final String selection = GroupTable.TABLE_NAME + "." + GroupTable.COLUMN_GROUP_ID + " = ? AND ("
+            + TransactionTable.TABLE_NAME + "." + TransactionTable.COLUMN_INFO_NAME + " like ? OR "
+            + TransactionTable.TABLE_NAME + "." + TransactionTable.COLUMN_INFO_CREATED_AT + " like ? )";
+        final String[] selectionArgs = {getCurrentGroupId(), search, search};
         return new CursorLoader(getActivity(), DatabaseProvider.CONTENT_GROUP_USER_TRANSACTION_JOIN_URI, projection, selection, selectionArgs, sortOrder);
     }
 

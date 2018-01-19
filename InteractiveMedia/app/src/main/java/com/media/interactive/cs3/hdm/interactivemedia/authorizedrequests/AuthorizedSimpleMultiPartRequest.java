@@ -1,5 +1,6 @@
 package com.media.interactive.cs3.hdm.interactivemedia.authorizedrequests;
 
+import com.android.volley.DefaultRetryPolicy;
 import com.android.volley.Response;
 import com.android.volley.error.AuthFailureError;
 import com.android.volley.request.SimpleMultiPartRequest;
@@ -11,6 +12,7 @@ import java.util.Map;
  */
 
 public class AuthorizedSimpleMultiPartRequest extends SimpleMultiPartRequest {
+
     public AuthorizedSimpleMultiPartRequest(int method, String url, Response.Listener<String> listener, Response.ErrorListener errorListener) {
         super(method, url, listener, errorListener);
     }
