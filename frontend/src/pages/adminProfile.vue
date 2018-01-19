@@ -78,10 +78,15 @@ import Config from "../js/Config.js";
     clicked: function() {
       this.$refs.input.click()
     },
+
     changed: function(e) {
       const file = e.target.files[0]
       if (file) {
+        this.imageFile = file
+        console.log("Imagefile:")
+        console.log(this.imageFile)
         this.$emit('input', file)
+        this.uploadPicture()
       }
     },
 
@@ -102,15 +107,21 @@ import Config from "../js/Config.js";
               console.log("Errors own user request (UserTableVuetify): " + e);           
             });
         },
-      }
+      
 
-   /*  uploadPicture(){
+     uploadPicture: function (){
 
       var upload = {
-        "uploadField": this.imageFile
+        uploadField : "<"+this.imageFile+">"
       }
+        
+      console.log(this.imageFile.name)
+      console.log(this.imageFile.type)
+      console.log(this.imageFile.size)
 
-      axios
+      console.log(upload)
+
+       axios
           .post(Config.webServiceURL + "/v1/object-store/upload", upload, {
           headers: { Authorization: "0 " + this.authToken }
         })
@@ -121,10 +132,11 @@ import Config from "../js/Config.js";
           this.imageFileUrl = response.data.payload.path
         })
         .catch(e => {
-          console.log("Errors in POST TRANSACTION: " + e);
+          console.log("Errors in POST Upload: " + e);
           console.log(e)
         });       
-    } */
+     }
+    } 
 }
   
 </script>
