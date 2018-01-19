@@ -23,7 +23,6 @@ import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import com.android.volley.DefaultRetryPolicy;
 import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.error.VolleyError;
@@ -146,7 +145,7 @@ public class AddGroupActivity extends ImagePickerActivity implements View.OnClic
 
       @Override
       public void afterTextChanged(Editable editable) {
-        if (Helper.IsGroupNameValid(editable.toString())) {
+        if (Helper.isGroupNameValid(editable.toString())) {
           groupNameError.setVisibility(View.GONE);
           saveGroup.setEnabled(true);
         } else {
@@ -213,7 +212,7 @@ public class AddGroupActivity extends ImagePickerActivity implements View.OnClic
 
       @Override
       public void afterTextChanged(Editable editable) {
-        if (Helper.IsEmailValid(editable.toString())) {
+        if (Helper.isEmailValid(editable.toString())) {
           errorMessage.setVisibility(View.GONE);
           positiveButton.setEnabled(true);
         } else {
@@ -252,7 +251,7 @@ public class AddGroupActivity extends ImagePickerActivity implements View.OnClic
     // Save into database as unsynchronized group
     toAdd = new Group();
     toAdd.setName(groupName.getText().toString());
-    toAdd.setCreatedAt(Helper.GetDateTime());
+    toAdd.setCreatedAt(Helper.getDateTime());
     toAdd.setSync(false);
     toAdd.setUsers(userList);
 

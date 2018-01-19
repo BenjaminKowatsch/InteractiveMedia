@@ -131,7 +131,7 @@ public class DatabaseProviderHelper {
 
   public void updateTransactionWithResponse(Transaction transaction, JSONObject payload) {
     try {
-      transaction.setPublishedAt(Helper.ParseDateString(payload.getString("publishedAt")));
+      transaction.setPublishedAt(Helper.parseDateString(payload.getString("publishedAt")));
       Log.d(TAG, "Transaction PublishedDate: " + transaction.getPublishedAt());
     } catch (JSONException e) {
       e.printStackTrace();
@@ -139,7 +139,7 @@ public class DatabaseProviderHelper {
     // Update transaction values
     final ContentValues transactionUpdateValues = new ContentValues();
     transactionUpdateValues.put(TransactionTable.COLUMN_INFO_IMAGE_URL, transaction.getImageUrl());
-    transactionUpdateValues.put(TransactionTable.COLUMN_PUBLISHED_AT, Helper.FormatDate(transaction.getPublishedAt()));
+    transactionUpdateValues.put(TransactionTable.COLUMN_PUBLISHED_AT, Helper.formatDate(transaction.getPublishedAt()));
     transactionUpdateValues.put(TransactionTable.COLUMN_SYNCHRONIZED, true);
     final String transactionSelection = TransactionTable.COLUMN_ID.concat(" = ?");
     Log.d(TAG, "Transaction SelectionArgs: " + transaction.getId());
@@ -212,7 +212,7 @@ public class DatabaseProviderHelper {
     for (int i = 0; i < jsonArray.length(); i++) {
       final JSONObject transactionObject = (JSONObject) jsonArray.get(i);
       final Transaction transaction = new Transaction();
-      transaction.setGroupId(groupId);
+      transaction.getGroup().setGroupId(groupId);
       transaction.setSynched(true);
       transaction.setAmount(transactionObject.getDouble("amount"));
       transaction.setInfoName(transactionObject.getString("infoName"));
@@ -256,7 +256,7 @@ public class DatabaseProviderHelper {
       final int transactionId = Integer.parseInt(id.getLastPathSegment());
       transaction.setId(transactionId);
       transactionGroupContent.put(GroupTransactionTable.COLUMN_TRANSACTION_ID, transactionId);
-      transactionGroupContent.put(GroupTransactionTable.COLUMN_GROUP_ID, transaction.getGroupId());
+      transactionGroupContent.put(GroupTransactionTable.COLUMN_GROUP_ID, transaction.getGroup().getGroupId());
       contentResolver.insert(DatabaseProvider.CONTENT_GROUP_TRANSACTION_URI, transactionGroupContent);
     }
     contentResolver.notifyChange(DatabaseProvider.CONTENT_GROUP_USER_TRANSACTION_JOIN_URI, null);
@@ -316,11 +316,11 @@ public class DatabaseProviderHelper {
       transaction.setId(cursor.getLong(cursor.getColumnIndexOrThrow(TransactionTable.COLUMN_ID)));
       transaction.setInfoName(cursor.getString(cursor.getColumnIndexOrThrow(TransactionTable.COLUMN_INFO_NAME)));
       transaction.setImageUrl(cursor.getString(cursor.getColumnIndexOrThrow(TransactionTable.COLUMN_INFO_IMAGE_URL)));
-      transaction.setDateTime(Helper.ParseDateString(cursor.getString(cursor.getColumnIndexOrThrow(TransactionTable.COLUMN_INFO_CREATED_AT))));
+      transaction.setDateTime(Helper.parseDateString(cursor.getString(cursor.getColumnIndexOrThrow(TransactionTable.COLUMN_INFO_CREATED_AT))));
       transaction.setPaidBy(cursor.getString(cursor.getColumnIndexOrThrow(TransactionTable.COLUMN_PAID_BY)));
       transaction.setAmount(cursor.getDouble(cursor.getColumnIndexOrThrow(TransactionTable.COLUMN_AMOUNT)));
       transaction.setSplit(cursor.getString(cursor.getColumnIndexOrThrow(TransactionTable.COLUMN_SPLIT)));
-      transaction.setGroupId(cursor.getString(cursor.getColumnIndexOrThrow(GroupTable.COLUMN_GROUP_ID)));
+      transaction.getGroup().setGroupId(cursor.getString(cursor.getColumnIndexOrThrow(GroupTable.COLUMN_GROUP_ID)));
       result.add(transaction);
     }
     return result;
@@ -440,7 +440,7 @@ public class DatabaseProviderHelper {
     paymentContent.put(PaymentTable.COLUMN_AMOUNT, payment.getAmount());
     paymentContent.put(PaymentTable.COLUMN_FROM_USER, payment.getFromUserId());
     paymentContent.put(PaymentTable.COLUMN_TO_USER, payment.getToUserId());
-    paymentContent.put(PaymentTable.COLUMN_CREATED_AT, Helper.FormatDate(creationTimestmap));
+    paymentContent.put(PaymentTable.COLUMN_CREATED_AT, Helper.formatDate(creationTimestmap));
     paymentContent.put(PaymentTable.COLUMN_GROUP_ID, groupId);
     final Uri insert = contentResolver.insert(DatabaseProvider.CONTENT_PAYMENT_URI, paymentContent);
     Log.d(TAG, "Inserted payment " + insert);

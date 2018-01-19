@@ -57,7 +57,7 @@ public class TransactionAdapter extends CursorAdapter {
     transaction.setId(cursor.getLong(cursor.getColumnIndexOrThrow(TransactionTable.COLUMN_ID)));
     transaction.setInfoName(cursor.getString(cursor.getColumnIndexOrThrow(TransactionTable.COLUMN_INFO_NAME)));
     transaction.setImageUrl(cursor.getString(cursor.getColumnIndexOrThrow(TransactionTable.COLUMN_INFO_IMAGE_URL)));
-    transaction.setDateTime(Helper.ParseDateString(cursor.getString(cursor.getColumnIndexOrThrow(TransactionTable.COLUMN_INFO_CREATED_AT))));
+    transaction.setDateTime(Helper.parseDateString(cursor.getString(cursor.getColumnIndexOrThrow(TransactionTable.COLUMN_INFO_CREATED_AT))));
     transaction.setPaidBy(cursor.getString(cursor.getColumnIndexOrThrow(TransactionTable.COLUMN_PAID_BY)));
     transaction.setAmount(cursor.getDouble(cursor.getColumnIndexOrThrow(TransactionTable.COLUMN_AMOUNT)));
     int synced = cursor.getInt(cursor.getColumnIndexOrThrow(TransactionTable.COLUMN_SYNCHRONIZED));
@@ -72,7 +72,7 @@ public class TransactionAdapter extends CursorAdapter {
     Log.d(Transaction.class.getSimpleName(), transaction.toString());
     // Populate fields with extracted properties
     viewHolder.transactionTitle.setText(transaction.getInfoName());
-    viewHolder.transactionCreationDate.setText(Helper.FormatDate(transaction.getDateTime()));
+    viewHolder.transactionCreationDate.setText(Helper.formatDate(transaction.getDateTime()));
     viewHolder.transactionPaidBy.setText("Paid by: " + cursor.getString(cursor.getColumnIndexOrThrow(UserTable.COLUMN_USERNAME)));
     viewHolder.transactionAmount.setText(String.valueOf(transaction.getAmount()));
 

@@ -345,7 +345,7 @@ public class ImagePickerActivity extends AppCompatActivity {
 
             try {
                 final File copy = createImageFile();
-                Helper.CopyFile(original, copy);
+                Helper.copyFile(original, copy);
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -513,7 +513,7 @@ public class ImagePickerActivity extends AppCompatActivity {
             @Override
             public void afterTextChanged(Editable editable) {
 
-                if (Helper.IsUrlValid(editable.toString())) {
+                if (Helper.isUrlValid(editable.toString())) {
                     errorMessage.setVisibility(View.GONE);
                     positiveButton.setEnabled(true);
                 } else {

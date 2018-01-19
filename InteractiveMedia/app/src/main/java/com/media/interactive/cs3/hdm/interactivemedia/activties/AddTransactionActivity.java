@@ -213,10 +213,10 @@ public class AddTransactionActivity extends ImagePickerActivity {
 
   private void sendToBackend(final Transaction toSave) throws JSONException {
     helper.saveTransaction(toSave);
-    Login.getInstance().requestTransactionsByGroupId(this, toSave.getGroupId(), groupCreatedAt, new CallbackListener<JSONObject, Exception>() {
+    Login.getInstance().requestTransactionsByGroupId(this, toSave.getGroup().getGroupId(), groupCreatedAt, new CallbackListener<JSONObject, Exception>() {
       @Override
       public void onSuccess(JSONObject response) {
-        final String url = getResources().getString(R.string.web_service_url).concat("/v1/groups/").concat(toSave.getGroupId()).concat("/transactions");
+        final String url = getResources().getString(R.string.web_service_url).concat("/v1/groups/").concat(toSave.getGroup().getGroupId()).concat("/transactions");
         Log.d(TAG, "url: " + url);
         try {
           final AuthorizedJsonObjectRequest jsonObjectRequest = new AuthorizedJsonObjectRequest(
@@ -281,7 +281,7 @@ public class AddTransactionActivity extends ImagePickerActivity {
     }
     final String paidBy = userAdapter.getCursor().getString(userAdapter.getCursor().getColumnIndex(UserTable.COLUMN_USER_ID));
     Log.d(TAG, "paidBy: " + paidBy);
-    return new Transaction(purpose, paidBy, split, dateTime, location, amount, groupId, group);
+    return new Transaction(purpose, paidBy, split, dateTime, location, amount, groupId);
   }
 
   private double parseAmount(EditText amountText) {

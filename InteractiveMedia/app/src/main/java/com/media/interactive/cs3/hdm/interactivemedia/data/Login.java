@@ -329,7 +329,7 @@ public class Login {
   }
 
   private void uploadTransaction(final Transaction transaction, final Context context, final CallbackListener<JSONObject, Exception> callbackListener) {
-    final String url = context.getResources().getString(R.string.web_service_url).concat("/v1/groups/").concat(transaction.getGroupId()).concat("/transactions");
+    final String url = context.getResources().getString(R.string.web_service_url).concat("/v1/groups/").concat(transaction.getGroup().getGroupId()).concat("/transactions");
     Log.d(TAG, "url: " + url);
     try {
       final AuthorizedJsonObjectRequest jsonObjectRequest = new AuthorizedJsonObjectRequest(
