@@ -7,17 +7,17 @@
         <h1>Hello {{adminUserData.username}}</h1>
         <br>
         <p>sometext</p>
- <div class="file-btn">
-    <input
-      ref="input"
-      type="file"
-      :accept="accept"
-      :disabled="disabled"
-      @change="changed">
-    <v-btn
-      :disabled="disabled"
-      @click="clicked"><slot>Browse</slot></v-btn>
-</div>
+ 				<v-flex xs12 class="text-xs-center text-sm-center text-md-center text-lg-center">
+					<img :src="imageUrl" height="150" v-if="imageUrl"/>
+					<v-text-field label="Select Image" @click='pickFile' v-model='imageName' prepend-icon='attach_file'></v-text-field>
+					<input
+						type="file"
+						style="display: none"
+						ref="image"
+						accept="image/*"
+						@change="onFilePicked"
+					>
+				</v-flex>
         <!-- <upload-button title="Browse" :selectedCallback="fileSelectedFunc">
         </upload-button> -->
         <v-btn :to="{path:'/overview'}">Back</v-btn>
@@ -38,28 +38,22 @@ import Config from "../js/Config.js";
       
     },
    name: 'VFileBtn',
-  props: {
-    value: {
-      type: File,
-      default: null
-    },
-    accept: {
-      type: String,
-      default: 'image/*'
-    },
-    disabled: {
-      type: Boolean,
-      default: false
-    }
-  },
+
+   
 
     data () {
       return {
         authToken: "",
         adminUserData: [],
-        imageFile: '',
+        //imageFile: '',
         isFile: false,
-        imageFileUrl: ''
+        imageFileUrl: '',
+        title: "Image Upload",
+        dialog: false,
+		imageName: '',
+		imageUrl: '',
+		imageFile: ''
+    
     
        
     }
@@ -75,20 +69,32 @@ import Config from "../js/Config.js";
 
 
       
-    clicked: function() {
-      this.$refs.input.click()
-    },
-
-    changed: function(e) {
-      const file = e.target.files[0]
-      if (file) {
-        this.imageFile = file
-        console.log("Imagefile:")
-        console.log(this.imageFile)
-        this.$emit('input', file)
-        this.uploadPicture()
-      }
-    },
+pickFile () {
+            this.$refs.image.click ()
+        },
+		
+		onFilePicked (e) {
+			const files = e.target.files
+			if(files[0] !== undefined) {
+				this.imageName = files[0].name
+				if(this.imageName.lastIndexOf('.') <= 0) {
+					return
+				}
+				const fr = new FileReader ()
+				fr.readAsDataURL(files[0])
+				fr.addEventListener('load', () => {
+					this.imageUrl = fr.result
+          this.imageFile = files[0]
+          console.log(this.imageFile)
+          this.uploadPicture() // this is an image file that can be sent to server...
+				})
+			} else {
+				this.imageName = ''
+				this.imageFile = ''
+				this.imageUrl = ''
+			}
+		},
+    
 
       getOwnUser: function(){
 
@@ -112,12 +118,9 @@ import Config from "../js/Config.js";
      uploadPicture: function (){
 
       var upload = {
-        uploadField : "<"+this.imageFile+">"
+          "uploadField" : `<${this.imageFile}`
       }
         
-      console.log(this.imageFile.name)
-      console.log(this.imageFile.type)
-      console.log(this.imageFile.size)
 
       console.log(upload)
 
