@@ -1,5 +1,5 @@
 <!-- TEMPLATE for user table
-  * Description: Table to display all users
+  * Description: Table to display all users and update specific props of them
  -->
 <template>
   <v-container>
@@ -34,8 +34,6 @@
             ></v-text-field>          
           </v-edit-dialog>
         </td> 
-        <!-- <td class="text-xs-right">{{ props.item.username }}</td> -->
-        <!-- <td class="text-xs-right">{{ props.item.email }}</td> -->
         <td>
           <v-edit-dialog
             lazy
@@ -54,7 +52,6 @@
           </v-edit-dialog>
         </td> 
         <td class="text-xs-right">{{ props.item.userId }}</td>
-        <!-- <td class="text-xs-right">{{ props.item.role }}</td> -->
         <td>
           <v-edit-dialog
             lazy
@@ -83,6 +80,12 @@
      <template slot="footer">
         <td class="text-xs-left" colspan="100%">
           <strong>Total Users: {{ items.length }}</strong>
+          <v-tooltip bottom>
+            <v-btn icon slot="activator">
+              <v-icon color="grey lighten-1">fa-question-circle</v-icon>
+            </v-btn>
+            <span>Update properties by clicking on them (username, email, role)</span>
+          </v-tooltip>
         </td>
       </template>
       <template slot="pageText" slot-scope="{ pageStart, pageStop }">
@@ -210,7 +213,7 @@
 
     methods: {
 
-      //get own userId for comparison if updating user role of his own user 
+      // Get own userId for comparison if updating user role of his own user 
       getOwnId: function (){
 
         axios
@@ -225,6 +228,7 @@
             });
       },
 
+      // Trys to update a specific user property
       updateUser: function(prop){
 
           console.log("Hello Updatefunction")
@@ -282,7 +286,8 @@
           {
             console.log("Own: " + this.ownUserId)
             console.log("Other: " + this.userId)
-            
+
+            // Noobfilter to prevent admin to revoke his own admin rights...
             if(this.userId == this.ownUserId && prop == "user"){
               this.dontDoThis = true
               this.cancelEditRole(this.tmp)
