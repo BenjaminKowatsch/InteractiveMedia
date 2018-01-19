@@ -223,7 +223,6 @@ public class DatabaseProviderHelper {
         location.setLatitude(infoLocation.getDouble("latitude"));
         location.setLongitude(infoLocation.getDouble("longitude"));
       } catch (JSONException e) {
-        e.printStackTrace();
       }
       transaction.setLocation(location);
       final SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
@@ -231,7 +230,6 @@ public class DatabaseProviderHelper {
         transaction.setDateTime(sdf.parse(transactionObject.getString("infoCreatedAt")));
         transaction.setPublishedAt(sdf.parse(transactionObject.getString("publishedAt")));
       } catch (ParseException e) {
-        e.printStackTrace();
       }
       transaction.setImageUrl(transactionObject.getString("infoImageUrl"));
       transaction.setPaidBy(transactionObject.getString("paidBy"));

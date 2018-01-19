@@ -45,6 +45,19 @@ public class Transaction {
         this.publishedAt = null;
     }
 
+    public Transaction(String infoName, String paidBy, String split, Date dateTime, Location location, double amount, Group group) {
+        this.infoName = infoName;
+        this.paidBy = paidBy;
+        this.split = split;
+        this.groupId = group.getGroupId();
+        this.dateTime = dateTime;
+        this.location = location;
+        this.amount = amount;
+        this.group = group;
+        this.synched = false;
+        this.publishedAt = null;
+    }
+
     public ContentValues toContentValues() {
         final ContentValues out = new ContentValues();
         out.put(TransactionTable.COLUMN_INFO_CREATED_AT, Helper.GetDateTime());
