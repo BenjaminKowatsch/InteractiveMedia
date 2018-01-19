@@ -5,8 +5,9 @@
     tools:context=".MainActivity">
     <item
         android:id="@+id/menu_group_selection"
+        android:background="#ff00"
         android:icon="@android:drawable/ic_menu_edit"
         android:title="Group Selection"
-        app:actionViewClass="android.widget.Spinner"
+        android:actionLayout="@layout/group_spinner"
         app:showAsAction="always" />
 </menu>

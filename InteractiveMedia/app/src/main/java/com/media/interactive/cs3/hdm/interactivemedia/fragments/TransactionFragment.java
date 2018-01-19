@@ -68,8 +68,10 @@ public class TransactionFragment extends ListFragment implements LoaderManager.L
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         inflater.inflate(R.menu.fragment_transaction, menu);
 
-        final MenuItem switchItem = menu.findItem(R.id.menu_group_selection);
-        groupSelection = (Spinner) switchItem.getActionView();
+        final MenuItem item = menu.findItem(R.id.menu_group_selection);
+        item.setActionView(R.layout.group_spinner);
+
+        groupSelection = item.getActionView().findViewById(R.id.menu_group_spinner);
         groupSelection.setAdapter(groupAdapter);
         groupSelection.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
