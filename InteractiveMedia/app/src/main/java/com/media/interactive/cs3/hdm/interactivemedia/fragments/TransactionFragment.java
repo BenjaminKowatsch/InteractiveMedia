@@ -17,6 +17,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
+import android.widget.CursorAdapter;
 import android.widget.ListView;
 import android.widget.SearchView;
 import android.widget.SimpleCursorAdapter;
@@ -28,10 +29,10 @@ import com.media.interactive.cs3.hdm.interactivemedia.activties.AddTransactionAc
 import com.media.interactive.cs3.hdm.interactivemedia.contentprovider.DatabaseHelper;
 import com.media.interactive.cs3.hdm.interactivemedia.contentprovider.DatabaseProvider;
 import com.media.interactive.cs3.hdm.interactivemedia.contentprovider.tables.GroupTable;
-import com.media.interactive.cs3.hdm.interactivemedia.contentprovider.tables.PaymentTable;
 import com.media.interactive.cs3.hdm.interactivemedia.contentprovider.tables.TransactionTable;
 import com.media.interactive.cs3.hdm.interactivemedia.contentprovider.tables.UserTable;
 import com.media.interactive.cs3.hdm.interactivemedia.data.Login;
+import com.media.interactive.cs3.hdm.interactivemedia.data.settlement.PaymentAdapter;
 
 import static android.database.DatabaseUtils.dumpCursorToString;
 import static com.media.interactive.cs3.hdm.interactivemedia.activties.AddTransactionActivity.GROUP_CREATED_AT_ADD_TO;
@@ -49,7 +50,7 @@ public class TransactionFragment extends ListFragment implements LoaderManager.L
     private View transactionListFragment;
     private ContentResolver contentResolver;
     private SimpleCursorAdapter groupAdapter;
-    private SimpleCursorAdapter paymentListAdapter;
+    private CursorAdapter paymentListAdapter;
     private ListView paymentListView;
     private static final int CURSOR_LOADER_TRANSACTIONS_NAME = 0;
     private static final String TRANSACTION_NAME_FILTER = "transactionName";
@@ -106,15 +107,10 @@ public class TransactionFragment extends ListFragment implements LoaderManager.L
         initOrRestartLoaderWithGroupId();
     }
 
-    private SimpleCursorAdapter initPaymentListAdapter() {
+    private CursorAdapter initPaymentListAdapter() {
         final Cursor payments = getPaymentCoursorForCurrentGroup();
         Log.d(TAG, dumpCursorToString(payments));
-        final String[] columns = new String[]{PaymentTable.COLUMN_AMOUNT,
-                DatabaseHelper.PAYMENT_USER_JOIN_COLUMN_FROM_USER,
-                DatabaseHelper.PAYMENT_USER_JOIN_COLUMN_TO_USER};
-        final int[] to = new int[]{R.id.payment_amount, R.id.payment_from, R.id.payment_to};
-        return new SimpleCursorAdapter(this.getContext(),
-                R.layout.payment, payments, columns, to, 0);
+        return new PaymentAdapter(this.getContext(), payments);
     }
 
     private Cursor getPaymentCoursorForCurrentGroup() {
