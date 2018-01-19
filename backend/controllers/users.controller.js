@@ -191,7 +191,7 @@ exports.getUserData = function(req, res) {
 
 exports.updateUser = function(req, res) {
   winston.debug('Hello from updateUser');
-  validateJsonService.againstSchema(req.body, jsonSchema.updateUserPayload)
+  validateJsonService.reqBodyAgainstSchema(req.body, jsonSchema.updateUserPayload)
   .then(() => {
     return user.updateUser(res.locals.userId, req.body);
   })

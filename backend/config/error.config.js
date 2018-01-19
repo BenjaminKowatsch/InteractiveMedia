@@ -24,4 +24,5 @@ module.exports = {
     INVALID_DATE_FORMAT: 'invalid date format',
     NO_USERS: 'no users',
     RESOURCE_NOT_FOUND: 'resource not found',
+    INVALID_JSON: 'invalid json',
   };

@@ -98,7 +98,7 @@ module.exports.getUserById = function(req, res) {
 
 module.exports.updateUserById = function(req, res) {
   const userId = req.params.userId;
-  validateJsonService.againstSchema(req.body, jsonSchema.updateUserAsAdminPayload)
+  validateJsonService.reqBodyAgainstSchema(req.body, jsonSchema.updateUserAsAdminPayload)
   .then(() => {
     return user.updateUser(userId, req.body);
   })
