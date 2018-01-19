@@ -38,25 +38,27 @@ public class TransactionSplittingTask extends AsyncTask<Transaction, Void, Boole
             } catch (Exception e) {
                 Log.e(TAG, "An error occured in completing transaction " + transaction, e);
             }
-            List<Debt> debts;
-            try {
-                debts = transaction.split();
-            } catch (Exception e) {
-                Log.e(TAG, "An error occurred in resolving transaction " + transaction, e);
-                return false;
-            }
-            if (isCancelled()) {
-                return false;
-            }
-            for (Debt debt : debts) {
+            if(transaction.getGroup().getUsers().size() > 1) {
+                List<Debt> debts;
                 try {
-                    helper.saveDebt(debt);
+                    debts = transaction.split();
                 } catch (Exception e) {
-                    Log.e(TAG, "An error occurred in saving debt " + debt, e);
+                    Log.e(TAG, "An error occurred in resolving transaction " + transaction, e);
                     return false;
                 }
+                if (isCancelled()) {
+                    return false;
+                }
+                for (Debt debt : debts) {
+                    try {
+                        helper.saveDebt(debt);
+                    } catch (Exception e) {
+                        Log.e(TAG, "An error occurred in saving debt " + debt, e);
+                        return false;
+                    }
+                }
+                groupsInTransactions.add(transaction.getGroup());
             }
-            groupsInTransactions.add(transaction.getGroup());
         }
         Log.d(TAG, "Groups in transaction: " + groupsInTransactions);
         for(Group group: groupsInTransactions) {
