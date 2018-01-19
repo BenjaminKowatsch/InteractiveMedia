@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "unit-test": "./node_modules/mocha/bin/mocha --reporter spec ./testing-unit/test/**/*.js",
+    "unit-test": "./node_modules/mocha/bin/mocha --reporter spec --recursive ./testing-unit/test",
     "static-code-analysis": "./node_modules/gulp/bin/gulp.js static-code-analysis",
     "start": "node index.js",
     "generate-apidoc": "./node_modules/gulp/bin/gulp.js apidoc"
@@ -26,6 +26,7 @@
   },
   "devDependencies": {
     "chai": "^4.0.2",
+    "chai-as-promised": "^7.1.1",
     "gulp": "^3.9.1",
     "gulp-apidoc": "^0.2.6",
     "gulp-jscs": "^4.0.0",
