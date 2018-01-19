@@ -7,8 +7,8 @@
   <v-container fluid grid-list-md text-xs-center>
     <v-layout row wrap>
     <v-flex xs12 sm12 md12 lg6 xl6>
-        <v-btn large @click="showUserTable = toggleState(showUserTable)">Overview Users</v-btn>
-        <user-table-vuetify v-if="usersLoaded && showUserTable" :users="users"></user-table-vuetify>
+        <v-btn large @click="showUserTable = toggleState(showUserTable)">Overview/Update Users</v-btn>
+        <user-table-vuetify v-if="usersLoaded && showUserTable" :users="users" :authToken="authToken"></user-table-vuetify>
     </v-flex>
     <v-flex xs12 sm12 md12 lg6 xl6>
         <v-btn  large @click="showGroupTable = toggleState(showGroupTable)">Overview Groups</v-btn>
@@ -20,9 +20,12 @@
         <login-type-chart v-if="usersLoaded && showLoginTypeChart" :passwordUsers="passwordUsers" :facebookUsers="facebookUsers" :googleUsers="googleUsers"></login-type-chart>
     </v-flex>
     <v-flex xs12 sm12 md12 lg6 xl6>
-        <v-btn  large @click="showTransactionAmountChart = toggleState(showTransactionAmountChart)">TOP 3 Groups</v-btn>
+       <v-tooltip left>
+        <v-btn slot="activator" large @click="showTransactionAmountChart = toggleState(showTransactionAmountChart)">TOP 3 Groups</v-btn>
+          <span>Needs at least three groups with transactions</span>
+        </v-tooltip>
         <p></p>
-        <transaction-amout-chart v-if="amountsCalculated && showTransactionAmountChart" :transactionGroups="transactionGroups"></transaction-amout-chart>
+        <transaction-amout-chart v-if="amountsCalculated && showTransactionAmountChart && transactionGroups.length > 2" :transactionGroups="transactionGroups"></transaction-amout-chart>
     </v-flex>
     </v-layout>
 </v-container>
@@ -168,7 +171,9 @@ export default {
           console.log("Anzahl Gruppen mit Transaktionen: " + this.transactionGroups.length)
           this.groupsLoaded = true;
           console.log(JSON.stringify(this.transactionGroups))
-          this.prepareTransactionAmouts()
+          if(this.transactionGroups.length > 0){
+            this.prepareTransactionAmouts()
+          }
 
           // console.log("Existing Groups: " + JSON.stringify(this.groups));
         })
