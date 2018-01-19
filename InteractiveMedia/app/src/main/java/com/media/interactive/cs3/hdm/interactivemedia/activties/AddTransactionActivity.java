@@ -36,8 +36,8 @@ import com.media.interactive.cs3.hdm.interactivemedia.contentprovider.tables.Use
 import com.media.interactive.cs3.hdm.interactivemedia.data.DatabaseProviderHelper;
 import com.media.interactive.cs3.hdm.interactivemedia.data.Group;
 import com.media.interactive.cs3.hdm.interactivemedia.data.Login;
-import com.media.interactive.cs3.hdm.interactivemedia.data.MoneyTextWatcher;
 import com.media.interactive.cs3.hdm.interactivemedia.data.Transaction;
+import com.media.interactive.cs3.hdm.interactivemedia.util.MoneyTextWatcher;
 
 import org.json.JSONException;
 import org.json.JSONObject;

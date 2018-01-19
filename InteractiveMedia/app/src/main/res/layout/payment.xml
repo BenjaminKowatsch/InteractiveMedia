@@ -28,9 +28,9 @@
     <TextView
         android:id="@+id/payment_amount"
         android:layout_marginLeft="10dp"
-        android:layout_width="50dp"
+        android:layout_width="70dp"
         android:layout_height="wrap_content"
-        android:hint="xx.xx"
+        android:hint="x.xxx,xx €"
         android:layout_toRightOf="@id/payment_to_user_name"/>
 
 </RelativeLayout>

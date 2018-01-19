@@ -14,20 +14,29 @@ import com.media.interactive.cs3.hdm.interactivemedia.contentprovider.DatabaseHe
 import com.media.interactive.cs3.hdm.interactivemedia.contentprovider.tables.PaymentTable;
 
 import java.text.NumberFormat;
+import java.util.Locale;
 
 
 public class PaymentAdapter extends CursorAdapter {
     private static final String TAG = PaymentAdapter.class.getSimpleName();
     private static final String FROM_USER = DatabaseHelper.PAYMENT_USER_JOIN_COLUMN_FROM_USER;
     private static final String TO_USER = DatabaseHelper.PAYMENT_USER_JOIN_COLUMN_TO_USER;
-    private final NumberFormat formatter = NumberFormat.getCurrencyInstance();
+    private final NumberFormat formatter;
     private final LayoutInflater mLayoutInflater;
     private final Context mContext;
+
+    public PaymentAdapter(Context context, Cursor c, int flags, NumberFormat formatter) {
+        super(context, c, flags);
+        this.formatter = formatter;
+        mContext = context;
+        mLayoutInflater = LayoutInflater.from(context);
+    }
 
     public PaymentAdapter(Context context, Cursor c) {
         super(context, c);
         mContext = context;
         mLayoutInflater = LayoutInflater.from(context);
+        formatter = NumberFormat.getCurrencyInstance(Locale.GERMANY);
     }
 
     @Override
