@@ -2,8 +2,8 @@ package com.media.interactive.cs3.hdm.interactivemedia.data;
 
 
 import android.content.ContentValues;
+import android.location.Location;
 
-import com.google.android.gms.maps.model.LatLng;
 import com.media.interactive.cs3.hdm.interactivemedia.contentprovider.tables.TransactionTable;
 import com.media.interactive.cs3.hdm.interactivemedia.data.split.SplitFactory;
 import com.media.interactive.cs3.hdm.interactivemedia.util.Helper;
@@ -17,11 +17,12 @@ import java.util.List;
 public class Transaction {
     private long id;
     private String infoName;
-    private String paidByUserId;
+    private String paidBy;
     private String split;
     private Date dateTime;
+    private String groupId;
     private String imageUrl;
-    private LatLng location;
+    private Location location;
     private double amount;
     private Group group;
     private boolean synched;
@@ -30,11 +31,12 @@ public class Transaction {
     public Transaction() {
     }
 
-    public Transaction(String infoName, String paidByUserId, String split, Date dateTime,
-                       LatLng location, double amount, Group group) {
+    public Transaction(String infoName, String paidBy, String split, Date dateTime,
+                       Location location, double amount, String groupId, Group group) {
         this.infoName = infoName;
-        this.paidByUserId = paidByUserId;
+        this.paidBy = paidBy;
         this.split = split;
+        this.groupId = groupId;
         this.dateTime = dateTime;
         this.location = location;
         this.amount = amount;
@@ -45,16 +47,16 @@ public class Transaction {
 
     public ContentValues toContentValues() {
         final ContentValues out = new ContentValues();
-        out.put(TransactionTable.COLUMN_INFO_CREATED_AT, Helper.getDateTime());
+        out.put(TransactionTable.COLUMN_INFO_CREATED_AT, Helper.GetDateTime());
         out.put(TransactionTable.COLUMN_AMOUNT, amount);
         out.put(TransactionTable.COLUMN_INFO_NAME, infoName);
         out.put(TransactionTable.COLUMN_PAID_BY, paidBy);
         out.put(TransactionTable.COLUMN_SPLIT, split);
         out.put(TransactionTable.COLUMN_INFO_IMAGE_URL, imageUrl);
-        out.put(TransactionTable.COLUMN_PUBLISHED_AT, Helper.formatDate(publishedAt));
+        out.put(TransactionTable.COLUMN_PUBLISHED_AT, Helper.FormatDate(publishedAt));
         if (location != null) {
-            out.put(TransactionTable.COLUMN_INFO_LOCATION_LONG, location.longitude);
-            out.put(TransactionTable.COLUMN_INFO_LOCATION_LAT, location.latitude);
+            out.put(TransactionTable.COLUMN_INFO_LOCATION_LONG, location.getLongitude());
+            out.put(TransactionTable.COLUMN_INFO_LOCATION_LAT, location.getLatitude());
         }
         out.put(TransactionTable.COLUMN_SYNCHRONIZED, synched);
         return out;
@@ -80,12 +82,12 @@ public class Transaction {
         this.infoName = infoName;
     }
 
-    public String getPaidByUserId() {
-        return paidByUserId;
+    public String getPaidBy() {
+        return paidBy;
     }
 
-    public void setPaidByUserId(String paidByUserId) {
-        this.paidByUserId = paidByUserId;
+    public void setPaidBy(String paidBy) {
+        this.paidBy = paidBy;
     }
 
     public String getSplit() {
@@ -112,11 +114,11 @@ public class Transaction {
         this.imageUrl = imageUrl;
     }
 
-    public LatLng getLocation() {
+    public Location getLocation() {
         return location;
     }
 
-    public void setLocation(LatLng location) {
+    public void setLocation(Location location) {
         this.location = location;
     }
 
@@ -129,7 +131,7 @@ public class Transaction {
     }
 
     public String getGroupId() {
-        return group.getGroupId();
+        return groupId;
     }
 
     public void setGroup(Group group) {
@@ -157,7 +159,7 @@ public class Transaction {
         return "Transaction{" +
                 "id=" + id +
                 ", infoName='" + infoName + '\'' +
-                ", paidByUserId='" + paidByUserId + '\'' +
+                ", paidBy='" + paidBy + '\'' +
                 ", split='" + split + '\'' +
                 ", dateTime=" + dateTime +
                 ", imageUrl='" + imageUrl + '\'' +
@@ -180,13 +182,17 @@ public class Transaction {
         result.put("infoLocation", infoLocation);
 
         result.put("infoImageUrl", imageUrl != null ? imageUrl : JSONObject.NULL);
-        result.put("infoCreatedAt", Helper.formatDate(dateTime));
-        result.put("paidBy", paidByUserId);
+        result.put("infoCreatedAt", Helper.FormatDate(dateTime));
+        result.put("paidBy", paidBy);
         result.put("split", split);
         return result;
     }
 
     public Group getGroup() {
         return group;
+    }
+
+    public void setGroupId(String groupId) {
+        this.groupId = groupId;
     }
 }

@@ -4,6 +4,7 @@ import android.app.DatePickerDialog;
 import android.app.TimePickerDialog;
 import android.content.Intent;
 import android.database.Cursor;
+import android.location.Location;
 import android.os.Bundle;
 import android.text.InputType;
 import android.util.Log;
@@ -71,6 +72,7 @@ public class AddTransactionActivity extends ImagePickerActivity {
   private SimpleCursorAdapter userAdapter;
   private AtomicInteger placePickerId = new AtomicInteger(0);
   private Place selectedPlace = null;
+  private Group group;
   private final static int PLACE_PICKER_REQUEST = 3;
 
   protected void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -156,22 +158,21 @@ public class AddTransactionActivity extends ImagePickerActivity {
     userAdapter = initializeUserAdapter();
     userSelection.setAdapter(userAdapter);
 
-    private Group loadGroup() {
-        final String groupId = getIntent().getStringExtra(GROUP_TO_ADD_TO);
-        if (groupId == null) {
-            Log.e(this.getClass().getSimpleName(), "Intent is missing id of group");
-            return null;
-        } else {
-            return new DatabaseHelper(this).getGroupWithUsers(groupId);
-        }
-    }
-
     final UUID randomUUID = UUID.randomUUID();
     final String randomFilename = randomUUID.toString() + ".png";
     initImagePickerActivity(R.id.iv_transaction_image, randomFilename, true);
     setDateTextField(dateEditText);
     setDateTimeTextField(timeEditText);
     setAmountTextField(amountEditText);
+  }
+
+  private Group loadGroup() {
+    if (groupId == null) {
+      Log.e(this.getClass().getSimpleName(), "Intent is missing id of group");
+      return null;
+    } else {
+      return new DatabaseHelper(this).getGroupWithUsers(groupId);
+    }
   }
 
   private void createAndSaveTransaction(View view) {
@@ -280,7 +281,7 @@ public class AddTransactionActivity extends ImagePickerActivity {
     }
     final String paidBy = userAdapter.getCursor().getString(userAdapter.getCursor().getColumnIndex(UserTable.COLUMN_USER_ID));
     Log.d(TAG, "paidBy: " + paidBy);
-    return new Transaction(purpose, paidBy, split, dateTime, location, amount, groupId);
+    return new Transaction(purpose, paidBy, split, dateTime, location, amount, groupId, group);
   }
 
   private double parseAmount(EditText amountText) {
