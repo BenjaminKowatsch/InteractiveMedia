@@ -9,6 +9,8 @@
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-feature android:name="android.hardware.camera"
         android:required="true" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
 
     <application
         android:allowBackup="true"
@@ -63,6 +65,13 @@
 
         <activity android:name=".activties.AddGroupActivity"></activity>
         <activity android:name=".activties.AddTransactionActivity" />
+        <!-- Offline/Online Detection -->
+        <receiver android:name="com.media.interactive.cs3.hdm.interactivemedia.receiver.NetworkStateChangeReceiver"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="android.net.conn.CONNECTIVITY_CHANGE"/>
+            </intent-filter>
+        </receiver>
         <!-- Firebase Cloud Messaging Services -->
         <service
             android:name=".notification.InteractiveMediaMessagingService">

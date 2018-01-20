@@ -2,11 +2,15 @@ package com.media.interactive.cs3.hdm.interactivemedia.activties;
 
 import android.app.Fragment;
 import android.app.FragmentTransaction;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
@@ -20,26 +24,20 @@ import android.widget.AdapterView;
 import android.widget.ImageView;
 import android.widget.Toast;
 
-import com.android.volley.Request;
-import com.android.volley.Response;
-import com.android.volley.error.VolleyError;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.load.model.GlideUrl;
 import com.bumptech.glide.load.model.LazyHeaders;
 import com.media.interactive.cs3.hdm.interactivemedia.CallbackListener;
 import com.media.interactive.cs3.hdm.interactivemedia.R;
-import com.media.interactive.cs3.hdm.interactivemedia.RestRequestQueue;
-import com.media.interactive.cs3.hdm.interactivemedia.authorizedrequests.AuthorizedJsonObjectRequest;
 import com.media.interactive.cs3.hdm.interactivemedia.data.Login;
 import com.media.interactive.cs3.hdm.interactivemedia.fragments.GroupFragment;
 import com.media.interactive.cs3.hdm.interactivemedia.fragments.IMyFragment;
 import com.media.interactive.cs3.hdm.interactivemedia.fragments.MapTransactionFragment;
 import com.media.interactive.cs3.hdm.interactivemedia.fragments.ProfileFragment;
 import com.media.interactive.cs3.hdm.interactivemedia.fragments.TransactionFragment;
-import com.media.interactive.cs3.hdm.interactivemedia.notification.DeleteInstanceIDService;
+import com.media.interactive.cs3.hdm.interactivemedia.receiver.NetworkStateChangeReceiver;
 
-import org.json.JSONException;
 import org.json.JSONObject;
 
 public class HomeActivity extends AppCompatActivity
@@ -91,6 +89,22 @@ public class HomeActivity extends AppCompatActivity
         }else {
             displayFragment(R.id.nav_groups);
         }
+        registerNetworkStatusChangeReceiver();
+    }
+
+    private void registerNetworkStatusChangeReceiver(){
+        final IntentFilter intentFilter = new IntentFilter(NetworkStateChangeReceiver.NETWORK_AVAILABLE_ACTION);
+        LocalBroadcastManager.getInstance(this).registerReceiver(new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                boolean isNetworkAvailable = intent.getBooleanExtra(NetworkStateChangeReceiver.IS_NETWORK_AVAILABLE,false);
+                final String networkStatus = isNetworkAvailable ? "connected" : "disconnected";
+                if(isNetworkAvailable){
+                    Login.getInstance().getSynchronisationHelper().synchronize(HomeActivity.this,null,null);
+                }
+                Toast.makeText(HomeActivity.this,"Network Status: " + networkStatus,Toast.LENGTH_SHORT).show();
+            }
+        }, intentFilter);
     }
 
     @Override

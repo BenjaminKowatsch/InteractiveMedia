@@ -37,6 +37,7 @@ import com.media.interactive.cs3.hdm.interactivemedia.contentprovider.tables.Use
 import com.media.interactive.cs3.hdm.interactivemedia.data.DatabaseProviderHelper;
 import com.media.interactive.cs3.hdm.interactivemedia.data.Group;
 import com.media.interactive.cs3.hdm.interactivemedia.data.Login;
+import com.media.interactive.cs3.hdm.interactivemedia.data.SynchronisationHelper;
 import com.media.interactive.cs3.hdm.interactivemedia.data.Transaction;
 import com.media.interactive.cs3.hdm.interactivemedia.util.MoneyTextWatcher;
 
@@ -209,7 +210,7 @@ public class AddTransactionActivity extends ImagePickerActivity {
 
   private void sendToBackend(final Transaction toSave) throws JSONException {
     helper.saveTransaction(toSave);
-    Login.getInstance().requestTransactionsByGroupId(this, toSave.getGroup().getGroupId(), groupCreatedAt, new CallbackListener<JSONObject, Exception>() {
+    Login.getInstance().getSynchronisationHelper().requestTransactionsByGroupId(this, toSave.getGroup().getGroupId(), groupCreatedAt, new CallbackListener<JSONObject, Exception>() {
       @Override
       public void onSuccess(JSONObject response) {
         final String url = getResources().getString(R.string.web_service_url).concat("/v1/groups/").concat(toSave.getGroup().getGroupId()).concat("/transactions");
