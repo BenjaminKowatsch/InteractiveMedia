@@ -26,8 +26,7 @@ describe('Authorization', () => {
     });
 
     before('login admin', done => {
-      chai.request(settings.host).post(settings.url.users.base + '/login?type=0')
-          .send({username: adminData.username, password: adminData.password})
+      userService.loginPassword({username: adminData.username, password: adminData.password})
       .then(res => {
           adminToken = res.body.payload.accessToken;
           done();
@@ -93,8 +92,7 @@ describe('Authorization', () => {
     });
 
     before('login admin', done => {
-      chai.request(settings.host).post(settings.url.users.base + '/login?type=0')
-          .send({username: adminData.username, password: adminData.password})
+      userService.loginPassword({username: adminData.username, password: adminData.password})
       .then(res => {
           adminToken = res.body.payload.accessToken;
           done();

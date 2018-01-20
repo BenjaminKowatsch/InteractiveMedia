@@ -442,9 +442,7 @@ describe('User-Controller', () => {
     });
 
     before('Login as facebook user', function(done) {
-      chai.request(settings.host)
-      .post(settings.url.users.base + '/login?type=2')
-      .send({'accessToken': facebookToken})
+      userService.loginFacebook({'accessToken': facebookToken})
       .then(res => {done();})
       .catch((error) => {console.log('Facbook Login Error: ' + error);});
     });

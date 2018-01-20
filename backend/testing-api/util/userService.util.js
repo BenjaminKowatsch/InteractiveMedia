@@ -12,3 +12,11 @@ chai.use(require('chai-http'));
 module.exports.register = function(data) {
   return chai.request(settings.host).post(settings.url.users.base).send(data);
 };
+
+module.exports.loginPassword = function(data) {
+  return chai.request(settings.host).post(settings.url.users.base + '/login?type=0').send(data);
+};
+
+module.exports.loginFacebook = function(data) {
+  return chai.request(settings.host).post(settings.url.users.base + '/login?type=2').send(data);
+};
