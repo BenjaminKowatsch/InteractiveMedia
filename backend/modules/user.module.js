@@ -424,39 +424,39 @@ module.exports.passwordLogin = function(username, password) {
     });
   });
 };
-/**
- * Function to logout a user independent of authType
- *
- * @param {String} userId String to uniquely identify the user, to find the user at the database
- * @return {Promise}                then: {JSONObject} promiseData Is a modified version of the responseData object
- *                                                 {Boolean} success  Flag to indicate the successful request
- *                                                 {JSONObject} payload
- *                                  catch: {JSONObject} error Is a modified version of the responseData object
- *                                                 {Boolean} success  Flag to indicate the unsuccessful request
- *                                                 {JSONObject} payload
- */
+
 exports.logout = function(userId, authType) {
   return new Promise((resolve, reject) => {
+    let responseData = {payload: {}};
+    const query = {
+      'userId': userId,
+      'authType': authType
+    };
     const update = {
       '$set': {
         'expiryDate': new Date()
       }
     };
-    const query = {
-      'userId': userId,
-      'authType': authType
-    };
-    database.collections.users.updateOne(query, update, function(err, result) {
-      // Parse driver result from string to json an object
-      result = JSON.parse(result);
-      if (err === null && result.n === 1 && result.ok === 1) {
-        // update successful
-        winston.debug('Logout successful');
-        resolve();
+
+    database.collections.users.updateOne(query, update)
+    .then(mongoUtilService.checkIfUpdateOneWasSuccessful)
+    .then(userResult => {
+      responseData.success = true;
+      resolve(responseData);
+    })
+    .catch(err => {
+      winston.debug(err);
+      responseData.success = false;
+      responseData.payload.dataPath = 'logout';
+      let errorCode;
+      if (err.isSelfProvided) {
+        responseData.payload.message = err.message;
+        errorCode = err.errorCode;
       } else {
-        winston.debug('Logout failed');
-        reject();
+        responseData.payload.message = 'uncaught error';
+        errorCode = ERROR.UNCAUGHT_ERROR;
       }
+      reject({errorCode: errorCode, responseData: responseData});
     });
   });
 };

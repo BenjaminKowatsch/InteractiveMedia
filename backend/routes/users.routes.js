@@ -83,8 +83,8 @@ router.post('/login', usersController.login);
  * @apiSuccess (SuccessCode) {200} Success Logout successful
  *
  * @apiUse errorBodyCommonStructure
- * @apiUse error400BadRequest
  * @apiUse error401Unauthorized
+ * @apiUse error500DatabaseError
  *
  * @apiUse successExampleSuccess
  *

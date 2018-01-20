@@ -181,18 +181,23 @@ exports.login = function(req, res) {
 };
 
 exports.logout = function(req, res) {
-  winston.debug('req.body', req.body);
-  winston.debug('userId: ', res.locals.userId);
-  winston.debug('authType: ', res.locals.authType);
-
   user.logout(res.locals.userId, res.locals.authType)
-    .then(function() {
-      const resBody = {'success': true, 'payload': {}};
-      httpResponseService.send(res, 200, resBody);
+    .then(() => {
+      let responseData = {payload: {}};
+      responseData.success = true;
+      httpResponseService.send(res, 200, responseData);
     })
-    .catch(function() {
-      const resBody = {'success': true, 'payload': {}};
-      httpResponseService.send(res, 400, resBody);
+    .catch(errorResult => {
+      winston.error(errorResult.errorCode);
+      let statusCode = 418;
+      switch (errorResult.errorCode) {
+        case ERROR.DB_ERROR:
+        case ERROR.UNCAUGHT_ERROR:
+        case ERROR.RESOURCE_NOT_FOUND:
+          statusCode = 500;
+          break;
+      }
+      httpResponseService.send(res, statusCode, errorResult.responseData);
     });
 };
 
