@@ -425,13 +425,7 @@ describe('User-Controller', () => {
       .send({username: testData.users.valid[1].username,
         password: testData.users.valid[1].password})
       .then(res => {
-        expect(res).to.have.status(400);
-        expect(res).to.be.json;
-        expect(res.body).to.be.an('object');
-        expect(res.body.success).to.be.false;
-        expect(res.body.payload).to.be.an('object');
-        expect(res.body.payload.dataPath).to.equal('authType');
-        expect(res.body.payload.message).to.equal('invalid auth type');
+        expectResponse.toBe400InvalidAuthType(res);
       });
     });
 
@@ -441,13 +435,7 @@ describe('User-Controller', () => {
       .send({username: testData.users.valid[1].username,
         password: testData.users.valid[1].password})
       .then(res => {
-        expect(res).to.have.status(400);
-        expect(res).to.be.json;
-        expect(res.body).to.be.an('object');
-        expect(res.body.success).to.be.false;
-        expect(res.body.payload).to.be.an('object');
-        expect(res.body.payload.dataPath).to.equal('authType');
-        expect(res.body.payload.message).to.equal('invalid auth type');
+        expectResponse.toBe400InvalidAuthType(res);
       });
     });
   });
