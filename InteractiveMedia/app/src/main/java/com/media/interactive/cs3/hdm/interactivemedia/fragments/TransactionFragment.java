@@ -17,6 +17,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
+import android.widget.CursorAdapter;
 import android.widget.ListView;
 import android.widget.SearchView;
 import android.widget.SimpleCursorAdapter;
@@ -28,12 +29,12 @@ import com.media.interactive.cs3.hdm.interactivemedia.activties.AddTransactionAc
 import com.media.interactive.cs3.hdm.interactivemedia.contentprovider.DatabaseHelper;
 import com.media.interactive.cs3.hdm.interactivemedia.contentprovider.DatabaseProvider;
 import com.media.interactive.cs3.hdm.interactivemedia.contentprovider.tables.GroupTable;
-import com.media.interactive.cs3.hdm.interactivemedia.contentprovider.tables.PaymentTable;
 import com.media.interactive.cs3.hdm.interactivemedia.contentprovider.tables.TransactionTable;
 import com.media.interactive.cs3.hdm.interactivemedia.contentprovider.tables.UserTable;
 import com.media.interactive.cs3.hdm.interactivemedia.data.DatabaseProviderHelper;
 import com.media.interactive.cs3.hdm.interactivemedia.data.Group;
 import com.media.interactive.cs3.hdm.interactivemedia.data.Login;
+import com.media.interactive.cs3.hdm.interactivemedia.data.settlement.PaymentAdapter;
 
 import static android.database.DatabaseUtils.dumpCursorToString;
 import org.json.JSONException;
@@ -55,7 +56,7 @@ public class TransactionFragment extends ListFragment implements LoaderManager.L
     private View transactionListFragment;
     private ContentResolver contentResolver;
     private SimpleCursorAdapter groupAdapter;
-    private SimpleCursorAdapter paymentListAdapter;
+    private CursorAdapter paymentListAdapter;
     private ListView paymentListView;
     private static final int CURSOR_LOADER_TRANSACTIONS_NAME = 0;
     private static final String TRANSACTION_NAME_FILTER = "transactionName";
@@ -73,24 +74,22 @@ public class TransactionFragment extends ListFragment implements LoaderManager.L
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         inflater.inflate(R.menu.fragment_transaction, menu);
 
-        final MenuItem searchItem = menu.findItem(R.id.menu_item_search);
+        final MenuItem item = menu.findItem(R.id.menu_group_selection);
+        item.setActionView(R.layout.group_spinner);
 
-        final SearchView searchView = (SearchView) searchItem.getActionView();
-        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+        groupSelection = item.getActionView().findViewById(R.id.menu_group_spinner);
+        groupSelection.setAdapter(groupAdapter);
+        groupSelection.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
-            public boolean onQueryTextSubmit(String s) {
-                final Bundle bundle = new Bundle();
-                bundle.putString(TRANSACTION_NAME_FILTER, s);
-                getLoaderManager().restartLoader(CURSOR_LOADER_TRANSACTIONS_NAME, bundle, TransactionFragment.this);
-                return true;
+            public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+                initOrRestartLoaderWithGroupId();
+                refreshPaymentAdapter();
             }
 
             @Override
-            public boolean onQueryTextChange(String s) {
-                final Bundle bundle = new Bundle();
-                bundle.putString(TRANSACTION_NAME_FILTER, s);
-                getLoaderManager().restartLoader(CURSOR_LOADER_TRANSACTIONS_NAME, bundle, TransactionFragment.this);
-                return true;
+            public void onNothingSelected(AdapterView<?> adapterView) {
+                initOrRestartLoaderWithGroupId();
+                refreshPaymentAdapter();
             }
         });
 
@@ -113,15 +112,10 @@ public class TransactionFragment extends ListFragment implements LoaderManager.L
 
     }
 
-    private SimpleCursorAdapter initPaymentListAdapter() {
+    private CursorAdapter initPaymentListAdapter() {
         final Cursor payments = getPaymentCoursorForCurrentGroup();
         Log.d(TAG, dumpCursorToString(payments));
-        final String[] columns = new String[]{PaymentTable.COLUMN_AMOUNT,
-                DatabaseHelper.PAYMENT_USER_JOIN_COLUMN_FROM_USER,
-                DatabaseHelper.PAYMENT_USER_JOIN_COLUMN_TO_USER};
-        final int[] to = new int[]{R.id.payment_amount, R.id.payment_from, R.id.payment_to};
-        return new SimpleCursorAdapter(this.getContext(),
-                R.layout.payment, payments, columns, to, 0);
+        return new PaymentAdapter(this.getContext(), payments);
     }
 
     private Cursor getPaymentCoursorForCurrentGroup() {
@@ -185,21 +179,26 @@ public class TransactionFragment extends ListFragment implements LoaderManager.L
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         transactionListFragment = inflater.inflate(R.layout.fragment_transaction_list, container, false);
-        groupSelection = transactionListFragment.findViewById(R.id.spinner_group_selection);
-        groupSelection.setAdapter(groupAdapter);
-        groupSelection.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+
+        final SearchView searchView = transactionListFragment.findViewById(R.id.transaction_search);
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
-            public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
-                initOrRestartLoaderWithGroupId();
-                refreshPaymentAdapter();
+            public boolean onQueryTextSubmit(String s) {
+                final Bundle bundle = new Bundle();
+                bundle.putString(TRANSACTION_NAME_FILTER, s);
+                getLoaderManager().restartLoader(CURSOR_LOADER_TRANSACTIONS_NAME, bundle, TransactionFragment.this);
+                return true;
             }
 
             @Override
-            public void onNothingSelected(AdapterView<?> adapterView) {
-                initOrRestartLoaderWithGroupId();
-                refreshPaymentAdapter();
+            public boolean onQueryTextChange(String s) {
+                final Bundle bundle = new Bundle();
+                bundle.putString(TRANSACTION_NAME_FILTER, s);
+                getLoaderManager().restartLoader(CURSOR_LOADER_TRANSACTIONS_NAME, bundle, TransactionFragment.this);
+                return true;
             }
         });
+
         initOrRestartLoaderWithGroupId();
         paymentListView = transactionListFragment.findViewById(R.id.payment_list);
         if(paymentListView == null) {

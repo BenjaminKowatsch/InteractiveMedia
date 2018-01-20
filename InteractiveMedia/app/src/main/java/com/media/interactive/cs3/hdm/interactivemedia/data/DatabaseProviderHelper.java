@@ -240,7 +240,6 @@ public class DatabaseProviderHelper {
       transactions.add(transaction);
     }
     calculateSplit(transactions.toArray(new Transaction[] {}));
-
   }
 
   public void saveTransaction(Transaction transaction) {
@@ -275,29 +274,6 @@ public class DatabaseProviderHelper {
     debtContent.put(DebtTable.COLUMN_TO_USER, debt.getCreditorId());
     final Uri insert = contentResolver.insert(DatabaseProvider.CONTENT_DEBT_URI, debtContent);
     Log.d(TAG, "Inserted debt " + debt + " at " + insert);
-  }
-
-  public long getGroupsByUserId(String userId) {
-    final String[] projection = {UserTable.COLUMN_ID};
-    final String selection = UserTable.COLUMN_USER_ID.concat(" = ?");
-    final String[] selectionArgs = {Login.getInstance().getUser().getUserId()};
-    final Cursor userCursor = contentResolver.query(DatabaseProvider.CONTENT_USER_URI, projection, selection, selectionArgs, null);
-    if (1 == userCursor.getCount()) {
-      userCursor.moveToNext();
-      return userCursor.getLong(0);
-    }
-    return -1;
-  }
-
-  public String getUserNameById(String userId) {
-    final String[] projection = {UserTable.COLUMN_USERNAME};
-    final String selection = UserTable.COLUMN_USER_ID + " = ?";
-    final String[] selectionArgs = {userId};
-    final Cursor query = contentResolver.query(DatabaseProvider.CONTENT_USER_URI, projection, selection, selectionArgs, null);
-    if (query.getCount() == 1 && query.moveToFirst()) {
-      return query.getString(query.getColumnIndex(UserTable.COLUMN_USERNAME));
-    }
-    return null;
   }
 
   public List<Transaction> getUnsyncedTransactions(String userId) {
@@ -448,6 +424,9 @@ public class DatabaseProviderHelper {
 
   public void completeTransaction(Transaction transaction) {
     if (transaction.getGroup() == null) {
+      transaction.setGroup(loadGroupForTransaction(transaction));
+    }
+    if(transaction.getGroup().getName() == null) {
       transaction.setGroup(loadGroupForTransaction(transaction));
     }
     if (transaction.getGroup().getUsers().isEmpty()) {

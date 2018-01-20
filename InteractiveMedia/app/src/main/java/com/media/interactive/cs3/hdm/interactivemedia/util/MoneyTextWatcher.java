@@ -1,4 +1,4 @@
-package com.media.interactive.cs3.hdm.interactivemedia.data;
+package com.media.interactive.cs3.hdm.interactivemedia.util;
 
 
 import android.text.Editable;
