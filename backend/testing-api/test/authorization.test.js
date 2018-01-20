@@ -8,16 +8,12 @@ const winston = require('winston');
 const databaseHelper = require('./data/databaseHelper');
 const expectResponse = require('../util/expectResponse.util');
 const settings = require('../config/settings.config');
+const userService = require('../util/userService.util');
 
 chai.use(require('chai-http'));
 
 const userData = require('./data/user.data');
 const adminData = require('./data/admin.data');
-
-// ************* Helper ***********//
-
-const registerUser = index => chai.request(settings.host).post(settings.url.users.base)
-.send(userData.users.valid[index]);
 
 describe('Authorization', () => {
   describe('No authorization required', () => {
@@ -39,7 +35,7 @@ describe('Authorization', () => {
     });
 
     before('register User 0', done => {
-      registerUser(0).then(res => {
+      userService.register(userData.users.valid[0]).then(res => {
         userToken = res.body.payload.accessToken;
         done();
       }).catch((error) => {
@@ -106,7 +102,7 @@ describe('Authorization', () => {
     });
 
     before('register User 0', done => {
-      registerUser(0).then(res => {
+      userService.register(userData.users.valid[0]).then(res => {
         userToken = res.body.payload.accessToken;
         done();
       }).catch((error) => {

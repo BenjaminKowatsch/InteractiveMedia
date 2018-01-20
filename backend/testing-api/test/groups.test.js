@@ -8,6 +8,7 @@ const winston = require('winston');
 const databaseHelper = require('./data/databaseHelper');
 const expectResponse = require('../util/expectResponse.util');
 const settings = require('../config/settings.config');
+const userService = require('../util/userService.util');
 
 chai.use(require('chai-http'));
 
@@ -16,8 +17,6 @@ const groupScenarios = require('./data/groupScenarios');
 
 // ************* Helper ***********//
 
-const registerUser = index => chai.request(settings.host).post(settings.url.users.base  + '/')
-.send(userData.users.valid[index]);
 const getUserData = token => chai.request(settings.host).get(settings.url.users.base  + '/user')
 .set('Authorization', '0 ' + token);
 const deepCopy = data => JSON.parse(JSON.stringify(data));
@@ -28,13 +27,13 @@ describe('Groups-Controller: Groups:', () => {
     let groupId = {};
     before('register User 0 and 1', done => {
       databaseHelper.promiseResetDB().then(()=> {
-        return registerUser(0);
+        return userService.register(userData.users.valid[0]);
       }).then(res => {
         tokens[0] = res.body.payload.accessToken;
-        return registerUser(1);
+        return userService.register(userData.users.valid[1]);
       }).then(res => {
         tokens[1] = res.body.payload.accessToken;
-        return registerUser(2);
+        return userService.register(userData.users.valid[2]);
       }).then(res => {
         tokens[2] = res.body.payload.accessToken;
         done();
@@ -168,13 +167,13 @@ describe('Groups-Controller: Groups:', () => {
 
     before('register User 0 and 1', done => {
       databaseHelper.promiseResetDB().then(()=> {
-        return registerUser(0);
+        return userService.register(userData.users.valid[0]);
       }).then(res => {
         tokens[0] = res.body.payload.accessToken;
-        return registerUser(1);
+        return userService.register(userData.users.valid[1]);
       }).then(res => {
         tokens[1] = res.body.payload.accessToken;
-        return registerUser(2);
+        return userService.register(userData.users.valid[2]);
       }).then(res => {
         tokens[2] = res.body.payload.accessToken;
         return chai.request(settings.host)

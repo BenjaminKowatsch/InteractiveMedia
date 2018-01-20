@@ -8,6 +8,7 @@ const winston = require('winston');
 const databaseHelper = require('./data/databaseHelper');
 const expectResponse = require('../util/expectResponse.util');
 const settings = require('../config/settings.config');
+const userService = require('../util/userService.util');
 
 chai.use(require('chai-http'));
 
@@ -16,8 +17,6 @@ const groupScenarios = require('./data/groupScenarios');
 
 // ************* Helper ***********//
 
-const registerUser = index => chai.request(settings.host).post(settings.url.users.base  + '/')
-.send(userData.users.valid[index]);
 const getUserData = token => chai.request(settings.host).get(settings.url.users.base  + '/user')
 .set('Authorization', '0 ' + token);
 const deepCopy = data => JSON.parse(JSON.stringify(data));
@@ -55,19 +54,19 @@ describe('Groups-Controller: Transactions:', () => {
     before('register user 0, 1, 2, create two groups, prepare testData', function(done) {
       this.timeout(10000);
       databaseHelper.promiseResetDB().then(()=> {
-        return registerUser(0);
+        return userService.register(userData.users.valid[0]);
       }).then(res => {
         users[0].token = res.body.payload.accessToken;
         return getUserData(users[0].token);
       }).then(res => {
         users[0].userId = res.body.payload.userId;
-        return registerUser(1);
+        return userService.register(userData.users.valid[1]);
       }).then(res => {
         users[1].token = res.body.payload.accessToken;
         return getUserData(users[1].token);
       }).then(res => {
         users[1].userId = res.body.payload.userId;
-        return registerUser(2);
+        return userService.register(userData.users.valid[2]);
       }).then(res => {
         users[2].token = res.body.payload.accessToken;
         return getUserData(users[2].token);
@@ -270,19 +269,19 @@ describe('Groups-Controller: Transactions:', () => {
     before('register user 0, 1, 2, create two groups, prepare testData, add t_0 for each group', function(done) {
       this.timeout(10000);
       databaseHelper.promiseResetDB().then(()=> {
-        return registerUser(0);
+        return userService.register(userData.users.valid[0]);
       }).then(res => {
         users[0].token = res.body.payload.accessToken;
         return getUserData(users[0].token);
       }).then(res => {
         users[0].userId = res.body.payload.userId;
-        return registerUser(1);
+        return userService.register(userData.users.valid[1]);
       }).then(res => {
         users[1].token = res.body.payload.accessToken;
         return getUserData(users[1].token);
       }).then(res => {
         users[1].userId = res.body.payload.userId;
-        return registerUser(2);
+        return userService.register(userData.users.valid[2]);
       }).then(res => {
         users[2].token = res.body.payload.accessToken;
         return getUserData(users[2].token);
@@ -378,19 +377,19 @@ describe('Groups-Controller: Transactions:', () => {
     before('register user 0, 1, 2, create group, prepare testData', function(done) {
       this.timeout(10000);
       databaseHelper.promiseResetDB().then(()=> {
-        return registerUser(0);
+        return userService.register(userData.users.valid[0]);
       }).then(res => {
         users[0].token = res.body.payload.accessToken;
         return getUserData(users[0].token);
       }).then(res => {
         users[0].userId = res.body.payload.userId;
-        return registerUser(1);
+        return userService.register(userData.users.valid[1]);
       }).then(res => {
         users[1].token = res.body.payload.accessToken;
         return getUserData(users[1].token);
       }).then(res => {
         users[1].userId = res.body.payload.userId;
-        return registerUser(2);
+        return userService.register(userData.users.valid[2]);
       }).then(res => {
         users[2].token = res.body.payload.accessToken;
         return getUserData(users[2].token);

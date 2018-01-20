@@ -10,15 +10,11 @@ const https = require('https');
 const databaseHelper = require('./data/databaseHelper');
 const expectResponse = require('../util/expectResponse.util');
 const settings = require('../config/settings.config');
+const userService = require('../util/userService.util');
 
 chai.use(require('chai-http'));
 
-const testData = require('./data/user.data');
-
-// ************* Helper ***********//
-
-const registerUser = index => chai.request(settings.host).post(settings.url.users.base)
-  .send(testData.users.valid[index]);
+const userData = require('./data/user.data');
 
 function getFacebookTestAccessToken() {
   return new Promise((resolve, reject) => {
@@ -176,7 +172,7 @@ describe('User-Controller', () => {
       it('should register new user', function() {
         return chai.request(settings.host)
         .post(settings.url.users.base + '/')
-        .send(testData.users.valid[0])
+        .send(userData.users.valid[0])
         .then(function(res) {
           expect(res).to.have.status(201);
           expect(res).to.be.json;
@@ -191,7 +187,7 @@ describe('User-Controller', () => {
       it('should fail to register existing user', function() {
         return chai.request(settings.host)
         .post(settings.url.users.base + '/')
-        .send(testData.users.valid[0])
+        .send(userData.users.valid[0])
         .then(function(res) {
           expectResponse.toBe409.register.userAlreadyExists(res);
         });
@@ -200,7 +196,7 @@ describe('User-Controller', () => {
       it('should fail to register user with invalid username', function() {
         return chai.request(settings.host)
         .post(settings.url.users.base + '/')
-        .send(testData.users.invalid.invalidUsername)
+        .send(userData.users.invalid.invalidUsername)
         .then(function(res) {
           expectResponse.toBe400.invalidRequestBody(res);
         });
@@ -209,7 +205,7 @@ describe('User-Controller', () => {
       it('should fail to register user with invalid password', function() {
         return chai.request(settings.host)
         .post(settings.url.users.base + '/')
-        .send(testData.users.invalid.invalidPassword)
+        .send(userData.users.invalid.invalidPassword)
         .then(function(res) {
           expectResponse.toBe400.invalidRequestBody(res);
         });
@@ -218,7 +214,7 @@ describe('User-Controller', () => {
       it('should fail to register user with missing username', function() {
         return chai.request(settings.host)
         .post(settings.url.users.base + '/')
-        .send(testData.users.invalid.missingUsername)
+        .send(userData.users.invalid.missingUsername)
         .then(function(res) {
           expectResponse.toBe400.invalidRequestBody(res);
         });
@@ -227,7 +223,7 @@ describe('User-Controller', () => {
       it('should fail to register user with missing email', function() {
         return chai.request(settings.host)
         .post(settings.url.users.base + '/')
-        .send(testData.users.invalid.missingEmail)
+        .send(userData.users.invalid.missingEmail)
         .then(function(res) {
           expectResponse.toBe400.invalidRequestBody(res);
         });
@@ -236,7 +232,7 @@ describe('User-Controller', () => {
       it('should fail to register user with missing password', function() {
         return chai.request(settings.host)
         .post(settings.url.users.base + '/')
-        .send(testData.users.invalid.missingPassword)
+        .send(userData.users.invalid.missingPassword)
         .then(function(res) {
           expectResponse.toBe400.invalidRequestBody(res);
         });
@@ -245,7 +241,7 @@ describe('User-Controller', () => {
       it('should fail to register user with missing imageUrl', function() {
         return chai.request(settings.host)
         .post(settings.url.users.base + '/')
-        .send(testData.users.invalid.missingImageUrl)
+        .send(userData.users.invalid.missingImageUrl)
         .then(function(res) {
           expectResponse.toBe400.invalidRequestBody(res);
         });
@@ -257,7 +253,7 @@ describe('User-Controller', () => {
       let defaultToken;
 
       before('register user 1', function(done) {
-        registerUser(1)
+        userService.register(userData.users.valid[1])
         .then((res) => {
           defaultToken = res.body.payload.accessToken;
           done();
@@ -267,8 +263,8 @@ describe('User-Controller', () => {
       it('should login as registered user', function() {
         return chai.request(settings.host)
         .post(settings.url.users.base + '/login?type=0')
-        .send({username: testData.users.valid[1].username,
-          password: testData.users.valid[1].password})
+        .send({username: userData.users.valid[1].username,
+          password: userData.users.valid[1].password})
         .then(res => {
           expect(res).to.have.status(200);
           expect(res).to.be.json;
@@ -283,7 +279,7 @@ describe('User-Controller', () => {
       it('should fail to login with invalid password', function() {
         return chai.request(settings.host)
         .post(settings.url.users.base + '/login?type=0')
-        .send({username: testData.users.valid[1].username,
+        .send({username: userData.users.valid[1].username,
           password: 'XXXXX'})
         .then(res => {
           expectResponse.toBe401.loginFailed(res);
@@ -293,7 +289,7 @@ describe('User-Controller', () => {
       it('should fail to login with empty password', function() {
         return chai.request(settings.host)
         .post(settings.url.users.base + '/login?type=0')
-        .send({username: testData.users.valid[1].username,
+        .send({username: userData.users.valid[1].username,
           password: ''})
         .then(res => {
           expectResponse.toBe400.invalidRequestBody(res);
@@ -303,7 +299,7 @@ describe('User-Controller', () => {
       it('should fail to login with no password', function() {
         return chai.request(settings.host)
         .post(settings.url.users.base + '/login?type=0')
-        .send({username: testData.users.valid[1].username})
+        .send({username: userData.users.valid[1].username})
         .then(res => {
           expectResponse.toBe400.invalidRequestBody(res);
         });
@@ -312,7 +308,7 @@ describe('User-Controller', () => {
       it('should fail to login with no username', function() {
         return chai.request(settings.host)
         .post(settings.url.users.base + '/login?type=0')
-        .send({password: testData.users.valid[2].password})
+        .send({password: userData.users.valid[2].password})
         .then(res => {
           expectResponse.toBe400.invalidRequestBody(res);
         });
@@ -346,7 +342,7 @@ describe('User-Controller', () => {
       before(function(done) {
         chai.request(settings.host)
         .post(settings.url.users.base + '/')
-        .send(testData.users.valid[4])
+        .send(userData.users.valid[4])
         .then((res) => {
           defaultToken = res.body.payload.accessToken;
           done();
@@ -381,8 +377,8 @@ describe('User-Controller', () => {
       it('should re-login', function() {
         return chai.request(settings.host)
         .post(settings.url.users.base + '/login?type=0')
-        .send({username: testData.users.valid[4].username,
-          password: testData.users.valid[4].password})
+        .send({username: userData.users.valid[4].username,
+          password: userData.users.valid[4].password})
         .then(res => {
           expect(res).to.have.status(200);
           expect(res).to.be.json;
@@ -399,8 +395,8 @@ describe('User-Controller', () => {
     it('should fail with an invalid auth type', function() {
       return chai.request(settings.host)
       .post(settings.url.users.base + '/login?type=99')
-      .send({username: testData.users.valid[1].username,
-        password: testData.users.valid[1].password})
+      .send({username: userData.users.valid[1].username,
+        password: userData.users.valid[1].password})
       .then(res => {
         expectResponse.toBe401.invalidAuthType(res);
       });
@@ -409,8 +405,8 @@ describe('User-Controller', () => {
     it('should fail with no auth type', function() {
       return chai.request(settings.host)
       .post(settings.url.users.base + '/login')
-      .send({username: testData.users.valid[1].username,
-        password: testData.users.valid[1].password})
+      .send({username: userData.users.valid[1].username,
+        password: userData.users.valid[1].password})
       .then(res => {
         expectResponse.toBe401.invalidAuthType(res);
       });
@@ -422,10 +418,10 @@ describe('User-Controller', () => {
     let facebookToken;
     before('Clean DB and register User 0 and 1', done => {
       databaseHelper.promiseResetDB().then(()=> {
-        return chai.request(settings.host).post(settings.url.users.base  + '/').send(testData.users.valid[0]);
+        return chai.request(settings.host).post(settings.url.users.base  + '/').send(userData.users.valid[0]);
       }).then(res => {
         tokens[0] = res.body.payload.accessToken;
-        return chai.request(settings.host).post(settings.url.users.base  + '/').send(testData.users.valid[1]);
+        return chai.request(settings.host).post(settings.url.users.base  + '/').send(userData.users.valid[1]);
       }).then(res => {
         tokens[1] = res.body.payload.accessToken;
         done();
@@ -484,13 +480,13 @@ describe('User-Controller', () => {
         expect(res.body).to.be.an('object');
         expect(res.body.success).to.be.true;
         expect(res.body.payload).to.be.an('object');
-        expect(res.body.payload.username).to.equal(testData.users.valid[0].username);
-        expect(res.body.payload.email).to.equal(testData.users.valid[0].email);
+        expect(res.body.payload.username).to.equal(userData.users.valid[0].username);
+        expect(res.body.payload.email).to.equal(userData.users.valid[0].email);
         expect(res.body.payload._id).to.be.undefined;
         expect(res.body.payload.groupIds).to.be.undefined;
         expect(res.body.payload.userId).to.have.lengthOf(36).and.to.be.a('string');
         expect(res.body.payload.role).to.equal('user');
-        expect(res.body.payload.imageUrl).to.equal(testData.users.valid[0].imageUrl);
+        expect(res.body.payload.imageUrl).to.equal(userData.users.valid[0].imageUrl);
       });
     });
 
@@ -504,8 +500,8 @@ describe('User-Controller', () => {
         expect(res.body).to.be.an('object');
         expect(res.body.success).to.be.true;
         expect(res.body.payload).to.be.an('object');
-        expect(res.body.payload.username).to.equal(testData.users.valid[1].username);
-        expect(res.body.payload.email).to.equal(testData.users.valid[1].email);
+        expect(res.body.payload.username).to.equal(userData.users.valid[1].username);
+        expect(res.body.payload.email).to.equal(userData.users.valid[1].email);
         expect(res.body.payload._id).to.be.undefined;
         expect(res.body.payload.groupIds).to.be.undefined;
         expect(res.body.payload.userId).to.have.lengthOf(36).and.to.be.a('string');
@@ -539,7 +535,7 @@ describe('User-Controller', () => {
 
       before('Clean DB and register User 0', done => {
         databaseHelper.promiseResetDB().then(()=> {
-          return registerUser(0);
+          return userService.register(userData.users.valid[0]);
         }).then(res => {
           token = res.body.payload.accessToken;
           done();
@@ -558,13 +554,13 @@ describe('User-Controller', () => {
           expect(res.body).to.be.an('object');
           expect(res.body.success).to.be.true;
           expect(res.body.payload).to.be.an('object');
-          expect(res.body.payload.username).to.equal(testData.users.valid[0].username);
-          expect(res.body.payload.email).to.equal(testData.users.valid[0].email);
+          expect(res.body.payload.username).to.equal(userData.users.valid[0].username);
+          expect(res.body.payload.email).to.equal(userData.users.valid[0].email);
           expect(res.body.payload._id).to.be.undefined;
           expect(res.body.payload.groupIds).to.be.undefined;
           expect(res.body.payload.userId).to.have.lengthOf(36).and.to.be.a('string');
           expect(res.body.payload.role).to.equal('user');
-          expect(res.body.payload.imageUrl).to.equal(testData.users.valid[0].imageUrl);
+          expect(res.body.payload.imageUrl).to.equal(userData.users.valid[0].imageUrl);
           constantUserData.groupIds = res.body.payload.groupIds;
           constantUserData.userId = res.body.payload.userId;
         });
@@ -574,7 +570,7 @@ describe('User-Controller', () => {
         return chai.request(settings.host)
         .put(settings.url.users.base  + '/user')
         .set('Authorization', '0 ' + token)
-        .send(testData.users.update.valid.allFields)
+        .send(userData.users.update.valid.allFields)
         .then(res => {
           expect(res).to.have.status(200);
           expect(res).to.be.json;
@@ -593,13 +589,13 @@ describe('User-Controller', () => {
           expect(res.body).to.be.an('object');
           expect(res.body.success).to.be.true;
           expect(res.body.payload).to.be.an('object');
-          expect(res.body.payload.username).to.equal(testData.users.update.valid.allFields.username);
-          expect(res.body.payload.email).to.equal(testData.users.update.valid.allFields.email);
+          expect(res.body.payload.username).to.equal(userData.users.update.valid.allFields.username);
+          expect(res.body.payload.email).to.equal(userData.users.update.valid.allFields.email);
           expect(res.body.payload._id).to.be.undefined;
           expect(res.body.payload.groupIds).to.equal(constantUserData.groupIds);
           expect(res.body.payload.userId).to.equal(constantUserData.userId);
           expect(res.body.payload.role).to.equal('user');
-          expect(res.body.payload.imageUrl).to.equal(testData.users.update.valid.allFields.imageUrl);
+          expect(res.body.payload.imageUrl).to.equal(userData.users.update.valid.allFields.imageUrl);
         });
       });
     });
@@ -610,7 +606,7 @@ describe('User-Controller', () => {
 
       before('Clean DB and register User 0', done => {
         databaseHelper.promiseResetDB().then(()=> {
-          return registerUser(0);
+          return userService.register(userData.users.valid[0]);
         }).then(res => {
           token = res.body.payload.accessToken;
           done();
@@ -629,13 +625,13 @@ describe('User-Controller', () => {
           expect(res.body).to.be.an('object');
           expect(res.body.success).to.be.true;
           expect(res.body.payload).to.be.an('object');
-          expect(res.body.payload.username).to.equal(testData.users.valid[0].username);
-          expect(res.body.payload.email).to.equal(testData.users.valid[0].email);
+          expect(res.body.payload.username).to.equal(userData.users.valid[0].username);
+          expect(res.body.payload.email).to.equal(userData.users.valid[0].email);
           expect(res.body.payload._id).to.be.undefined;
           expect(res.body.payload.groupIds).to.be.undefined;
           expect(res.body.payload.userId).to.have.lengthOf(36).and.to.be.a('string');
           expect(res.body.payload.role).to.equal('user');
-          expect(res.body.payload.imageUrl).to.equal(testData.users.valid[0].imageUrl);
+          expect(res.body.payload.imageUrl).to.equal(userData.users.valid[0].imageUrl);
           constantUserData.groupIds = res.body.payload.groupIds;
           constantUserData.userId = res.body.payload.userId;
         });
@@ -645,7 +641,7 @@ describe('User-Controller', () => {
         return chai.request(settings.host)
         .put(settings.url.users.base  + '/user')
         .set('Authorization', '0 ' + token)
-        .send(testData.users.update.valid.oneFieldUsername)
+        .send(userData.users.update.valid.oneFieldUsername)
         .then(res => {
           expect(res).to.have.status(200);
           expect(res).to.be.json;
@@ -664,13 +660,13 @@ describe('User-Controller', () => {
           expect(res.body).to.be.an('object');
           expect(res.body.success).to.be.true;
           expect(res.body.payload).to.be.an('object');
-          expect(res.body.payload.username).to.equal(testData.users.update.valid.oneFieldUsername.username);
-          expect(res.body.payload.email).to.equal(testData.users.valid[0].email);
+          expect(res.body.payload.username).to.equal(userData.users.update.valid.oneFieldUsername.username);
+          expect(res.body.payload.email).to.equal(userData.users.valid[0].email);
           expect(res.body.payload._id).to.be.undefined;
           expect(res.body.payload.groupIds).to.equal(constantUserData.groupIds);
           expect(res.body.payload.userId).to.equal(constantUserData.userId);
           expect(res.body.payload.role).to.equal('user');
-          expect(res.body.payload.imageUrl).to.equal(testData.users.valid[0].imageUrl);
+          expect(res.body.payload.imageUrl).to.equal(userData.users.valid[0].imageUrl);
         });
       });
     });
@@ -680,7 +676,7 @@ describe('User-Controller', () => {
 
       before('Clean DB and register User 0', done => {
         databaseHelper.promiseResetDB().then(()=> {
-          return registerUser(0);
+          return userService.register(userData.users.valid[0]);
         }).then(res => {
           token = res.body.payload.accessToken;
           done();
@@ -702,7 +698,7 @@ describe('User-Controller', () => {
         return chai.request(settings.host)
         .put(settings.url.users.base  + '/user')
         .set('Authorization', '0 ' + token)
-        .send(testData.users.update.invalid.updateUserId)
+        .send(userData.users.update.invalid.updateUserId)
         .then(res => {
           expectResponse.toBe400.invalidRequestBody(res);
         });
@@ -712,7 +708,7 @@ describe('User-Controller', () => {
         return chai.request(settings.host)
         .put(settings.url.users.base  + '/user')
         .set('Authorization', '0 ' + token)
-        .send(testData.users.update.invalid.updateGroupIds)
+        .send(userData.users.update.invalid.updateGroupIds)
         .then(res => {
           expectResponse.toBe400.invalidRequestBody(res);
         });
@@ -722,7 +718,7 @@ describe('User-Controller', () => {
         return chai.request(settings.host)
         .put(settings.url.users.base  + '/user')
         .set('Authorization', '0 ' + token)
-        .send(testData.users.update.invalid.updateInternalId)
+        .send(userData.users.update.invalid.updateInternalId)
         .then(res => {
           expectResponse.toBe400.invalidRequestBody(res);
         });
@@ -732,7 +728,7 @@ describe('User-Controller', () => {
         return chai.request(settings.host)
         .put(settings.url.users.base  + '/user')
         .set('Authorization', '0 ' + token)
-        .send(testData.users.update.invalid.updateAuthType)
+        .send(userData.users.update.invalid.updateAuthType)
         .then(res => {
           expectResponse.toBe400.invalidRequestBody(res);
         });
@@ -742,7 +738,7 @@ describe('User-Controller', () => {
         return chai.request(settings.host)
         .put(settings.url.users.base  + '/user')
         .set('Authorization', '0 ' + token)
-        .send(testData.users.update.invalid.updateRole)
+        .send(userData.users.update.invalid.updateRole)
         .then(res => {
           expectResponse.toBe400.invalidRequestBody(res);
         });
@@ -752,7 +748,7 @@ describe('User-Controller', () => {
         return chai.request(settings.host)
         .put(settings.url.users.base  + '/user')
         .set('Authorization', '0 ' + token)
-        .send(testData.users.update.invalid.updateUnknownField)
+        .send(userData.users.update.invalid.updateUnknownField)
         .then(res => {
           expectResponse.toBe400.invalidRequestBody(res);
         });
@@ -762,7 +758,7 @@ describe('User-Controller', () => {
         return chai.request(settings.host)
         .put(settings.url.users.base  + '/user')
         .set('Authorization', '0 ' + token)
-        .send(testData.users.update.invalid.updateUsernameNull)
+        .send(userData.users.update.invalid.updateUsernameNull)
         .then(res => {
           expectResponse.toBe400.invalidRequestBody(res);
         });
@@ -772,7 +768,7 @@ describe('User-Controller', () => {
         return chai.request(settings.host)
         .put(settings.url.users.base  + '/user')
         .set('Authorization', '0 ' + token)
-        .send(testData.users.update.invalid.updatePasswordNull)
+        .send(userData.users.update.invalid.updatePasswordNull)
         .then(res => {
           expectResponse.toBe400.invalidRequestBody(res);
         });
@@ -782,7 +778,7 @@ describe('User-Controller', () => {
         return chai.request(settings.host)
         .put(settings.url.users.base  + '/user')
         .set('Authorization', '0 ' + token)
-        .send(testData.users.update.invalid.updateEmailNull)
+        .send(userData.users.update.invalid.updateEmailNull)
         .then(res => {
           expectResponse.toBe400.invalidRequestBody(res);
         });

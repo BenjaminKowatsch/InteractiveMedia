@@ -8,13 +8,11 @@ const expect = require('chai').expect;
 const databaseHelper = require('./data/databaseHelper');
 const expectResponse = require('../util/expectResponse.util');
 const settings = require('../config/settings.config');
+const userService = require('../util/userService.util');
 
 chai.use(require('chai-http'));
 
 const userData = require('./data/user.data');
-
-const registerUser = index => chai.request(settings.host).post(settings.url.users.register)
-.send(userData.users.valid[index]);
 
 describe('Object-store', function() {
 
@@ -27,7 +25,7 @@ describe('Object-store', function() {
     });
     before('register User 0', done => {
       databaseHelper.promiseResetDB().then(()=> {
-        return registerUser(0);
+        return userService.register(userData.users.valid[0]);
       }).then(res => {
         token = res.body.payload.accessToken;
         done();
@@ -78,7 +76,7 @@ describe('Object-store', function() {
       });
       before('register User 0', done => {
         databaseHelper.promiseResetDB().then(()=> {
-          return registerUser(0);
+          return userService.register(userData.users.valid[0]);
         }).then(res => {
           token = res.body.payload.accessToken;
           done();

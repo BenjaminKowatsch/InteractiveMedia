@@ -7,6 +7,7 @@ const expect = require('chai').expect;
 const winston = require('winston');
 const databaseHelper = require('./data/databaseHelper');
 const settings = require('../config/settings.config');
+const userService = require('../util/userService.util');
 
 chai.use(require('chai-http'));
 
@@ -14,11 +15,6 @@ const userData = require('./data/user.data');
 
 const MINUTE = 60000;
 const nowPlus = time => new Date(new Date().getTime() + time).toISOString();
-
-// ************* Helper ***********//
-
-const registerUser = index => chai.request(settings.host).post(settings.url.users.register)
-.send(userData.users.valid[index]);
 
 describe.skip('PushNotifications create transactions', function() {
     let tokens = {};
@@ -29,10 +25,10 @@ describe.skip('PushNotifications create transactions', function() {
 
     before('register user 0 and 1', function(done) {
       databaseHelper.promiseResetDB().then(()=> {
-        return registerUser(0);
+        return userService.register(userData.users.valid[0]);
       }).then(res => {
         tokens[0] = res.body.payload.accessToken;
-        return registerUser(1);
+        return userService.register(userData.users.valid[1]);
       }).then(res => {
         tokens[1] = res.body.payload.accessToken;
         done();

@@ -8,17 +8,13 @@ const winston = require('winston');
 const databaseHelper = require('./data/databaseHelper');
 const expectResponse = require('../util/expectResponse.util');
 const settings = require('../config/settings.config');
+const userService = require('../util/userService.util');
 
 chai.use(require('chai-http'));
 
 const userData = require('./data/user.data');
 const adminData = require('./data/admin.data');
 const groupScenarios = require('./data/groupScenarios');
-
-// ************* Helper ***********//
-
-const registerUser = index => chai.request(settings.host).post(settings.url.users.base)
-.send(userData.users.valid[index]);
 
 describe('Admin', () => {
   describe('Login', () => {
@@ -100,12 +96,12 @@ describe('Admin', () => {
       });
 
       before('register users, create groups', done => {
-        registerUser(0).then(res => {
+        userService.register(userData.users.valid[0]).then(res => {
           tokens[0] = res.body.payload.accessToken;
-          return registerUser(1);
+          return userService.register(userData.users.valid[1]);
         }).then(res => {
           tokens[1] = res.body.payload.accessToken;
-          return registerUser(2);
+          return userService.register(userData.users.valid[2]);
         }).then(res => {
           tokens[2] = res.body.payload.accessToken;
           return chai.request(settings.host)
@@ -181,12 +177,12 @@ describe('Admin', () => {
       });
 
       before('register users, create group', done => {
-        registerUser(0).then(res => {
+        userService.register(userData.users.valid[0]).then(res => {
           tokens[0] = res.body.payload.accessToken;
-          return registerUser(1);
+          return userService.register(userData.users.valid[1]);
         }).then(res => {
           tokens[1] = res.body.payload.accessToken;
-          return registerUser(2);
+          return userService.register(userData.users.valid[2]);
         }).then(res => {
           tokens[2] = res.body.payload.accessToken;
           return chai.request(settings.host)
@@ -262,9 +258,9 @@ describe('Admin', () => {
       });
 
       before('register users, create group', done => {
-        registerUser(0).then(res => {
+        userService.register(userData.users.valid[0]).then(res => {
           tokens[0] = res.body.payload.accessToken;
-          return registerUser(1);
+          return userService.register(userData.users.valid[1]);
         }).then(res => {
           tokens[1] = res.body.payload.accessToken;
           return chai.request(settings.host)
@@ -341,12 +337,12 @@ describe('Admin', () => {
       });
 
       before('register users, create group', done => {
-        registerUser(0).then(res => {
+        userService.register(userData.users.valid[0]).then(res => {
           tokens[0] = res.body.payload.accessToken;
-          return registerUser(1);
+          return userService.register(userData.users.valid[1]);
         }).then(res => {
           tokens[1] = res.body.payload.accessToken;
-          return registerUser(2);
+          return userService.register(userData.users.valid[2]);
         }).then(res => {
           tokens[2] = res.body.payload.accessToken;
           return chai.request(settings.host)
@@ -431,7 +427,7 @@ describe('Admin', () => {
         });
 
         before('register user 0', done => {
-          registerUser(0).then(res => {
+          userService.register(userData.users.valid[0]).then(res => {
             tokens[0] = res.body.payload.accessToken;
             done();
           }).catch((error) => {console.log('Register User Error: ' + error);});
@@ -523,7 +519,7 @@ describe('Admin', () => {
         });
 
         before('register user 0', done => {
-          registerUser(0).then(res => {
+          userService.register(userData.users.valid[0]).then(res => {
             tokens[0] = res.body.payload.accessToken;
             done();
           }).catch((error) => {console.log('Register User Error: ' + error);});
@@ -615,7 +611,7 @@ describe('Admin', () => {
         });
 
         before('register user 0', done => {
-          registerUser(0).then(res => {
+          userService.register(userData.users.valid[0]).then(res => {
             tokens[0] = res.body.payload.accessToken;
             done();
           }).catch((error) => {console.log('Register User Error: ' + error);});
