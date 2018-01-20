@@ -3,7 +3,7 @@
 const appVersionService = require('../services/appVersion.service');
 const httpResponseService = require('../services/httpResponse.service');
 
-exports.getVersion = function(req, res) {
+module.exports.getVersion = function(req, res) {
   const currentAppVersion = appVersionService.getAppVersion();
   const responseData = {
     'success': true,

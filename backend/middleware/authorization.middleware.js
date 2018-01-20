@@ -10,7 +10,7 @@ const httpResponseService = require('../services/httpResponse.service');
 const ERROR = require('../config/error.config');
 const ROLES = require('../config/roles.config');
 
-exports.isAuthorizedAdmin = function(req, res, next) {
+module.exports.isAuthorizedAdmin = function(req, res, next) {
   winston.debug('Authorizing request as admin');
 
   isAuthenticated(res.locals).then(authResult => {
@@ -37,7 +37,7 @@ exports.isAuthorizedAdmin = function(req, res, next) {
   });
 };
 
-exports.isGroupMember = function(req, res, next) {
+module.exports.isGroupMember = function(req, res, next) {
   winston.debug('Hello from isGroupMember');
   let responseData = {payload: {}, success: false};
   Promise.resolve().then(() => {

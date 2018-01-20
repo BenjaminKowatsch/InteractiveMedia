@@ -5,7 +5,7 @@
  *
  * @return {String} Generated new Universal Unique Identifier
  */
-exports.generateUUID = function() {
+module.exports.generateUUID = function() {
   let d = new Date().getTime();
   const uuid = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
     const r = (d + Math.random() * 16) % 16 | 0;

@@ -26,7 +26,7 @@ const validTimeOfTokenInMs = 3600000;
 const googleAuth = new GoogleAuth();
 const googleAuthClient = new googleAuth.OAuth2(config.googleOAuthClientID, '', '');
 
-exports.verifyGoogleAccessToken = function(token, verifyDatabase) {
+module.exports.verifyGoogleAccessToken = function(token, verifyDatabase) {
   return new Promise((resolve, reject) => {
     let responseData = {payload: {}};
     // verify google access token
@@ -113,7 +113,7 @@ exports.verifyGoogleAccessToken = function(token, verifyDatabase) {
  *                                                OR
  *                                                MongoDB Error
  */
-exports.verifyPasswordAccessToken = function(token) {
+module.exports.verifyPasswordAccessToken = function(token) {
   return new Promise((resolve, reject) => {
     let responseData = {payload: {}};
     tokenService.decodeToken(token).then(promiseData => {
@@ -246,7 +246,7 @@ function verifyFacbookTokenAtDatabase(data, verifyDatabase) {
  *                                  catch: {JSONObject} error Containing the following properties:
  *                                                 {String} message String containing the error message or facebook error
  */
-exports.verifyFacebookAccessToken = function(token, verifyDatabase, getUserInfo) {
+module.exports.verifyFacebookAccessToken = function(token, verifyDatabase, getUserInfo) {
   let responseData = {payload: {}};
   const options = {
     host: 'graph.facebook.com',
@@ -321,7 +321,7 @@ exports.verifyFacebookAccessToken = function(token, verifyDatabase, getUserInfo)
     });
 };
 
-exports.googleOrFacebookLogin = function(userId, expiryDate, authType, accessToken, email, username, imageUrl) {
+module.exports.googleOrFacebookLogin = function(userId, expiryDate, authType, accessToken, email, username, imageUrl) {
   return new Promise((resolve, reject) => {
     let responseData = {payload: {}};
     // Upsert entry at db
@@ -425,7 +425,7 @@ module.exports.passwordLogin = function(username, password) {
   });
 };
 
-exports.logout = function(userId, authType) {
+module.exports.logout = function(userId, authType) {
   return new Promise((resolve, reject) => {
     let responseData = {payload: {}};
     const query = {
@@ -461,7 +461,7 @@ exports.logout = function(userId, authType) {
   });
 };
 
-exports.register = function(username, password, email, role, imageUrl) {
+module.exports.register = function(username, password, email, role, imageUrl) {
   return new Promise((resolve, reject) => {
     const userToRegister = {
       'expiryDate': tokenService.getNewExpiryDate(validTimeOfTokenInMs),

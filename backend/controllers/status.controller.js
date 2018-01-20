@@ -3,7 +3,7 @@
 const winston = require('winston');
 const httpResponseService = require('../services/httpResponse.service');
 
-exports.getStatus = function(req, res) {
+module.exports.getStatus = function(req, res) {
     const responseData = {
       'success': true,
       'payload': {

@@ -13,7 +13,7 @@ const ERROR = require('../config/error.config');
  * @param  {Date} startDate  Optional. Use startDate instead of current date to calculate expiry date
  * @return {Date}  new epxiry date
  */
-exports.getNewExpiryDate = function(validTime, startDate) {
+module.exports.getNewExpiryDate = function(validTime, startDate) {
     let newExpDate;
     if (startDate) {
       newExpDate = startDate.getTime() + validTime;
@@ -23,11 +23,11 @@ exports.getNewExpiryDate = function(validTime, startDate) {
     return new Date(newExpDate);
   };
 
-exports.generateAccessToken = function(toEncode) {
+module.exports.generateAccessToken = function(toEncode) {
     return jwt.encode(toEncode, config.jwtSimpleSecret);
   };
 
-exports.decodeToken = function(token) {
+module.exports.decodeToken = function(token) {
   let responseData = {payload: {}};
   try {
     const decodeResult = jwt.decode(token, config.jwtSimpleSecret);
