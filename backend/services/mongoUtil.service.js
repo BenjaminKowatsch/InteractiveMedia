@@ -49,10 +49,19 @@ module.exports.checkIfUpdateOneUpsertWasSuccessful = function(resultRaw) {
   return new Promise((resolve, reject) => {
     const result = JSON.parse(resultRaw);
 
-    // first: check if document was found and updated
-    // second: check if document was not found, hence it was created (upserted)
-    if ((result && result.n === 1 && result.nModified === 1 && result.ok === 1) ||
-      (result && result.n === 1 && result.nModified === 0 && result.upserted.length > 0 && result.ok === 1)) {
+    // no error
+    const success = result.ok === 1;
+
+    // doc was found and updated
+    const docUpdated = result.n === 1 && result.nModified === 1;
+
+    // doc was found and not updated because doc to update is the same as the existing doc in collection
+    const docNotUpdated = result.n === 1 && result.nModified === 0;
+
+    // doc was not found and hence upserted
+    const docUpserted = docNotUpdated && result.upserted && result.upserted.length == 1 && result.upserted[0]._id;
+
+    if (success && (docUpdated || docNotUpdated || docUpserted)) {
       resolve(result);
     } else {
       let errorToReturn = {isSelfProvided: true};
