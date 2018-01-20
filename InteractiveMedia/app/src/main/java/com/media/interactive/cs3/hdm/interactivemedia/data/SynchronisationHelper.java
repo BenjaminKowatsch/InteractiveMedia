@@ -36,7 +36,7 @@ public class SynchronisationHelper {
         this.helper = helper;
     }
 
-    public void synchronize(final Context context, final JSONObject loginResponse, final CallbackListener<JSONObject, Exception> callbackListener){
+    public void synchronize(final Context context, final JSONObject response, final CallbackListener<JSONObject, Exception> callbackListener){
         final String url = context.getResources().getString(R.string.web_service_url).concat("/v1/users/user");
         Log.d(TAG, "Get: " + url);
         final AuthorizedJsonObjectRequest jsonObjectRequest = new AuthorizedJsonObjectRequest(
@@ -88,8 +88,8 @@ public class SynchronisationHelper {
                         }
                         uploadUnsyncedGroups(context);
                         uploadUnsyncedTransactions(context);
-                        if(loginResponse != null && callbackListener != null) {
-                            callbackListener.onSuccess(loginResponse);
+                        if(response != null && callbackListener != null) {
+                            callbackListener.onSuccess(response);
                         }
                         Login.getInstance().getUser().setSync(true);
                         helper.upsertUser(Login.getInstance().getUser());

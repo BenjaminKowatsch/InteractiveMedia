@@ -173,13 +173,6 @@ public class Login {
     this.userType = userType;
   }
 
-  public void synchronize(final Context context, final JSONObject loginResponse, final CallbackListener<JSONObject, Exception> callbackListener) {
-    if(synchronisationHelper == null){
-      synchronisationHelper = new SynchronisationHelper(helper, onUserDataSetList);
-    }
-    synchronisationHelper.synchronize(context, loginResponse, callbackListener);
-  }
-
   public boolean loginResponseHandler(Context context, JSONObject response, CallbackListener<JSONObject, Exception> callbackListener) {
     boolean result = false;
     Log.d("User: ", "loginResponseHandler: Thread Id: "
@@ -204,7 +197,10 @@ public class Login {
       e.printStackTrace();
       result = false;
     }
-    synchronize(context, response, callbackListener);
+    if(synchronisationHelper == null){
+      synchronisationHelper = new SynchronisationHelper(helper, onUserDataSetList);
+    }
+    synchronisationHelper.synchronize(context, response, callbackListener);
     return result;
   }
 

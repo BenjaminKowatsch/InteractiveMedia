@@ -100,7 +100,7 @@ public class HomeActivity extends AppCompatActivity
                 boolean isNetworkAvailable = intent.getBooleanExtra(NetworkStateChangeReceiver.IS_NETWORK_AVAILABLE,false);
                 final String networkStatus = isNetworkAvailable ? "connected" : "disconnected";
                 if(isNetworkAvailable){
-                    Login.getInstance().synchronize(HomeActivity.this,null,null);
+                    Login.getInstance().getSynchronisationHelper().synchronize(HomeActivity.this,null,null);
                 }
                 Toast.makeText(HomeActivity.this,"Network Status: " + networkStatus,Toast.LENGTH_SHORT).show();
             }
