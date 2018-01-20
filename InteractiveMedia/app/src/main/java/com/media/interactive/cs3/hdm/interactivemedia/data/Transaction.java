@@ -68,10 +68,10 @@ public class Transaction {
         out.put(TransactionTable.COLUMN_SPLIT, split);
         out.put(TransactionTable.COLUMN_INFO_IMAGE_URL, imageUrl);
         out.put(TransactionTable.COLUMN_PUBLISHED_AT, Helper.formatDate(publishedAt));
-        if (location != null) {
-            out.put(TransactionTable.COLUMN_INFO_LOCATION_LONG, location.getLongitude());
-            out.put(TransactionTable.COLUMN_INFO_LOCATION_LAT, location.getLatitude());
-        }
+
+        out.put(TransactionTable.COLUMN_INFO_LOCATION_LONG, location != null ? location.getLongitude(): null);
+        out.put(TransactionTable.COLUMN_INFO_LOCATION_LAT, location != null ? location.getLatitude() : null);
+
         out.put(TransactionTable.COLUMN_SYNCHRONIZED, synched);
         return out;
     }
