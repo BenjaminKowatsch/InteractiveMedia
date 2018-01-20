@@ -29,30 +29,4 @@ const testData = {
     }
 };
 
-describe('Test service "validateJson"', function() {
-  it('should return true for valid input', function() {
-    const result = validateJsonService.validateAgainstSchema(testData.userData.validInput,
-      jsonSchema.registerUserPayload);
-    expect(result).to.be.an('object');
-    expect(result.valid).to.be.true;
-  });
-
-  it('should return false for invalid input', function() {
-    const result = validateJsonService.validateAgainstSchema(testData.userData.invalidInput,
-      jsonSchema.registerUserPayload);
-    expect(result).to.be.an('object');
-    expect(result.valid).to.be.false;
-  });
-
-  it('should return false for null input', function() {
-    const result = validateJsonService.validateAgainstSchema(null, jsonSchema.registerUserPayload);
-    expect(result).to.be.an('object');
-    expect(result.valid).to.be.false;
-  });
-
-  it('should return false for empty input', function() {
-    const result = validateJsonService.validateAgainstSchema({}, jsonSchema.registerUserPayload);
-    expect(result).to.be.an('object');
-    expect(result.valid).to.be.false;
-  });
-});
+describe('Test service "validateJson"', function() {});
