@@ -20,10 +20,7 @@ describe('Authorization', () => {
     let userToken;
     let adminToken;
 
-    before('reset db', done => {
-      databaseHelper.promiseResetDB().then(() => {done();})
-        .catch((err) => {console.error('Error add admin');});
-    });
+    before('Clean DB', databaseHelper.cbResetDB);
 
     before('login admin', done => {
       userService.loginPassword({username: adminData.username, password: adminData.password})
@@ -86,10 +83,7 @@ describe('Authorization', () => {
     let adminToken;
     let userToken;
 
-    before('reset db', done => {
-      databaseHelper.promiseResetDB().then(() => {done();})
-        .catch((err) => {console.error('Error add admin');});
-    });
+    before('Clean DB', databaseHelper.cbResetDB);
 
     before('login admin', done => {
       userService.loginPassword({username: adminData.username, password: adminData.password})

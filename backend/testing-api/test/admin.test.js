@@ -9,6 +9,7 @@ const databaseHelper = require('./data/databaseHelper');
 const expectResponse = require('../util/expectResponse.util');
 const settings = require('../config/settings.config');
 const userService = require('../util/userService.util');
+const groupService = require('../util/groupService.util');
 
 chai.use(require('chai-http'));
 
@@ -18,10 +19,7 @@ const groupScenarios = require('./data/groupScenarios');
 
 describe('Admin', () => {
   describe('Login', () => {
-    before('reset db', done => {
-      databaseHelper.promiseResetDB().then(() => {done();})
-      .catch((err) => {console.error('Error add admin');});
-    });
+    before('Clean DB', databaseHelper.cbResetDB);
 
     it('should login as admin', () => {
       return chai.request(settings.host)
@@ -41,10 +39,7 @@ describe('Admin', () => {
 
   describe('User data', () => {
     let adminToken;
-    before('reset db', done => {
-      databaseHelper.promiseResetDB().then(() => {done();})
-        .catch((err) => {console.error('Error add admin');});
-    });
+    before('Clean DB', databaseHelper.cbResetDB);
 
     before('login admin', done => {
       userService.loginPassword({username: adminData.username, password: adminData.password})
@@ -80,10 +75,7 @@ describe('Admin', () => {
       let adminToken;
       let tokens = {};
       let groupIds = {};
-      before('reset db', done => {
-        databaseHelper.promiseResetDB().then(() => {done();})
-          .catch((err) => {console.error('Error add admin');});
-      });
+      before('Clean DB', databaseHelper.cbResetDB);
 
       before('login admin', done => {
         userService.loginPassword({username: adminData.username, password: adminData.password})
@@ -154,10 +146,7 @@ describe('Admin', () => {
       let adminToken;
       let tokens = {};
       let groupId;
-      before('reset db', done => {
-        databaseHelper.promiseResetDB().then(() => {done();})
-          .catch((err) => {console.error('Error add admin');});
-      });
+      before('Clean DB', databaseHelper.cbResetDB);
 
       before('login admin', done => {
         userService.loginPassword({username: adminData.username, password: adminData.password})
@@ -231,10 +220,7 @@ describe('Admin', () => {
       let adminToken;
       let tokens = {};
       let groupId;
-      before('reset db', done => {
-        databaseHelper.promiseResetDB().then(() => {done();})
-          .catch((err) => {console.error('Error add admin');});
-      });
+      before('Clean DB', databaseHelper.cbResetDB);
 
       before('login admin', done => {
         userService.loginPassword({username: adminData.username, password: adminData.password})
@@ -306,10 +292,7 @@ describe('Admin', () => {
       let tokens = {};
       let userIds = {};
       let groupId;
-      before('reset db', done => {
-        databaseHelper.promiseResetDB().then(() => {done();})
-          .catch((err) => {console.error('Error add admin');});
-      });
+      before('Clean DB', databaseHelper.cbResetDB);
 
       before('login admin', done => {
         userService.loginPassword({username: adminData.username, password: adminData.password})
@@ -392,10 +375,7 @@ describe('Admin', () => {
         let userIds = {};
         let constantUserData = {};
 
-        before('reset db', done => {
-          databaseHelper.promiseResetDB().then(() => {done();})
-            .catch((err) => {console.error('Error add admin');});
-        });
+        before('Clean DB', databaseHelper.cbResetDB);
 
         before('login admin', done => {
           userService.loginPassword({username: adminData.username, password: adminData.password})
@@ -483,10 +463,7 @@ describe('Admin', () => {
         let userIds = {};
         let constantUserData = {};
 
-        before('reset db', done => {
-          databaseHelper.promiseResetDB().then(() => {done();})
-            .catch((err) => {console.error('Error add admin');});
-        });
+        before('Clean DB', databaseHelper.cbResetDB);
 
         before('login admin', done => {
           userService.loginPassword({username: adminData.username, password: adminData.password})
@@ -574,10 +551,7 @@ describe('Admin', () => {
         let userIds = {};
         let constantUserData = {};
 
-        before('reset db', done => {
-          databaseHelper.promiseResetDB().then(() => {done();})
-            .catch((err) => {console.error('Error add admin');});
-        });
+        before('Clean DB', databaseHelper.cbResetDB);
 
         before('login admin', done => {
           userService.loginPassword({username: adminData.username, password: adminData.password})
