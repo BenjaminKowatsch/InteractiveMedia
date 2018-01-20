@@ -6,6 +6,7 @@ const chai = require('chai');
 const expect = require('chai').expect;
 const winston = require('winston');
 const databaseHelper = require('./data/databaseHelper');
+const expectResponse = require('../util/expectResponse.util');
 
 chai.use(require('chai-http'));
 
@@ -124,13 +125,7 @@ describe('Authorization', () => {
       return chai.request(HOST)
           .get(URL.TEST_AUTHORIZATION + '/admin')
           .then(res => {
-            expect(res).to.have.status(401);
-            expect(res).to.be.json;
-            expect(res.body).to.be.an('object');
-            expect(res.body.success).to.be.false;
-            expect(res.body.payload).to.be.an('object');
-            expect(res.body.payload.dataPath).to.be.equal('authentication');
-            expect(res.body.payload.message).to.be.equal('no http request header Authorization provided');
+            expectResponse.toBe401MissingHeaderAuthorization(res);
           });
     });
 

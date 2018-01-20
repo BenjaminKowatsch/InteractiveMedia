@@ -6,7 +6,7 @@ module.exports = {
     INVALID_CREATE_GROUP_VALUES: 'invalid create group values',
     INVALID_REQUEST_BODY: 'invalid request body',
     DB_ERROR: 'database error',
-    NO_AUTH_HEADER: 'no http request header Authorization provided',
+    MISSING_AUTH_HEADER: 'missing http request header Authorization',
     INVALID_AUTH_HEADER: 'invalid http request header Authorization provided',
     INVALID_AUTH_TOKEN: 'invalid authToken',
     UNKNOWN_USER_OR_EXPIRED_TOKEN: 'unknown user or expired token',

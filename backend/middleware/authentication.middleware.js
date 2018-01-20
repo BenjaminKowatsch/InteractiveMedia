@@ -30,7 +30,7 @@ module.exports.isAuthenticated = function(req, res, next) {
     winston.error('errorCode', errorResult.errorCode);
     let statusCode = 418;
     switch (errorResult.errorCode) {
-      case ERROR.NO_AUTH_HEADER:
+      case ERROR.MISSING_AUTH_HEADER:
       case ERROR.INVALID_AUTH_HEADER:
       case ERROR.INVALID_AUTHTYPE:
       case ERROR.INVALID_AUTH_TOKEN:
@@ -86,8 +86,8 @@ function parseAuthHeader(authHeaderRaw) {
     // no header Authorization provided
     responseData.success = false;
     responseData.payload.dataPath = 'authentication';
-    responseData.payload.message = 'no http request header Authorization provided';
-    let errorCode = ERROR.NO_AUTH_HEADER;
+    responseData.payload.message = 'missing http request header Authorization';
+    let errorCode = ERROR.MISSING_AUTH_HEADER;
     return Promise.reject({errorCode: errorCode, responseData: responseData});
   }
   const authHeader = authHeaderRaw.split(' ');
