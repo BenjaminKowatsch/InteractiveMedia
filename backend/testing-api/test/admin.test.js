@@ -685,7 +685,7 @@ describe('Admin', () => {
             expect(res.body.success).to.be.false;
             expect(res.body.payload).to.be.an('object');
             expect(res.body.payload.dataPath).to.equal('validation');
-            expect(res.body.payload.message).to.equal('invalid body');
+            expect(res.body.payload.message).to.equal('invalid request body');
           });
         });
 
@@ -701,7 +701,7 @@ describe('Admin', () => {
             expect(res.body.success).to.be.false;
             expect(res.body.payload).to.be.an('object');
             expect(res.body.payload.dataPath).to.equal('validation');
-            expect(res.body.payload.message).to.equal('invalid body');
+            expect(res.body.payload.message).to.equal('invalid request body');
           });
         });
 
@@ -717,7 +717,7 @@ describe('Admin', () => {
             expect(res.body.success).to.be.false;
             expect(res.body.payload).to.be.an('object');
             expect(res.body.payload.dataPath).to.equal('validation');
-            expect(res.body.payload.message).to.equal('invalid body');
+            expect(res.body.payload.message).to.equal('invalid request body');
           });
         });
 
@@ -733,7 +733,7 @@ describe('Admin', () => {
             expect(res.body.success).to.be.false;
             expect(res.body.payload).to.be.an('object');
             expect(res.body.payload.dataPath).to.equal('validation');
-            expect(res.body.payload.message).to.equal('invalid body');
+            expect(res.body.payload.message).to.equal('invalid request body');
           });
         });
 
@@ -749,7 +749,7 @@ describe('Admin', () => {
             expect(res.body.success).to.be.false;
             expect(res.body.payload).to.be.an('object');
             expect(res.body.payload.dataPath).to.equal('validation');
-            expect(res.body.payload.message).to.equal('invalid body');
+            expect(res.body.payload.message).to.equal('invalid request body');
           });
         });
 
@@ -765,7 +765,7 @@ describe('Admin', () => {
             expect(res.body.success).to.be.false;
             expect(res.body.payload).to.be.an('object');
             expect(res.body.payload.dataPath).to.equal('validation');
-            expect(res.body.payload.message).to.equal('invalid body');
+            expect(res.body.payload.message).to.equal('invalid request body');
           });
         });
 
@@ -781,7 +781,7 @@ describe('Admin', () => {
             expect(res.body.success).to.be.false;
             expect(res.body.payload).to.be.an('object');
             expect(res.body.payload.dataPath).to.equal('validation');
-            expect(res.body.payload.message).to.equal('invalid body');
+            expect(res.body.payload.message).to.equal('invalid request body');
           });
         });
 
@@ -797,7 +797,7 @@ describe('Admin', () => {
             expect(res.body.success).to.be.false;
             expect(res.body.payload).to.be.an('object');
             expect(res.body.payload.dataPath).to.equal('validation');
-            expect(res.body.payload.message).to.equal('invalid body');
+            expect(res.body.payload.message).to.equal('invalid request body');
           });
         });
 
@@ -813,7 +813,7 @@ describe('Admin', () => {
             expect(res.body.success).to.be.false;
             expect(res.body.payload).to.be.an('object');
             expect(res.body.payload.dataPath).to.equal('validation');
-            expect(res.body.payload.message).to.equal('invalid body');
+            expect(res.body.payload.message).to.equal('invalid request body');
           });
         });
 
@@ -829,7 +829,7 @@ describe('Admin', () => {
             expect(res.body.success).to.be.false;
             expect(res.body.payload).to.be.an('object');
             expect(res.body.payload.dataPath).to.equal('validation');
-            expect(res.body.payload.message).to.equal('invalid body');
+            expect(res.body.payload.message).to.equal('invalid request body');
           });
         });
 

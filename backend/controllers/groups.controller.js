@@ -19,7 +19,7 @@ const jsonSchema = {
 module.exports.createNewGroup = function(req, res) {
   winston.debug('Creating a new group');
   // validate data in request body
-  validateJsonService.againstSchema(req.body, jsonSchema.groupPayload).then(() => {
+  validateJsonService.reqBodyAgainstSchema(req.body, jsonSchema.groupPayload).then(() => {
     return group.createNewGroup(res.locals.userId, req.body);
   }).then(registerResult =>  {
     httpResponseService.send(res, 201, registerResult);
@@ -75,7 +75,7 @@ module.exports.createNewTransaction = function(req, res) {
   const groupId = req.params.groupId;
   const userIdCreator = res.locals.userId;
   // validate data in request body
-  validateJsonService.againstSchema(req.body, jsonSchema.transactionPayload).then(() => {
+  validateJsonService.reqBodyAgainstSchema(req.body, jsonSchema.transactionPayload).then(() => {
     return group.createNewTransaction(groupId, req.body);
   }).then(transactionResult =>  {
     httpResponseService.send(res, 201, transactionResult);
