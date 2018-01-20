@@ -6,7 +6,7 @@ const express = require('express');
 const router = express.Router();
 
 const usersController = require('../controllers/users.controller');
-const authenticationService = require('../services/authentication.service');
+const authenticationMiddleware = require('../middleware/authentication.middleware');
 
 /**
  * @api {POST} /v1/users Register
@@ -87,7 +87,7 @@ router.post('/login', usersController.login);
  *
  * @apiUse errorExampleCommon
  */
-router.post('/logout', authenticationService.isAuthenticated, usersController.logout);
+router.post('/logout', authenticationMiddleware.isAuthenticated, usersController.logout);
 
 /**
  * @api {GET} /v1/users/user Get User
@@ -118,7 +118,7 @@ router.post('/logout', authenticationService.isAuthenticated, usersController.lo
  *
  * @apiUse errorExampleCommon
  */
-router.get('/user', authenticationService.isAuthenticated, usersController.getUserData);
+router.get('/user', authenticationMiddleware.isAuthenticated, usersController.getUserData);
 
 /**
  * @api {PUT} /v1/users/user Update user
@@ -154,6 +154,6 @@ router.get('/user', authenticationService.isAuthenticated, usersController.getUs
  *
  * @apiUse errorExampleCommon
  */
-router.put('/user', authenticationService.isAuthenticated, usersController.updateUser);
+router.put('/user', authenticationMiddleware.isAuthenticated, usersController.updateUser);
 
 module.exports = router;

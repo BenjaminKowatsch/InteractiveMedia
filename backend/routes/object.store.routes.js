@@ -6,7 +6,7 @@ const express = require('express');
 const multer = require('multer');
 const router = express.Router();
 
-const authenticationService = require('../services/authentication.service');
+const authenticationMiddleware = require('../middleware/authentication.middleware');
 const objectStoreController = require('../controllers/object.store.controller');
 
 /**
@@ -44,7 +44,7 @@ const objectStoreController = require('../controllers/object.store.controller');
  * @apiUse errorExampleCommon
  */
 router.post('/upload', multer({storage: multer.memoryStorage()}).single('uploadField'),
-    authenticationService.isAuthenticated, objectStoreController.upload);
+    authenticationMiddleware.isAuthenticated, objectStoreController.upload);
 
 /**
  * @api {GET} /v1/object-store/download?filename=:filename Download
@@ -65,6 +65,6 @@ router.post('/upload', multer({storage: multer.memoryStorage()}).single('uploadF
  *
  * @apiUse errorExampleCommon
  */
-router.get('/download', authenticationService.isAuthenticated, objectStoreController.download);
+router.get('/download', authenticationMiddleware.isAuthenticated, objectStoreController.download);
 
 module.exports = router;
