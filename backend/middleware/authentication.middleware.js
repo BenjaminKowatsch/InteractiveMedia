@@ -6,7 +6,7 @@ const router = express.Router();
 const winston = require('winston');
 
 const user = require('../modules/user.module');
-const httpResponseService = require('./httpResponse.service');
+const httpResponseService = require('../services/httpResponse.service');
 
 const ERROR = require('../config/error.config');
 const AUTH_TYPE = require('../config/authType.config');

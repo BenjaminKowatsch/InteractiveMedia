@@ -6,8 +6,8 @@ const express = require('express');
 const router = express.Router();
 
 const testController = require('../controllers/test.controller');
-const authenticationService = require('../services/authentication.service');
-const authorizationService = require('../services/authorization.service');
+const authenticationMiddleware = require('../middleware/authentication.middleware');
+const authorizationMiddleware = require('../middleware/authorization.middleware');
 
 /**
  * @api {GET} /v1/test/authentication/none Authentication not required
@@ -52,7 +52,8 @@ router.get('/authentication/none', testController.getAuthenticationNotRequired);
  *
  * @apiUse errorExampleCommon
  */
-router.get('/authentication/required', authenticationService.isAuthenticated, testController.getAuthenticationRequired);
+router.get('/authentication/required', authenticationMiddleware.isAuthenticated,
+    testController.getAuthenticationRequired);
 
 /**
  * @api {GET} /v1/test/authorization/none Authorization not required
@@ -99,7 +100,7 @@ router.get('/authorization/none', testController.getAuthorizationNotRequired);
  *
  * @apiUse errorExampleCommon
  */
-router.get('/authorization/admin', authenticationService.isAuthenticated, authorizationService.isAuthorizedAdmin,
+router.get('/authorization/admin', authenticationMiddleware.isAuthenticated, authorizationMiddleware.isAuthorizedAdmin,
     testController.getAuthorizationAdminRequired);
 
 /**
@@ -129,6 +130,6 @@ router.get('/authorization/admin', authenticationService.isAuthenticated, author
  *
  * @apiUse errorExampleCommon
  */
-router.post('/notification/user', authenticationService.isAuthenticated, testController.sendPushNotificationToUser);
+router.post('/notification/user', authenticationMiddleware.isAuthenticated, testController.sendPushNotificationToUser);
 
 module.exports = router;

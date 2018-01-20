@@ -6,13 +6,10 @@ const express = require('express');
 const router = express.Router();
 
 const groupsController = require('../controllers/groups.controller');
-const authorizationService = require('../services/authorization.service');
-const authenticationService = require('../services/authentication.service');
+const authenticationMiddleware = require('../middleware/authentication.middleware');
+const authorizationMiddleware = require('../middleware/authorization.middleware');
 
 //base route: host:8081/groups
-
-router.get('/', authenticationService.isAuthenticated,
-    authorizationService.isAuthorizedAdmin, groupsController.getAll);
 
 /**
  * @api {POST} /v1/groups/ Create
@@ -43,7 +40,7 @@ router.get('/', authenticationService.isAuthenticated,
  *
  * @apiUse errorExampleCommon
  */
-router.post('/', authenticationService.isAuthenticated,
+router.post('/', authenticationMiddleware.isAuthenticated,
     groupsController.createNewGroup);
 
 /**
@@ -80,8 +77,8 @@ router.post('/', authenticationService.isAuthenticated,
  *
  * @apiUse errorExampleCommon
  */
-router.get('/:groupId', authenticationService.isAuthenticated,
-    authorizationService.isGroupMember, groupsController.getGroupById);
+router.get('/:groupId', authenticationMiddleware.isAuthenticated,
+    authorizationMiddleware.isGroupMember, groupsController.getGroupById);
 
 /**
  * @api {POST} /v1/groups/:groupId/transactions Create Transaction
@@ -114,8 +111,8 @@ router.get('/:groupId', authenticationService.isAuthenticated,
  *
  * @apiUse errorExampleCommon
  */
-router.post('/:groupId/transactions', authenticationService.isAuthenticated,
-    authorizationService.isGroupMember, groupsController.createNewTransaction);
+router.post('/:groupId/transactions', authenticationMiddleware.isAuthenticated,
+    authorizationMiddleware.isGroupMember, groupsController.createNewTransaction);
 
 /**
  * @api {GET} /v1/groups/:groupId/transactions?after=ISOdate Get Transactions After
@@ -142,7 +139,7 @@ router.post('/:groupId/transactions', authenticationService.isAuthenticated,
  *
  * @apiUse errorExampleCommon
  */
-router.get('/:groupId/transactions', authenticationService.isAuthenticated,
-authorizationService.isGroupMember, groupsController.getTransactionAfterDate);
+router.get('/:groupId/transactions', authenticationMiddleware.isAuthenticated,
+    authorizationMiddleware.isGroupMember, groupsController.getTransactionAfterDate);
 
 module.exports = router;

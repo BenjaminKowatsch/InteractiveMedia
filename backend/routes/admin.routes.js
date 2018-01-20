@@ -6,8 +6,8 @@ const express = require('express');
 const router = express.Router();
 
 const adminController = require('../controllers/admin.controller');
-const authenticationService = require('../services/authentication.service');
-const authorizationService = require('../services/authorization.service');
+const authenticationMiddleware = require('../middleware/authentication.middleware');
+const authorizationMiddleware = require('../middleware/authorization.middleware');
 
 /**
  * @api {GET} /v1/admin/groups/ Get groups
@@ -38,7 +38,7 @@ const authorizationService = require('../services/authorization.service');
  *
  * @apiUse errorExampleCommon
  */
-router.get('/groups', authenticationService.isAuthenticated, authorizationService.isAuthorizedAdmin,
+router.get('/groups', authenticationMiddleware.isAuthenticated, authorizationMiddleware.isAuthorizedAdmin,
     adminController.getAllGroups);
 
 /**
@@ -77,7 +77,7 @@ router.get('/groups', authenticationService.isAuthenticated, authorizationServic
  *
  * @apiUse errorExampleCommon
  */
-router.get('/groups/:groupId', authenticationService.isAuthenticated, authorizationService.isAuthorizedAdmin,
+router.get('/groups/:groupId', authenticationMiddleware.isAuthenticated, authorizationMiddleware.isAuthorizedAdmin,
     adminController.getGroupById);
 
 /**
@@ -109,7 +109,7 @@ router.get('/groups/:groupId', authenticationService.isAuthenticated, authorizat
  *
  * @apiUse errorExampleCommon
  */
-router.get('/users', authenticationService.isAuthenticated, authorizationService.isAuthorizedAdmin,
+router.get('/users', authenticationMiddleware.isAuthenticated, authorizationMiddleware.isAuthorizedAdmin,
     adminController.getAllUsers);
 
 /**
@@ -144,7 +144,7 @@ router.get('/users', authenticationService.isAuthenticated, authorizationService
  *
  * @apiUse errorExampleCommon
  */
-router.get('/users/:userId', authenticationService.isAuthenticated, authorizationService.isAuthorizedAdmin,
+router.get('/users/:userId', authenticationMiddleware.isAuthenticated, authorizationMiddleware.isAuthorizedAdmin,
     adminController.getUserById);
 
 /**
@@ -184,7 +184,7 @@ router.get('/users/:userId', authenticationService.isAuthenticated, authorizatio
  *
  * @apiUse errorExampleCommon
  */
-router.put('/users/:userId', authenticationService.isAuthenticated, authorizationService.isAuthorizedAdmin,
+router.put('/users/:userId', authenticationMiddleware.isAuthenticated, authorizationMiddleware.isAuthorizedAdmin,
     adminController.updateUserById);
 
 module.exports = router;

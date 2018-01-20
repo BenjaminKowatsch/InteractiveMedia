@@ -6,7 +6,7 @@ const database = require('../modules/database.module');
 const group = require('../modules/group.module');
 const user = require('../modules/user.module');
 const winston = require('winston');
-const httpResponseService = require('./httpResponse.service');
+const httpResponseService = require('../services/httpResponse.service');
 const ERROR = require('../config/error.config');
 const ROLES = require('../config/roles.config');
 
