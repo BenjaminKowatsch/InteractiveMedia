@@ -7,27 +7,22 @@ const expect = require('chai').expect;
 const winston = require('winston');
 const databaseHelper = require('./data/databaseHelper');
 const expectResponse = require('../util/expectResponse.util');
+const settings = require('../config/settings.config');
 
 chai.use(require('chai-http'));
-
-const HOST = 'http://backend:8081';
-
-const URL = {
-  REGISTER_USER: '/v1/users',
-  TEST_AUTHENTICATION: '/v1/test/authentication'
-};
 
 const userData = require('./data/user.data');
 
 // ************* Helper ***********//
 
-const registerUser = index => chai.request(HOST).post(URL.REGISTER_USER).send(userData.users.valid[index]);
+const registerUser = index => chai.request(settings.host).post(settings.url.users.register)
+.send(userData.users.valid[index]);
 
 describe('Autentication', function() {
   describe('No autentication required', function() {
     it('should require no authentication', function() {
-        return chai.request(HOST)
-            .get(URL.TEST_AUTHENTICATION + '/none')
+        return chai.request(settings.host)
+            .get(settings.url.test.authentication + '/none')
             .then(res => {
               expect(res).to.have.status(200);
               expect(res).to.be.json;
@@ -53,8 +48,8 @@ describe('Autentication', function() {
     });
 
     it('should require authentication', function() {
-        return chai.request(HOST)
-            .get(URL.TEST_AUTHENTICATION + '/required')
+        return chai.request(settings.host)
+            .get(settings.url.test.authentication + '/required')
             .set('Authorization', '0 ' + token)
             .then(res => {
               expect(res).to.have.status(200);
@@ -67,16 +62,16 @@ describe('Autentication', function() {
       });
 
     it('should fail to get restricted resource with no authorization header', function() {
-      return chai.request(HOST)
-          .get(URL.TEST_AUTHENTICATION + '/required')
+      return chai.request(settings.host)
+          .get(settings.url.test.authentication + '/required')
           .then(res => {
             expectResponse.toBe401.missingHeaderAuthorization(res);
           });
     });
 
     it('should fail to get restricted resource with no token in authorization header', function() {
-      return chai.request(HOST)
-          .get(URL.TEST_AUTHENTICATION + '/required')
+      return chai.request(settings.host)
+          .get(settings.url.test.authentication + '/required')
           .set('Authorization', '0')
           .then(res => {
 
@@ -84,8 +79,8 @@ describe('Autentication', function() {
     });
 
     it('should fail to get restricted resource with no authType in authorization header', function() {
-      return chai.request(HOST)
-          .get(URL.TEST_AUTHENTICATION + '/required')
+      return chai.request(settings.host)
+          .get(settings.url.test.authentication + '/required')
           .set('Authorization', token)
           .then(res => {
             expectResponse.toBe401.invalidFormatHeaderAuthorization(res);
@@ -93,8 +88,8 @@ describe('Autentication', function() {
     });
 
     it('should fail to get restricted resource with too many arguments in authorization header', function() {
-      return chai.request(HOST)
-          .get(URL.TEST_AUTHENTICATION + '/required')
+      return chai.request(settings.host)
+          .get(settings.url.test.authentication + '/required')
           .set('Authorization', '0 ' +  token + ' XXX')
           .then(res => {
             expectResponse.toBe401.invalidFormatHeaderAuthorization(res);
@@ -102,8 +97,8 @@ describe('Autentication', function() {
     });
 
     it('should fail to get restricted resource with non-integer authType in authorization header', function() {
-      return chai.request(HOST)
-          .get(URL.TEST_AUTHENTICATION + '/required')
+      return chai.request(settings.host)
+          .get(settings.url.test.authentication + '/required')
           .set('Authorization', 'X ' + token)
           .then(res => {
             expectResponse.toBe401.invalidAuthType(res);
@@ -111,8 +106,8 @@ describe('Autentication', function() {
     });
 
     it('should fail to get restricted resource with invalid authType in authorization header', function() {
-      return chai.request(HOST)
-          .get(URL.TEST_AUTHENTICATION + '/required')
+      return chai.request(settings.host)
+          .get(settings.url.test.authentication + '/required')
           .set('Authorization', '99 ' + token)
           .then(res => {
             expectResponse.toBe401.invalidAuthType(res);
@@ -120,8 +115,8 @@ describe('Autentication', function() {
     });
 
     it('should fail to get restricted resource with invalid auth token in authorization header', function() {
-      return chai.request(HOST)
-          .get(URL.TEST_AUTHENTICATION + '/required')
+      return chai.request(settings.host)
+          .get(settings.url.test.authentication + '/required')
           .set('Authorization', '0 ' + 'XXX')
           .then(res => {
             expectResponse.toBe401.invalidAuthToken(res);
@@ -130,8 +125,8 @@ describe('Autentication', function() {
 
     it('should fail to get restricted resource with valid auth token and wrong authType in authorization header',
       function() {
-      return chai.request(HOST)
-      .get(URL.TEST_AUTHENTICATION + '/required')
+      return chai.request(settings.host)
+      .get(settings.url.test.authentication + '/required')
       .set('Authorization', '1 ' + token)
       .then(res => {
         expectResponse.toBe401.invalidAuthToken(res);

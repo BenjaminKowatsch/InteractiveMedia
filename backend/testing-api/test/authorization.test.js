@@ -7,24 +7,17 @@ const expect = require('chai').expect;
 const winston = require('winston');
 const databaseHelper = require('./data/databaseHelper');
 const expectResponse = require('../util/expectResponse.util');
+const settings = require('../config/settings.config');
 
 chai.use(require('chai-http'));
-
-const HOST = 'http://backend:8081';
-
-const URL = {
-  BASE_USER: '/v1/users',
-  TEST_AUTHENTICATION: '/v1/test/authentication',
-  TEST_AUTHORIZATION: '/v1/test/authorization',
-  BASE_ADMIN: '/v1/admin'
-};
 
 const userData = require('./data/user.data');
 const adminData = require('./data/admin.data');
 
 // ************* Helper ***********//
 
-const registerUser = index => chai.request(HOST).post(URL.BASE_USER).send(userData.users.valid[index]);
+const registerUser = index => chai.request(settings.host).post(settings.url.users.base)
+.send(userData.users.valid[index]);
 
 describe('Authorization', () => {
   describe('No authorization required', () => {
@@ -37,7 +30,7 @@ describe('Authorization', () => {
     });
 
     before('login admin', done => {
-      chai.request(HOST).post(URL.BASE_USER + '/login?type=0')
+      chai.request(settings.host).post(settings.url.users.base + '/login?type=0')
           .send({username: adminData.username, password: adminData.password})
       .then(res => {
           adminToken = res.body.payload.accessToken;
@@ -55,8 +48,8 @@ describe('Authorization', () => {
     });
 
     it('should be accessible with no authorization', () => {
-        return chai.request(HOST)
-            .get(URL.TEST_AUTHORIZATION + '/none')
+        return chai.request(settings.host)
+            .get(settings.url.test.authorization + '/none')
             .then(res => {
               expect(res).to.have.status(200);
               expect(res).to.be.json;
@@ -67,8 +60,8 @@ describe('Authorization', () => {
             });
       });
     it('should be accessible for normal user', () => {
-        return chai.request(HOST)
-            .get(URL.TEST_AUTHORIZATION + '/none')
+        return chai.request(settings.host)
+            .get(settings.url.test.authorization + '/none')
             .set('Authorization', '0 ' + userToken)
             .then(res => {
               expect(res).to.have.status(200);
@@ -80,8 +73,8 @@ describe('Authorization', () => {
             });
       });
     it('should be accessible for normal admin', () => {
-        return chai.request(HOST)
-            .get(URL.TEST_AUTHORIZATION + '/none')
+        return chai.request(settings.host)
+            .get(settings.url.test.authorization + '/none')
             .set('Authorization', '0 ' + adminToken)
             .then(res => {
               expect(res).to.have.status(200);
@@ -104,7 +97,7 @@ describe('Authorization', () => {
     });
 
     before('login admin', done => {
-      chai.request(HOST).post(URL.BASE_USER + '/login?type=0')
+      chai.request(settings.host).post(settings.url.users.base + '/login?type=0')
           .send({username: adminData.username, password: adminData.password})
       .then(res => {
           adminToken = res.body.payload.accessToken;
@@ -122,16 +115,16 @@ describe('Authorization', () => {
     });
 
     it('should fail with no authorization header', () => {
-      return chai.request(HOST)
-          .get(URL.TEST_AUTHORIZATION + '/admin')
+      return chai.request(settings.host)
+          .get(settings.url.test.authorization + '/admin')
           .then(res => {
             expectResponse.toBe401.missingHeaderAuthorization(res);
           });
     });
 
     it('should fail with normal user', () => {
-      return chai.request(HOST)
-          .get(URL.TEST_AUTHORIZATION + '/admin')
+      return chai.request(settings.host)
+          .get(settings.url.test.authorization + '/admin')
           .set('Authorization', '0 ' + userToken)
           .then(res => {
             expectResponse.toBe403.unauthorized(res);
@@ -139,8 +132,8 @@ describe('Authorization', () => {
     });
 
     it('should be accessible for admin', () => {
-        return chai.request(HOST)
-            .get(URL.TEST_AUTHORIZATION + '/admin')
+        return chai.request(settings.host)
+            .get(settings.url.test.authorization + '/admin')
             .set('Authorization', '0 ' + adminToken)
             .then(res => {
               expect(res).to.have.status(200);

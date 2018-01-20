@@ -6,22 +6,16 @@ const chai = require('chai');
 const expect = require('chai').expect;
 const winston = require('winston');
 const databaseHelper = require('./data/databaseHelper');
+const settings = require('../config/settings.config');
 
 chai.use(require('chai-http'));
-
-const HOST = 'http://backend:8081';
-
-const URL = {
-  REGISTER_USER: '/v1/users',
-  BASE_USER: '/v1/users',
-  TEST_NOTIFICATION: '/v1/test/notification'
-};
 
 const userData = require('./data/user.data');
 
 // ************* Helper ***********//
 
-const registerUser = index => chai.request(HOST).post(URL.REGISTER_USER).send(userData.users.valid[index]);
+const registerUser = index => chai.request(settings.host).post(settings.url.users.register)
+.send(userData.users.valid[index]);
 
 describe.skip('PushNotifications', () => {
     let token;
@@ -40,8 +34,8 @@ describe.skip('PushNotifications', () => {
     });
 
     before('set fcm token of user_0', done => {
-      chai.request(HOST)
-      .put(URL.BASE_USER  + '/user')
+      chai.request(settings.host)
+      .put(settings.url.users.base  + '/user')
       .set('Authorization', '0 ' + token)
       .send({fcmToken: fcmToken})
       .then(res => {
@@ -50,8 +44,8 @@ describe.skip('PushNotifications', () => {
     });
 
     it('should send notification via fcm to registered user', function() {
-      return chai.request(HOST)
-          .post(URL.TEST_NOTIFICATION + '/user')
+      return chai.request(settings.host)
+          .post(settings.url.test.notification + '/user')
           .set('Authorization', '0 ' + token)
           .send({dryRun: true})
           .then(res => {

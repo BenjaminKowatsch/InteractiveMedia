@@ -6,17 +6,9 @@ const chai = require('chai');
 const expect = require('chai').expect;
 const winston = require('winston');
 const databaseHelper = require('./data/databaseHelper');
+const settings = require('../config/settings.config');
 
 chai.use(require('chai-http'));
-
-const HOST = 'http://backend:8081';
-
-const URL = {
-  REGISTER_USER: '/v1/users',
-  BASE_USER: '/v1/users',
-  BASE_GROUP: '/v1/groups',
-  TEST_NOTIFICATION: '/v1/test/notification'
-};
 
 const userData = require('./data/user.data');
 
@@ -25,7 +17,8 @@ const nowPlus = time => new Date(new Date().getTime() + time).toISOString();
 
 // ************* Helper ***********//
 
-const registerUser = index => chai.request(HOST).post(URL.REGISTER_USER).send(userData.users.valid[index]);
+const registerUser = index => chai.request(settings.host).post(settings.url.users.register)
+.send(userData.users.valid[index]);
 
 describe.skip('PushNotifications create transactions', function() {
     let tokens = {};
@@ -47,8 +40,8 @@ describe.skip('PushNotifications create transactions', function() {
     });
 
     before('create group', function(done) {
-      chai.request(HOST)
-        .post(URL.BASE_GROUP  + '/')
+      chai.request(settings.host)
+        .post(settings.url.groups.base  + '/')
         .set('Authorization', '0 ' + tokens[0])
         .send({
           name: 'test_gruppe_1',
@@ -67,8 +60,8 @@ describe.skip('PushNotifications create transactions', function() {
     });
 
     before('set fcm token of user_0', function(done) {
-      chai.request(HOST)
-      .put(URL.BASE_USER  + '/user')
+      chai.request(settings.host)
+      .put(settings.url.users.base  + '/user')
       .set('Authorization', '0 ' + tokens[0])
       .send({fcmToken: fcmToken})
       .then(res => {done();})
@@ -76,8 +69,8 @@ describe.skip('PushNotifications create transactions', function() {
     });
 
     it('create transaction with user_1', function() {
-      return chai.request(HOST)
-        .post(URL.BASE_GROUP + '/' + groupId + '/transactions')
+      return chai.request(settings.host)
+        .post(settings.url.groups.base + '/' + groupId + '/transactions')
         .set('Authorization', '0 ' + tokens[1])
         .send({
           amount: 9,

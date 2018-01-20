@@ -7,19 +7,14 @@ const fs = require('fs');
 const expect = require('chai').expect;
 const databaseHelper = require('./data/databaseHelper');
 const expectResponse = require('../util/expectResponse.util');
+const settings = require('../config/settings.config');
 
 chai.use(require('chai-http'));
 
-const HOST = 'http://backend:8081';
-
-const URL = {
-  BASE_GROUP: '/v1/groups/',
-  REGISTER_USER: '/v1/users/',
-  BASE_OBJECTSTORE: '/v1/object-store'
-};
 const userData = require('./data/user.data');
 
-const registerUser = index => chai.request(HOST).post(URL.REGISTER_USER).send(userData.users.valid[index]);
+const registerUser = index => chai.request(settings.host).post(settings.url.users.register)
+.send(userData.users.valid[index]);
 
 describe('Object-store', function() {
 
@@ -42,8 +37,8 @@ describe('Object-store', function() {
     });
 
     it('should upload a new image', function() {
-      return chai.request(HOST)
-        .post(URL.BASE_OBJECTSTORE + '/upload')
+      return chai.request(settings.host)
+        .post(settings.url.objectstore.base + '/upload')
         .attach('uploadField', imageData, 'image.png')
         .set('Authorization', '0 ' + token)
         .then(res => {
@@ -54,8 +49,8 @@ describe('Object-store', function() {
     });
 
     it('should fail upload a new image with invalid auth token', function() {
-      return chai.request(HOST)
-        .post(URL.BASE_OBJECTSTORE + '/upload')
+      return chai.request(settings.host)
+        .post(settings.url.objectstore.base + '/upload')
         .attach('uploadField', imageData, 'image.png')
         .set('Authorization', '0 ' + 'XXX')
         .then(res => {
@@ -64,8 +59,8 @@ describe('Object-store', function() {
     });
 
     it('should fail upload a new image with missing uploadField', function() {
-      return chai.request(HOST)
-        .post(URL.BASE_OBJECTSTORE + '/upload')
+      return chai.request(settings.host)
+        .post(settings.url.objectstore.base + '/upload')
         .set('Authorization', '0 ' + token)
         .then(res => {
           expectResponse.toBe400.invalidRequestBody(res);
@@ -93,8 +88,8 @@ describe('Object-store', function() {
       });
 
       before('upload a new image', function() {
-        return chai.request(HOST)
-          .post(URL.BASE_OBJECTSTORE + '/upload')
+        return chai.request(settings.host)
+          .post(settings.url.objectstore.base + '/upload')
           .attach('uploadField', imageData, 'imageToDownload.png')
           .set('Authorization', '0 ' + token)
           .then(res => {
@@ -103,8 +98,8 @@ describe('Object-store', function() {
       });
 
       it('should download an existing image', function() {
-        return chai.request(HOST)
-          .get(URL.BASE_OBJECTSTORE + '/download?filename=' + imagePath)
+        return chai.request(settings.host)
+          .get(settings.url.objectstore.base + '/download?filename=' + imagePath)
           .set('Authorization', '0 ' + token)
           .then(res => {
             expect(res).to.have.status(200);
@@ -112,8 +107,8 @@ describe('Object-store', function() {
       });
 
       it('should fail to download an existing image with invalid auth token', function() {
-        return chai.request(HOST)
-          .get(URL.BASE_OBJECTSTORE + '/download?filename=' + imagePath)
+        return chai.request(settings.host)
+          .get(settings.url.objectstore.base + '/download?filename=' + imagePath)
           .set('Authorization', '0 ' + 'XXX')
           .then(res => {
             expectResponse.toBe401.invalidAuthToken(res);
@@ -121,8 +116,8 @@ describe('Object-store', function() {
       });
 
       it('should fail to download a missing image', function() {
-        return chai.request(HOST)
-          .get(URL.BASE_OBJECTSTORE + '/download?filename=missingimage.png')
+        return chai.request(settings.host)
+          .get(settings.url.objectstore.base + '/download?filename=missingimage.png')
           .set('Authorization', '0 ' + token)
           .then(res => {
             expectResponse.toBe404.fileNotFound(res);
@@ -130,8 +125,8 @@ describe('Object-store', function() {
       });
 
       it('should fail to download with missing filename url parameter', function() {
-        return chai.request(HOST)
-          .get(URL.BASE_OBJECTSTORE + '/download')
+        return chai.request(settings.host)
+          .get(settings.url.objectstore.base + '/download')
           .set('Authorization', '0 ' + token)
           .then(res => {
             expectResponse.toBe400.objectstore.missingUrlParameterFilename(res);

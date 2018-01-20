@@ -7,18 +7,9 @@ const expect = require('chai').expect;
 const winston = require('winston');
 const databaseHelper = require('./data/databaseHelper');
 const expectResponse = require('../util/expectResponse.util');
+const settings = require('../config/settings.config');
 
 chai.use(require('chai-http'));
-
-const HOST = 'http://backend:8081';
-
-const URL = {
-  BASE_USER: '/v1/users',
-  TEST_AUTHENTICATION: '/v1/test/authentication',
-  TEST_AUTHORIZATION: '/v1/test/authorization',
-  BASE_ADMIN: '/v1/admin',
-  BASE_GROUP: '/v1/groups'
-};
 
 const userData = require('./data/user.data');
 const adminData = require('./data/admin.data');
@@ -26,7 +17,8 @@ const groupScenarios = require('./data/groupScenarios');
 
 // ************* Helper ***********//
 
-const registerUser = index => chai.request(HOST).post(URL.BASE_USER).send(userData.users.valid[index]);
+const registerUser = index => chai.request(settings.host).post(settings.url.users.base)
+.send(userData.users.valid[index]);
 
 describe('Admin', () => {
   describe('Login', () => {
@@ -36,8 +28,8 @@ describe('Admin', () => {
     });
 
     it('should login as admin', () => {
-      return chai.request(HOST)
-      .post(URL.BASE_USER + '/login?type=0')
+      return chai.request(settings.host)
+      .post(settings.url.users.base + '/login?type=0')
       .send({username: adminData.username, password: adminData.password})
       .then(res => {
         expect(res).to.have.status(200);
@@ -59,7 +51,7 @@ describe('Admin', () => {
     });
 
     before('login admin', done => {
-      chai.request(HOST).post(URL.BASE_USER + '/login?type=0')
+      chai.request(settings.host).post(settings.url.users.base + '/login?type=0')
           .send({username: adminData.username, password: adminData.password})
       .then(res => {
           adminToken = res.body.payload.accessToken;
@@ -68,8 +60,8 @@ describe('Admin', () => {
     });
 
     it('should get user data of admin', () => {
-      return chai.request(HOST)
-      .get(URL.BASE_USER + '/user')
+      return chai.request(settings.host)
+      .get(settings.url.users.base + '/user')
       .set('Authorization', '0 ' + adminToken)
       .then(res => {
         expect(res).to.have.status(200);
@@ -99,7 +91,7 @@ describe('Admin', () => {
       });
 
       before('login admin', done => {
-        chai.request(HOST).post(URL.BASE_USER + '/login?type=0')
+        chai.request(settings.host).post(settings.url.users.base + '/login?type=0')
             .send({username: adminData.username, password: adminData.password})
         .then(res => {
             adminToken = res.body.payload.accessToken;
@@ -116,14 +108,14 @@ describe('Admin', () => {
           return registerUser(2);
         }).then(res => {
           tokens[2] = res.body.payload.accessToken;
-          return chai.request(HOST)
-            .post(URL.BASE_GROUP  + '/')
+          return chai.request(settings.host)
+            .post(settings.url.groups.base  + '/')
             .set('Authorization', '0 ' + tokens[0])
             .send(groupScenarios[1].createGroup0);
         }).then(res => {
           groupIds[0] = res.body.payload.groupId;
-          return chai.request(HOST)
-            .post(URL.BASE_GROUP  + '/')
+          return chai.request(settings.host)
+            .post(settings.url.groups.base  + '/')
             .set('Authorization', '0 ' + tokens[0])
             .send(groupScenarios[1].createGroup1);
         }).then(res => {
@@ -135,8 +127,8 @@ describe('Admin', () => {
       });
 
       it('should get all groups', () => {
-        return chai.request(HOST)
-        .get(URL.BASE_ADMIN + '/groups')
+        return chai.request(settings.host)
+        .get(settings.url.admin.base + '/groups')
         .set('Authorization', '0 ' + adminToken)
         .then(res => {
           expect(res).to.have.status(200);
@@ -161,8 +153,8 @@ describe('Admin', () => {
       });
 
       it('should fail to get all groups with normal user', () => {
-        return chai.request(HOST)
-            .get(URL.BASE_ADMIN + '/groups')
+        return chai.request(settings.host)
+            .get(settings.url.admin.base + '/groups')
             .set('Authorization', '0 ' + tokens[0])
             .then(res => {
               expectResponse.toBe403.unauthorized(res);
@@ -180,7 +172,7 @@ describe('Admin', () => {
       });
 
       before('login admin', done => {
-        chai.request(HOST).post(URL.BASE_USER + '/login?type=0')
+        chai.request(settings.host).post(settings.url.users.base + '/login?type=0')
             .send({username: adminData.username, password: adminData.password})
         .then(res => {
             adminToken = res.body.payload.accessToken;
@@ -197,8 +189,8 @@ describe('Admin', () => {
           return registerUser(2);
         }).then(res => {
           tokens[2] = res.body.payload.accessToken;
-          return chai.request(HOST)
-            .post(URL.BASE_GROUP  + '/')
+          return chai.request(settings.host)
+            .post(settings.url.groups.base  + '/')
             .set('Authorization', '0 ' + tokens[0])
             .send(groupScenarios[1].createGroup0);
         }).then(res => {
@@ -210,8 +202,8 @@ describe('Admin', () => {
       });
 
       it('should get group by id', () => {
-        return chai.request(HOST)
-        .get(URL.BASE_ADMIN + '/groups/' + groupId)
+        return chai.request(settings.host)
+        .get(settings.url.admin.base + '/groups/' + groupId)
         .set('Authorization', '0 ' + adminToken)
         .then(res => {
           expect(res).to.have.status(200);
@@ -231,8 +223,8 @@ describe('Admin', () => {
       });
 
       it('should fail to get group by id with normal user', () => {
-        return chai.request(HOST)
-            .get(URL.BASE_ADMIN + '/groups/' + groupId)
+        return chai.request(settings.host)
+            .get(settings.url.admin.base + '/groups/' + groupId)
             .set('Authorization', '0 ' + tokens[0])
             .then(res => {
               expectResponse.toBe403.unauthorized(res);
@@ -240,8 +232,8 @@ describe('Admin', () => {
       });
 
       it('should fail to get group by id with unknown groupId', () => {
-        return chai.request(HOST)
-            .get(URL.BASE_ADMIN + '/groups/' + 'XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX')
+        return chai.request(settings.host)
+            .get(settings.url.admin.base + '/groups/' + 'XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX')
             .set('Authorization', '0 ' + adminToken)
             .then(res => {
               expectResponse.toBe404.groupNotFound(res);
@@ -261,7 +253,7 @@ describe('Admin', () => {
       });
 
       before('login admin', done => {
-        chai.request(HOST).post(URL.BASE_USER + '/login?type=0')
+        chai.request(settings.host).post(settings.url.users.base + '/login?type=0')
             .send({username: adminData.username, password: adminData.password})
         .then(res => {
             adminToken = res.body.payload.accessToken;
@@ -275,8 +267,8 @@ describe('Admin', () => {
           return registerUser(1);
         }).then(res => {
           tokens[1] = res.body.payload.accessToken;
-          return chai.request(HOST)
-            .post(URL.BASE_GROUP  + '/')
+          return chai.request(settings.host)
+            .post(settings.url.groups.base  + '/')
             .set('Authorization', '0 ' + tokens[0])
             .send(groupScenarios[1].createGroup0);
         }).then(res => {
@@ -288,8 +280,8 @@ describe('Admin', () => {
       });
 
       it('should get all users', () => {
-        return chai.request(HOST)
-        .get(URL.BASE_ADMIN + '/users')
+        return chai.request(settings.host)
+        .get(settings.url.admin.base + '/users')
         .set('Authorization', '0 ' + adminToken)
         .then(res => {
           expect(res).to.have.status(200);
@@ -320,8 +312,8 @@ describe('Admin', () => {
       });
 
       it('should fail to get all users with normal user', () => {
-        return chai.request(HOST)
-            .get(URL.BASE_ADMIN + '/users')
+        return chai.request(settings.host)
+            .get(settings.url.admin.base + '/users')
             .set('Authorization', '0 ' + tokens[0])
             .then(res => {
               expectResponse.toBe403.unauthorized(res);
@@ -340,7 +332,7 @@ describe('Admin', () => {
       });
 
       before('login admin', done => {
-        chai.request(HOST).post(URL.BASE_USER + '/login?type=0')
+        chai.request(settings.host).post(settings.url.users.base + '/login?type=0')
             .send({username: adminData.username, password: adminData.password})
         .then(res => {
             adminToken = res.body.payload.accessToken;
@@ -357,8 +349,8 @@ describe('Admin', () => {
           return registerUser(2);
         }).then(res => {
           tokens[2] = res.body.payload.accessToken;
-          return chai.request(HOST)
-            .post(URL.BASE_GROUP  + '/')
+          return chai.request(settings.host)
+            .post(settings.url.groups.base  + '/')
             .set('Authorization', '0 ' + tokens[0])
             .send(groupScenarios[1].createGroup0);
         }).then(res => {
@@ -368,8 +360,8 @@ describe('Admin', () => {
       });
 
       before('get userId of user_0', done => {
-        chai.request(HOST)
-        .get(URL.BASE_USER  + '/user')
+        chai.request(settings.host)
+        .get(settings.url.users.base  + '/user')
         .set('Authorization', '0 ' + tokens[0])
         .then(res => {
           userIds[0] = res.body.payload.userId;
@@ -378,8 +370,8 @@ describe('Admin', () => {
       });
 
       it('should get user by id', () => {
-        return chai.request(HOST)
-        .get(URL.BASE_ADMIN + '/users/' + userIds[0])
+        return chai.request(settings.host)
+        .get(settings.url.admin.base + '/users/' + userIds[0])
         .set('Authorization', '0 ' + adminToken)
         .then(res => {
           expect(res).to.have.status(200);
@@ -399,8 +391,8 @@ describe('Admin', () => {
       });
 
       it('should fail to get user by id with normal user', () => {
-        return chai.request(HOST)
-            .get(URL.BASE_ADMIN + '/users/' + userIds[0])
+        return chai.request(settings.host)
+            .get(settings.url.admin.base + '/users/' + userIds[0])
             .set('Authorization', '0 ' + tokens[0])
             .then(res => {
               expectResponse.toBe403.unauthorized(res);
@@ -408,8 +400,8 @@ describe('Admin', () => {
       });
 
       it('should fail to get user by id with unknown userId', () => {
-        return chai.request(HOST)
-            .get(URL.BASE_ADMIN + '/users/' + 'XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX')
+        return chai.request(settings.host)
+            .get(settings.url.admin.base + '/users/' + 'XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX')
             .set('Authorization', '0 ' + adminToken)
             .then(res => {
               expectResponse.toBe404.userNotFound(res);
@@ -430,7 +422,7 @@ describe('Admin', () => {
         });
 
         before('login admin', done => {
-          chai.request(HOST).post(URL.BASE_USER + '/login?type=0')
+          chai.request(settings.host).post(settings.url.users.base + '/login?type=0')
               .send({username: adminData.username, password: adminData.password})
           .then(res => {
               adminToken = res.body.payload.accessToken;
@@ -446,8 +438,8 @@ describe('Admin', () => {
         });
 
         before('get userId of user_0', done => {
-          chai.request(HOST)
-          .get(URL.BASE_USER  + '/user')
+          chai.request(settings.host)
+          .get(settings.url.users.base  + '/user')
           .set('Authorization', '0 ' + tokens[0])
           .then(res => {
             userIds[0] = res.body.payload.userId;
@@ -456,8 +448,8 @@ describe('Admin', () => {
         });
 
         it('should get original user data of user_0 by id', () => {
-          return chai.request(HOST)
-          .get(URL.BASE_ADMIN + '/users/' + userIds[0])
+          return chai.request(settings.host)
+          .get(settings.url.admin.base + '/users/' + userIds[0])
           .set('Authorization', '0 ' + adminToken)
           .then(res => {
             expect(res).to.have.status(200);
@@ -477,8 +469,8 @@ describe('Admin', () => {
         });
 
         it('should update user_0', function() {
-          return chai.request(HOST)
-          .put(URL.BASE_ADMIN  + '/users/' + userIds[0])
+          return chai.request(settings.host)
+          .put(settings.url.admin.base  + '/users/' + userIds[0])
           .set('Authorization', '0 ' + adminToken)
           .send(userData.users.updateAsAdmin.valid.allFields)
           .then(res => {
@@ -490,8 +482,8 @@ describe('Admin', () => {
         });
 
         it('should get the updated user data of user_0 by id', function() {
-          return chai.request(HOST)
-          .get(URL.BASE_ADMIN + '/users/' + userIds[0])
+          return chai.request(settings.host)
+          .get(settings.url.admin.base + '/users/' + userIds[0])
           .set('Authorization', '0 ' + adminToken)
           .then(res => {
             expect(res).to.have.status(200);
@@ -522,7 +514,7 @@ describe('Admin', () => {
         });
 
         before('login admin', done => {
-          chai.request(HOST).post(URL.BASE_USER + '/login?type=0')
+          chai.request(settings.host).post(settings.url.users.base + '/login?type=0')
               .send({username: adminData.username, password: adminData.password})
           .then(res => {
               adminToken = res.body.payload.accessToken;
@@ -538,8 +530,8 @@ describe('Admin', () => {
         });
 
         before('get userId of user_0', done => {
-          chai.request(HOST)
-          .get(URL.BASE_USER  + '/user')
+          chai.request(settings.host)
+          .get(settings.url.users.base  + '/user')
           .set('Authorization', '0 ' + tokens[0])
           .then(res => {
             userIds[0] = res.body.payload.userId;
@@ -548,8 +540,8 @@ describe('Admin', () => {
         });
 
         it('should get original user data of user_0 by id', () => {
-          return chai.request(HOST)
-          .get(URL.BASE_ADMIN + '/users/' + userIds[0])
+          return chai.request(settings.host)
+          .get(settings.url.admin.base + '/users/' + userIds[0])
           .set('Authorization', '0 ' + adminToken)
           .then(res => {
             expect(res).to.have.status(200);
@@ -569,8 +561,8 @@ describe('Admin', () => {
         });
 
         it('should update user_0', function() {
-          return chai.request(HOST)
-          .put(URL.BASE_ADMIN  + '/users/' + userIds[0])
+          return chai.request(settings.host)
+          .put(settings.url.admin.base  + '/users/' + userIds[0])
           .set('Authorization', '0 ' + adminToken)
           .send(userData.users.updateAsAdmin.valid.oneFieldUsername)
           .then(res => {
@@ -582,8 +574,8 @@ describe('Admin', () => {
         });
 
         it('should get the updated user data of user_0', function() {
-          return chai.request(HOST)
-          .get(URL.BASE_ADMIN + '/users/' + userIds[0])
+          return chai.request(settings.host)
+          .get(settings.url.admin.base + '/users/' + userIds[0])
           .set('Authorization', '0 ' + adminToken)
           .then(res => {
             expect(res).to.have.status(200);
@@ -614,7 +606,7 @@ describe('Admin', () => {
         });
 
         before('login admin', done => {
-          chai.request(HOST).post(URL.BASE_USER + '/login?type=0')
+          chai.request(settings.host).post(settings.url.users.base + '/login?type=0')
               .send({username: adminData.username, password: adminData.password})
           .then(res => {
               adminToken = res.body.payload.accessToken;
@@ -630,8 +622,8 @@ describe('Admin', () => {
         });
 
         before('get userId of user_0', done => {
-          chai.request(HOST)
-          .get(URL.BASE_USER  + '/user')
+          chai.request(settings.host)
+          .get(settings.url.users.base  + '/user')
           .set('Authorization', '0 ' + tokens[0])
           .then(res => {
             userIds[0] = res.body.payload.userId;
@@ -640,8 +632,8 @@ describe('Admin', () => {
         });
 
         it('should fail to update due to missing payload', function() {
-          return chai.request(HOST)
-          .put(URL.BASE_ADMIN  + '/users/' + userIds[0])
+          return chai.request(settings.host)
+          .put(settings.url.admin.base  + '/users/' + userIds[0])
           .set('Authorization', '0 ' + adminToken)
           .then(res => {
             expectResponse.toBe400.invalidRequestBody(res);
@@ -649,8 +641,8 @@ describe('Admin', () => {
         });
 
         it('should fail to update userId', function() {
-          return chai.request(HOST)
-          .put(URL.BASE_ADMIN  + '/users/' + userIds[0])
+          return chai.request(settings.host)
+          .put(settings.url.admin.base  + '/users/' + userIds[0])
           .set('Authorization', '0 ' + adminToken)
           .send(userData.users.updateAsAdmin.invalid.updateUserId)
           .then(res => {
@@ -659,8 +651,8 @@ describe('Admin', () => {
         });
 
         it('should fail to update groupd ids', function() {
-          return chai.request(HOST)
-          .put(URL.BASE_ADMIN  + '/users/' + userIds[0])
+          return chai.request(settings.host)
+          .put(settings.url.admin.base  + '/users/' + userIds[0])
           .set('Authorization', '0 ' + adminToken)
           .send(userData.users.updateAsAdmin.invalid.updateGroupIds)
           .then(res => {
@@ -669,8 +661,8 @@ describe('Admin', () => {
         });
 
         it('should fail to update internal id', function() {
-          return chai.request(HOST)
-          .put(URL.BASE_ADMIN  + '/users/' + userIds[0])
+          return chai.request(settings.host)
+          .put(settings.url.admin.base  + '/users/' + userIds[0])
           .set('Authorization', '0 ' + adminToken)
           .send(userData.users.updateAsAdmin.invalid.updateInternalId)
           .then(res => {
@@ -679,8 +671,8 @@ describe('Admin', () => {
         });
 
         it('should fail to update authType', function() {
-          return chai.request(HOST)
-          .put(URL.BASE_ADMIN  + '/users/' + userIds[0])
+          return chai.request(settings.host)
+          .put(settings.url.admin.base  + '/users/' + userIds[0])
           .set('Authorization', '0 ' + adminToken)
           .send(userData.users.updateAsAdmin.invalid.updateAuthType)
           .then(res => {
@@ -689,8 +681,8 @@ describe('Admin', () => {
         });
 
         it('should fail to update username with null', function() {
-          return chai.request(HOST)
-          .put(URL.BASE_ADMIN  + '/users/' + userIds[0])
+          return chai.request(settings.host)
+          .put(settings.url.admin.base  + '/users/' + userIds[0])
           .set('Authorization', '0 ' + adminToken)
           .send(userData.users.updateAsAdmin.invalid.updateUsernameNull)
           .then(res => {
@@ -699,8 +691,8 @@ describe('Admin', () => {
         });
 
         it('should fail to update password with null', function() {
-          return chai.request(HOST)
-          .put(URL.BASE_ADMIN  + '/users/' + userIds[0])
+          return chai.request(settings.host)
+          .put(settings.url.admin.base  + '/users/' + userIds[0])
           .set('Authorization', '0 ' + adminToken)
           .send(userData.users.updateAsAdmin.invalid.updatePasswordNull)
           .then(res => {
@@ -709,8 +701,8 @@ describe('Admin', () => {
         });
 
         it('should fail to update email with null', function() {
-          return chai.request(HOST)
-          .put(URL.BASE_ADMIN  + '/users/' + userIds[0])
+          return chai.request(settings.host)
+          .put(settings.url.admin.base  + '/users/' + userIds[0])
           .set('Authorization', '0 ' + adminToken)
           .send(userData.users.updateAsAdmin.invalid.updateEmailNull)
           .then(res => {
@@ -719,8 +711,8 @@ describe('Admin', () => {
         });
 
         it('should fail to update role with invalid value', function() {
-          return chai.request(HOST)
-          .put(URL.BASE_ADMIN  + '/users/' + userIds[0])
+          return chai.request(settings.host)
+          .put(settings.url.admin.base  + '/users/' + userIds[0])
           .set('Authorization', '0 ' + adminToken)
           .send(userData.users.updateAsAdmin.invalid.updateInvalidRole)
           .then(res => {
@@ -729,8 +721,8 @@ describe('Admin', () => {
         });
 
         it('should fail to update unknown field', function() {
-          return chai.request(HOST)
-          .put(URL.BASE_ADMIN  + '/users/' + userIds[0])
+          return chai.request(settings.host)
+          .put(settings.url.admin.base  + '/users/' + userIds[0])
           .set('Authorization', '0 ' + adminToken)
           .send(userData.users.updateAsAdmin.invalid.updateUnknownField)
           .then(res => {
@@ -739,8 +731,8 @@ describe('Admin', () => {
         });
 
         it('should fail to update with normal user', () => {
-          return chai.request(HOST)
-          .put(URL.BASE_ADMIN  + '/users/' + userIds[0])
+          return chai.request(settings.host)
+          .put(settings.url.admin.base  + '/users/' + userIds[0])
           .set('Authorization', '0 ' + tokens[0])
           .send(userData.users.updateAsAdmin.valid.allFields)
           .then(res => {
@@ -749,8 +741,8 @@ describe('Admin', () => {
         });
 
         it('should fail to update with unknown userId', () => {
-          return chai.request(HOST)
-          .put(URL.BASE_ADMIN + '/users/' + 'XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX')
+          return chai.request(settings.host)
+          .put(settings.url.admin.base + '/users/' + 'XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX')
           .set('Authorization', '0 ' + adminToken)
           .send(userData.users.updateAsAdmin.valid.allFields)
           .then(res => {
