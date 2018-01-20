@@ -29,6 +29,8 @@ const authenticationService = require('../services/authentication.service');
  * @apiUse successExampleAuthtypeToken
  *
  * @apiUse error400BadRequest
+ * @apiUse error409ConflictUserAlreadyExists
+ * @apiUse error500DatabaseError
  * @apiUse errorBodyCommonStructure
  *
  * @apiUse errorExampleCommon
@@ -61,6 +63,7 @@ router.post('/', usersController.registerNewUser);
  * @apiUse error400BadRequest
  * @apiUse error400MissingUnknownUrlParameterType
  * @apiUse error401CredentialsInvalid
+ * @apiUse error500DatabaseError
  * @apiUse errorBodyCommonStructure
  *
  * @apiUse errorExampleCommon

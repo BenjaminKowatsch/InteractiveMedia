@@ -147,8 +147,8 @@ describe('User-Controller', () => {
         expect(res).to.be.json;
         expect(res.body).to.be.an('object');
         expect(res.body.success).to.be.false;
-        expect(res.body.payload.dataPath).to.equal('authentication');
-        expect(res.body.payload.message).to.equal('invalid auth token');
+        expect(res.body.payload.dataPath).to.equal('login');
+        expect(res.body.payload.message).to.equal('login failed');
       });
     });
 
@@ -162,7 +162,8 @@ describe('User-Controller', () => {
         expect(res.body).to.be.an('object');
         expect(res.body.success).to.be.false;
         expect(res.body.payload).to.be.an('object');
-        expect(res.body.payload.dataPath).to.equal('accessToken');
+        expect(res.body.payload.dataPath).to.equal('validation');
+        expect(res.body.payload.message).to.equal('invalid request body');
       });
     });
 
@@ -176,7 +177,8 @@ describe('User-Controller', () => {
         expect(res.body).to.be.an('object');
         expect(res.body.success).to.be.false;
         expect(res.body.payload).to.be.an('object');
-        expect(res.body.payload.message).to.be.equal('empty input');
+        expect(res.body.payload.dataPath).to.equal('validation');
+        expect(res.body.payload.message).to.be.equal('invalid request body');
       });
     });
   });
@@ -204,7 +206,7 @@ describe('User-Controller', () => {
         .post(URL.BASE_USER + '/')
         .send(testData.users.valid[0])
         .then(function(res) {
-          expect(res).to.have.status(400);
+          expect(res).to.have.status(409);
           expect(res).to.be.json;
           expect(res.body).to.be.an('object');
           expect(res.body.success).to.be.false;
@@ -224,7 +226,7 @@ describe('User-Controller', () => {
           expect(res.body).to.be.an('object');
           expect(res.body.success).to.be.false;
           expect(res.body.payload).to.be.an('object');
-          expect(res.body.payload.dataPath).to.equal('login');
+          expect(res.body.payload.dataPath).to.equal('validation');
           expect(res.body.payload.message).to.equal('invalid request body');
         });
       });
@@ -239,7 +241,7 @@ describe('User-Controller', () => {
           expect(res.body).to.be.an('object');
           expect(res.body.success).to.be.false;
           expect(res.body.payload).to.be.an('object');
-          expect(res.body.payload.dataPath).to.equal('login');
+          expect(res.body.payload.dataPath).to.equal('validation');
           expect(res.body.payload.message).to.equal('invalid request body');
         });
       });
@@ -254,7 +256,7 @@ describe('User-Controller', () => {
           expect(res.body).to.be.an('object');
           expect(res.body.success).to.be.false;
           expect(res.body.payload).to.be.an('object');
-          expect(res.body.payload.dataPath).to.equal('login');
+          expect(res.body.payload.dataPath).to.equal('validation');
           expect(res.body.payload.message).to.equal('invalid request body');
         });
       });
@@ -269,7 +271,7 @@ describe('User-Controller', () => {
           expect(res.body).to.be.an('object');
           expect(res.body.success).to.be.false;
           expect(res.body.payload).to.be.an('object');
-          expect(res.body.payload.dataPath).to.equal('login');
+          expect(res.body.payload.dataPath).to.equal('validation');
           expect(res.body.payload.message).to.equal('invalid request body');
         });
       });
@@ -284,7 +286,7 @@ describe('User-Controller', () => {
           expect(res.body).to.be.an('object');
           expect(res.body.success).to.be.false;
           expect(res.body.payload).to.be.an('object');
-          expect(res.body.payload.dataPath).to.equal('login');
+          expect(res.body.payload.dataPath).to.equal('validation');
           expect(res.body.payload.message).to.equal('invalid request body');
         });
       });
@@ -299,7 +301,7 @@ describe('User-Controller', () => {
           expect(res.body).to.be.an('object');
           expect(res.body.success).to.be.false;
           expect(res.body.payload).to.be.an('object');
-          expect(res.body.payload.dataPath).to.equal('login');
+          expect(res.body.payload.dataPath).to.equal('validation');
           expect(res.body.payload.message).to.equal('invalid request body');
         });
       });
@@ -309,10 +311,8 @@ describe('User-Controller', () => {
       before('Clean DB', databaseHelper.cbResetDB);
       let defaultToken;
 
-      before(function(done) {
-        chai.request(HOST)
-        .post(URL.BASE_USER + '/')
-        .send(testData.users.valid[1])
+      before('register user 1', function(done) {
+        registerUser(1)
         .then((res) => {
           defaultToken = res.body.payload.accessToken;
           done();
@@ -362,7 +362,7 @@ describe('User-Controller', () => {
           expect(res.body).to.be.an('object');
           expect(res.body.success).to.be.false;
           expect(res.body.payload).to.be.an('object');
-          expect(res.body.payload.dataPath).to.equal('login');
+          expect(res.body.payload.dataPath).to.equal('validation');
           expect(res.body.payload.message).to.equal('invalid request body');
         });
       });
@@ -377,7 +377,7 @@ describe('User-Controller', () => {
           expect(res.body).to.be.an('object');
           expect(res.body.success).to.be.false;
           expect(res.body.payload).to.be.an('object');
-          expect(res.body.payload.dataPath).to.equal('login');
+          expect(res.body.payload.dataPath).to.equal('validation');
           expect(res.body.payload.message).to.equal('invalid request body');
         });
       });
@@ -392,7 +392,7 @@ describe('User-Controller', () => {
           expect(res.body).to.be.an('object');
           expect(res.body.success).to.be.false;
           expect(res.body.payload).to.be.an('object');
-          expect(res.body.payload.dataPath).to.equal('login');
+          expect(res.body.payload.dataPath).to.equal('validation');
           expect(res.body.payload.message).to.equal('invalid request body');
         });
       });

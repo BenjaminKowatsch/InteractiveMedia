@@ -123,17 +123,18 @@
  * @apiDefine error401CredentialsInvalid
     @apiError (ErrorCode) {401} InvalidCredentials Credentials are invalid
  */
-
 /**
  * @apiDefine error403Forbidden
     @apiError (ErrorCode) {403} Forbidden The authenticated user is not permitted to perform the requested operation
  */
-
+/**
+ * @apiDefine error409ConflictUserAlreadyExists
+    @apiError (ErrorCode) {409} Conflict User already exists
+ */
 /**
  * @apiDefine error418UncaughtError
     @apiError (ErrorCode) {418} UncaughtError Uncaught error
  */
-
 /**
  * @apiDefine error500InternalServerError
     @apiError (ErrorCode) {500} InternalServerError Internal server error

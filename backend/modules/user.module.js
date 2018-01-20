@@ -10,6 +10,7 @@ const config = require('../config/settings.config');
 const uuidService = require('../services/uuid.service');
 const tokenService = require('../services/token.service');
 const emailService = require('../services/email.service');
+const mongoUtilService = require('../services/mongoUtil.service');
 const database = require('../modules/database.module');
 const ERROR = require('../config/error.config');
 const ROLES = require('../config/roles.config');
@@ -25,19 +26,6 @@ const validTimeOfTokenInMs = 3600000;
 const googleAuth = new GoogleAuth();
 const googleAuthClient = new googleAuth.OAuth2(config.googleOAuthClientID, '', '');
 
-/**
- * Function to verify an access token from google.
- *
- * @param  {String} token    AccessToken to be verified
- * @return {Promise}                then: {JSONObject} promiseData Containing the following properties:
- *                                                 {Object} userCollection  Reference to the database collection based on the authentication type
- *                                                 {Date} expiryDate Date to indicate the expiration of the accessToken
- *                                                 {String} userId String to uniquely identify the user
- *                                  catch:{JSONObject} error Containing the following properties:
- *                                                 {String} message String containing the error message
- *                                                OR
- *                                                Google Error
- */
 exports.verifyGoogleAccessToken = function(token, verifyDatabase) {
   return new Promise((resolve, reject) => {
     let responseData = {payload: {}};
@@ -333,29 +321,16 @@ exports.verifyFacebookAccessToken = function(token, verifyDatabase, getUserInfo)
     });
 };
 
-/**
- * Function to login either a google or a facebook user.
- *
- * @param {String} userId String to uniquely identify the user, to find the user at the database
- * @param {Date} expiryDate Date to indicate the expiration of the accessToken, will be stored into the database
- * @param  {AUTH_TYPE} authType An enumeration value, which specifies the current type of authentication,
- *                                   to be stored into the responseData, so the client will received it and store it into a cookie
- * @param  {String} accessToken    AccessToken to be stored into the responseData, so the client will received it and store it into a cookie
- * @param  {String} email
- * @param  {String} username
- * @param  {String} imageUrl
- * @return {Promise}                then:  {JSONObject} object containing access token and auth type
- *                                  catch:  {JSONObject} object containing an error message
- */
 exports.googleOrFacebookLogin = function(userId, expiryDate, authType, accessToken, email, username, imageUrl) {
   return new Promise((resolve, reject) => {
-    let responseData = {};
+    let responseData = {payload: {}};
     // Upsert entry at db
-    database.collections.users.updateOne({
+    const query = {
       'userId': userId,
       'email': email,
       'authType': authType
-    }, {
+    };
+    const update = {
       '$set': {
         'userId': userId,
         'email': email,
@@ -365,39 +340,41 @@ exports.googleOrFacebookLogin = function(userId, expiryDate, authType, accessTok
         'username': username,
         'imageUrl': imageUrl
       }
-    }, {
+    };
+    const options = {
       upsert: true
-    },
-      function(err, result) {
-        if (err !== null) {
-          responseData = {
-            'dataPath': 'login',
-            'message': 'login failed'
-          };
-          winston.error('Login failed');
-          reject(responseData);
-        } else {
-          responseData = {
+    };
+    database.collections.users.updateOne(query, update, options)
+    .then(mongoUtilService.checkIfUpdateOneUpsertWasSuccessful)
+    .then(updateResult => {
+      responseData.success = true;
+      responseData.payload = {
             'authType': authType,
             'accessToken': accessToken
           };
-          winston.debug('Login successful ');
-          resolve(responseData);
-        }
-      });
+      winston.debug('Login successful ');
+      resolve(responseData);
+    })
+    .catch(err => {
+      winston.debug(err);
+      responseData.success = false;
+      responseData.payload.dataPath = 'login';
+      let errorCode;
+      if (err.isSelfProvided) {
+        responseData.payload.message = err.message;
+        errorCode = err.errorCode;
+      } else {
+        responseData.payload.message = 'uncaught error';
+        errorCode = ERROR.UNCAUGHT_ERROR;
+      }
+      reject({errorCode: errorCode, responseData: responseData});
+    });
   });
 };
 
-/**
- * Function to login a user with password.
- *
- * @param  {String} username       The name of the user
- * @param  {String} password       The password of the user
- * @return {Promise}                then:  {JSONObject} object containing access token and auth type
- *                                  catch:  {JSONObject} object containing an error message
- */
-exports.passwordLogin = function(username, password) {
+module.exports.passwordLogin = function(username, password) {
   return new Promise((resolve, reject) => {
+    let responseData = {payload: {}};
     const newExpiryDate = tokenService.getNewExpiryDate(validTimeOfTokenInMs);
     const query = {
       'username': username,
@@ -416,29 +393,34 @@ exports.passwordLogin = function(username, password) {
       returnOriginal: false
     };
 
-    database.collections.users.findOneAndUpdate(query, update, options, function(err, result) {
-      let responseData = {};
-      if (err === null && result.value !== null && result.ok === 1) {
-        // Successfully logged in and created new expiry date
-        const toEncode = {
-          'userId': result.value.userId,
-          'expiryDate': result.value.expiryDate
-        };
-        responseData = {
-          'accessToken': tokenService.generateAccessToken(toEncode),
-          'authType': AUTH_TYPE.PASSWORD
-        };
-        winston.debug('Login successful');
-        resolve(responseData);
+    database.collections.users.findOneAndUpdate(query, update, options)
+    .then(mongoUtilService.checkIfFindOneAndUpdateWasSuccessful)
+    .then(updateResult => {
+      const toEncode = {
+        'userId': updateResult.value.userId,
+        'expiryDate': updateResult.value.expiryDate
+      };
+      responseData.success = true;
+      responseData.payload = {
+        'accessToken': tokenService.generateAccessToken(toEncode),
+        'authType': AUTH_TYPE.PASSWORD
+      };
+      winston.debug('Login successful');
+      resolve(responseData);
+    })
+    .catch(err => {
+      winston.debug(err);
+      responseData.success = false;
+      responseData.payload.dataPath = 'login';
+      let errorCode;
+      if (err.isSelfProvided) {
+        responseData.payload.message = err.message;
+        errorCode = err.errorCode;
       } else {
-        // Error handling
-        winston.debug('Login failed');
-        responseData = {
-          'dataPath': 'login',
-          'message': 'login failed'
-        };
-        reject(responseData);
+        responseData.payload.message = 'uncaught error';
+        errorCode = ERROR.UNCAUGHT_ERROR;
       }
+      reject({errorCode: errorCode, responseData: responseData});
     });
   });
 };
