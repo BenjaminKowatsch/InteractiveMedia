@@ -2,6 +2,7 @@ package com.media.interactive.cs3.hdm.interactivemedia;
 
 import android.content.Context;
 import android.database.Cursor;
+import android.graphics.Color;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -17,8 +18,12 @@ import com.bumptech.glide.load.model.LazyHeaders;
 import com.media.interactive.cs3.hdm.interactivemedia.contentprovider.tables.GroupTable;
 import com.media.interactive.cs3.hdm.interactivemedia.data.Group;
 import com.media.interactive.cs3.hdm.interactivemedia.data.Login;
+import com.media.interactive.cs3.hdm.interactivemedia.util.Helper;
 
 import java.io.File;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
 
 /**
  * Created by benny on 04.01.18.
@@ -45,6 +50,13 @@ public class GroupAdapter extends CursorAdapter {
 
     @Override
     public void bindView(View view, final Context context, Cursor cursor) {
+
+        if(cursor.getPosition() % 2 == 0) {
+            view.setBackgroundColor(context.getResources().getColor(R.color.colorPrimary));
+        }else{
+            view.setBackgroundColor(context.getResources().getColor(R.color.colorPrimaryLight));
+        }
+
         // Extract properties from cursor
         final ViewHolder viewHolder = (ViewHolder) view.getTag();
         final Group group = viewHolder.getGroup();
@@ -58,7 +70,8 @@ public class GroupAdapter extends CursorAdapter {
         // Populate fields with extracted properties
         Log.d(Group.class.getSimpleName(), "ImageUrl: " + group.getImageUrl());
         viewHolder.groupTitle.setText(group.getName());
-        viewHolder.groupCreationDate.setText(group.getCreatedAt());
+        final Date date = Helper.parseDateString(group.getCreatedAt());
+        viewHolder.groupCreationDate.setText(Helper.READABLE_DATE_FORMAT.format(date));
         if (group.getSync()) {
             viewHolder.syncedIcon.setVisibility(View.GONE);
         } else {

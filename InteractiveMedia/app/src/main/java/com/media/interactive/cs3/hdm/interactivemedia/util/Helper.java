@@ -18,8 +18,8 @@ import java.util.Locale;
  */
 
 public class Helper {
-
-  private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.getDefault());
+  public static final SimpleDateFormat READABLE_DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault());
+  public static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.getDefault());
 
   public static boolean isUrlValid(String url) {
     if (Patterns.WEB_URL.matcher(url).matches()) {
