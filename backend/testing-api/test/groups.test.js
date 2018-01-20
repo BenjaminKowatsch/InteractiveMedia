@@ -174,13 +174,7 @@ describe('Groups-Controller: Groups:', () => {
         .set('Authorization', '0 ' + 'foobar')
         .send(groupScenarios[0].create)
         .then(res => {
-          expect(res).to.have.status(401);
-          expect(res).to.be.json;
-          expect(res.body).to.be.an('object');
-          expect(res.body.success).to.be.false;
-          expect(res.body.payload).to.be.an('object');
-          expect(res.body.payload.dataPath).to.equal('authentication');
-          expect(res.body.payload.message).to.equal('invalid authToken');
+          expectResponse.toBe401InvalidAuthToken(res);
         });
       });
 

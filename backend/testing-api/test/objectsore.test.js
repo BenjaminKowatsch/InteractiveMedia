@@ -6,6 +6,7 @@ const chai = require('chai');
 const fs = require('fs');
 const expect = require('chai').expect;
 const databaseHelper = require('./data/databaseHelper');
+const expectResponse = require('../util/expectResponse.util');
 
 chai.use(require('chai-http'));
 
@@ -58,10 +59,7 @@ describe('Object-store', function() {
         .attach('uploadField', imageData, 'image.png')
         .set('Authorization', '0 ' + 'XXX')
         .then(res => {
-          expect(res).to.have.status(401);
-          expect(res.body.success).to.be.false;
-          expect(res.body.payload.dataPath).to.be.equal('authentication');
-          expect(res.body.payload.message).to.be.equal('invalid authToken');
+          expectResponse.toBe401InvalidAuthToken(res);
         });
     });
 
@@ -121,10 +119,7 @@ describe('Object-store', function() {
           .get(URL.BASE_OBJECTSTORE + '/download?filename=' + imagePath)
           .set('Authorization', '0 ' + 'XXX')
           .then(res => {
-            expect(res).to.have.status(401);
-            expect(res.body.success).to.be.false;
-            expect(res.body.payload.dataPath).to.be.equal('authentication');
-            expect(res.body.payload.message).to.be.equal('invalid authToken');
+            expectResponse.toBe401InvalidAuthToken(res);
           });
       });
 
