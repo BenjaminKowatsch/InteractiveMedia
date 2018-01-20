@@ -17,7 +17,7 @@ const jsonSchema = {
   updateUserPayload: require('../jsonSchema/updateUserPayload.json')
 };
 
-exports.registerNewUser = function(req, res) {
+module.exports.registerNewUser = function(req, res) {
   validateJsonService.reqBodyAgainstSchema(req.body, jsonSchema.registerUserPayload)
   .then(validationResult => {
     return user.register(req.body.username, req.body.password, req.body.email, ROLES.USER, req.body.imageUrl);
@@ -45,7 +45,7 @@ exports.registerNewUser = function(req, res) {
   });
 };
 
-exports.login = function(req, res) {
+module.exports.login = function(req, res) {
   // get login type from uri parameter 'type'
   const loginType = req.query.type;
 
@@ -180,7 +180,7 @@ exports.login = function(req, res) {
   }
 };
 
-exports.logout = function(req, res) {
+module.exports.logout = function(req, res) {
   user.logout(res.locals.userId, res.locals.authType)
     .then(() => {
       let responseData = {payload: {}};
@@ -201,7 +201,7 @@ exports.logout = function(req, res) {
     });
 };
 
-exports.getUserData = function(req, res) {
+module.exports.getUserData = function(req, res) {
   winston.debug('Hello from getUserData');
   user.getUserData(res.locals.userId).then(userResult => {
     httpResponseService.send(res, 200, userResult);
@@ -218,7 +218,7 @@ exports.getUserData = function(req, res) {
   });
 };
 
-exports.updateUser = function(req, res) {
+module.exports.updateUser = function(req, res) {
   winston.debug('Hello from updateUser');
   validateJsonService.reqBodyAgainstSchema(req.body, jsonSchema.updateUserPayload)
   .then(() => {
