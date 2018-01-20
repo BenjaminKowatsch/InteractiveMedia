@@ -8,7 +8,6 @@ import android.content.CursorLoader;
 import android.content.Intent;
 import android.content.Loader;
 import android.database.Cursor;
-import android.graphics.Color;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -23,7 +22,7 @@ import android.widget.ListView;
 import android.widget.SearchView;
 import android.widget.SimpleCursorAdapter;
 import android.widget.Spinner;
-import android.widget.TextView;
+import android.widget.Toast;
 
 import com.media.interactive.cs3.hdm.interactivemedia.R;
 import com.media.interactive.cs3.hdm.interactivemedia.TransactionAdapter;
@@ -33,22 +32,16 @@ import com.media.interactive.cs3.hdm.interactivemedia.contentprovider.DatabasePr
 import com.media.interactive.cs3.hdm.interactivemedia.contentprovider.tables.GroupTable;
 import com.media.interactive.cs3.hdm.interactivemedia.contentprovider.tables.TransactionTable;
 import com.media.interactive.cs3.hdm.interactivemedia.contentprovider.tables.UserTable;
-import com.media.interactive.cs3.hdm.interactivemedia.data.DatabaseProviderHelper;
-import com.media.interactive.cs3.hdm.interactivemedia.data.Group;
 import com.media.interactive.cs3.hdm.interactivemedia.data.Login;
 import com.media.interactive.cs3.hdm.interactivemedia.data.settlement.PaymentAdapter;
 
 import static android.database.DatabaseUtils.dumpCursorToString;
-import org.json.JSONException;
-
-import java.util.List;
-
 import static com.media.interactive.cs3.hdm.interactivemedia.activties.AddTransactionActivity.GROUP_CREATED_AT_ADD_TO;
 import static com.media.interactive.cs3.hdm.interactivemedia.activties.AddTransactionActivity.GROUP_TO_ADD_TO;
 
 
 public class TransactionFragment extends ListFragment implements LoaderManager.LoaderCallbacks<Cursor>, IMyFragment {
-
+    private boolean mainMode = true;
     private static final String TAG = TransactionFragment.class.getSimpleName();
     private Spinner groupSelection;
 
@@ -109,11 +102,14 @@ public class TransactionFragment extends ListFragment implements LoaderManager.L
         contentResolver = getActivity().getContentResolver();
 
         groupAdapter = initializeGroupAdapter();
-        groupAdapter.getCursor().moveToFirst();
+        if (groupAdapter.getCursor().getCount() < 1) {
+            mainMode = false;
+        } else {
+            groupAdapter.getCursor().moveToFirst();
 
-        paymentListAdapter = initPaymentListAdapter();
-        initOrRestartLoaderWithGroupId();
-
+            paymentListAdapter = initPaymentListAdapter();
+            initOrRestartLoaderWithGroupId();
+        }
     }
 
     private CursorAdapter initPaymentListAdapter() {
@@ -128,9 +124,11 @@ public class TransactionFragment extends ListFragment implements LoaderManager.L
     }
 
     private void refreshPaymentAdapter() {
-        final Cursor cursor = getPaymentCoursorForCurrentGroup();
-        Log.d(TAG, dumpCursorToString(cursor));
-        paymentListAdapter.swapCursor(cursor);
+        if (mainMode) {
+            final Cursor cursor = getPaymentCoursorForCurrentGroup();
+            Log.d(TAG, dumpCursorToString(cursor));
+            paymentListAdapter.swapCursor(cursor);
+        }
     }
 
     private void initOrRestartLoaderWithGroupId() {
@@ -147,7 +145,6 @@ public class TransactionFragment extends ListFragment implements LoaderManager.L
         initOrRestartLoaderWithGroupId();
         refreshPaymentAdapter();
     }
-
 
 
     private String getCurrentGroupId() {
@@ -167,7 +164,7 @@ public class TransactionFragment extends ListFragment implements LoaderManager.L
         final String[] projection = {GroupTable.TABLE_NAME + ".*"};
         final String sortOrder = GroupTable.TABLE_NAME + "." + GroupTable.COLUMN_CREATED_AT + " DESC";
         final String selection = UserTable.TABLE_NAME + "." + UserTable.COLUMN_USER_ID + " = ? AND "
-            + GroupTable.TABLE_NAME + "." + GroupTable.COLUMN_SYNCHRONIZED + " = 1 ";
+                + GroupTable.TABLE_NAME + "." + GroupTable.COLUMN_SYNCHRONIZED + " = 1 ";
         final String[] selectionArgs = {Login.getInstance().getUser().getUserId()};
         final Cursor query = contentResolver.query(DatabaseProvider.CONTENT_GROUP_USER_JOIN_URI, projection, selection, selectionArgs, sortOrder);
 
@@ -187,8 +184,7 @@ public class TransactionFragment extends ListFragment implements LoaderManager.L
         final SearchView searchView = transactionListFragment.findViewById(R.id.transaction_search);
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
-            public boolean onQueryTextSubmit(String s) {
-                final Bundle bundle = new Bundle();
+            public boolean onQueryTextSubmit(String s) {                final Bundle bundle = new Bundle();
                 bundle.putString(TRANSACTION_NAME_FILTER, s);
                 getLoaderManager().restartLoader(CURSOR_LOADER_TRANSACTIONS_NAME, bundle, TransactionFragment.this);
                 return true;
@@ -205,7 +201,7 @@ public class TransactionFragment extends ListFragment implements LoaderManager.L
 
         initOrRestartLoaderWithGroupId();
         paymentListView = transactionListFragment.findViewById(R.id.payment_list);
-        if(paymentListView == null) {
+        if (paymentListView == null) {
             Log.e(TAG, "PaymentList is null");
         } else {
             paymentListView.setAdapter(paymentListAdapter);
@@ -254,42 +250,55 @@ public class TransactionFragment extends ListFragment implements LoaderManager.L
         final String[] projection = {TransactionTable.TABLE_NAME + ".*", UserTable.TABLE_NAME + "." + UserTable.COLUMN_USERNAME};
         final String sortOrder = TransactionTable.TABLE_NAME + "." + TransactionTable.COLUMN_INFO_CREATED_AT + " DESC";
         final String selection = GroupTable.TABLE_NAME + "." + GroupTable.COLUMN_GROUP_ID + " = ? AND ("
-            + TransactionTable.TABLE_NAME + "." + TransactionTable.COLUMN_INFO_NAME + " like ? OR "
-            + TransactionTable.TABLE_NAME + "." + TransactionTable.COLUMN_INFO_CREATED_AT + " like ? )";
-        final String[] selectionArgs = {getCurrentGroupId(), search, search};
-        return new CursorLoader(getActivity(), DatabaseProvider.CONTENT_GROUP_USER_TRANSACTION_JOIN_URI, projection, selection, selectionArgs, sortOrder);
-    }
-
-    @Override
-    public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
-        data.moveToFirst();
-        Log.d(TAG, "Data: " + data.getCount());
-        if (transactionAdapter == null) {
-            transactionAdapter = new TransactionAdapter(getContext(), R.layout.fragment_transaction, data);
+                + TransactionTable.TABLE_NAME + "." + TransactionTable.COLUMN_INFO_NAME + " like ? OR "
+                + TransactionTable.TABLE_NAME + "." + TransactionTable.COLUMN_INFO_CREATED_AT + " like ? )";
+        String[] selectionArgs;
+        if (mainMode) {
+            selectionArgs = new String[]{getCurrentGroupId(), search, search};
         } else {
-            transactionAdapter.swapCursor(data);
+            selectionArgs = new String[]{"", search, search};
         }
-        setListAdapter(transactionAdapter);
-    }
+            return new CursorLoader(getActivity(), DatabaseProvider.CONTENT_GROUP_USER_TRANSACTION_JOIN_URI, projection, selection, selectionArgs, sortOrder);
+        }
 
-    @Override
-    public void onLoaderReset(Loader<Cursor> loader) {
-        transactionAdapter.swapCursor(null);
-    }
-
-
-    @Override
-    public View.OnClickListener getOnFabClickListener() {
-        return new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Log.d(TAG, "Hello from " + TAG);
-                final Intent intent = new Intent(view.getContext(), AddTransactionActivity.class);
-                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
-                intent.putExtra(GROUP_TO_ADD_TO, getCurrentGroupId());
-                intent.putExtra(GROUP_CREATED_AT_ADD_TO, getCurrentGroupCreatedAt());
-                startActivity(intent);
+        @Override
+        public void onLoadFinished (Loader < Cursor > loader, Cursor data){
+            data.moveToFirst();
+            Log.d(TAG, "Data: " + data.getCount());
+            if (transactionAdapter == null) {
+                transactionAdapter = new TransactionAdapter(getContext(), R.layout.fragment_transaction, data);
+            } else {
+                transactionAdapter.swapCursor(data);
             }
-        };
+            setListAdapter(transactionAdapter);
+        }
+
+        @Override
+        public void onLoaderReset (Loader < Cursor > loader) {
+            transactionAdapter.swapCursor(null);
+        }
+
+
+        @Override
+        public View.OnClickListener getOnFabClickListener () {
+            return new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    Log.d(TAG, "Hello from " + TAG);
+                    if (isMainMode()) {
+                        final Intent intent = new Intent(view.getContext(), AddTransactionActivity.class);
+                        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+                        intent.putExtra(GROUP_TO_ADD_TO, getCurrentGroupId());
+                        intent.putExtra(GROUP_CREATED_AT_ADD_TO, getCurrentGroupCreatedAt());
+                        startActivity(intent);
+                    } else {
+                        Toast.makeText(getContext(), "Create a group before adding transactions", Toast.LENGTH_LONG).show();
+                    }
+                }
+            };
+        }
+
+        public boolean isMainMode() {
+            return mainMode;
+        }
     }
-}

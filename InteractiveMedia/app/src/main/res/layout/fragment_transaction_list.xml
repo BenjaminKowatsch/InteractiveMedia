@@ -1,81 +1,96 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
+    tools:context="com.media.interactive.cs3.hdm.interactivemedia.fragments.TransactionFragment"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical"
-    tools:context="com.media.interactive.cs3.hdm.interactivemedia.fragments.TransactionFragment">
+    android:layout_height="match_parent">
 
-    <RelativeLayout
+    <LinearLayout
+        android:id="@+id/main_view"
+        android:layout_alignParentStart="true"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
-
-        <TextView
-            android:id="@+id/transaction_debt_overview_title"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentStart="true"
-            android:text="Debt Overview"
-            android:textAppearance="@android:style/TextAppearance.Material.Large" />
-
-        <ListView
-            android:id="@+id/payment_list"
-            android:layout_width="245dp"
-            android:layout_height="80dp"
-            android:layout_below="@+id/transaction_debt_overview_title"
-            android:layout_gravity="start"
-            android:divider="@android:color/transparent"
-            android:fadeScrollbars="false" />
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@id/payment_list"
-            android:hint="Total Payments: "
-            android:textAppearance="@android:style/TextAppearance.Material.Medium" />
-
-    </RelativeLayout>
-
-    <Space
-        android:layout_width="match_parent"
-        android:layout_height="10dp" />
-
-    <RelativeLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="match_parent"
+        android:orientation="vertical">
 
         <RelativeLayout
-            android:id="@+id/transaction_title_line"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content">
+
+            <TextView
+                android:id="@+id/transaction_debt_overview_title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentStart="true"
+                android:text="Debt Overview"
+                android:textAppearance="@android:style/TextAppearance.Material.Large" />
+
+            <ListView
+                android:id="@+id/payment_list"
+                android:layout_width="245dp"
+                android:layout_height="80dp"
+                android:layout_below="@+id/transaction_debt_overview_title"
+                android:layout_gravity="start"
+                android:divider="@android:color/transparent"
+                android:fadeScrollbars="false" />
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_alignParentStart="true"
-                android:text="Transactions"
-                android:layout_centerVertical="true"
-                android:textAppearance="@android:style/TextAppearance.Material.Large" />
-
-            <SearchView
-                android:id="@+id/transaction_search"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:maxWidth="250dp"
-                android:layout_alignParentEnd="true"
-                android:layout_centerVertical="true"
-                android:layout_marginEnd="8dp"/>
+                android:layout_below="@id/payment_list"
+                android:hint="Total Payments: "
+                android:textAppearance="@android:style/TextAppearance.Material.Medium" />
 
         </RelativeLayout>
 
-        <ListView
-            android:id="@+id/android:list"
+        <Space
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_below="@+id/transaction_title_line"
-            android:layout_gravity="center" />
+            android:layout_height="10dp" />
 
-    </RelativeLayout>
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
 
+            <RelativeLayout
+                android:id="@+id/transaction_title_line"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content">
 
-</LinearLayout>
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentStart="true"
+                    android:layout_centerVertical="true"
+                    android:text="Transactions"
+                    android:textAppearance="@android:style/TextAppearance.Material.Large" />
+
+                <SearchView
+                    android:id="@+id/transaction_search"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentEnd="true"
+                    android:layout_centerVertical="true"
+                    android:layout_marginEnd="8dp"
+                    android:maxWidth="250dp" />
+
+            </RelativeLayout>
+
+            <ListView
+                android:id="@+id/android:list"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_below="@+id/transaction_title_line"
+                android:layout_gravity="center" />
+
+        </RelativeLayout>
+
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/no_group_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:padding="15dp"
+        android:text="You have to create a group before you can add transactions"
+        android:visibility="invisible"
+        android:textAppearance="@style/TextAppearance.AppCompat.Large" />
+</RelativeLayout>
