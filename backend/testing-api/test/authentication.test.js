@@ -5,7 +5,7 @@
 const chai = require('chai');
 const expect = require('chai').expect;
 const winston = require('winston');
-const databaseHelper = require('./data/databaseHelper');
+const databaseService = require('../util/databaseService');
 const expectResponse = require('../util/expectResponse.util');
 const settings = require('../config/settings.config');
 const userService = require('../util/userService.util');
@@ -33,7 +33,7 @@ describe('Autentication', function() {
   describe('autentication required', function() {
     let token;
     before('register User 0', done => {
-      databaseHelper.promiseResetDB().then(()=> {
+      databaseService.promiseResetDB().then(()=> {
         return userService.register(userData.users.valid[0]);
       }).then(res => {
         token = res.body.payload.accessToken;

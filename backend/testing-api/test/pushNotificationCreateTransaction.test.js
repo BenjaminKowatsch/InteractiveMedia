@@ -5,7 +5,7 @@
 const chai = require('chai');
 const expect = require('chai').expect;
 const winston = require('winston');
-const databaseHelper = require('./data/databaseHelper');
+const databaseService = require('../util/databaseService');
 const settings = require('../config/settings.config');
 const userService = require('../util/userService.util');
 const groupService = require('../util/groupService.util');
@@ -25,7 +25,7 @@ describe.skip('PushNotifications create transactions', function() {
     '_dSrALygUJ4RFzurwrGvaIE8o2W33SX1L7R0bGU6A1-ARZCu2kL6Pgk2hF59B8BR-OIVPIzVi0aS';
 
     before('register user 0 and 1', function(done) {
-      databaseHelper.promiseResetDB().then(()=> {
+      databaseService.promiseResetDB().then(()=> {
         return userService.register(userData.users.valid[0]);
       }).then(res => {
         tokens[0] = res.body.payload.accessToken;

@@ -6,7 +6,7 @@ const chai = require('chai');
 const expect = require('chai').expect;
 const fs = require('fs');
 
-const databaseHelper = require('./data/databaseHelper');
+const databaseService = require('../util/databaseService');
 const expectResponse = require('../util/expectResponse.util');
 const settings = require('../config/settings.config');
 const userService = require('../util/userService.util');
@@ -18,7 +18,7 @@ const userData = require('./data/user.data');
 describe('User-Controller', () => {
 
   describe('Auth-Type: Facebook', function() {
-    before('Clean DB', databaseHelper.cbResetDB);
+    before('Clean DB', databaseService.cbResetDB);
     let facebookToken;
     before(function(done) {
       userService.getFacebookTestAccessToken()
@@ -144,7 +144,7 @@ describe('User-Controller', () => {
 
   describe('Auth-Type: Password', function() {
     describe('Register', function() {
-      before('Clean DB', databaseHelper.cbResetDB);
+      before('Clean DB', databaseService.cbResetDB);
       it('should register new user', function() {
         return chai.request(settings.host)
         .post(settings.url.users.base + '/')
@@ -225,7 +225,7 @@ describe('User-Controller', () => {
     });
 
     describe('Login', function() {
-      before('Clean DB', databaseHelper.cbResetDB);
+      before('Clean DB', databaseService.cbResetDB);
       let defaultToken;
 
       before('register user 1', function(done) {
@@ -312,7 +312,7 @@ describe('User-Controller', () => {
     });
 
     describe('Logout', function() {
-      before('Clean DB', databaseHelper.cbResetDB);
+      before('Clean DB', databaseService.cbResetDB);
       let defaultToken;
 
       before(function(done) {
@@ -367,7 +367,7 @@ describe('User-Controller', () => {
   });
 
   describe('Invalid Auth-Type', function() {
-    before('Clean DB', databaseHelper.cbResetDB);
+    before('Clean DB', databaseService.cbResetDB);
     it('should fail with an invalid auth type', function() {
       return chai.request(settings.host)
       .post(settings.url.users.base + '/login?type=99')
@@ -393,7 +393,7 @@ describe('User-Controller', () => {
     let tokens = {};
     let facebookToken;
     before('Clean DB and register User 0 and 1', done => {
-      databaseHelper.promiseResetDB().then(()=> {
+      databaseService.promiseResetDB().then(()=> {
         return chai.request(settings.host).post(settings.url.users.base  + '/').send(userData.users.valid[0]);
       }).then(res => {
         tokens[0] = res.body.payload.accessToken;
@@ -508,7 +508,7 @@ describe('User-Controller', () => {
       let constantUserData = {};
 
       before('Clean DB and register User 0', done => {
-        databaseHelper.promiseResetDB().then(()=> {
+        databaseService.promiseResetDB().then(()=> {
           return userService.register(userData.users.valid[0]);
         }).then(res => {
           token = res.body.payload.accessToken;
@@ -579,7 +579,7 @@ describe('User-Controller', () => {
       let constantUserData = {};
 
       before('Clean DB and register User 0', done => {
-        databaseHelper.promiseResetDB().then(()=> {
+        databaseService.promiseResetDB().then(()=> {
           return userService.register(userData.users.valid[0]);
         }).then(res => {
           token = res.body.payload.accessToken;
@@ -649,7 +649,7 @@ describe('User-Controller', () => {
       let token;
 
       before('Clean DB and register User 0', done => {
-        databaseHelper.promiseResetDB().then(()=> {
+        databaseService.promiseResetDB().then(()=> {
           return userService.register(userData.users.valid[0]);
         }).then(res => {
           token = res.body.payload.accessToken;

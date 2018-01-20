@@ -38,6 +38,15 @@ const settings = {
   version: {
     current: '0.1.0',
   },
+  mongoDb: {
+    connect: {
+      url: 'mongodb://mongo/debtsquared',
+      options: {
+        bufferMaxEntries: 0,
+        autoReconnect: true,
+      },
+    },
+  },
 };
 
 module.exports = settings;

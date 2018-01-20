@@ -5,7 +5,7 @@
 const chai = require('chai');
 const expect = require('chai').expect;
 const winston = require('winston');
-const databaseHelper = require('./data/databaseHelper');
+const databaseService = require('../util/databaseService');
 const expectResponse = require('../util/expectResponse.util');
 const settings = require('../config/settings.config');
 const userService = require('../util/userService.util');
@@ -27,7 +27,7 @@ describe('Groups-Controller: Transactions:', () => {
 
     before('register user 0, 1, 2, create two groups, prepare testData', function(done) {
       this.timeout(10000);
-      databaseHelper.promiseResetDB().then(()=> {
+      databaseService.promiseResetDB().then(()=> {
         return userService.register(userData.users.valid[0]);
       }).then(res => {
         users[0].token = res.body.payload.accessToken;
@@ -236,7 +236,7 @@ describe('Groups-Controller: Transactions:', () => {
 
     before('register user 0, 1, 2, create two groups, prepare testData, add t_0 for each group', function(done) {
       this.timeout(10000);
-      databaseHelper.promiseResetDB().then(()=> {
+      databaseService.promiseResetDB().then(()=> {
         return userService.register(userData.users.valid[0]);
       }).then(res => {
         users[0].token = res.body.payload.accessToken;
@@ -332,7 +332,7 @@ describe('Groups-Controller: Transactions:', () => {
 
     before('register user 0, 1, 2, create group, prepare testData', function(done) {
       this.timeout(10000);
-      databaseHelper.promiseResetDB().then(()=> {
+      databaseService.promiseResetDB().then(()=> {
         return userService.register(userData.users.valid[0]);
       }).then(res => {
         users[0].token = res.body.payload.accessToken;

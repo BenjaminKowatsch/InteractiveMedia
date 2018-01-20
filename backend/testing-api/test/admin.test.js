@@ -5,7 +5,7 @@
 const chai = require('chai');
 const expect = require('chai').expect;
 const winston = require('winston');
-const databaseHelper = require('./data/databaseHelper');
+const databaseService = require('../util/databaseService');
 const expectResponse = require('../util/expectResponse.util');
 const settings = require('../config/settings.config');
 const userService = require('../util/userService.util');
@@ -19,7 +19,7 @@ const groupScenarios = require('./data/groupScenarios');
 
 describe('Admin', () => {
   describe('Login', () => {
-    before('Clean DB', databaseHelper.cbResetDB);
+    before('Clean DB', databaseService.cbResetDB);
 
     it('should login as admin', () => {
       return chai.request(settings.host)
@@ -39,7 +39,7 @@ describe('Admin', () => {
 
   describe('User data', () => {
     let adminToken;
-    before('Clean DB', databaseHelper.cbResetDB);
+    before('Clean DB', databaseService.cbResetDB);
 
     before('login admin', done => {
       userService.loginPassword({username: adminData.username, password: adminData.password})
@@ -75,7 +75,7 @@ describe('Admin', () => {
       let adminToken;
       let tokens = {};
       let groupIds = {};
-      before('Clean DB', databaseHelper.cbResetDB);
+      before('Clean DB', databaseService.cbResetDB);
 
       before('login admin', done => {
         userService.loginPassword({username: adminData.username, password: adminData.password})
@@ -146,7 +146,7 @@ describe('Admin', () => {
       let adminToken;
       let tokens = {};
       let groupId;
-      before('Clean DB', databaseHelper.cbResetDB);
+      before('Clean DB', databaseService.cbResetDB);
 
       before('login admin', done => {
         userService.loginPassword({username: adminData.username, password: adminData.password})
@@ -220,7 +220,7 @@ describe('Admin', () => {
       let adminToken;
       let tokens = {};
       let groupId;
-      before('Clean DB', databaseHelper.cbResetDB);
+      before('Clean DB', databaseService.cbResetDB);
 
       before('login admin', done => {
         userService.loginPassword({username: adminData.username, password: adminData.password})
@@ -292,7 +292,7 @@ describe('Admin', () => {
       let tokens = {};
       let userIds = {};
       let groupId;
-      before('Clean DB', databaseHelper.cbResetDB);
+      before('Clean DB', databaseService.cbResetDB);
 
       before('login admin', done => {
         userService.loginPassword({username: adminData.username, password: adminData.password})
@@ -375,7 +375,7 @@ describe('Admin', () => {
         let userIds = {};
         let constantUserData = {};
 
-        before('Clean DB', databaseHelper.cbResetDB);
+        before('Clean DB', databaseService.cbResetDB);
 
         before('login admin', done => {
           userService.loginPassword({username: adminData.username, password: adminData.password})
@@ -463,7 +463,7 @@ describe('Admin', () => {
         let userIds = {};
         let constantUserData = {};
 
-        before('Clean DB', databaseHelper.cbResetDB);
+        before('Clean DB', databaseService.cbResetDB);
 
         before('login admin', done => {
           userService.loginPassword({username: adminData.username, password: adminData.password})
@@ -551,7 +551,7 @@ describe('Admin', () => {
         let userIds = {};
         let constantUserData = {};
 
-        before('Clean DB', databaseHelper.cbResetDB);
+        before('Clean DB', databaseService.cbResetDB);
 
         before('login admin', done => {
           userService.loginPassword({username: adminData.username, password: adminData.password})

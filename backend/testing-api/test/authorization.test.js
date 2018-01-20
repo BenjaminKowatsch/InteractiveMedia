@@ -5,7 +5,7 @@
 const chai = require('chai');
 const expect = require('chai').expect;
 const winston = require('winston');
-const databaseHelper = require('./data/databaseHelper');
+const databaseService = require('../util/databaseService');
 const expectResponse = require('../util/expectResponse.util');
 const settings = require('../config/settings.config');
 const userService = require('../util/userService.util');
@@ -20,7 +20,7 @@ describe('Authorization', () => {
     let userToken;
     let adminToken;
 
-    before('Clean DB', databaseHelper.cbResetDB);
+    before('Clean DB', databaseService.cbResetDB);
 
     before('login admin', done => {
       userService.loginPassword({username: adminData.username, password: adminData.password})
@@ -83,7 +83,7 @@ describe('Authorization', () => {
     let adminToken;
     let userToken;
 
-    before('Clean DB', databaseHelper.cbResetDB);
+    before('Clean DB', databaseService.cbResetDB);
 
     before('login admin', done => {
       userService.loginPassword({username: adminData.username, password: adminData.password})

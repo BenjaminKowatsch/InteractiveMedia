@@ -2,21 +2,18 @@
 
 const MongoClient = require('mongodb').MongoClient;
 const winston = require('winston');
-const adminData = require('./admin.data');
+const settings = require('../config/settings.config');
+const adminData = require('../test/data/admin.data');
 
 let database = {};
 database.collections = {};
-const mongoConnectConfig = {
-  bufferMaxEntries: 0,
-  autoReconnect: true
-};
 
 function waitOrOrderForDB() {
   return new Promise((resolve,reject) => {
     if (database.db) {
       resolve();
     } else {
-      MongoClient.connect('mongodb://mongo/debtsquared', mongoConnectConfig).then(db => {
+      MongoClient.connect(settings.mongoDb.connect.url, settings.mongoDb.connect.options).then(db => {
         console.log('DB connection established');
         database.db = db;
         resolve();

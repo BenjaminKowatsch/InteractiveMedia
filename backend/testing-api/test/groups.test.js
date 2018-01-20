@@ -5,7 +5,7 @@
 const chai = require('chai');
 const expect = require('chai').expect;
 const winston = require('winston');
-const databaseHelper = require('./data/databaseHelper');
+const databaseService = require('../util/databaseService');
 const expectResponse = require('../util/expectResponse.util');
 const settings = require('../config/settings.config');
 const userService = require('../util/userService.util');
@@ -21,7 +21,7 @@ describe('Groups-Controller: Groups:', () => {
     let tokens = {};
     let groupId = {};
     before('register User 0 and 1', done => {
-      databaseHelper.promiseResetDB().then(()=> {
+      databaseService.promiseResetDB().then(()=> {
         return userService.register(userData.users.valid[0]);
       }).then(res => {
         tokens[0] = res.body.payload.accessToken;
@@ -161,7 +161,7 @@ describe('Groups-Controller: Groups:', () => {
     let groupId;
 
     before('register User 0 and 1', done => {
-      databaseHelper.promiseResetDB().then(()=> {
+      databaseService.promiseResetDB().then(()=> {
         return userService.register(userData.users.valid[0]);
       }).then(res => {
         tokens[0] = res.body.payload.accessToken;

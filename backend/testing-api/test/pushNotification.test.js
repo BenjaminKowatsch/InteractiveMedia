@@ -5,7 +5,7 @@
 const chai = require('chai');
 const expect = require('chai').expect;
 const winston = require('winston');
-const databaseHelper = require('./data/databaseHelper');
+const databaseService = require('../util/databaseService');
 const settings = require('../config/settings.config');
 const userService = require('../util/userService.util');
 
@@ -19,7 +19,7 @@ describe.skip('PushNotifications', () => {
       '_OtBftNydOnDnV4WSEVqqz-3D2twflIFRIePuiTr_2Tn75ZSZRbgOnLeY_lCkkHvvjZ6i-GzJxvkdtf-n0no701Do';
 
     before('register User 0', done => {
-      databaseHelper.promiseResetDB().then(()=> {
+      databaseService.promiseResetDB().then(()=> {
         return userService.register(userData.users.valid[0]);
       }).then(res => {
         token = res.body.payload.accessToken;
