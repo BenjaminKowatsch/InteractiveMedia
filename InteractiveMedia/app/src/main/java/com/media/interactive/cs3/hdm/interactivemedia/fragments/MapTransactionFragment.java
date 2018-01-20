@@ -3,8 +3,11 @@ package com.media.interactive.cs3.hdm.interactivemedia.fragments;
 import android.app.Fragment;
 import android.content.Context;
 import android.database.Cursor;
+import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.v4.graphics.drawable.RoundedBitmapDrawable;
+import android.support.v4.graphics.drawable.RoundedBitmapDrawableFactory;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -16,11 +19,20 @@ import android.widget.AdapterView;
 import android.widget.SimpleCursorAdapter;
 import android.widget.Spinner;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
+import com.bumptech.glide.request.animation.GlideAnimation;
+import com.bumptech.glide.request.target.SimpleTarget;
+import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.model.BitmapDescriptor;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.LatLngBounds;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.media.interactive.cs3.hdm.interactivemedia.R;
 import com.media.interactive.cs3.hdm.interactivemedia.contentprovider.DatabaseProvider;
@@ -29,6 +41,7 @@ import com.media.interactive.cs3.hdm.interactivemedia.contentprovider.tables.Tra
 import com.media.interactive.cs3.hdm.interactivemedia.contentprovider.tables.UserTable;
 import com.media.interactive.cs3.hdm.interactivemedia.data.Login;
 import com.media.interactive.cs3.hdm.interactivemedia.data.Transaction;
+import com.media.interactive.cs3.hdm.interactivemedia.transforms.CircleTransform;
 
 
 public class MapTransactionFragment extends Fragment implements IMyFragment,
@@ -123,17 +136,41 @@ public class MapTransactionFragment extends Fragment implements IMyFragment,
       final Cursor transactions = getActivity().getContentResolver().query(DatabaseProvider.CONTENT_GROUP_USER_TRANSACTION_JOIN_URI, projection, selection, selectionArgs, sortOrder);
       Log.d(TAG, "Transactions Count: " + transactions.getCount());
 
+      LatLngBounds.Builder builder = LatLngBounds.builder();
+      int markers = 0;
       while (transactions.moveToNext()) {
 
-        String name = transactions.getString(transactions.getColumnIndex(TransactionTable.COLUMN_INFO_NAME));
-        Double longitude = transactions.getDouble(transactions.getColumnIndex(TransactionTable.COLUMN_INFO_LOCATION_LONG));
-        Double latiude = transactions.getDouble(transactions.getColumnIndex(TransactionTable.COLUMN_INFO_LOCATION_LONG));
-        if (longitude != null && latiude != null) {
-          final LatLng position = new LatLng(latiude, longitude);
-          Log.d(TAG, "Transaction position: " + position);
-          mMap.addMarker(new MarkerOptions().position(position).title(name));
-          mMap.moveCamera(CameraUpdateFactory.newLatLng(position));
+        final String name = transactions.getString(transactions.getColumnIndex(TransactionTable.COLUMN_INFO_NAME));
+        final String imageUrl = transactions.getString(transactions.getColumnIndex(TransactionTable.COLUMN_INFO_IMAGE_URL));
+        final double longitude = transactions.getDouble(transactions.getColumnIndex(TransactionTable.COLUMN_INFO_LOCATION_LONG));
+        final double amount = transactions.getDouble(transactions.getColumnIndex(TransactionTable.COLUMN_AMOUNT));
+        final double latitude = transactions.getDouble(transactions.getColumnIndex(TransactionTable.COLUMN_INFO_LOCATION_LAT));
+        if (longitude != 0 && latitude != 0) {
+          markers += 1 ;
+          final LatLng position = new LatLng(latitude,longitude);
+          final MarkerOptions markerOptions = new MarkerOptions().position(position).title(name);
+          if(imageUrl != null){
+            Glide.with(this)
+                .load(imageUrl)
+                .asBitmap()
+                .diskCacheStrategy(DiskCacheStrategy.SOURCE)
+                .centerCrop()
+                .transform(new CircleTransform(getContext())) // applying the image transformer
+                .override(100,100)
+                .into(new SimpleTarget<Bitmap>() {
+              @Override
+              public void onResourceReady(Bitmap bitmap, GlideAnimation<? super Bitmap> glideAnimation) {
+                mMap.addMarker(markerOptions.icon(BitmapDescriptorFactory.fromBitmap(bitmap)));
+              }
+            });
+          } else {
+            mMap.addMarker(markerOptions);
+          }
+          builder = builder.include(position);
         }
+      }
+      if(markers > 0) {
+        mMap.animateCamera(CameraUpdateFactory.newLatLngBounds(builder.build(), 150));
       }
     }
   }

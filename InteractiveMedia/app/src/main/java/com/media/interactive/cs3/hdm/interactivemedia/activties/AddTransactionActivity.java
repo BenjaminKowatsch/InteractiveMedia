@@ -273,8 +273,9 @@ public class AddTransactionActivity extends ImagePickerActivity {
     final double amount = parseAmount(amountText);
     final Date dateTime = parseDateTime(dateText, timeText);
     //FIXME: replace this with real location
-    final Location location = new Location("");
+    Location location = null;
     if (selectedPlace != null) {
+      location = new Location("");
       final LatLng latLng = selectedPlace.getLatLng();
       location.setLongitude(latLng.longitude);
       location.setLatitude(latLng.latitude);
