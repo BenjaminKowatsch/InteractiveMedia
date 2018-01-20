@@ -34,12 +34,7 @@ import Cookie from "../js/Cookie.js";
 import Config from "../js/Config.js";
 
   export default {
-    components: {
-      
-    },
-   name: 'VFileBtn',
 
-   
 
     data () {
       return {
@@ -83,10 +78,16 @@ pickFile () {
 				const fr = new FileReader ()
 				fr.readAsDataURL(files[0])
 				fr.addEventListener('load', () => {
+
+          let data = new FormData();   
+           let file = files[0];
+           data.append('uploadField', file, file.name);
+       
 					this.imageUrl = fr.result
-          this.imageFile = files[0]
-          console.log(this.imageFile)
-          this.uploadPicture() // this is an image file that can be sent to server...
+         // const file = files[0]
+         // this.imageFile = files[0]
+         // console.log(this.imageFile)
+          this.uploadPicture(data) // this is an image file that can be sent to server...
 				})
 			} else {
 				this.imageName = ''
@@ -107,7 +108,7 @@ pickFile () {
         .then(response => {
             this.adminUserData = response.data.payload 
             console.log(JSON.stringify(this.adminUserData))
-            console.log("Profilpicture: " + this.adminUserData.imageUrl)
+            console.log("Profilpicture: " + this.adminUserData.path)
         })
         .catch(e => {              
               console.log("Errors own user request (UserTableVuetify): " + e);           
@@ -115,18 +116,18 @@ pickFile () {
         },
       
 
-     uploadPicture: function (){
-
+     uploadPicture: function (data){
+    
+      console.log(data)
       var upload = {
-          "uploadField" : `<${this.imageFile}`
+          uploadField : data
       }
         
-
       console.log(upload)
 
        axios
-          .post(Config.webServiceURL + "/v1/object-store/upload", upload, {
-          headers: { Authorization: "0 " + this.authToken }
+          .post(Config.webServiceURL + "/v1/object-store/upload", data, {
+          headers: { Authorization: "0 " + this.authToken, 'content-type': 'multipart/form-data' }
         })
         .then(function(response){
           console.log("Uploaded Picture")
