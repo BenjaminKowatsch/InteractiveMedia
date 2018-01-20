@@ -83,6 +83,21 @@ describe('User-Controller', () => {
       });
     });
 
+    it('Login/Register as facebook user again', function() {
+      return chai.request(HOST)
+      .post(URL.BASE_USER + '/login?type=2')
+      .send({'accessToken': facebookToken})
+      .then(res => {
+        expect(res).to.have.status(200);
+        expect(res).to.be.json;
+        expect(res.body).to.be.an('object');
+        expect(res.body.success).to.be.true;
+        expect(res.body.payload).to.be.an('object');
+        expect(res.body.payload.authType).to.be.equal(2);
+        expect(res.body.payload.accessToken).to.have.lengthOf.above(1);
+      });
+    });
+
     // POST - Send user data as facebook user
     it('Send user data as facebook user', function() {
       return chai.request(HOST)
