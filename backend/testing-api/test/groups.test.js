@@ -16,12 +16,6 @@ chai.use(require('chai-http'));
 const userData = require('./data/user.data');
 const groupScenarios = require('./data/groupScenarios');
 
-// ************* Helper ***********//
-
-const getUserData = token => chai.request(settings.host).get(settings.url.users.base  + '/user')
-.set('Authorization', '0 ' + token);
-const deepCopy = data => JSON.parse(JSON.stringify(data));
-
 describe('Groups-Controller: Groups:', () => {
   describe('Create new Group', () => {
     let tokens = {};

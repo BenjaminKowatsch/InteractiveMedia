@@ -5,7 +5,6 @@
 const chai = require('chai');
 const expect = require('chai').expect;
 const fs = require('fs');
-const https = require('https');
 
 const databaseHelper = require('./data/databaseHelper');
 const expectResponse = require('../util/expectResponse.util');
@@ -16,36 +15,13 @@ chai.use(require('chai-http'));
 
 const userData = require('./data/user.data');
 
-function getFacebookTestAccessToken() {
-  return new Promise((resolve, reject) => {
-    https.get('https://graph.facebook.com/v2.11/' + settings.facebook.appId + '/' +
-    'accounts/test-users?access_token=' +
-    settings.facebook.urlAppToken, function(response) {
-      let responseMessage = '';
-
-      response.on('data', function(chunk) {
-        responseMessage += chunk;
-      });
-
-      response.on('end', function() {
-        const data = JSON.parse(responseMessage);
-        if (data.length <= 0) {
-          reject(data);
-        } else {
-          resolve(data.data[0].access_token);
-        }
-      });
-    });
-  });
-}
-
 describe('User-Controller', () => {
 
   describe('Auth-Type: Facebook', function() {
     before('Clean DB', databaseHelper.cbResetDB);
     let facebookToken;
     before(function(done) {
-      getFacebookTestAccessToken()
+      userService.getFacebookTestAccessToken()
         .then((token) => {
           facebookToken = token;
           done();
@@ -431,7 +407,7 @@ describe('User-Controller', () => {
     });
 
     before('get test facebook access token', function(done) {
-      getFacebookTestAccessToken()
+      userService.getFacebookTestAccessToken()
         .then((token) => {
           facebookToken = token;
           done();
