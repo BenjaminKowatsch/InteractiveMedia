@@ -60,6 +60,7 @@ router.post('/upload', multer({storage: multer.memoryStorage()}).single('uploadF
  *
  * @apiUse error400BadRequest
  * @apiUse error401Unauthorized
+ * @apiUse error404ResourceNotFound
  * @apiUse error500MinioInternalError
  * @apiUse errorBodyCommonStructure
  *

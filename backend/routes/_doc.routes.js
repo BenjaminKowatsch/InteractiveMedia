@@ -112,6 +112,10 @@
     @apiError (ErrorCode) {404} UnknownId Id for the requested resource is unknown
  */
 /**
+ * @apiDefine error404ResourceNotFound
+    @apiError (ErrorCode) {404} NotFound Requested resource is not available
+ */
+/**
  * @apiDefine error400InvalidBody
     @apiError (ErrorCode) {400} InvalidBody Validation error for request body
  */

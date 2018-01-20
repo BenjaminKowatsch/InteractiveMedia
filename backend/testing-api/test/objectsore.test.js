@@ -128,13 +128,13 @@ describe('Object-store', function() {
           .get(URL.BASE_OBJECTSTORE + '/download?filename=missingimage.png')
           .set('Authorization', '0 ' + token)
           .then(res => {
-            expect(res).to.have.status(500);
+            expect(res).to.have.status(404);
             expect(res).to.be.json;
             expect(res.body).to.be.an('object');
             expect(res.body.success).to.be.false;
             expect(res.body.payload).to.be.an('object');
             expect(res.body.payload.dataPath).to.equal('objectstore');
-            expect(res.body.payload.message).to.equal('failed to load file');
+            expect(res.body.payload.message).to.equal('file not found');
           });
       });
 

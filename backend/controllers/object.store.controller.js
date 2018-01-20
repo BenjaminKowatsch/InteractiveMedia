@@ -93,6 +93,9 @@ module.exports.download = function(req, res) {
       case ERROR.INVALID_OR_MISSING_FILENAME_IN_REQUEST:
         statusCode = 400;
         break;
+      case ERROR.RESOURCE_NOT_FOUND:
+        statusCode = 404;
+        break;
       case ERROR.MINIO_ERROR:
         statusCode = 500;
         break;
