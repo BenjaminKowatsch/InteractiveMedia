@@ -59,7 +59,7 @@ describe('Object-store', function() {
         .attach('uploadField', imageData, 'image.png')
         .set('Authorization', '0 ' + 'XXX')
         .then(res => {
-          expectResponse.toBe401InvalidAuthToken(res);
+          expectResponse.toBe401.invalidAuthToken(res);
         });
     });
 
@@ -119,7 +119,7 @@ describe('Object-store', function() {
           .get(URL.BASE_OBJECTSTORE + '/download?filename=' + imagePath)
           .set('Authorization', '0 ' + 'XXX')
           .then(res => {
-            expectResponse.toBe401InvalidAuthToken(res);
+            expectResponse.toBe401.invalidAuthToken(res);
           });
       });
 

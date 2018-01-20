@@ -102,7 +102,7 @@ describe('Groups-Controller: Transactions:', () => {
       .set('Authorization', '0 ' + users[0].token)
       .send(transactions[0])
       .then(res => {
-        expectResponse.toBe404GroupNotFound(res);
+        expectResponse.toBe404.groupNotFound(res);
       });
     });
 
@@ -128,7 +128,7 @@ describe('Groups-Controller: Transactions:', () => {
       .set('Authorization', '0 ' + users[2].token)
       .send(transactions[0])
       .then(res => {
-        expectResponse.toBe403GroupsUserIsNotMember(res);
+        expectResponse.toBe403.groups.userIsNotMember(res);
       });
     });
 
@@ -138,7 +138,7 @@ describe('Groups-Controller: Transactions:', () => {
       .set('Authorization', '0 ' + users[0].token)
       .send(groupScenarios[2].transactionWrongLocation1)
       .then(res => {
-        expectResponse.toBe400InvalidRequestBody(res);
+        expectResponse.toBe400.invalidRequestBody(res);
       });
     });
 
@@ -148,7 +148,7 @@ describe('Groups-Controller: Transactions:', () => {
       .set('Authorization', '0 ' + users[0].token)
       .send(groupScenarios[2].transactionWrongLocation2)
       .then(res => {
-        expectResponse.toBe400InvalidRequestBody(res);
+        expectResponse.toBe400.invalidRequestBody(res);
       });
     });
 
@@ -158,7 +158,7 @@ describe('Groups-Controller: Transactions:', () => {
       .set('Authorization', '0 ' + users[0].token)
       .send(groupScenarios[2].transactionWrongLocation3)
       .then(res => {
-        expectResponse.toBe400InvalidRequestBody(res);
+        expectResponse.toBe400.invalidRequestBody(res);
       });
     });
 
@@ -187,7 +187,7 @@ describe('Groups-Controller: Transactions:', () => {
       .set('Authorization', '0 ' + users[0].token)
       .send(transaction)
       .then(res => {
-        expectResponse.toBe400InvalidRequestBody(res);
+        expectResponse.toBe400.invalidRequestBody(res);
       });
     });
 
@@ -199,7 +199,7 @@ describe('Groups-Controller: Transactions:', () => {
       .set('Authorization', '0 ' + users[0].token)
       .send(transaction)
       .then(res => {
-        expectResponse.toBe400InvalidRequestBody(res);
+        expectResponse.toBe400.invalidRequestBody(res);
       });
     });
 
@@ -211,7 +211,7 @@ describe('Groups-Controller: Transactions:', () => {
       .set('Authorization', '0 ' + users[0].token)
       .send(transaction)
       .then(res => {
-        expectResponse.toBe400InvalidRequestBody(res);
+        expectResponse.toBe400.invalidRequestBody(res);
       });
     });
 
@@ -223,7 +223,7 @@ describe('Groups-Controller: Transactions:', () => {
       .set('Authorization', '0 ' + users[0].token)
       .send(transaction)
       .then(res => {
-        expectResponse.toBe400InvalidRequestBody(res);
+        expectResponse.toBe400.invalidRequestBody(res);
       });
     });
 
@@ -235,7 +235,7 @@ describe('Groups-Controller: Transactions:', () => {
       .set('Authorization', '0 ' + users[0].token)
       .send(transaction)
       .then(res => {
-        expectResponse.toBe400InvalidRequestBody(res);
+        expectResponse.toBe400.invalidRequestBody(res);
       });
     });
 
@@ -247,7 +247,7 @@ describe('Groups-Controller: Transactions:', () => {
       .set('Authorization', '0 ' + users[0].token)
       .send(transaction)
       .then(res => {
-        expectResponse.toBe400InvalidRequestBody(res);
+        expectResponse.toBe400.invalidRequestBody(res);
       });
     });
 
@@ -259,7 +259,7 @@ describe('Groups-Controller: Transactions:', () => {
       .set('Authorization', '0 ' + users[0].token)
       .send(transaction)
       .then(res => {
-        expectResponse.toBe400InvalidRequestBody(res);
+        expectResponse.toBe400.invalidRequestBody(res);
       });
     });
 
@@ -271,7 +271,7 @@ describe('Groups-Controller: Transactions:', () => {
       .set('Authorization', '0 ' + users[0].token)
       .send(transaction)
       .then(res => {
-        expectResponse.toBe400InvalidRequestBody(res);
+        expectResponse.toBe400.invalidRequestBody(res);
       });
     });
   });
@@ -341,7 +341,7 @@ describe('Groups-Controller: Transactions:', () => {
       .get(URL.BASE_GROUP  + '/wrong_group_id/transactions?after=' + s2GroupCreatedAt)
       .set('Authorization', '0 ' + users[1].token)
       .then(res => {
-        expectResponse.toBe404GroupNotFound(res);
+        expectResponse.toBe404.groupNotFound(res);
       });
     });
 
@@ -350,7 +350,7 @@ describe('Groups-Controller: Transactions:', () => {
       .get(URL.BASE_GROUP  + '/' + s1GroupId + '/transactions?after=' + s1GroupCreatedAt)
       .set('Authorization', '0 ' + users[2].token)
       .then(res => {
-        expectResponse.toBe403GroupsUserIsNotMember(res);
+        expectResponse.toBe403.groups.userIsNotMember(res);
       });
     });
 

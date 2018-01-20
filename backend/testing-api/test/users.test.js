@@ -133,7 +133,7 @@ describe('User-Controller', () => {
       .get(URL.BASE_TEST + '/authentication/required')
       .set('Authorization', '2 ' + facebookToken)
       .then(res => {
-        expectResponse.toBe401UnknownUserOrExpiredToken(res);
+        expectResponse.toBe401.unknownUserOrExpiredToken(res);
       });
     });
 
@@ -156,7 +156,7 @@ describe('User-Controller', () => {
       .post(URL.BASE_USER + '/login?type=2')
       .send({'accessToken': 'XXXXX'})
       .then(res => {
-        expectResponse.toBe401LoginFailed(res);
+        expectResponse.toBe401.loginFailed(res);
       });
     });
 
@@ -165,7 +165,7 @@ describe('User-Controller', () => {
       .post(URL.BASE_USER + '/login?type=2')
       .send({'accessToken': ''})
       .then(res => {
-        expectResponse.toBe400InvalidRequestBody(res);
+        expectResponse.toBe400.invalidRequestBody(res);
       });
     });
 
@@ -174,7 +174,7 @@ describe('User-Controller', () => {
       .post(URL.BASE_USER + '/login?type=2')
       .send({})
       .then(res => {
-        expectResponse.toBe400InvalidRequestBody(res);
+        expectResponse.toBe400.invalidRequestBody(res);
       });
     });
   });
@@ -217,7 +217,7 @@ describe('User-Controller', () => {
         .post(URL.BASE_USER + '/')
         .send(testData.users.invalid.invalidUsername)
         .then(function(res) {
-          expectResponse.toBe400InvalidRequestBody(res);
+          expectResponse.toBe400.invalidRequestBody(res);
         });
       });
 
@@ -226,7 +226,7 @@ describe('User-Controller', () => {
         .post(URL.BASE_USER + '/')
         .send(testData.users.invalid.invalidPassword)
         .then(function(res) {
-          expectResponse.toBe400InvalidRequestBody(res);
+          expectResponse.toBe400.invalidRequestBody(res);
         });
       });
 
@@ -235,7 +235,7 @@ describe('User-Controller', () => {
         .post(URL.BASE_USER + '/')
         .send(testData.users.invalid.missingUsername)
         .then(function(res) {
-          expectResponse.toBe400InvalidRequestBody(res);
+          expectResponse.toBe400.invalidRequestBody(res);
         });
       });
 
@@ -244,7 +244,7 @@ describe('User-Controller', () => {
         .post(URL.BASE_USER + '/')
         .send(testData.users.invalid.missingEmail)
         .then(function(res) {
-          expectResponse.toBe400InvalidRequestBody(res);
+          expectResponse.toBe400.invalidRequestBody(res);
         });
       });
 
@@ -253,7 +253,7 @@ describe('User-Controller', () => {
         .post(URL.BASE_USER + '/')
         .send(testData.users.invalid.missingPassword)
         .then(function(res) {
-          expectResponse.toBe400InvalidRequestBody(res);
+          expectResponse.toBe400.invalidRequestBody(res);
         });
       });
 
@@ -262,7 +262,7 @@ describe('User-Controller', () => {
         .post(URL.BASE_USER + '/')
         .send(testData.users.invalid.missingImageUrl)
         .then(function(res) {
-          expectResponse.toBe400InvalidRequestBody(res);
+          expectResponse.toBe400.invalidRequestBody(res);
         });
       });
     });
@@ -301,7 +301,7 @@ describe('User-Controller', () => {
         .send({username: testData.users.valid[1].username,
           password: 'XXXXX'})
         .then(res => {
-          expectResponse.toBe401LoginFailed(res);
+          expectResponse.toBe401.loginFailed(res);
         });
       });
 
@@ -311,7 +311,7 @@ describe('User-Controller', () => {
         .send({username: testData.users.valid[1].username,
           password: ''})
         .then(res => {
-          expectResponse.toBe400InvalidRequestBody(res);
+          expectResponse.toBe400.invalidRequestBody(res);
         });
       });
 
@@ -320,7 +320,7 @@ describe('User-Controller', () => {
         .post(URL.BASE_USER + '/login?type=0')
         .send({username: testData.users.valid[1].username})
         .then(res => {
-          expectResponse.toBe400InvalidRequestBody(res);
+          expectResponse.toBe400.invalidRequestBody(res);
         });
       });
 
@@ -329,7 +329,7 @@ describe('User-Controller', () => {
         .post(URL.BASE_USER + '/login?type=0')
         .send({password: testData.users.valid[2].password})
         .then(res => {
-          expectResponse.toBe400InvalidRequestBody(res);
+          expectResponse.toBe400.invalidRequestBody(res);
         });
       });
 
@@ -339,7 +339,7 @@ describe('User-Controller', () => {
         .send({username: 'unknownUsername',
           password: 'passwordX'})
         .then(res => {
-          expectResponse.toBe401LoginFailed(res);
+          expectResponse.toBe401.loginFailed(res);
         });
       });
 
@@ -348,7 +348,7 @@ describe('User-Controller', () => {
         .post(URL.BASE_USER + '/login?type=0')
         .send({})
         .then(res => {
-          expectResponse.toBe400InvalidRequestBody(res);
+          expectResponse.toBe400.invalidRequestBody(res);
         });
       });
 
@@ -388,7 +388,7 @@ describe('User-Controller', () => {
         .get(URL.BASE_TEST + '/authentication/required')
         .set('Authorization', '0 ' + defaultToken)
         .then(res => {
-          expectResponse.toBe401UnknownUserOrExpiredToken(res);
+          expectResponse.toBe401.unknownUserOrExpiredToken(res);
         });
       });
 
@@ -417,7 +417,7 @@ describe('User-Controller', () => {
       .send({username: testData.users.valid[1].username,
         password: testData.users.valid[1].password})
       .then(res => {
-        expectResponse.toBe400InvalidAuthType(res);
+        expectResponse.toBe400.invalidAuthType(res);
       });
     });
 
@@ -427,7 +427,7 @@ describe('User-Controller', () => {
       .send({username: testData.users.valid[1].username,
         password: testData.users.valid[1].password})
       .then(res => {
-        expectResponse.toBe400InvalidAuthType(res);
+        expectResponse.toBe400.invalidAuthType(res);
       });
     });
   });
@@ -534,7 +534,7 @@ describe('User-Controller', () => {
       .get(URL.BASE_USER  + '/user')
       .set('Authorization', '0 this_is_a_wrong_token')
       .then(res => {
-        expectResponse.toBe401InvalidAuthToken(res);
+        expectResponse.toBe401.invalidAuthToken(res);
       });
     });
 
@@ -542,7 +542,7 @@ describe('User-Controller', () => {
       return chai.request(HOST)
       .get(URL.BASE_USER  + '/user')
       .then(res => {
-        expectResponse.toBe401MissingHeaderAuthorization(res);
+        expectResponse.toBe401.missingHeaderAuthorization(res);
       });
     });
   });
@@ -709,7 +709,7 @@ describe('User-Controller', () => {
         .put(URL.BASE_USER  + '/user')
         .set('Authorization', '0 ' + token)
         .then(res => {
-          expectResponse.toBe400InvalidRequestBody(res);
+          expectResponse.toBe400.invalidRequestBody(res);
         });
       });
 
@@ -719,7 +719,7 @@ describe('User-Controller', () => {
         .set('Authorization', '0 ' + token)
         .send(testData.users.update.invalid.updateUserId)
         .then(res => {
-          expectResponse.toBe400InvalidRequestBody(res);
+          expectResponse.toBe400.invalidRequestBody(res);
         });
       });
 
@@ -729,7 +729,7 @@ describe('User-Controller', () => {
         .set('Authorization', '0 ' + token)
         .send(testData.users.update.invalid.updateGroupIds)
         .then(res => {
-          expectResponse.toBe400InvalidRequestBody(res);
+          expectResponse.toBe400.invalidRequestBody(res);
         });
       });
 
@@ -739,7 +739,7 @@ describe('User-Controller', () => {
         .set('Authorization', '0 ' + token)
         .send(testData.users.update.invalid.updateInternalId)
         .then(res => {
-          expectResponse.toBe400InvalidRequestBody(res);
+          expectResponse.toBe400.invalidRequestBody(res);
         });
       });
 
@@ -749,7 +749,7 @@ describe('User-Controller', () => {
         .set('Authorization', '0 ' + token)
         .send(testData.users.update.invalid.updateAuthType)
         .then(res => {
-          expectResponse.toBe400InvalidRequestBody(res);
+          expectResponse.toBe400.invalidRequestBody(res);
         });
       });
 
@@ -759,7 +759,7 @@ describe('User-Controller', () => {
         .set('Authorization', '0 ' + token)
         .send(testData.users.update.invalid.updateRole)
         .then(res => {
-          expectResponse.toBe400InvalidRequestBody(res);
+          expectResponse.toBe400.invalidRequestBody(res);
         });
       });
 
@@ -769,7 +769,7 @@ describe('User-Controller', () => {
         .set('Authorization', '0 ' + token)
         .send(testData.users.update.invalid.updateUnknownField)
         .then(res => {
-          expectResponse.toBe400InvalidRequestBody(res);
+          expectResponse.toBe400.invalidRequestBody(res);
         });
       });
 
@@ -779,7 +779,7 @@ describe('User-Controller', () => {
         .set('Authorization', '0 ' + token)
         .send(testData.users.update.invalid.updateUsernameNull)
         .then(res => {
-          expectResponse.toBe400InvalidRequestBody(res);
+          expectResponse.toBe400.invalidRequestBody(res);
         });
       });
 
@@ -789,7 +789,7 @@ describe('User-Controller', () => {
         .set('Authorization', '0 ' + token)
         .send(testData.users.update.invalid.updatePasswordNull)
         .then(res => {
-          expectResponse.toBe400InvalidRequestBody(res);
+          expectResponse.toBe400.invalidRequestBody(res);
         });
       });
 
@@ -799,7 +799,7 @@ describe('User-Controller', () => {
         .set('Authorization', '0 ' + token)
         .send(testData.users.update.invalid.updateEmailNull)
         .then(res => {
-          expectResponse.toBe400InvalidRequestBody(res);
+          expectResponse.toBe400.invalidRequestBody(res);
         });
       });
     });

@@ -165,7 +165,7 @@ describe('Admin', () => {
             .get(URL.BASE_ADMIN + '/groups')
             .set('Authorization', '0 ' + tokens[0])
             .then(res => {
-              expectResponse.toBe403Unauthorized(res);
+              expectResponse.toBe403.unauthorized(res);
             });
       });
     });
@@ -235,7 +235,7 @@ describe('Admin', () => {
             .get(URL.BASE_ADMIN + '/groups/' + groupId)
             .set('Authorization', '0 ' + tokens[0])
             .then(res => {
-              expectResponse.toBe403Unauthorized(res);
+              expectResponse.toBe403.unauthorized(res);
             });
       });
 
@@ -244,7 +244,7 @@ describe('Admin', () => {
             .get(URL.BASE_ADMIN + '/groups/' + 'XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX')
             .set('Authorization', '0 ' + adminToken)
             .then(res => {
-              expectResponse.toBe404GroupNotFound(res);
+              expectResponse.toBe404.groupNotFound(res);
             });
       });
     });
@@ -324,7 +324,7 @@ describe('Admin', () => {
             .get(URL.BASE_ADMIN + '/users')
             .set('Authorization', '0 ' + tokens[0])
             .then(res => {
-              expectResponse.toBe403Unauthorized(res);
+              expectResponse.toBe403.unauthorized(res);
             });
       });
     });
@@ -403,7 +403,7 @@ describe('Admin', () => {
             .get(URL.BASE_ADMIN + '/users/' + userIds[0])
             .set('Authorization', '0 ' + tokens[0])
             .then(res => {
-              expectResponse.toBe403Unauthorized(res);
+              expectResponse.toBe403.unauthorized(res);
             });
       });
 
@@ -412,7 +412,7 @@ describe('Admin', () => {
             .get(URL.BASE_ADMIN + '/users/' + 'XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX')
             .set('Authorization', '0 ' + adminToken)
             .then(res => {
-              expectResponse.toBe404UserNotFound(res);
+              expectResponse.toBe404.userNotFound(res);
             });
       });
     });
@@ -644,7 +644,7 @@ describe('Admin', () => {
           .put(URL.BASE_ADMIN  + '/users/' + userIds[0])
           .set('Authorization', '0 ' + adminToken)
           .then(res => {
-            expectResponse.toBe400InvalidRequestBody(res);
+            expectResponse.toBe400.invalidRequestBody(res);
           });
         });
 
@@ -654,7 +654,7 @@ describe('Admin', () => {
           .set('Authorization', '0 ' + adminToken)
           .send(userData.users.updateAsAdmin.invalid.updateUserId)
           .then(res => {
-            expectResponse.toBe400InvalidRequestBody(res);
+            expectResponse.toBe400.invalidRequestBody(res);
           });
         });
 
@@ -664,7 +664,7 @@ describe('Admin', () => {
           .set('Authorization', '0 ' + adminToken)
           .send(userData.users.updateAsAdmin.invalid.updateGroupIds)
           .then(res => {
-            expectResponse.toBe400InvalidRequestBody(res);
+            expectResponse.toBe400.invalidRequestBody(res);
           });
         });
 
@@ -674,7 +674,7 @@ describe('Admin', () => {
           .set('Authorization', '0 ' + adminToken)
           .send(userData.users.updateAsAdmin.invalid.updateInternalId)
           .then(res => {
-            expectResponse.toBe400InvalidRequestBody(res);
+            expectResponse.toBe400.invalidRequestBody(res);
           });
         });
 
@@ -684,7 +684,7 @@ describe('Admin', () => {
           .set('Authorization', '0 ' + adminToken)
           .send(userData.users.updateAsAdmin.invalid.updateAuthType)
           .then(res => {
-            expectResponse.toBe400InvalidRequestBody(res);
+            expectResponse.toBe400.invalidRequestBody(res);
           });
         });
 
@@ -694,7 +694,7 @@ describe('Admin', () => {
           .set('Authorization', '0 ' + adminToken)
           .send(userData.users.updateAsAdmin.invalid.updateUsernameNull)
           .then(res => {
-            expectResponse.toBe400InvalidRequestBody(res);
+            expectResponse.toBe400.invalidRequestBody(res);
           });
         });
 
@@ -704,7 +704,7 @@ describe('Admin', () => {
           .set('Authorization', '0 ' + adminToken)
           .send(userData.users.updateAsAdmin.invalid.updatePasswordNull)
           .then(res => {
-            expectResponse.toBe400InvalidRequestBody(res);
+            expectResponse.toBe400.invalidRequestBody(res);
           });
         });
 
@@ -714,7 +714,7 @@ describe('Admin', () => {
           .set('Authorization', '0 ' + adminToken)
           .send(userData.users.updateAsAdmin.invalid.updateEmailNull)
           .then(res => {
-            expectResponse.toBe400InvalidRequestBody(res);
+            expectResponse.toBe400.invalidRequestBody(res);
           });
         });
 
@@ -724,7 +724,7 @@ describe('Admin', () => {
           .set('Authorization', '0 ' + adminToken)
           .send(userData.users.updateAsAdmin.invalid.updateInvalidRole)
           .then(res => {
-            expectResponse.toBe400InvalidRequestBody(res);
+            expectResponse.toBe400.invalidRequestBody(res);
           });
         });
 
@@ -734,7 +734,7 @@ describe('Admin', () => {
           .set('Authorization', '0 ' + adminToken)
           .send(userData.users.updateAsAdmin.invalid.updateUnknownField)
           .then(res => {
-            expectResponse.toBe400InvalidRequestBody(res);
+            expectResponse.toBe400.invalidRequestBody(res);
           });
         });
 
@@ -744,7 +744,7 @@ describe('Admin', () => {
           .set('Authorization', '0 ' + tokens[0])
           .send(userData.users.updateAsAdmin.valid.allFields)
           .then(res => {
-            expectResponse.toBe403Unauthorized(res);
+            expectResponse.toBe403.unauthorized(res);
           });
         });
 
@@ -754,7 +754,7 @@ describe('Admin', () => {
           .set('Authorization', '0 ' + adminToken)
           .send(userData.users.updateAsAdmin.valid.allFields)
           .then(res => {
-            expectResponse.toBe404UserNotFound(res);
+            expectResponse.toBe404.userNotFound(res);
           });
         });
       });

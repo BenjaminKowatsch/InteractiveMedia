@@ -100,7 +100,7 @@ describe('Groups-Controller: Groups:', () => {
         .set('Authorization', '0 ' + tokens[0])
         .send(groupScenarios[0].createWrongUser)
         .then(res => {
-          expectResponse.toBe409CreateGroupNonExistingUser(res, groupScenarios[0].createWrongUser.users[0]);
+          expectResponse.toBe409.createGroup.nonExistingUser(res, groupScenarios[0].createWrongUser.users[0]);
         });
       });
 
@@ -110,7 +110,7 @@ describe('Groups-Controller: Groups:', () => {
         .set('Authorization', '0 ' + tokens[0])
         .send(groupScenarios[0].createDuplicatedUser)
         .then(res => {
-          expectResponse.toBe400CreateGroupDuplicatedUsers(res);
+          expectResponse.toBe400.createGroup.duplicatedUsers(res);
         });
       });
 
@@ -120,7 +120,7 @@ describe('Groups-Controller: Groups:', () => {
         .set('Authorization', '0 ' + tokens[0])
         .send(groupScenarios[0].createWithoutCreatorUser)
         .then(res => {
-          expectResponse.toBe400CreateGroupMissingCreator(res);
+          expectResponse.toBe400.createGroup.missingCreator(res);
         });
       });
 
@@ -130,7 +130,7 @@ describe('Groups-Controller: Groups:', () => {
         .set('Authorization', '0 ' + tokens[0])
         .send(groupScenarios[0].createNullUsers)
         .then(res => {
-          expectResponse.toBe400CreateGroupMissingCreator(res);
+          expectResponse.toBe400.createGroup.missingCreator(res);
         });
       });
 
@@ -140,7 +140,7 @@ describe('Groups-Controller: Groups:', () => {
         .set('Authorization', '0 ' + tokens[0])
         .send(groupScenarios[0].createInvalidPayload)
         .then(res => {
-          expectResponse.toBe400InvalidRequestBody(res);
+          expectResponse.toBe400.invalidRequestBody(res);
         });
       });
 
@@ -150,7 +150,7 @@ describe('Groups-Controller: Groups:', () => {
         .set('Authorization', '0 ' + 'foobar')
         .send(groupScenarios[0].create)
         .then(res => {
-          expectResponse.toBe401InvalidAuthToken(res);
+          expectResponse.toBe401.invalidAuthToken(res);
         });
       });
 
@@ -160,7 +160,7 @@ describe('Groups-Controller: Groups:', () => {
         .set('Authorization', '')
         .send(groupScenarios[0].create)
         .then(res => {
-          expectResponse.toBe401InvalidFormatHeaderAuthorization(res);
+          expectResponse.toBe401.invalidFormatHeaderAuthorization(res);
         });
       });
     });
@@ -247,7 +247,7 @@ describe('Groups-Controller: Groups:', () => {
         .get(URL.BASE_GROUP  + '/' + groupId)
         .set('Authorization', '0 ' + tokens[2])
         .then(res => {
-          expectResponse.toBe403GroupsUserIsNotMember(res);
+          expectResponse.toBe403.groups.userIsNotMember(res);
         });
       });
 
@@ -256,7 +256,7 @@ describe('Groups-Controller: Groups:', () => {
         .get(URL.BASE_GROUP  + '/fooBar-this-is-not-an-valid-groupId')
         .set('Authorization', '0 ' + tokens[0])
         .then(res => {
-          expectResponse.toBe404GroupNotFound(res);
+          expectResponse.toBe404.groupNotFound(res);
         });
       });
     });

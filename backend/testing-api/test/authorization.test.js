@@ -125,7 +125,7 @@ describe('Authorization', () => {
       return chai.request(HOST)
           .get(URL.TEST_AUTHORIZATION + '/admin')
           .then(res => {
-            expectResponse.toBe401MissingHeaderAuthorization(res);
+            expectResponse.toBe401.missingHeaderAuthorization(res);
           });
     });
 
@@ -134,7 +134,7 @@ describe('Authorization', () => {
           .get(URL.TEST_AUTHORIZATION + '/admin')
           .set('Authorization', '0 ' + userToken)
           .then(res => {
-            expectResponse.toBe403Unauthorized(res);
+            expectResponse.toBe403.unauthorized(res);
           });
     });
 

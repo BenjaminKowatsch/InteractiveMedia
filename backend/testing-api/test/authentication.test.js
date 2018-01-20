@@ -70,7 +70,7 @@ describe('Autentication', function() {
       return chai.request(HOST)
           .get(URL.TEST_AUTHENTICATION + '/required')
           .then(res => {
-            expectResponse.toBe401MissingHeaderAuthorization(res);
+            expectResponse.toBe401.missingHeaderAuthorization(res);
           });
     });
 
@@ -88,7 +88,7 @@ describe('Autentication', function() {
           .get(URL.TEST_AUTHENTICATION + '/required')
           .set('Authorization', token)
           .then(res => {
-            expectResponse.toBe401InvalidFormatHeaderAuthorization(res);
+            expectResponse.toBe401.invalidFormatHeaderAuthorization(res);
           });
     });
 
@@ -97,7 +97,7 @@ describe('Autentication', function() {
           .get(URL.TEST_AUTHENTICATION + '/required')
           .set('Authorization', '0 ' +  token + ' XXX')
           .then(res => {
-            expectResponse.toBe401InvalidFormatHeaderAuthorization(res);
+            expectResponse.toBe401.invalidFormatHeaderAuthorization(res);
           });
     });
 
@@ -138,7 +138,7 @@ describe('Autentication', function() {
           .get(URL.TEST_AUTHENTICATION + '/required')
           .set('Authorization', '0 ' + 'XXX')
           .then(res => {
-            expectResponse.toBe401InvalidAuthToken(res);
+            expectResponse.toBe401.invalidAuthToken(res);
           });
     });
 
@@ -148,7 +148,7 @@ describe('Autentication', function() {
       .get(URL.TEST_AUTHENTICATION + '/required')
       .set('Authorization', '1 ' + token)
       .then(res => {
-        expectResponse.toBe401InvalidAuthToken(res);
+        expectResponse.toBe401.invalidAuthToken(res);
       });
     }).timeout(10000);
 
