@@ -6,10 +6,10 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.res.ColorStateList;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
-import android.support.v4.content.ContextCompat;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
@@ -22,6 +22,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
@@ -31,6 +32,7 @@ import com.bumptech.glide.load.model.LazyHeaders;
 import com.media.interactive.cs3.hdm.interactivemedia.CallbackListener;
 import com.media.interactive.cs3.hdm.interactivemedia.R;
 import com.media.interactive.cs3.hdm.interactivemedia.data.Login;
+import com.media.interactive.cs3.hdm.interactivemedia.data.User;
 import com.media.interactive.cs3.hdm.interactivemedia.fragments.GroupFragment;
 import com.media.interactive.cs3.hdm.interactivemedia.fragments.IMyFragment;
 import com.media.interactive.cs3.hdm.interactivemedia.fragments.MapTransactionFragment;
@@ -47,7 +49,7 @@ public class HomeActivity extends AppCompatActivity
     private static final String TAG = "HomeActivity";
 
     private FloatingActionButton fab;
-    private CallbackListener<JSONObject,Exception> userDataCompleted;
+    private CallbackListener<JSONObject, Exception> userDataCompleted;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -55,10 +57,14 @@ public class HomeActivity extends AppCompatActivity
         setContentView(R.layout.activity_home);
         final Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+        getSupportActionBar().setTitle("");
 
         fab = (FloatingActionButton) findViewById(R.id.fab);
+        fab.setForegroundTintList(ColorStateList.valueOf(getResources().getColor(android.R.color.white)));
+        fab.setBackgroundTintList(ColorStateList.valueOf(getResources().getColor(R.color.colorPrimaryDark)));
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+
 
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
             this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
@@ -68,41 +74,30 @@ public class HomeActivity extends AppCompatActivity
         final NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
-        userDataCompleted = new CallbackListener<JSONObject, Exception>() {
-            @Override
-            public void onSuccess(JSONObject response) {
-                loadProfilePicture(navigationView);
-            }
-
-            @Override
-            public void onFailure(Exception error) {
-
-            }
-        };
-        Login.getInstance().addOnUserDataSetListener(userDataCompleted);
+        loadUserData(navigationView);
 
         final Boolean transactionReload = getIntent().getExtras().getBoolean("transactionReload");
 
-        if(transactionReload != null && transactionReload){
-            Log.d(TAG,"Started from Notification Intent to reload transactions");
+        if (transactionReload != null && transactionReload) {
+            Log.d(TAG, "Started from Notification Intent to reload transactions");
             displayFragment(R.id.nav_transactions);
-        }else {
+        } else {
             displayFragment(R.id.nav_groups);
         }
         registerNetworkStatusChangeReceiver();
     }
 
-    private void registerNetworkStatusChangeReceiver(){
+    private void registerNetworkStatusChangeReceiver() {
         final IntentFilter intentFilter = new IntentFilter(NetworkStateChangeReceiver.NETWORK_AVAILABLE_ACTION);
         LocalBroadcastManager.getInstance(this).registerReceiver(new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
-                boolean isNetworkAvailable = intent.getBooleanExtra(NetworkStateChangeReceiver.IS_NETWORK_AVAILABLE,false);
+                boolean isNetworkAvailable = intent.getBooleanExtra(NetworkStateChangeReceiver.IS_NETWORK_AVAILABLE, false);
                 final String networkStatus = isNetworkAvailable ? "connected" : "disconnected";
-                if(isNetworkAvailable){
-                    Login.getInstance().getSynchronisationHelper().synchronize(HomeActivity.this,null,null);
+                if (isNetworkAvailable) {
+                    Login.getInstance().getSynchronisationHelper().synchronize(HomeActivity.this, null, null);
                 }
-                Toast.makeText(HomeActivity.this,"Network Status: " + networkStatus,Toast.LENGTH_SHORT).show();
+                Toast.makeText(HomeActivity.this, "Network Status: " + networkStatus, Toast.LENGTH_SHORT).show();
             }
         }, intentFilter);
     }
@@ -113,20 +108,35 @@ public class HomeActivity extends AppCompatActivity
         Login.getInstance().removeOnUserDataSetListener(userDataCompleted);
     }
 
-    private void loadProfilePicture(NavigationView navigationView) {
-        final String imageUrl = Login.getInstance().getUser().getImageUrl();
+    private void loadUserData(NavigationView navigationView) {
+        final User user = Login.getInstance().getUser();
+        final String imageUrl = user.getImageUrl();
+        final ImageView profilePicture = (ImageView) navigationView.getHeaderView(0).findViewById(R.id.nav_profile_image);
+        final TextView profileEmail = (TextView) navigationView.getHeaderView(0).findViewById(R.id.nav_profile_email);
+        final TextView profileUsername = (TextView) navigationView.getHeaderView(0).findViewById(R.id.nav_profile_username);
+        profileUsername.setText(user.getUsername());
+        profileEmail.setText(user.getEmail());
         if (imageUrl != null) {
-            final ImageView profilePicture = (ImageView) navigationView.getHeaderView(0).findViewById(R.id.imageView);
 
             Log.d(TAG, "Try to download URL: " + imageUrl);
 
-            final LazyHeaders.Builder builder = new LazyHeaders.Builder()
-                .addHeader("Authorization", Login.getInstance().getUserType().getValue() + " " + Login.getInstance().getAccessToken());
-
-            final GlideUrl glideUrl = new GlideUrl(imageUrl, builder.build());
-            Glide.with(this).load(glideUrl)
+            LazyHeaders.Builder builder = new LazyHeaders.Builder();
+            GlideUrl glideUrl = null;
+            if (imageUrl != null) {
+                if (imageUrl.startsWith(getResources().getString(R.string.web_service_url))) {
+                    builder = builder.addHeader("Authorization", Login.getInstance().getUserType().getValue() + " " + Login.getInstance().getAccessToken());
+                }
+                glideUrl = new GlideUrl(imageUrl, builder.build());
+                Glide.with(this).load(glideUrl)
+                    .diskCacheStrategy(DiskCacheStrategy.SOURCE)
+                    .fallback(R.drawable.anonymoususer)
+                    .placeholder(R.drawable.anonymoususer)
+                    .into(profilePicture);
+            }
+        } else {
+            Glide.with(this)
+                .load(R.drawable.anonymoususer)
                 .diskCacheStrategy(DiskCacheStrategy.SOURCE)
-                .placeholder(ContextCompat.getDrawable(this, R.drawable.anonymoususer))
                 .into(profilePicture);
         }
     }
@@ -174,7 +184,7 @@ public class HomeActivity extends AppCompatActivity
                 fragment = new TransactionFragment();
                 break;
             case R.id.nav_profile:
-                fab.show();
+                fab.hide();
                 Log.d(TAG, "item with id nav_profile was selected");
                 fragment = new ProfileFragment();
                 break;

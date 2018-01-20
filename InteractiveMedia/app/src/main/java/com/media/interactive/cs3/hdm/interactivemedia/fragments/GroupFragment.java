@@ -41,7 +41,6 @@ import java.util.List;
 
 public class GroupFragment extends ListFragment implements LoaderManager.LoaderCallbacks<Cursor>, IMyFragment {
 
-    public static final String LIST_FRAGMENT_NAME = "group";
     private static final String TAG = GroupFragment.class.getSimpleName();
     private static final int CURSOR_LOADER_GROUPS = 0;
     private static final int CURSOR_LOADER_USER_ID = 1;

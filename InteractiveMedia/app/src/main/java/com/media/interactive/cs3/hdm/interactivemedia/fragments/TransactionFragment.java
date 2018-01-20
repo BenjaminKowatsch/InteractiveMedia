@@ -8,6 +8,7 @@ import android.content.CursorLoader;
 import android.content.Intent;
 import android.content.Loader;
 import android.database.Cursor;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -22,6 +23,7 @@ import android.widget.ListView;
 import android.widget.SearchView;
 import android.widget.SimpleCursorAdapter;
 import android.widget.Spinner;
+import android.widget.TextView;
 
 import com.media.interactive.cs3.hdm.interactivemedia.R;
 import com.media.interactive.cs3.hdm.interactivemedia.TransactionAdapter;
@@ -78,7 +80,9 @@ public class TransactionFragment extends ListFragment implements LoaderManager.L
         item.setActionView(R.layout.group_spinner);
 
         groupSelection = item.getActionView().findViewById(R.id.menu_group_spinner);
+
         groupSelection.setAdapter(groupAdapter);
+
         groupSelection.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
