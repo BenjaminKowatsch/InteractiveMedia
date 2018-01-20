@@ -50,7 +50,6 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
 import java.util.UUID;
-import java.util.concurrent.atomic.AtomicInteger;
 
 import static com.google.android.gms.location.places.ui.PlacePicker.getPlace;
 
@@ -70,9 +69,7 @@ public class AddTransactionActivity extends ImagePickerActivity {
   private TextView locationDisplay;
   private DatabaseProviderHelper helper;
   private SimpleCursorAdapter userAdapter;
-  private AtomicInteger placePickerId = new AtomicInteger(0);
   private Place selectedPlace = null;
-  private Group group;
   private final static int PLACE_PICKER_REQUEST = 3;
 
   protected void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -117,7 +114,6 @@ public class AddTransactionActivity extends ImagePickerActivity {
     userSelection = findViewById(R.id.s_add_transaction_user);
     EditText amountEditText = findViewById(R.id.et_add_transaction_amount);
     amountEditText.addTextChangedListener(new MoneyTextWatcher(amountEditText, CURRENCY_FORMAT));
-        group = loadGroup();
 
     helper = new DatabaseProviderHelper(getContentResolver());
 
