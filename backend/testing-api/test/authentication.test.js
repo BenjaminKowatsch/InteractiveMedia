@@ -79,14 +79,7 @@ describe('Autentication', function() {
           .get(URL.TEST_AUTHENTICATION + '/required')
           .set('Authorization', '0')
           .then(res => {
-            expect(res).to.have.status(401);
-            expect(res).to.be.json;
-            expect(res.body).to.be.an('object');
-            expect(res.body.success).to.be.false;
-            expect(res.body.payload).to.be.an('object');
-            expect(res.body.payload.dataPath).to.be.equal('authentication');
-            expect(res.body.payload.message).to.be.
-              equal('invalid number of arguments provided in http request header Authorization');
+
           });
     });
 
@@ -95,14 +88,7 @@ describe('Autentication', function() {
           .get(URL.TEST_AUTHENTICATION + '/required')
           .set('Authorization', token)
           .then(res => {
-            expect(res).to.have.status(401);
-            expect(res).to.be.json;
-            expect(res.body).to.be.an('object');
-            expect(res.body.success).to.be.false;
-            expect(res.body.payload).to.be.an('object');
-            expect(res.body.payload.dataPath).to.be.equal('authentication');
-            expect(res.body.payload.message).to.be.
-              equal('invalid number of arguments provided in http request header Authorization');
+            expectResponse.toBe401InvalidFormatHeaderAuthorization(res);
           });
     });
 
@@ -111,14 +97,7 @@ describe('Autentication', function() {
           .get(URL.TEST_AUTHENTICATION + '/required')
           .set('Authorization', '0 ' +  token + ' XXX')
           .then(res => {
-            expect(res).to.have.status(401);
-            expect(res).to.be.json;
-            expect(res.body).to.be.an('object');
-            expect(res.body.success).to.be.false;
-            expect(res.body.payload).to.be.an('object');
-            expect(res.body.payload.dataPath).to.be.equal('authentication');
-            expect(res.body.payload.message).to.be.
-              equal('invalid number of arguments provided in http request header Authorization');
+            expectResponse.toBe401InvalidFormatHeaderAuthorization(res);
           });
     });
 

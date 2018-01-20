@@ -95,7 +95,7 @@ function parseAuthHeader(authHeaderRaw) {
     // invalid number arguments in header Authorization
     responseData.success = false;
     responseData.payload.dataPath = 'authentication';
-    responseData.payload.message = 'invalid number of arguments provided in http request header Authorization';
+    responseData.payload.message = 'invalid format of http request header Authorization';
     let errorCode = ERROR.INVALID_AUTH_HEADER;
     return Promise.reject({errorCode: errorCode, responseData: responseData});
   }

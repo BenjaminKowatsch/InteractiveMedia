@@ -133,10 +133,7 @@ describe('User-Controller', () => {
       .get(URL.BASE_TEST + '/authentication/required')
       .set('Authorization', '2 ' + facebookToken)
       .then(res => {
-        expect(res).to.have.status(401);
-        expect(res).to.be.json;
-        expect(res.body).to.be.an('object');
-        expect(res.body.success).to.be.false;
+        expectResponse.toBe401UnknownUserOrExpiredToken(res);
       });
     });
 
@@ -391,12 +388,7 @@ describe('User-Controller', () => {
         .get(URL.BASE_TEST + '/authentication/required')
         .set('Authorization', '0 ' + defaultToken)
         .then(res => {
-          expect(res).to.have.status(401);
-          expect(res).to.be.json;
-          expect(res.body).to.be.an('object');
-          expect(res.body.success).to.be.false;
-          expect(res.body.payload.dataPath).to.equal('user');
-          expect(res.body.payload.message).to.equal('unknown user or expired token');
+          expectResponse.toBe401UnknownUserOrExpiredToken(res);
         });
       });
 

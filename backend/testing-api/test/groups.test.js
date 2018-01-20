@@ -100,13 +100,7 @@ describe('Groups-Controller: Groups:', () => {
         .set('Authorization', '0 ' + tokens[0])
         .send(groupScenarios[0].createWrongUser)
         .then(res => {
-          expect(res).to.have.status(409);
-          expect(res).to.be.json;
-          expect(res.body).to.be.an('object');
-          expect(res.body.success).to.be.false;
-          expect(res.body.payload).to.be.an('object');
-          expect(res.body.payload.dataPath).to.equal('groupUsers');
-          expect(res.body.payload.message).to.equal('Unknown user: ' + groupScenarios[0].createWrongUser.users[0]);
+          expectResponse.toBe409CreateGroupNonExistingUser(res, groupScenarios[0].createWrongUser.users[0]);
         });
       });
 
@@ -116,13 +110,7 @@ describe('Groups-Controller: Groups:', () => {
         .set('Authorization', '0 ' + tokens[0])
         .send(groupScenarios[0].createDuplicatedUser)
         .then(res => {
-          expect(res).to.have.status(400);
-          expect(res).to.be.json;
-          expect(res.body).to.be.an('object');
-          expect(res.body.success).to.be.false;
-          expect(res.body.payload).to.be.an('object');
-          expect(res.body.payload.dataPath).to.equal('groupUsers');
-          expect(res.body.payload.message).to.equal('Duplicated groupUsers');
+          expectResponse.toBe400CreateGroupDuplicatedUsers(res);
         });
       });
 
@@ -132,13 +120,7 @@ describe('Groups-Controller: Groups:', () => {
         .set('Authorization', '0 ' + tokens[0])
         .send(groupScenarios[0].createWithoutCreatorUser)
         .then(res => {
-          expect(res).to.have.status(400);
-          expect(res).to.be.json;
-          expect(res.body).to.be.an('object');
-          expect(res.body.success).to.be.false;
-          expect(res.body.payload).to.be.an('object');
-          expect(res.body.payload.dataPath).to.equal('groupUsers');
-          expect(res.body.payload.message).to.equal('GroupCreator must be part of groupUsers');
+          expectResponse.toBe400CreateGroupMissingCreator(res);
         });
       });
 
@@ -148,13 +130,7 @@ describe('Groups-Controller: Groups:', () => {
         .set('Authorization', '0 ' + tokens[0])
         .send(groupScenarios[0].createNullUsers)
         .then(res => {
-          expect(res).to.have.status(400);
-          expect(res).to.be.json;
-          expect(res.body).to.be.an('object');
-          expect(res.body.success).to.be.false;
-          expect(res.body.payload).to.be.an('object');
-          expect(res.body.payload.dataPath).to.equal('groupUsers');
-          expect(res.body.payload.message).to.equal('GroupCreator must be part of groupUsers');
+          expectResponse.toBe400CreateGroupMissingCreator(res);
         });
       });
 
@@ -184,13 +160,7 @@ describe('Groups-Controller: Groups:', () => {
         .set('Authorization', '')
         .send(groupScenarios[0].create)
         .then(res => {
-          expect(res).to.have.status(401);
-          expect(res).to.be.json;
-          expect(res.body.success).to.be.false;
-          expect(res.body.payload).to.be.an('object');
-          expect(res.body.payload.dataPath).to.equal('authentication');
-          expect(res.body.payload.message).to.
-            equal('invalid number of arguments provided in http request header Authorization');
+          expectResponse.toBe401InvalidFormatHeaderAuthorization(res);
         });
       });
     });
@@ -277,13 +247,7 @@ describe('Groups-Controller: Groups:', () => {
         .get(URL.BASE_GROUP  + '/' + groupId)
         .set('Authorization', '0 ' + tokens[2])
         .then(res => {
-          expect(res).to.have.status(403);
-          expect(res).to.be.json;
-          expect(res.body).to.be.an('object');
-          expect(res.body.success).to.be.false;
-          expect(res.body.payload).to.be.an('object');
-          expect(res.body.payload.dataPath).to.equal('authorization');
-          expect(res.body.payload.message).to.equal('user is not but has to be a member of the group');
+          expectResponse.toBe403GroupsUserIsNotMember(res);
         });
       });
 
@@ -292,13 +256,7 @@ describe('Groups-Controller: Groups:', () => {
         .get(URL.BASE_GROUP  + '/fooBar-this-is-not-an-valid-groupId')
         .set('Authorization', '0 ' + tokens[0])
         .then(res => {
-          expect(res).to.have.status(404);
-          expect(res).to.be.json;
-          expect(res.body).to.be.an('object');
-          expect(res.body.success).to.be.false;
-          expect(res.body.payload).to.be.an('object');
-          expect(res.body.payload.dataPath).to.equal('group');
-          expect(res.body.payload.message).to.equal('group not found');
+          expectResponse.toBe404GroupNotFound(res);
         });
       });
     });

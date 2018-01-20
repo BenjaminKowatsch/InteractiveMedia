@@ -102,13 +102,7 @@ describe('Groups-Controller: Transactions:', () => {
       .set('Authorization', '0 ' + users[0].token)
       .send(transactions[0])
       .then(res => {
-        expect(res).to.have.status(404);
-        expect(res).to.be.json;
-        expect(res.body).to.be.an('object');
-        expect(res.body.success).to.be.false;
-        expect(res.body.payload).to.be.an('object');
-        expect(res.body.payload.dataPath).to.equal('group');
-        expect(res.body.payload.message).to.equal('group not found');
+        expectResponse.toBe404GroupNotFound(res);
       });
     });
 
@@ -134,13 +128,7 @@ describe('Groups-Controller: Transactions:', () => {
       .set('Authorization', '0 ' + users[2].token)
       .send(transactions[0])
       .then(res => {
-        expect(res).to.have.status(403);
-        expect(res).to.be.json;
-        expect(res.body).to.be.an('object');
-        expect(res.body.success).to.be.false;
-        expect(res.body.payload).to.be.an('object');
-        expect(res.body.payload.dataPath).to.equal('authorization');
-        expect(res.body.payload.message).to.equal('user is not but has to be a member of the group');
+        expectResponse.toBe403GroupsUserIsNotMember(res);
       });
     });
 
@@ -353,13 +341,7 @@ describe('Groups-Controller: Transactions:', () => {
       .get(URL.BASE_GROUP  + '/wrong_group_id/transactions?after=' + s2GroupCreatedAt)
       .set('Authorization', '0 ' + users[1].token)
       .then(res => {
-        expect(res).to.have.status(404);
-        expect(res).to.be.json;
-        expect(res.body).to.be.an('object');
-        expect(res.body.success).to.be.false;
-        expect(res.body.payload).to.be.an('object');
-        expect(res.body.payload.dataPath).to.equal('group');
-        expect(res.body.payload.message).to.equal('group not found');
+        expectResponse.toBe404GroupNotFound(res);
       });
     });
 
@@ -368,13 +350,7 @@ describe('Groups-Controller: Transactions:', () => {
       .get(URL.BASE_GROUP  + '/' + s1GroupId + '/transactions?after=' + s1GroupCreatedAt)
       .set('Authorization', '0 ' + users[2].token)
       .then(res => {
-        expect(res).to.have.status(403);
-        expect(res).to.be.json;
-        expect(res.body).to.be.an('object');
-        expect(res.body.success).to.be.false;
-        expect(res.body.payload).to.be.an('object');
-        expect(res.body.payload.dataPath).to.equal('authorization');
-        expect(res.body.payload.message).to.equal('user is not but has to be a member of the group');
+        expectResponse.toBe403GroupsUserIsNotMember(res);
       });
     });
 
