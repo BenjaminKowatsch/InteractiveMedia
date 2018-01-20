@@ -13,7 +13,7 @@ const userService = require('../util/userService.util');
 
 chai.use(require('chai-http'));
 
-const userData = require('./data/user.data');
+const userData = require('../data/user.data');
 
 describe('User-Controller', () => {
 

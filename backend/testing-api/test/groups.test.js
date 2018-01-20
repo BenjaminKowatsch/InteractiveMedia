@@ -13,8 +13,8 @@ const groupService = require('../util/groupService.util');
 
 chai.use(require('chai-http'));
 
-const userData = require('./data/user.data');
-const groupScenarios = require('./data/groupScenarios');
+const userData = require('../data/user.data');
+const groupScenarios = require('../data/groupScenarios');
 
 describe('Groups-Controller: Groups:', () => {
   describe('Create new Group', () => {

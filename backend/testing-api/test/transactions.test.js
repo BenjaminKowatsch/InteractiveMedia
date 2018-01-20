@@ -14,8 +14,8 @@ const miscService = require('../util/miscService.util');
 
 chai.use(require('chai-http'));
 
-const userData = require('./data/user.data');
-const groupScenarios = require('./data/groupScenarios');
+const userData = require('../data/user.data');
+const groupScenarios = require('../data/groupScenarios');
 
 describe('Groups-Controller: Transactions:', () => {
 

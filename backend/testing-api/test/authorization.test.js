@@ -12,8 +12,8 @@ const userService = require('../util/userService.util');
 
 chai.use(require('chai-http'));
 
-const userData = require('./data/user.data');
-const adminData = require('./data/admin.data');
+const userData = require('../data/user.data');
+const adminData = require('../data/admin.data');
 
 describe('Authorization', () => {
   describe('No authorization required', () => {

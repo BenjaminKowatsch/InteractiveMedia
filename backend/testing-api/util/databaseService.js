@@ -3,7 +3,7 @@
 const MongoClient = require('mongodb').MongoClient;
 const winston = require('winston');
 const settings = require('../config/settings.config');
-const adminData = require('../test/data/admin.data');
+const adminData = require('../data/admin.data');
 
 let database = {};
 database.collections = {};

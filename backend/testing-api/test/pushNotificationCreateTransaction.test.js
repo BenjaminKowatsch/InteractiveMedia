@@ -12,7 +12,7 @@ const groupService = require('../util/groupService.util');
 
 chai.use(require('chai-http'));
 
-const userData = require('./data/user.data');
+const userData = require('../data/user.data');
 
 const MINUTE = 60000;
 const nowPlus = time => new Date(new Date().getTime() + time).toISOString();

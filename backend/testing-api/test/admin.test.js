@@ -13,9 +13,9 @@ const groupService = require('../util/groupService.util');
 
 chai.use(require('chai-http'));
 
-const userData = require('./data/user.data');
-const adminData = require('./data/admin.data');
-const groupScenarios = require('./data/groupScenarios');
+const userData = require('../data/user.data');
+const adminData = require('../data/admin.data');
+const groupScenarios = require('../data/groupScenarios');
 
 describe('Admin', () => {
   describe('Login', () => {
