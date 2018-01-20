@@ -112,17 +112,11 @@ describe('Groups-Controller: Transactions:', () => {
       .set('Authorization', '0 ' + users[0].token)
       .send(groupScenarios[2].transactionWrongUserId)
       .then(res => {
-        expect(res).to.have.status(400);
-        expect(res).to.be.json;
-        expect(res.body).to.be.an('object');
-        expect(res.body.success).to.be.false;
-        expect(res.body.payload).to.be.an('object');
-        expect(res.body.payload.dataPath).to.equal('authorization');
-        expect(res.body.payload.message).to.equal('user is not but has to be a member of the group');
+        expectResponse.toBe400.transactions.userIsNotMember(res);
       });
     });
 
-    it('should fail to add a transaction due to userId (paidBy) not in group', () => {
+    it('should fail to add a transaction due to userId not in group', () => {
       return chai.request(HOST)
       .post(URL.BASE_GROUP  + '/' + scenario1GroupId + '/transactions')
       .set('Authorization', '0 ' + users[2].token)
@@ -168,14 +162,7 @@ describe('Groups-Controller: Transactions:', () => {
       .set('Authorization', '0 ' + users[0].token)
       .send(groupScenarios[2].transactionWrongInfoCreatedAt)
       .then(res => {
-        expect(res).to.have.status(400);
-        expect(res).to.be.json;
-        expect(res.body).to.be.an('object');
-        expect(res.body.success).to.be.false;
-        expect(res.body.payload).to.be.an('object');
-        expect(res.body.payload.dataPath).to.equal('transaction');
-        expect(res.body.payload.message)
-        .to.equal('invalid time adjustment: group.createdAt is gt transaction.infoCreatedAt');
+        expectResponse.toBe400.transactions.invalidTimeAdjustment(res);
       });
     });
 
@@ -359,13 +346,7 @@ describe('Groups-Controller: Transactions:', () => {
       .get(URL.BASE_GROUP  + '/' + s2GroupId + '/transactions?after=foobar')
       .set('Authorization', '0 ' + users[1].token)
       .then(res => {
-        expect(res).to.have.status(400);
-        expect(res).to.be.json;
-        expect(res.body).to.be.an('object');
-        expect(res.body.success).to.be.false;
-        expect(res.body.payload).to.be.an('object');
-        expect(res.body.payload.dataPath).to.equal('urlParamAfter');
-        expect(res.body.payload.message).to.equal('invalid date format');
+        expectResponse.toBe400.transactions.invalidFormatUrlParameterAfter(res);
       });
     });
 
@@ -374,13 +355,7 @@ describe('Groups-Controller: Transactions:', () => {
       .get(URL.BASE_GROUP  + '/' + s2GroupId + '/transactions?after=2018-01-01')
       .set('Authorization', '0 ' + users[1].token)
       .then(res => {
-        expect(res).to.have.status(400);
-        expect(res).to.be.json;
-        expect(res.body).to.be.an('object');
-        expect(res.body.success).to.be.false;
-        expect(res.body.payload).to.be.an('object');
-        expect(res.body.payload.dataPath).to.equal('urlParamAfter');
-        expect(res.body.payload.message).to.equal('invalid date format');
+        expectResponse.toBe400.transactions.invalidFormatUrlParameterAfter(res);
       });
     });
 
@@ -389,13 +364,7 @@ describe('Groups-Controller: Transactions:', () => {
       .get(URL.BASE_GROUP  + '/' + s2GroupId + '/transactions')
       .set('Authorization', '0 ' + users[1].token)
       .then(res => {
-        expect(res).to.have.status(400);
-        expect(res).to.be.json;
-        expect(res.body).to.be.an('object');
-        expect(res.body.success).to.be.false;
-        expect(res.body.payload).to.be.an('object');
-        expect(res.body.payload.dataPath).to.equal('urlParamAfter');
-        expect(res.body.payload.message).to.equal('missing param after in URL');
+        expectResponse.toBe400.transactions.missingUrlParameterAfter(res);
       });
     });
 

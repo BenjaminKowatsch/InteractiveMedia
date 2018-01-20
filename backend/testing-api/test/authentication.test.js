@@ -106,14 +106,7 @@ describe('Autentication', function() {
           .get(URL.TEST_AUTHENTICATION + '/required')
           .set('Authorization', 'X ' + token)
           .then(res => {
-            expect(res).to.have.status(401);
-            expect(res).to.be.json;
-            expect(res.body).to.be.an('object');
-            expect(res.body.success).to.be.false;
-            expect(res.body.payload).to.be.an('object');
-            expect(res.body.payload.dataPath).to.be.equal('authentication');
-            expect(res.body.payload.message).to.be.
-              equal('invalid authType provided in http request header Authorization');
+            expectResponse.toBe401.invalidAuthType(res);
           });
     });
 
@@ -122,14 +115,7 @@ describe('Autentication', function() {
           .get(URL.TEST_AUTHENTICATION + '/required')
           .set('Authorization', '99 ' + token)
           .then(res => {
-            expect(res).to.have.status(401);
-            expect(res).to.be.json;
-            expect(res.body).to.be.an('object');
-            expect(res.body.success).to.be.false;
-            expect(res.body.payload).to.be.an('object');
-            expect(res.body.payload.dataPath).to.be.equal('authentication');
-            expect(res.body.payload.message).to.be.
-              equal('invalid authType provided in http request header Authorization');
+            expectResponse.toBe401.invalidAuthType(res);
           });
     });
 

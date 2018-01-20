@@ -16,13 +16,6 @@ module.exports.toBe400 = {
     .withDataPath('validation')
     .inResponse(res);
   },
-  invalidAuthType: function(res) {
-    new ExpectError()
-    .withStatusCode(400)
-    .withDataPath('authType')
-    .withMessage('invalid auth type')
-    .inResponse(res);
-  },
   createGroup: {
     duplicatedUsers: function(res) {
       new ExpectError()
@@ -39,6 +32,45 @@ module.exports.toBe400 = {
       .inResponse(res);
     },
   },
+  objectstore: {
+    missingUrlParameterFilename: function(res) {
+      new ExpectError()
+      .withStatusCode(400)
+      .withDataPath('objectstore')
+      .withMessage('invalid or missing filename in request')
+      .inResponse(res);
+    },
+  },
+  transactions: {
+    missingUrlParameterAfter: function(res) {
+      new ExpectError()
+      .withStatusCode(400)
+      .withDataPath('urlParamAfter')
+      .withMessage('missing param after in URL')
+      .inResponse(res);
+    },
+    invalidFormatUrlParameterAfter: function(res) {
+      new ExpectError()
+      .withStatusCode(400)
+      .withDataPath('urlParamAfter')
+      .withMessage('invalid date format')
+      .inResponse(res);
+    },
+    userIsNotMember: function(res) {
+      new ExpectError()
+      .withStatusCode(400)
+      .withDataPath('authorization')
+      .withMessage('user is not but has to be a member of the group')
+      .inResponse(res);
+    },
+    invalidTimeAdjustment: function(res) {
+      new ExpectError()
+      .withStatusCode(400)
+      .withDataPath('transaction')
+      .withMessage('invalid time adjustment: group.createdAt is gt transaction.infoCreatedAt')
+      .inResponse(res);
+    },
+  },
 };
 
 module.exports.toBe401 = {
@@ -47,6 +79,13 @@ module.exports.toBe401 = {
     .withStatusCode(401)
     .withDataPath('authentication')
     .withMessage('invalid authToken')
+    .inResponse(res);
+  },
+  invalidAuthType: function(res) {
+    new ExpectError()
+    .withStatusCode(401)
+    .withDataPath('authentication')
+    .withMessage('invalid auth type')
     .inResponse(res);
   },
   loginFailed: function(res) {
@@ -113,6 +152,20 @@ module.exports.toBe404 = {
     .withMessage('user not found')
     .inResponse(res);
   },
+  fileNotFound: function(res) {
+    new ExpectError()
+    .withStatusCode(404)
+    .withDataPath('objectstore')
+    .withMessage('file not found')
+    .inResponse(res);
+  },
+  urlNotFound: function(res) {
+    new ExpectError()
+    .withStatusCode(404)
+    .withDataPath('application')
+    .withMessage('url not found')
+    .inResponse(res);
+  },
 };
 
 module.exports.toBe409 = {
@@ -122,6 +175,15 @@ module.exports.toBe409 = {
       .withStatusCode(409)
       .withDataPath('groupUsers')
       .withMessage('Unknown user: ' + emailOfNotExistingUser)
+      .inResponse(res);
+    },
+  },
+  register: {
+    userAlreadyExists: function(res) {
+      new ExpectError()
+      .withStatusCode(409)
+      .withDataPath('register')
+      .withMessage('username already exists')
       .inResponse(res);
     },
   }

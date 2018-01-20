@@ -202,13 +202,7 @@ describe('User-Controller', () => {
         .post(URL.BASE_USER + '/')
         .send(testData.users.valid[0])
         .then(function(res) {
-          expect(res).to.have.status(409);
-          expect(res).to.be.json;
-          expect(res.body).to.be.an('object');
-          expect(res.body.success).to.be.false;
-          expect(res.body.payload).to.be.an('object');
-          expect(res.body.payload.dataPath).to.equal('register');
-          expect(res.body.payload.message).to.equal('username already exists');
+          expectResponse.toBe409.register.userAlreadyExists(res);
         });
       });
 
@@ -417,7 +411,7 @@ describe('User-Controller', () => {
       .send({username: testData.users.valid[1].username,
         password: testData.users.valid[1].password})
       .then(res => {
-        expectResponse.toBe400.invalidAuthType(res);
+        expectResponse.toBe401.invalidAuthType(res);
       });
     });
 
@@ -427,7 +421,7 @@ describe('User-Controller', () => {
       .send({username: testData.users.valid[1].username,
         password: testData.users.valid[1].password})
       .then(res => {
-        expectResponse.toBe400.invalidAuthType(res);
+        expectResponse.toBe401.invalidAuthType(res);
       });
     });
   });

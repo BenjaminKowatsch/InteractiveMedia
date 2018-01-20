@@ -97,15 +97,15 @@ app.use(function(err, req, res, next) {
   if (err.status !== 404) {
     return next();
   }
-  const dataPath = req.method + ' ' + req.url;
+
   const notFoundResponse = {
     'success': false,
     'payload': {
-      'message': 'Not found',
-      'dataPath': dataPath
+      'dataPath': 'application',
+      'message': 'url not found'
     }
   };
-  winston.error('Endpoint not found:' + dataPath);
+  winston.error('Endpoint not found:' + req.method + ' ' + req.url);
   res.status(404).send(notFoundResponse);
 });
 

@@ -171,10 +171,10 @@ module.exports.login = function(req, res) {
       const resBody = {
         'success': false,
         'payload': {
-          'dataPath': 'authType',
+          'dataPath': 'authentication',
           'message': 'invalid auth type'
         }};
-      httpResponseService.send(res, 400, resBody);
+      httpResponseService.send(res, 401, resBody);
       break;
     }
   }

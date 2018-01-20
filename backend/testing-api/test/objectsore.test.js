@@ -68,10 +68,7 @@ describe('Object-store', function() {
         .post(URL.BASE_OBJECTSTORE + '/upload')
         .set('Authorization', '0 ' + token)
         .then(res => {
-          expect(res).to.have.status(400);
-          expect(res.body.success).to.be.false;
-          expect(res.body.payload.dataPath).to.be.equal('objectstore');
-          expect(res.body.payload.message).to.be.equal('invalid or missing file');
+          expectResponse.toBe400.invalidRequestBody(res);
         });
     });
   });
@@ -128,13 +125,7 @@ describe('Object-store', function() {
           .get(URL.BASE_OBJECTSTORE + '/download?filename=missingimage.png')
           .set('Authorization', '0 ' + token)
           .then(res => {
-            expect(res).to.have.status(404);
-            expect(res).to.be.json;
-            expect(res.body).to.be.an('object');
-            expect(res.body.success).to.be.false;
-            expect(res.body.payload).to.be.an('object');
-            expect(res.body.payload.dataPath).to.equal('objectstore');
-            expect(res.body.payload.message).to.equal('file not found');
+            expectResponse.toBe404.fileNotFound(res);
           });
       });
 
@@ -143,13 +134,7 @@ describe('Object-store', function() {
           .get(URL.BASE_OBJECTSTORE + '/download')
           .set('Authorization', '0 ' + token)
           .then(res => {
-            expect(res).to.have.status(400);
-            expect(res).to.be.json;
-            expect(res.body).to.be.an('object');
-            expect(res.body.success).to.be.false;
-            expect(res.body.payload).to.be.an('object');
-            expect(res.body.payload.dataPath).to.equal('objectstore');
-            expect(res.body.payload.message).to.equal('invalid or missing filename in request');
+            expectResponse.toBe400.objectstore.missingUrlParameterFilename(res);
           });
       });
     });

@@ -12,8 +12,8 @@ function parseRequestUploadFile(req) {
   return new Promise((resolve, reject) => {
     if (!('file' in req)) {
       responseData.success = false;
-      responseData.payload.dataPath = 'objectstore';
-      responseData.payload.message = 'invalid or missing file';
+      responseData.payload.dataPath = 'validation';
+      responseData.payload.message = 'invalid request body';
       let errorCode = ERROR.INVALID_OR_MISSING_FILE_IN_REQUEST;
       reject({errorCode: errorCode, responseData: responseData});
     }
@@ -22,8 +22,8 @@ function parseRequestUploadFile(req) {
 
     if (filenameRaw == null || filenameRaw == undefined) {
       responseData.success = false;
-      responseData.payload.dataPath = 'objectstore';
-      responseData.payload.message = 'invalid or missing file';
+      responseData.payload.dataPath = 'validation';
+      responseData.payload.message = 'invalid request body';
       let errorCode = ERROR.INVALID_OR_MISSING_FILE_IN_REQUEST;
       reject({errorCode: errorCode, responseData: responseData});
     }

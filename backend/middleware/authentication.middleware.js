@@ -73,7 +73,7 @@ function verifyAccessToken(token, authType) {
       let responseData = {payload: {}};
       responseData.success = false;
       responseData.payload.dataPath = 'authentication';
-      responseData.payload.message = 'invalid authType provided in http request header Authorization';
+      responseData.payload.message = 'invalid auth type';
       let errorCode = ERROR.INVALID_AUTHTYPE;
       winston.error('errorCode', errorCode);
       return Promise.reject({errorCode: errorCode, responseData: responseData});
@@ -105,7 +105,7 @@ function parseAuthHeader(authHeaderRaw) {
     // authType is not an integer
     responseData.success = false;
     responseData.payload.dataPath = 'authentication';
-    responseData.payload.message = 'invalid authType provided in http request header Authorization';
+    responseData.payload.message = 'invalid auth type';
     let errorCode = ERROR.INVALID_AUTHTYPE;
     return Promise.reject({errorCode: errorCode, responseData: responseData});
   }
