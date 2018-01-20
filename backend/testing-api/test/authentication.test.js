@@ -70,7 +70,7 @@ describe('Autentication', function() {
           .get(settings.url.test.authentication + '/required')
           .set('Authorization', '0')
           .then(res => {
-
+            expectResponse.toBe401.invalidFormatHeaderAuthorization(res);
           });
     });
 
