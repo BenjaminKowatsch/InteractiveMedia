@@ -11,9 +11,6 @@ const authorizationMiddleware = require('../middleware/authorization.middleware'
 
 //base route: host:8081/groups
 
-router.get('/', authenticationService.isAuthenticated,
-    authorizationService.isAuthorizedAdmin, groupsController.getAll);
-
 /**
  * @api {POST} /v1/groups/ Create
  * @apiName Create

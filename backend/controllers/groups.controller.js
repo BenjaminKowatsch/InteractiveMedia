@@ -42,11 +42,6 @@ module.exports.createNewGroup = function(req, res) {
   });
 };
 
-module.exports.getAll = function(req, res) {
-  winston.debug('Getting all groups');
-  httpResponseService.send(res, 404, 'Not implemented');
-};
-
 module.exports.getGroupById = function(req, res) {
   const groupId = req.params.groupId;
   group.getGroupById(groupId).then(groupResult =>  {
