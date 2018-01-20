@@ -8,6 +8,7 @@ const winston = require('winston');
 const databaseHelper = require('./data/databaseHelper');
 const settings = require('../config/settings.config');
 const userService = require('../util/userService.util');
+const groupService = require('../util/groupService.util');
 
 chai.use(require('chai-http'));
 
@@ -36,14 +37,12 @@ describe.skip('PushNotifications create transactions', function() {
     });
 
     before('create group', function(done) {
-      chai.request(settings.host)
-        .post(settings.url.groups.base  + '/')
-        .set('Authorization', '0 ' + tokens[0])
-        .send({
-          name: 'test_gruppe_1',
-          imageUrl: null,
-          users: [userData.users.valid[0].email, userData.users.valid[1].email]
-        })
+      const groupData = {
+        name: 'test_gruppe_1',
+        imageUrl: null,
+        users: [userData.users.valid[0].email, userData.users.valid[1].email]
+      };
+      groupService.create(0, tokens[0], groupData)
       .then(res => {
         groupId = res.body.payload.groupId;
         userIds[0] = res.body.payload.users[0].userId;

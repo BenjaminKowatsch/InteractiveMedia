@@ -9,6 +9,7 @@ const databaseHelper = require('./data/databaseHelper');
 const expectResponse = require('../util/expectResponse.util');
 const settings = require('../config/settings.config');
 const userService = require('../util/userService.util');
+const groupService = require('../util/groupService.util');
 
 chai.use(require('chai-http'));
 
@@ -72,17 +73,11 @@ describe('Groups-Controller: Transactions:', () => {
         return getUserData(users[2].token);
       }).then(res => {
         users[2].userId = res.body.payload.userId;
-        return chai.request(settings.host)
-          .post(settings.url.groups.base  + '/')
-          .set('Authorization', '0 ' + users[0].token)
-          .send(groupScenarios[2].createGroup);
+        return groupService.create(0, users[0].token, groupScenarios[2].createGroup);
       }).then(res => {
         groupId = res.body.payload.groupId;
         groupScenarios[2].setUserIdsInTransactions(users);
-        return chai.request(settings.host)
-        .post(settings.url.groups.base  + '/')
-        .set('Authorization', '0 ' + users[0].token)
-        .send(groupScenarios[1].createGroup0); //only user 0 + 1
+        return groupService.create(0, users[0].token, groupScenarios[1].createGroup0); //only user 0 + 1
       }).then(res => {
         scenario1GroupId = res.body.payload.groupId;
         done();
@@ -287,30 +282,18 @@ describe('Groups-Controller: Transactions:', () => {
         return getUserData(users[2].token);
       }).then(res => {
         users[2].userId = res.body.payload.userId;
-        return chai.request(settings.host)
-          .post(settings.url.groups.base  + '/')
-          .set('Authorization', '0 ' + users[0].token)
-          .send(groupScenarios[2].createGroup);
+        return groupService.create(0, users[0].token, groupScenarios[2].createGroup);
       }).then(res => {
         s2GroupCreatedAt = res.body.payload.createdAt;
         s2GroupId = res.body.payload.groupId;
         groupScenarios[2].setUserIdsInTransactions(users);
-        return chai.request(settings.host)
-        .post(settings.url.groups.base  + '/')
-        .set('Authorization', '0 ' + users[0].token)
-        .send(groupScenarios[1].createGroup0); //only user 0 + 1
+        return groupService.create(0, users[0].token, groupScenarios[1].createGroup0); //only user 0 + 1
       }).then(res => {
         s1GroupCreatedAt = res.body.payload.createdAt;
         s1GroupId = res.body.payload.groupId;
-        return chai.request(settings.host)
-        .post(settings.url.groups.base  + '/' + s1GroupId + '/transactions')
-        .set('Authorization', '0 ' + users[0].token)
-        .send(transactions[0]);
+        return groupService.createTransaction(s1GroupId, 0, users[0].token, transactions[0]);
       }).then(res => {
-        return chai.request(settings.host)
-        .post(settings.url.groups.base  + '/' + s2GroupId + '/transactions')
-        .set('Authorization', '0 ' + users[0].token)
-        .send(transactions[0]);
+        return groupService.createTransaction(s2GroupId, 0, users[0].token, transactions[0]);
       }).then(res => wait(2000)).then(() => {
         done();
       }).catch((error) => {
@@ -395,10 +378,7 @@ describe('Groups-Controller: Transactions:', () => {
         return getUserData(users[2].token);
       }).then(res => {
         users[2].userId = res.body.payload.userId;
-        return chai.request(settings.host)
-          .post(settings.url.groups.base  + '/')
-          .set('Authorization', '0 ' + users[0].token)
-          .send(groupScenarios[2].createGroup);
+        return groupService.create(0, users[0].token, groupScenarios[2].createGroup);
       }).then(res => {
         groupCreatedAt = res.body.payload.createdAt;
         groupId = res.body.payload.groupId;

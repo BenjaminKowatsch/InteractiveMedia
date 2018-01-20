@@ -9,6 +9,7 @@ const databaseHelper = require('./data/databaseHelper');
 const expectResponse = require('../util/expectResponse.util');
 const settings = require('../config/settings.config');
 const userService = require('../util/userService.util');
+const groupService = require('../util/groupService.util');
 
 chai.use(require('chai-http'));
 
@@ -176,10 +177,7 @@ describe('Groups-Controller: Groups:', () => {
         return userService.register(userData.users.valid[2]);
       }).then(res => {
         tokens[2] = res.body.payload.accessToken;
-        return chai.request(settings.host)
-          .post(settings.url.groups.base  + '/')
-          .set('Authorization', '0 ' + tokens[0])
-          .send(groupScenarios[0].create);
+        return groupService.create(0, tokens[0], groupScenarios[0].create);
       }).then(res => {
         groupId = res.body.payload.groupId;
         done();

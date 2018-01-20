@@ -102,16 +102,10 @@ describe('Admin', () => {
           return userService.register(userData.users.valid[2]);
         }).then(res => {
           tokens[2] = res.body.payload.accessToken;
-          return chai.request(settings.host)
-            .post(settings.url.groups.base  + '/')
-            .set('Authorization', '0 ' + tokens[0])
-            .send(groupScenarios[1].createGroup0);
+          return groupService.create(0, tokens[0], groupScenarios[1].createGroup0);
         }).then(res => {
           groupIds[0] = res.body.payload.groupId;
-          return chai.request(settings.host)
-            .post(settings.url.groups.base  + '/')
-            .set('Authorization', '0 ' + tokens[0])
-            .send(groupScenarios[1].createGroup1);
+          return groupService.create(0, tokens[0], groupScenarios[1].createGroup1);
         }).then(res => {
           groupIds[1] = res.body.payload.groupId;
           done();
@@ -182,10 +176,7 @@ describe('Admin', () => {
           return userService.register(userData.users.valid[2]);
         }).then(res => {
           tokens[2] = res.body.payload.accessToken;
-          return chai.request(settings.host)
-            .post(settings.url.groups.base  + '/')
-            .set('Authorization', '0 ' + tokens[0])
-            .send(groupScenarios[1].createGroup0);
+          return groupService.create(0, tokens[0], groupScenarios[1].createGroup0);
         }).then(res => {
           groupId = res.body.payload.groupId;
           done();
@@ -259,10 +250,7 @@ describe('Admin', () => {
           return userService.register(userData.users.valid[1]);
         }).then(res => {
           tokens[1] = res.body.payload.accessToken;
-          return chai.request(settings.host)
-            .post(settings.url.groups.base  + '/')
-            .set('Authorization', '0 ' + tokens[0])
-            .send(groupScenarios[1].createGroup0);
+          return groupService.create(0, tokens[0], groupScenarios[1].createGroup0);
         }).then(res => {
           groupId = res.body.payload.groupId;
           done();
@@ -340,10 +328,7 @@ describe('Admin', () => {
           return userService.register(userData.users.valid[2]);
         }).then(res => {
           tokens[2] = res.body.payload.accessToken;
-          return chai.request(settings.host)
-            .post(settings.url.groups.base  + '/')
-            .set('Authorization', '0 ' + tokens[0])
-            .send(groupScenarios[1].createGroup0);
+          return groupService.create(0, tokens[0], groupScenarios[1].createGroup0);
         }).then(res => {
           groupId = res.body.payload.groupId;
           done();
