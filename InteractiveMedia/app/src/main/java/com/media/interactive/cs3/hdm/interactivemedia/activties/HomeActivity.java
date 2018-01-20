@@ -6,7 +6,6 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.content.res.ColorStateList;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
@@ -60,8 +59,6 @@ public class HomeActivity extends AppCompatActivity
         getSupportActionBar().setTitle("");
 
         fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setForegroundTintList(ColorStateList.valueOf(getResources().getColor(android.R.color.white)));
-        fab.setBackgroundTintList(ColorStateList.valueOf(getResources().getColor(R.color.colorPrimaryDark)));
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
 
