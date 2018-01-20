@@ -1,5 +1,7 @@
 package com.media.interactive.cs3.hdm.interactivemedia.data.split;
 
+import android.location.Location;
+
 import com.google.android.gms.maps.model.LatLng;
 import com.media.interactive.cs3.hdm.interactivemedia.data.Debt;
 import com.media.interactive.cs3.hdm.interactivemedia.data.Group;
@@ -40,7 +42,7 @@ public class EvenSplitTest {
         testGroup.getUsers().add(testUser3);
         testGroup.getUsers().add(payingUser);
         transaction = new Transaction("TestTransaction", payingUser.getUserId(), "even",
-                new Date(System.currentTimeMillis()), new LatLng(0.0, 0.0), 0.0, testGroup);
+                new Date(System.currentTimeMillis()), new Location(""), 0.0, testGroup);
     }
 
     @Test

@@ -30,8 +30,8 @@
     </v-layout>
 </v-container>
 
-       <input type="button" v-on:click="createDummyGroup()" value="AddDummyGroup"/>
-  <!--       <input type="button" v-on:click="showGroupUserChart = toggleState(showGroupUserChart)" value="Show User and Groups Chart"/>
+<!--        <input type="button" v-on:click="createDummyGroup()" value="AddDummyGroup"/>
+ -->  <!--       <input type="button" v-on:click="showGroupUserChart = toggleState(showGroupUserChart)" value="Show User and Groups Chart"/>
 
         <input type="button" v-on:click="showLoginTypeChart = toggleState(showLoginTypeChart)" value="Show Logintype Chart"/>
         <input type="button"  v-on:click="logout()" value="Logout"/>  -->
@@ -123,7 +123,7 @@ export default {
 
   methods: {
     /*     Create a dummy group for testpurpose. After creating, page has to be reloaded to see group*/
-    createDummyGroup: function() {
+/*     createDummyGroup: function() {
       axios
         .post(
           Config.webServiceURL + "/v1/groups",
@@ -142,7 +142,7 @@ export default {
         .catch(function(error) {
           console.log(error);
         });
-    },
+    }, */
 
     authorizeAdmin: function() {
       axios

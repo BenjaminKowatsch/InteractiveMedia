@@ -341,7 +341,14 @@ public class ImagePickerActivity extends AppCompatActivity {
 
             int columnIndex = cursor.getColumnIndex(filePathColumn[0]);
 
-            currentPhotoPath = cursor.getString(columnIndex);
+            final File original = new File(cursor.getString(columnIndex));
+
+            try {
+                final File copy = createImageFile();
+                Helper.copyFile(original, copy);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
 
             cursor.close();
 
@@ -506,7 +513,7 @@ public class ImagePickerActivity extends AppCompatActivity {
             @Override
             public void afterTextChanged(Editable editable) {
 
-                if (Helper.IsUrlValid(editable.toString())) {
+                if (Helper.isUrlValid(editable.toString())) {
                     errorMessage.setVisibility(View.GONE);
                     positiveButton.setEnabled(true);
                 } else {

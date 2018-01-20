@@ -18,6 +18,8 @@ import com.media.interactive.cs3.hdm.interactivemedia.contentprovider.tables.Gro
 import com.media.interactive.cs3.hdm.interactivemedia.data.Group;
 import com.media.interactive.cs3.hdm.interactivemedia.data.Login;
 
+import java.io.File;
+
 /**
  * Created by benny on 04.01.18.
  */
@@ -70,13 +72,24 @@ public class GroupAdapter extends CursorAdapter {
             builder = builder.addHeader("Authorization", Login.getInstance().getUserType().getValue() + " " + Login.getInstance().getAccessToken());
             glideUrl = new GlideUrl(imageUrl, builder.build());
         }
-
-        Glide.with(context).load(glideUrl)
-            .diskCacheStrategy(DiskCacheStrategy.SOURCE)
-            .fallback(R.drawable.anonymoususer)
-            .placeholder(R.drawable.anonymoususer)
-            .into(viewHolder.groupIcon);
-
+        if(group.getSync() && group.getImageUrl() != null) {
+            Glide.with(context).load(glideUrl)
+                .diskCacheStrategy(DiskCacheStrategy.SOURCE)
+                .fallback(R.drawable.anonymoususer)
+                .placeholder(R.drawable.anonymoususer)
+                .into(viewHolder.groupIcon);
+        } else if(group.getImageUrl() != null){
+            Glide.with(context).load(new File(group.getImageUrl()))
+                .diskCacheStrategy(DiskCacheStrategy.SOURCE)
+                .fallback(R.drawable.anonymoususer)
+                .placeholder(R.drawable.anonymoususer)
+                .into(viewHolder.groupIcon);
+        } else {
+            Glide.with(context)
+                .load(R.drawable.anonymoususer)
+                .diskCacheStrategy(DiskCacheStrategy.SOURCE)
+                .into(viewHolder.groupIcon);
+        }
     }
 
     public class ViewHolder {
