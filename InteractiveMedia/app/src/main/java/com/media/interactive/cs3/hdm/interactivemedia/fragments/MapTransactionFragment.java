@@ -73,7 +73,10 @@ public class MapTransactionFragment extends Fragment implements IMyFragment,
     }
 
     private String getCurrentGroupId() {
+        if(groupAdapter.getCursor().getCount() > 0){
         return groupAdapter.getCursor().getString(groupAdapter.getCursor().getColumnIndex(GroupTable.COLUMN_GROUP_ID));
+        }
+        return null;
     }
 
     private SimpleCursorAdapter initializeGroupAdapter() {
@@ -122,12 +125,13 @@ public class MapTransactionFragment extends Fragment implements IMyFragment,
 
 
     private void setMarkers() {
-        if (mMap != null) {
+        final String groupId = getCurrentGroupId();
+        if (mMap != null && groupId != null) {
             mMap.clear();
             final String[] projection = {TransactionTable.TABLE_NAME + ".*"};
             final String sortOrder = TransactionTable.TABLE_NAME + "." + TransactionTable.COLUMN_INFO_CREATED_AT + " DESC";
             final String selection = GroupTable.TABLE_NAME + "." + GroupTable.COLUMN_GROUP_ID + " = ? AND " + UserTable.TABLE_NAME + "." + UserTable.COLUMN_USER_ID + " = ?";
-            final String[] selectionArgs = {getCurrentGroupId(), Login.getInstance().getUser().getUserId()};
+            final String[] selectionArgs = {groupId, Login.getInstance().getUser().getUserId()};
             final Cursor transactions = getActivity().getContentResolver().query(DatabaseProvider.CONTENT_GROUP_USER_TRANSACTION_JOIN_URI, projection, selection, selectionArgs, sortOrder);
             Log.d(TAG, "Transactions Count: " + transactions.getCount());
 
