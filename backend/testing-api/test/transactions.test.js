@@ -6,6 +6,7 @@ const chai = require('chai');
 const expect = require('chai').expect;
 const winston = require('winston');
 const databaseHelper = require('./data/databaseHelper');
+const expectResponse = require('../util/expectResponse.util');
 
 chai.use(require('chai-http'));
 
@@ -149,13 +150,7 @@ describe('Groups-Controller: Transactions:', () => {
       .set('Authorization', '0 ' + users[0].token)
       .send(groupScenarios[2].transactionWrongLocation1)
       .then(res => {
-        expect(res).to.have.status(400);
-        expect(res).to.be.json;
-        expect(res.body).to.be.an('object');
-        expect(res.body.success).to.be.false;
-        expect(res.body.payload).to.be.an('object');
-        expect(res.body.payload.dataPath).to.equal('validation');
-        expect(res.body.payload.message).to.equal('invalid request body');
+        expectResponse.toBe400InvalidRequestBody(res);
       });
     });
 
@@ -165,13 +160,7 @@ describe('Groups-Controller: Transactions:', () => {
       .set('Authorization', '0 ' + users[0].token)
       .send(groupScenarios[2].transactionWrongLocation2)
       .then(res => {
-        expect(res).to.have.status(400);
-        expect(res).to.be.json;
-        expect(res.body).to.be.an('object');
-        expect(res.body.success).to.be.false;
-        expect(res.body.payload).to.be.an('object');
-        expect(res.body.payload.dataPath).to.equal('validation');
-        expect(res.body.payload.message).to.equal('invalid request body');
+        expectResponse.toBe400InvalidRequestBody(res);
       });
     });
 
@@ -181,13 +170,7 @@ describe('Groups-Controller: Transactions:', () => {
       .set('Authorization', '0 ' + users[0].token)
       .send(groupScenarios[2].transactionWrongLocation3)
       .then(res => {
-        expect(res).to.have.status(400);
-        expect(res).to.be.json;
-        expect(res.body).to.be.an('object');
-        expect(res.body.success).to.be.false;
-        expect(res.body.payload).to.be.an('object');
-        expect(res.body.payload.dataPath).to.equal('validation');
-        expect(res.body.payload.message).to.equal('invalid request body');
+        expectResponse.toBe400InvalidRequestBody(res);
       });
     });
 
@@ -216,13 +199,7 @@ describe('Groups-Controller: Transactions:', () => {
       .set('Authorization', '0 ' + users[0].token)
       .send(transaction)
       .then(res => {
-        expect(res).to.have.status(400);
-        expect(res).to.be.json;
-        expect(res.body).to.be.an('object');
-        expect(res.body.success).to.be.false;
-        expect(res.body.payload).to.be.an('object');
-        expect(res.body.payload.dataPath).to.equal('validation');
-        expect(res.body.payload.message).to.equal('invalid request body');
+        expectResponse.toBe400InvalidRequestBody(res);
       });
     });
 
@@ -234,13 +211,7 @@ describe('Groups-Controller: Transactions:', () => {
       .set('Authorization', '0 ' + users[0].token)
       .send(transaction)
       .then(res => {
-        expect(res).to.have.status(400);
-        expect(res).to.be.json;
-        expect(res.body).to.be.an('object');
-        expect(res.body.success).to.be.false;
-        expect(res.body.payload).to.be.an('object');
-        expect(res.body.payload.dataPath).to.equal('validation');
-        expect(res.body.payload.message).to.equal('invalid request body');
+        expectResponse.toBe400InvalidRequestBody(res);
       });
     });
 
@@ -252,13 +223,7 @@ describe('Groups-Controller: Transactions:', () => {
       .set('Authorization', '0 ' + users[0].token)
       .send(transaction)
       .then(res => {
-        expect(res).to.have.status(400);
-        expect(res).to.be.json;
-        expect(res.body).to.be.an('object');
-        expect(res.body.success).to.be.false;
-        expect(res.body.payload).to.be.an('object');
-        expect(res.body.payload.dataPath).to.equal('validation');
-        expect(res.body.payload.message).to.equal('invalid request body');
+        expectResponse.toBe400InvalidRequestBody(res);
       });
     });
 
@@ -270,13 +235,7 @@ describe('Groups-Controller: Transactions:', () => {
       .set('Authorization', '0 ' + users[0].token)
       .send(transaction)
       .then(res => {
-        expect(res).to.have.status(400);
-        expect(res).to.be.json;
-        expect(res.body).to.be.an('object');
-        expect(res.body.success).to.be.false;
-        expect(res.body.payload).to.be.an('object');
-        expect(res.body.payload.dataPath).to.equal('validation');
-        expect(res.body.payload.message).to.equal('invalid request body');
+        expectResponse.toBe400InvalidRequestBody(res);
       });
     });
 
@@ -288,13 +247,7 @@ describe('Groups-Controller: Transactions:', () => {
       .set('Authorization', '0 ' + users[0].token)
       .send(transaction)
       .then(res => {
-        expect(res).to.have.status(400);
-        expect(res).to.be.json;
-        expect(res.body).to.be.an('object');
-        expect(res.body.success).to.be.false;
-        expect(res.body.payload).to.be.an('object');
-        expect(res.body.payload.dataPath).to.equal('validation');
-        expect(res.body.payload.message).to.equal('invalid request body');
+        expectResponse.toBe400InvalidRequestBody(res);
       });
     });
 
@@ -306,13 +259,7 @@ describe('Groups-Controller: Transactions:', () => {
       .set('Authorization', '0 ' + users[0].token)
       .send(transaction)
       .then(res => {
-        expect(res).to.have.status(400);
-        expect(res).to.be.json;
-        expect(res.body).to.be.an('object');
-        expect(res.body.success).to.be.false;
-        expect(res.body.payload).to.be.an('object');
-        expect(res.body.payload.dataPath).to.equal('validation');
-        expect(res.body.payload.message).to.equal('invalid request body');
+        expectResponse.toBe400InvalidRequestBody(res);
       });
     });
 
@@ -324,13 +271,7 @@ describe('Groups-Controller: Transactions:', () => {
       .set('Authorization', '0 ' + users[0].token)
       .send(transaction)
       .then(res => {
-        expect(res).to.have.status(400);
-        expect(res).to.be.json;
-        expect(res.body).to.be.an('object');
-        expect(res.body.success).to.be.false;
-        expect(res.body.payload).to.be.an('object');
-        expect(res.body.payload.dataPath).to.equal('validation');
-        expect(res.body.payload.message).to.equal('invalid request body');
+        expectResponse.toBe400InvalidRequestBody(res);
       });
     });
 
@@ -342,13 +283,7 @@ describe('Groups-Controller: Transactions:', () => {
       .set('Authorization', '0 ' + users[0].token)
       .send(transaction)
       .then(res => {
-        expect(res).to.have.status(400);
-        expect(res).to.be.json;
-        expect(res.body).to.be.an('object');
-        expect(res.body.success).to.be.false;
-        expect(res.body.payload).to.be.an('object');
-        expect(res.body.payload.dataPath).to.equal('validation');
-        expect(res.body.payload.message).to.equal('invalid request body');
+        expectResponse.toBe400InvalidRequestBody(res);
       });
     });
   });

@@ -6,6 +6,7 @@ const chai = require('chai');
 const fs = require('fs');
 const expect = require('chai').expect;
 const databaseHelper = require('./data/databaseHelper');
+const expectResponse = require('../util/expectResponse.util');
 
 chai.use(require('chai-http'));
 
@@ -172,13 +173,7 @@ describe('User-Controller', () => {
       .post(URL.BASE_USER + '/login?type=2')
       .send({'accessToken': ''})
       .then(res => {
-        expect(res).to.have.status(400);
-        expect(res).to.be.json;
-        expect(res.body).to.be.an('object');
-        expect(res.body.success).to.be.false;
-        expect(res.body.payload).to.be.an('object');
-        expect(res.body.payload.dataPath).to.equal('validation');
-        expect(res.body.payload.message).to.equal('invalid request body');
+        expectResponse.toBe400InvalidRequestBody(res);
       });
     });
 
@@ -187,13 +182,7 @@ describe('User-Controller', () => {
       .post(URL.BASE_USER + '/login?type=2')
       .send({})
       .then(res => {
-        expect(res).to.have.status(400);
-        expect(res).to.be.json;
-        expect(res.body).to.be.an('object');
-        expect(res.body.success).to.be.false;
-        expect(res.body.payload).to.be.an('object');
-        expect(res.body.payload.dataPath).to.equal('validation');
-        expect(res.body.payload.message).to.be.equal('invalid request body');
+        expectResponse.toBe400InvalidRequestBody(res);
       });
     });
   });
@@ -236,13 +225,7 @@ describe('User-Controller', () => {
         .post(URL.BASE_USER + '/')
         .send(testData.users.invalid.invalidUsername)
         .then(function(res) {
-          expect(res).to.have.status(400);
-          expect(res).to.be.json;
-          expect(res.body).to.be.an('object');
-          expect(res.body.success).to.be.false;
-          expect(res.body.payload).to.be.an('object');
-          expect(res.body.payload.dataPath).to.equal('validation');
-          expect(res.body.payload.message).to.equal('invalid request body');
+          expectResponse.toBe400InvalidRequestBody(res);
         });
       });
 
@@ -251,13 +234,7 @@ describe('User-Controller', () => {
         .post(URL.BASE_USER + '/')
         .send(testData.users.invalid.invalidPassword)
         .then(function(res) {
-          expect(res).to.have.status(400);
-          expect(res).to.be.json;
-          expect(res.body).to.be.an('object');
-          expect(res.body.success).to.be.false;
-          expect(res.body.payload).to.be.an('object');
-          expect(res.body.payload.dataPath).to.equal('validation');
-          expect(res.body.payload.message).to.equal('invalid request body');
+          expectResponse.toBe400InvalidRequestBody(res);
         });
       });
 
@@ -266,13 +243,7 @@ describe('User-Controller', () => {
         .post(URL.BASE_USER + '/')
         .send(testData.users.invalid.missingUsername)
         .then(function(res) {
-          expect(res).to.have.status(400);
-          expect(res).to.be.json;
-          expect(res.body).to.be.an('object');
-          expect(res.body.success).to.be.false;
-          expect(res.body.payload).to.be.an('object');
-          expect(res.body.payload.dataPath).to.equal('validation');
-          expect(res.body.payload.message).to.equal('invalid request body');
+          expectResponse.toBe400InvalidRequestBody(res);
         });
       });
 
@@ -281,13 +252,7 @@ describe('User-Controller', () => {
         .post(URL.BASE_USER + '/')
         .send(testData.users.invalid.missingEmail)
         .then(function(res) {
-          expect(res).to.have.status(400);
-          expect(res).to.be.json;
-          expect(res.body).to.be.an('object');
-          expect(res.body.success).to.be.false;
-          expect(res.body.payload).to.be.an('object');
-          expect(res.body.payload.dataPath).to.equal('validation');
-          expect(res.body.payload.message).to.equal('invalid request body');
+          expectResponse.toBe400InvalidRequestBody(res);
         });
       });
 
@@ -296,13 +261,7 @@ describe('User-Controller', () => {
         .post(URL.BASE_USER + '/')
         .send(testData.users.invalid.missingPassword)
         .then(function(res) {
-          expect(res).to.have.status(400);
-          expect(res).to.be.json;
-          expect(res.body).to.be.an('object');
-          expect(res.body.success).to.be.false;
-          expect(res.body.payload).to.be.an('object');
-          expect(res.body.payload.dataPath).to.equal('validation');
-          expect(res.body.payload.message).to.equal('invalid request body');
+          expectResponse.toBe400InvalidRequestBody(res);
         });
       });
 
@@ -311,13 +270,7 @@ describe('User-Controller', () => {
         .post(URL.BASE_USER + '/')
         .send(testData.users.invalid.missingImageUrl)
         .then(function(res) {
-          expect(res).to.have.status(400);
-          expect(res).to.be.json;
-          expect(res.body).to.be.an('object');
-          expect(res.body.success).to.be.false;
-          expect(res.body.payload).to.be.an('object');
-          expect(res.body.payload.dataPath).to.equal('validation');
-          expect(res.body.payload.message).to.equal('invalid request body');
+          expectResponse.toBe400InvalidRequestBody(res);
         });
       });
     });
@@ -372,13 +325,7 @@ describe('User-Controller', () => {
         .send({username: testData.users.valid[1].username,
           password: ''})
         .then(res => {
-          expect(res).to.have.status(400);
-          expect(res).to.be.json;
-          expect(res.body).to.be.an('object');
-          expect(res.body.success).to.be.false;
-          expect(res.body.payload).to.be.an('object');
-          expect(res.body.payload.dataPath).to.equal('validation');
-          expect(res.body.payload.message).to.equal('invalid request body');
+          expectResponse.toBe400InvalidRequestBody(res);
         });
       });
 
@@ -387,13 +334,7 @@ describe('User-Controller', () => {
         .post(URL.BASE_USER + '/login?type=0')
         .send({username: testData.users.valid[1].username})
         .then(res => {
-          expect(res).to.have.status(400);
-          expect(res).to.be.json;
-          expect(res.body).to.be.an('object');
-          expect(res.body.success).to.be.false;
-          expect(res.body.payload).to.be.an('object');
-          expect(res.body.payload.dataPath).to.equal('validation');
-          expect(res.body.payload.message).to.equal('invalid request body');
+          expectResponse.toBe400InvalidRequestBody(res);
         });
       });
 
@@ -402,13 +343,7 @@ describe('User-Controller', () => {
         .post(URL.BASE_USER + '/login?type=0')
         .send({password: testData.users.valid[2].password})
         .then(res => {
-          expect(res).to.have.status(400);
-          expect(res).to.be.json;
-          expect(res.body).to.be.an('object');
-          expect(res.body.success).to.be.false;
-          expect(res.body.payload).to.be.an('object');
-          expect(res.body.payload.dataPath).to.equal('validation');
-          expect(res.body.payload.message).to.equal('invalid request body');
+          expectResponse.toBe400InvalidRequestBody(res);
         });
       });
 
@@ -433,12 +368,7 @@ describe('User-Controller', () => {
         .post(URL.BASE_USER + '/login?type=0')
         .send({})
         .then(res => {
-          expect(res).to.have.status(400);
-          expect(res).to.be.json;
-          expect(res.body).to.be.an('object');
-          expect(res.body.success).to.be.false;
-          expect(res.body.payload).to.be.an('object');
-          expect(res.body.payload.message).to.be.equal('invalid request body');
+          expectResponse.toBe400InvalidRequestBody(res);
         });
       });
 
@@ -828,13 +758,7 @@ describe('User-Controller', () => {
         .put(URL.BASE_USER  + '/user')
         .set('Authorization', '0 ' + token)
         .then(res => {
-          expect(res).to.have.status(400);
-          expect(res).to.be.json;
-          expect(res.body).to.be.an('object');
-          expect(res.body.success).to.be.false;
-          expect(res.body.payload).to.be.an('object');
-          expect(res.body.payload.dataPath).to.equal('validation');
-          expect(res.body.payload.message).to.equal('invalid request body');
+          expectResponse.toBe400InvalidRequestBody(res);
         });
       });
 
@@ -844,13 +768,7 @@ describe('User-Controller', () => {
         .set('Authorization', '0 ' + token)
         .send(testData.users.update.invalid.updateUserId)
         .then(res => {
-          expect(res).to.have.status(400);
-          expect(res).to.be.json;
-          expect(res.body).to.be.an('object');
-          expect(res.body.success).to.be.false;
-          expect(res.body.payload).to.be.an('object');
-          expect(res.body.payload.dataPath).to.equal('validation');
-          expect(res.body.payload.message).to.equal('invalid request body');
+          expectResponse.toBe400InvalidRequestBody(res);
         });
       });
 
@@ -860,13 +778,7 @@ describe('User-Controller', () => {
         .set('Authorization', '0 ' + token)
         .send(testData.users.update.invalid.updateGroupIds)
         .then(res => {
-          expect(res).to.have.status(400);
-          expect(res).to.be.json;
-          expect(res.body).to.be.an('object');
-          expect(res.body.success).to.be.false;
-          expect(res.body.payload).to.be.an('object');
-          expect(res.body.payload.dataPath).to.equal('validation');
-          expect(res.body.payload.message).to.equal('invalid request body');
+          expectResponse.toBe400InvalidRequestBody(res);
         });
       });
 
@@ -876,13 +788,7 @@ describe('User-Controller', () => {
         .set('Authorization', '0 ' + token)
         .send(testData.users.update.invalid.updateInternalId)
         .then(res => {
-          expect(res).to.have.status(400);
-          expect(res).to.be.json;
-          expect(res.body).to.be.an('object');
-          expect(res.body.success).to.be.false;
-          expect(res.body.payload).to.be.an('object');
-          expect(res.body.payload.dataPath).to.equal('validation');
-          expect(res.body.payload.message).to.equal('invalid request body');
+          expectResponse.toBe400InvalidRequestBody(res);
         });
       });
 
@@ -892,13 +798,7 @@ describe('User-Controller', () => {
         .set('Authorization', '0 ' + token)
         .send(testData.users.update.invalid.updateAuthType)
         .then(res => {
-          expect(res).to.have.status(400);
-          expect(res).to.be.json;
-          expect(res.body).to.be.an('object');
-          expect(res.body.success).to.be.false;
-          expect(res.body.payload).to.be.an('object');
-          expect(res.body.payload.dataPath).to.equal('validation');
-          expect(res.body.payload.message).to.equal('invalid request body');
+          expectResponse.toBe400InvalidRequestBody(res);
         });
       });
 
@@ -908,13 +808,7 @@ describe('User-Controller', () => {
         .set('Authorization', '0 ' + token)
         .send(testData.users.update.invalid.updateRole)
         .then(res => {
-          expect(res).to.have.status(400);
-          expect(res).to.be.json;
-          expect(res.body).to.be.an('object');
-          expect(res.body.success).to.be.false;
-          expect(res.body.payload).to.be.an('object');
-          expect(res.body.payload.dataPath).to.equal('validation');
-          expect(res.body.payload.message).to.equal('invalid request body');
+          expectResponse.toBe400InvalidRequestBody(res);
         });
       });
 
@@ -924,13 +818,7 @@ describe('User-Controller', () => {
         .set('Authorization', '0 ' + token)
         .send(testData.users.update.invalid.updateUnknownField)
         .then(res => {
-          expect(res).to.have.status(400);
-          expect(res).to.be.json;
-          expect(res.body).to.be.an('object');
-          expect(res.body.success).to.be.false;
-          expect(res.body.payload).to.be.an('object');
-          expect(res.body.payload.dataPath).to.equal('validation');
-          expect(res.body.payload.message).to.equal('invalid request body');
+          expectResponse.toBe400InvalidRequestBody(res);
         });
       });
 
@@ -940,13 +828,7 @@ describe('User-Controller', () => {
         .set('Authorization', '0 ' + token)
         .send(testData.users.update.invalid.updateUsernameNull)
         .then(res => {
-          expect(res).to.have.status(400);
-          expect(res).to.be.json;
-          expect(res.body).to.be.an('object');
-          expect(res.body.success).to.be.false;
-          expect(res.body.payload).to.be.an('object');
-          expect(res.body.payload.dataPath).to.equal('validation');
-          expect(res.body.payload.message).to.equal('invalid request body');
+          expectResponse.toBe400InvalidRequestBody(res);
         });
       });
 
@@ -956,13 +838,7 @@ describe('User-Controller', () => {
         .set('Authorization', '0 ' + token)
         .send(testData.users.update.invalid.updatePasswordNull)
         .then(res => {
-          expect(res).to.have.status(400);
-          expect(res).to.be.json;
-          expect(res.body).to.be.an('object');
-          expect(res.body.success).to.be.false;
-          expect(res.body.payload).to.be.an('object');
-          expect(res.body.payload.dataPath).to.equal('validation');
-          expect(res.body.payload.message).to.equal('invalid request body');
+          expectResponse.toBe400InvalidRequestBody(res);
         });
       });
 
@@ -972,13 +848,7 @@ describe('User-Controller', () => {
         .set('Authorization', '0 ' + token)
         .send(testData.users.update.invalid.updateEmailNull)
         .then(res => {
-          expect(res).to.have.status(400);
-          expect(res).to.be.json;
-          expect(res.body).to.be.an('object');
-          expect(res.body.success).to.be.false;
-          expect(res.body.payload).to.be.an('object');
-          expect(res.body.payload.dataPath).to.equal('validation');
-          expect(res.body.payload.message).to.equal('invalid request body');
+          expectResponse.toBe400InvalidRequestBody(res);
         });
       });
     });

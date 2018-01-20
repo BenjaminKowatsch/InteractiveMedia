@@ -6,6 +6,7 @@ const chai = require('chai');
 const expect = require('chai').expect;
 const winston = require('winston');
 const databaseHelper = require('./data/databaseHelper');
+const expectResponse = require('../util/expectResponse.util');
 
 chai.use(require('chai-http'));
 
@@ -679,13 +680,7 @@ describe('Admin', () => {
           .put(URL.BASE_ADMIN  + '/users/' + userIds[0])
           .set('Authorization', '0 ' + adminToken)
           .then(res => {
-            expect(res).to.have.status(400);
-            expect(res).to.be.json;
-            expect(res.body).to.be.an('object');
-            expect(res.body.success).to.be.false;
-            expect(res.body.payload).to.be.an('object');
-            expect(res.body.payload.dataPath).to.equal('validation');
-            expect(res.body.payload.message).to.equal('invalid request body');
+            expectResponse.toBe400InvalidRequestBody(res);
           });
         });
 
@@ -695,13 +690,7 @@ describe('Admin', () => {
           .set('Authorization', '0 ' + adminToken)
           .send(userData.users.updateAsAdmin.invalid.updateUserId)
           .then(res => {
-            expect(res).to.have.status(400);
-            expect(res).to.be.json;
-            expect(res.body).to.be.an('object');
-            expect(res.body.success).to.be.false;
-            expect(res.body.payload).to.be.an('object');
-            expect(res.body.payload.dataPath).to.equal('validation');
-            expect(res.body.payload.message).to.equal('invalid request body');
+            expectResponse.toBe400InvalidRequestBody(res);
           });
         });
 
@@ -711,13 +700,7 @@ describe('Admin', () => {
           .set('Authorization', '0 ' + adminToken)
           .send(userData.users.updateAsAdmin.invalid.updateGroupIds)
           .then(res => {
-            expect(res).to.have.status(400);
-            expect(res).to.be.json;
-            expect(res.body).to.be.an('object');
-            expect(res.body.success).to.be.false;
-            expect(res.body.payload).to.be.an('object');
-            expect(res.body.payload.dataPath).to.equal('validation');
-            expect(res.body.payload.message).to.equal('invalid request body');
+            expectResponse.toBe400InvalidRequestBody(res);
           });
         });
 
@@ -727,13 +710,7 @@ describe('Admin', () => {
           .set('Authorization', '0 ' + adminToken)
           .send(userData.users.updateAsAdmin.invalid.updateInternalId)
           .then(res => {
-            expect(res).to.have.status(400);
-            expect(res).to.be.json;
-            expect(res.body).to.be.an('object');
-            expect(res.body.success).to.be.false;
-            expect(res.body.payload).to.be.an('object');
-            expect(res.body.payload.dataPath).to.equal('validation');
-            expect(res.body.payload.message).to.equal('invalid request body');
+            expectResponse.toBe400InvalidRequestBody(res);
           });
         });
 
@@ -743,13 +720,7 @@ describe('Admin', () => {
           .set('Authorization', '0 ' + adminToken)
           .send(userData.users.updateAsAdmin.invalid.updateAuthType)
           .then(res => {
-            expect(res).to.have.status(400);
-            expect(res).to.be.json;
-            expect(res.body).to.be.an('object');
-            expect(res.body.success).to.be.false;
-            expect(res.body.payload).to.be.an('object');
-            expect(res.body.payload.dataPath).to.equal('validation');
-            expect(res.body.payload.message).to.equal('invalid request body');
+            expectResponse.toBe400InvalidRequestBody(res);
           });
         });
 
@@ -759,13 +730,7 @@ describe('Admin', () => {
           .set('Authorization', '0 ' + adminToken)
           .send(userData.users.updateAsAdmin.invalid.updateUsernameNull)
           .then(res => {
-            expect(res).to.have.status(400);
-            expect(res).to.be.json;
-            expect(res.body).to.be.an('object');
-            expect(res.body.success).to.be.false;
-            expect(res.body.payload).to.be.an('object');
-            expect(res.body.payload.dataPath).to.equal('validation');
-            expect(res.body.payload.message).to.equal('invalid request body');
+            expectResponse.toBe400InvalidRequestBody(res);
           });
         });
 
@@ -775,13 +740,7 @@ describe('Admin', () => {
           .set('Authorization', '0 ' + adminToken)
           .send(userData.users.updateAsAdmin.invalid.updatePasswordNull)
           .then(res => {
-            expect(res).to.have.status(400);
-            expect(res).to.be.json;
-            expect(res.body).to.be.an('object');
-            expect(res.body.success).to.be.false;
-            expect(res.body.payload).to.be.an('object');
-            expect(res.body.payload.dataPath).to.equal('validation');
-            expect(res.body.payload.message).to.equal('invalid request body');
+            expectResponse.toBe400InvalidRequestBody(res);
           });
         });
 
@@ -791,13 +750,7 @@ describe('Admin', () => {
           .set('Authorization', '0 ' + adminToken)
           .send(userData.users.updateAsAdmin.invalid.updateEmailNull)
           .then(res => {
-            expect(res).to.have.status(400);
-            expect(res).to.be.json;
-            expect(res.body).to.be.an('object');
-            expect(res.body.success).to.be.false;
-            expect(res.body.payload).to.be.an('object');
-            expect(res.body.payload.dataPath).to.equal('validation');
-            expect(res.body.payload.message).to.equal('invalid request body');
+            expectResponse.toBe400InvalidRequestBody(res);
           });
         });
 
@@ -807,13 +760,7 @@ describe('Admin', () => {
           .set('Authorization', '0 ' + adminToken)
           .send(userData.users.updateAsAdmin.invalid.updateInvalidRole)
           .then(res => {
-            expect(res).to.have.status(400);
-            expect(res).to.be.json;
-            expect(res.body).to.be.an('object');
-            expect(res.body.success).to.be.false;
-            expect(res.body.payload).to.be.an('object');
-            expect(res.body.payload.dataPath).to.equal('validation');
-            expect(res.body.payload.message).to.equal('invalid request body');
+            expectResponse.toBe400InvalidRequestBody(res);
           });
         });
 
@@ -823,13 +770,7 @@ describe('Admin', () => {
           .set('Authorization', '0 ' + adminToken)
           .send(userData.users.updateAsAdmin.invalid.updateUnknownField)
           .then(res => {
-            expect(res).to.have.status(400);
-            expect(res).to.be.json;
-            expect(res.body).to.be.an('object');
-            expect(res.body.success).to.be.false;
-            expect(res.body.payload).to.be.an('object');
-            expect(res.body.payload.dataPath).to.equal('validation');
-            expect(res.body.payload.message).to.equal('invalid request body');
+            expectResponse.toBe400InvalidRequestBody(res);
           });
         });
 
