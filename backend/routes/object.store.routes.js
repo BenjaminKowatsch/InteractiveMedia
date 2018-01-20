@@ -16,7 +16,9 @@ const objectStoreController = require('../controllers/object.store.controller');
  * @apiVersion 0.1.0
  *
  * @apiUse headerAuthorization
+ * @apiUse headerContentTypeFormUrlEncoded
  * @apiUse headerExampleAuthorization
+ * @apiUse headerExampleContentTypeFormUrlEncoded
  * @apiParam (body) {file} uploadField File to upload
  *
  * @apiParamExample {type} body
