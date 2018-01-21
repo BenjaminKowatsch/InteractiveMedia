@@ -103,6 +103,7 @@ router.get('/:groupId', authenticationMiddleware.isAuthenticated,
  * @apiUse error400InvalidBody
  * @apiUse error400UserNotInGroup
  * @apiUse error400MissingUnknownUrlParameter
+ * @apiUse error400InvalidSplit
  * @apiUse error401Unauthorized
  * @apiUse error403Forbidden
  * @apiUse error418UncaughtError

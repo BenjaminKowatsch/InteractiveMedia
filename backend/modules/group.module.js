@@ -6,6 +6,7 @@ const uuidService = require('../services/uuid.service');
 const database = require('../modules/database.module');
 const tokenService = require('../services/token.service');
 const ERROR = require('../config/error.config');
+const SPLIT = require('../config/split.config');
 
 /**
  * @param  {String} authToken auth token of user
@@ -160,6 +161,42 @@ module.exports.getAllGroups = function() {
   });
 };
 
+function validateSplit(group, transaction) {
+  let errorToReturn = {isSelfProvided: true};
+  errorToReturn.dataPath = 'transaction';
+  errorToReturn.message = 'invalid split';
+  let splitInvalid = false;
+
+  // validate split types individually
+  transaction.split.forEach((split, index) => {
+    switch (split.type) {
+      case SPLIT.EVEN:
+        // SPLIT.EVEN hast to be last in the array
+        if (transaction.split.length - 1 != index) {
+          splitInvalid = true;
+          errorToReturn.errorCode = ERROR.INVALID_SPLIT;
+          break;
+        }
+        break;
+      case SPLIT.CONSTANT_DEDUCTION:
+        // userId has to be member of the group
+        if (group.users.indexOf(split.userId) < 0) {
+          errorToReturn.dataPath = 'authorization';
+          errorToReturn.message = 'user is not but has to be a member of the group';
+          splitInvalid = true;
+          errorToReturn.errorCode = ERROR.USER_NOT_IN_GROUP;
+          break;
+        }
+        break;
+    }
+  });
+  if (splitInvalid) {
+    return Promise.reject(errorToReturn);
+  } else {
+    return group;
+  }
+}
+
 module.exports.createNewTransaction = function(groupId, transactionData) {
   return new Promise((resolve, reject) => {
     winston.debug('Hello from module createNewTransaction');
@@ -171,6 +208,7 @@ module.exports.createNewTransaction = function(groupId, transactionData) {
     .then(checkForGroupResult)
     .then(groupResult => checkIfUserIdIsInGroup(groupResult, transactionData.paidBy))
     .then(groupResult => checkIfDateIsGtGroupCreateDate(groupResult, transactionData.infoCreatedAt))
+    .then(groupResult => validateSplit(groupResult, transactionData))
     .then(groupResult => addTransactionToGroup(groupId, transactionData))
     .then(transactionResult => {
       winston.debug('Creating a new transaction successful');
