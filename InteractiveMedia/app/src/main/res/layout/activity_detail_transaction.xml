@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/colorPrimary"
-    tools:context="com.media.interactive.cs3.hdm.interactivemedia.activties.GroupDetailViewActivity">
+    tools:context="com.media.interactive.cs3.hdm.interactivemedia.activties.TransactionDetailViewActivity">
 
     <android.support.design.widget.AppBarLayout
         android:layout_width="match_parent"
@@ -65,7 +65,7 @@
             android:textSize="18dp" />
 
         <ImageView
-            android:id="@+id/detail_group_image"
+            android:id="@+id/detail_transaction_image"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
@@ -88,7 +88,7 @@
 
 
         <TextView
-            android:id="@+id/detail_group_name"
+            android:id="@+id/detail_transaction_name"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
@@ -109,7 +109,7 @@
 
 
         <TextView
-            android:id="@+id/detail_group_created_at"
+            android:id="@+id/detail_transaction_created_at"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
@@ -121,20 +121,40 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="left"
             android:layout_marginBottom="10dp"
             android:layout_marginRight="30dp"
             android:layout_marginLeft="30dp"
-            android:text="Group users:"
+            android:layout_gravity="left"
+            android:text="Amount:"
             android:textSize="18dp" />
 
-        <com.media.interactive.cs3.hdm.interactivemedia.NonScrollListView
+        <TextView
+            android:id="@+id/detail_transaction_amount"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginBottom="10dp"
+            android:layout_marginRight="40dp"
+            android:layout_marginLeft="40dp"
+            android:text="Amount"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="10dp"
             android:layout_marginRight="30dp"
             android:layout_marginLeft="30dp"
-            android:id="@+id/detail_list_view"
-            android:layout_gravity="center" />
+            android:layout_gravity="left"
+            android:text="Debts:"
+            android:textSize="18dp" />
+
+        <com.github.mikephil.charting.charts.PieChart
+            android:id="@+id/chart"
+            android:background="@color/colorPrimary"
+            android:foregroundTint="@android:color/white"
+            android:minHeight="400dp"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
 
 
     </LinearLayout>

@@ -15,6 +15,12 @@ import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.load.model.GlideUrl;
 import com.bumptech.glide.load.model.LazyHeaders;
+import com.github.mikephil.charting.charts.PieChart;
+import com.github.mikephil.charting.data.Entry;
+import com.github.mikephil.charting.data.PieData;
+import com.github.mikephil.charting.data.PieDataSet;
+import com.github.mikephil.charting.data.PieEntry;
+import com.github.mikephil.charting.utils.ColorTemplate;
 import com.media.interactive.cs3.hdm.interactivemedia.NonScrollListView;
 import com.media.interactive.cs3.hdm.interactivemedia.R;
 import com.media.interactive.cs3.hdm.interactivemedia.UserAdapter;
@@ -23,46 +29,55 @@ import com.media.interactive.cs3.hdm.interactivemedia.contentprovider.tables.Gro
 import com.media.interactive.cs3.hdm.interactivemedia.contentprovider.tables.UserTable;
 import com.media.interactive.cs3.hdm.interactivemedia.data.Login;
 
+import java.util.ArrayList;
+import java.util.Date;
+
 /**
  * Created by benny on 04.01.18.
  */
 
-public class GroupDetailViewActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor>{
+public class TransactionDetailViewActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor>{
 
-    private final static String TAG = GroupDetailViewActivity.class.getSimpleName();
+    private final static String TAG = TransactionDetailViewActivity.class.getSimpleName();
 
-    private ImageView groupImage;
-    private TextView groupName;
-    private TextView groupCreatedAt;
-    private NonScrollListView listView;
+    private ImageView transactionImage;
+    private TextView transactionName;
+    private TextView transactionCreatedAt;
+    private TextView transactionAmount;
 
     private UserAdapter userAdapter;
+    private PieChart pieChart;
 
-    private long groupId;
+    private long transactionId;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_detail_group);
+        setContentView(R.layout.activity_detail_transaction);
 
         final Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setTitle("");
 
-        groupImage = (ImageView) findViewById(R.id.detail_group_image);
-        groupName = (TextView) findViewById(R.id.detail_group_name);
-        groupCreatedAt = (TextView) findViewById(R.id.detail_group_created_at);
-        listView = (NonScrollListView) findViewById(R.id.detail_list_view);
+        transactionImage = (ImageView) findViewById(R.id.detail_transaction_image);
+        transactionName = (TextView) findViewById(R.id.detail_transaction_name);
+        transactionCreatedAt = (TextView) findViewById(R.id.detail_transaction_created_at);
+        transactionAmount = (TextView) findViewById(R.id.detail_transaction_amount);
 
         final Bundle extras = getIntent().getExtras();
-        groupId = extras.getLong("id");
+        transactionId = extras.getLong("id");
         final String imageUrl = extras.getString("imageUrl");
         final String name = extras.getString("name");
         final String createdAt = extras.getString("createdAt");
-        final boolean sync = extras.getBoolean("sync");
+        final double amount = extras.getDouble("amount");
 
-        groupName.setText(name);
-        groupCreatedAt.setText(createdAt);
+        transactionName.setText(name);
+        transactionCreatedAt.setText(createdAt);
+        transactionAmount.setText(String.valueOf(amount));
+
+        pieChart = (PieChart) findViewById(R.id.chart);
+
+        setPieChartData(pieChart);
 
         if(imageUrl != null) {
             LazyHeaders.Builder builder = new LazyHeaders.Builder();
@@ -75,19 +90,52 @@ public class GroupDetailViewActivity extends AppCompatActivity implements Loader
             Glide.with(this).load(glideUrl)
                 .diskCacheStrategy(DiskCacheStrategy.SOURCE)
                 .placeholder(ContextCompat.getDrawable(this, R.drawable.anonymoususer))
-                .into(groupImage);
+                .into(transactionImage);
         }
         // TODO: link to transactions
 
         getLoaderManager().initLoader(0, null, this);
     }
 
+    private void setPieChartData(PieChart pieChart) {
+        final PieDataSet dataset = new PieDataSet(getEntries(), "Time spent");
+        //Set the data
+        PieData data = new PieData(dataset); // initialize PieData
+
+        pieChart.setData(data); //set data into chart
+        pieChart.invalidate();
+
+        dataset.setColors(ColorTemplate.COLORFUL_COLORS); // set the color
+        dataset.setValueTextSize(16);
+    }
+
+    private ArrayList<PieEntry> getEntries() {
+        // creating data values
+
+        ArrayList<PieEntry> entries = new ArrayList<>();
+
+        for (int i = 0; i < 10; i++) {
+            entries.add(new PieEntry(i, i));
+        }
+
+        return entries;
+    }
+
+    private ArrayList<String> getLabels() {
+        // creating labels
+        ArrayList<String> labels = new ArrayList<>();
+        for (int i = 0; i < 10; i++) {
+            labels.add("Username: "+ i);
+        }
+        return labels;
+    }
+
     @Override
     public Loader<Cursor> onCreateLoader(int i, Bundle bundle) {
         final String[] projection = { UserTable.TABLE_NAME + ".*" };
         final String selection = GroupTable.TABLE_NAME + "." + GroupTable.COLUMN_ID + " = ? ";
-        final String[] selectionArgs = {String.valueOf(groupId)};
-        return new CursorLoader(GroupDetailViewActivity.this, DatabaseProvider.CONTENT_GROUP_USER_JOIN_URI, projection, selection, selectionArgs,null);
+        final String[] selectionArgs = {String.valueOf(transactionId)};
+        return new CursorLoader(TransactionDetailViewActivity.this, DatabaseProvider.CONTENT_GROUP_USER_JOIN_URI, projection, selection, selectionArgs,null);
     }
 
     @Override
@@ -98,7 +146,6 @@ public class GroupDetailViewActivity extends AppCompatActivity implements Loader
         } else {
             userAdapter.swapCursor(cursor);
         }
-        listView.setAdapter(userAdapter);
     }
 
     @Override

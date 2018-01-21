@@ -4,55 +4,67 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
+    android:background="@color/colorPrimary"
     tools:context="com.media.interactive.cs3.hdm.interactivemedia.fragments.ProfileFragment">
 
     <!-- TODO: Update blank fragment layout -->
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_marginLeft="30dp"
+        android:layout_marginRight="30dp"
+        android:layout_marginBottom="10dp"
+        android:text="Image:"
+        android:textSize="19sp" />
 
     <ImageView
         android:id="@+id/profile_image_view"
         android:layout_width="wrap_content"
         android:layout_height="153dp"
         app:srcCompat="@drawable/anonymoususer"
-        android:layout_marginBottom="20dp" />
+        android:layout_marginBottom="10dp" />
+
     <TextView
-        android:layout_marginBottom="20dp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
-        android:layout_marginLeft="20dp"
-        android:layout_marginRight="20dp"
+        android:layout_marginLeft="30dp"
+        android:layout_marginRight="30dp"
+        android:layout_marginBottom="10dp"
         android:text="Username:"
         android:textSize="19sp" />
 
     <TextView
-        android:layout_marginBottom="20dp"
         android:id="@+id/profile_username"
         android:layout_gravity="center"
         android:textSize="19sp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginLeft="20dp"
-        android:layout_marginRight="20dp"
+        android:layout_marginLeft="40dp"
+        android:layout_marginRight="40dp"
+        android:layout_marginBottom="10dp"
         android:hint="Username" />
 
     <TextView
-        android:layout_marginBottom="20dp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
-        android:layout_marginLeft="20dp"
-        android:layout_marginRight="20dp"
+        android:layout_marginLeft="30dp"
+        android:layout_marginRight="30dp"
+        android:layout_marginBottom="10dp"
         android:text="Email:"
         android:textSize="19sp" />
 
     <TextView
         android:id="@+id/profile_email"
-        android:layout_marginBottom="20dp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
-        android:layout_marginLeft="20dp"
-        android:layout_marginRight="20dp"
+        android:layout_marginLeft="40dp"
+        android:layout_marginRight="40dp"
+        android:layout_marginBottom="10dp"
         android:hint="Email"
         android:textSize="19sp" />
 

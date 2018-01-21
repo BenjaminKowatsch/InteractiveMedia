@@ -32,24 +32,32 @@
             android:name="com.facebook.sdk.ApplicationId"
             android:value="@string/facebook_app_id" />
 
-        <activity android:name=".activties.MainActivity">
+        <activity android:name=".activties.MainActivity" android:theme="@style/SplashTheme" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".activties.RegisterActivity" />
-        <activity android:name=".activties.GroupDetailViewActivity" />
+        <activity android:name=".activties.RegisterActivity"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity android:name=".activties.GroupDetailViewActivity"
+            android:theme="@style/AppTheme.NoActionBar"/>
+        <activity android:name=".activties.TransactionDetailViewActivity"
+            android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".activties.HomeActivity"
-            android:label="@string/title_activity_home"
             android:theme="@style/AppTheme.NoActionBar" >
             <intent-filter>
                 <action android:name="com.media.interactive.cs3.hdm.interactivemedia_OPEN_HOME_ACTIVITY" />
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
-        <activity android:name=".activties.LoginActivity" />
+        <activity android:name=".activties.LoginActivity"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity android:name=".activties.AddGroupActivity"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity android:name=".activties.AddTransactionActivity"
+            android:theme="@style/AppTheme.NoActionBar"/>
         <provider
             android:name="android.support.v4.content.FileProvider"
             android:authorities="com.media.interactive.cs3.hdm.interactivemedia.fileprovider"
@@ -63,8 +71,6 @@
             android:name=".contentprovider.DatabaseProvider"
             android:authorities="com.media.interactive.cs3.hdm.interactivemedia.contentprovider" />
 
-        <activity android:name=".activties.AddGroupActivity"></activity>
-        <activity android:name=".activties.AddTransactionActivity" />
         <!-- Offline/Online Detection -->
         <receiver android:name="com.media.interactive.cs3.hdm.interactivemedia.receiver.NetworkStateChangeReceiver"
             android:exported="false">

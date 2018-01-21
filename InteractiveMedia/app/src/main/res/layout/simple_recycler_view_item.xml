@@ -33,7 +33,7 @@
         android:id="@+id/view_foreground"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@android:color/darker_gray"
+        android:background="@color/colorPrimaryDark"
         android:padding="10dp">
 
         <TextView

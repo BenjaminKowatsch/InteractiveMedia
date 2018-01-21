@@ -1,11 +1,53 @@
 <?xml version="1.0" encoding="utf-8"?>
+<android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/colorPrimary"
+    tools:context="com.media.interactive.cs3.hdm.interactivemedia.activties.LoginActivity">
+
+    <android.support.design.widget.AppBarLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:theme="@style/AppTheme.AppBarOverlay">
+
+        <android.support.v7.widget.Toolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            android:background="?attr/colorPrimary"
+            app:popupTheme="@style/AppTheme.PopupOverlay" >
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="30dp"
+                android:layout_gravity="center"
+                android:src="@mipmap/ic_launcher"
+                android:layout_marginRight="5sp"/>
+            <TextView
+                android:id="@+id/toolbar_title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:fontFamily="@font/architects_daughter"
+                android:text="@string/app_name" />
+
+        </android.support.v7.widget.Toolbar>
+
+    </android.support.design.widget.AppBarLayout>
+
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/colorPrimary"
+    app:layout_behavior="@string/appbar_scrolling_view_behavior"
     android:fillViewport="true">
 
     <LinearLayout xmlns:tools="http://schemas.android.com/tools"
         android:id="@+id/activity_main"
+        android:background="@color/colorPrimary"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical"
@@ -25,12 +67,16 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:text="Social Media Signin"
+            android:textColor="@android:color/white"
             android:textSize="18dp" />
 
         <com.google.android.gms.common.SignInButton
             android:id="@+id/bn_login"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:minHeight="40dp"
+            android:background="@color/colorPrimaryLight"
+            android:foregroundTint="@android:color/white"
             android:layout_marginBottom="5dp"
             android:layout_marginTop="5dp"
             android:layout_marginLeft="30dp"
@@ -40,7 +86,9 @@
         <com.facebook.login.widget.LoginButton
             android:id="@+id/fb_login_bn"
             android:layout_width="match_parent"
-            android:layout_height="60dp"
+            android:layout_height="40dp"
+            android:minHeight="40dp"
+            android:height="40dp"
             android:layout_marginBottom="5dp"
             android:layout_marginTop="5dp"
             android:layout_marginLeft="30dp"
@@ -65,3 +113,4 @@
 
     </LinearLayout>
 </ScrollView>
+</android.support.design.widget.CoordinatorLayout>

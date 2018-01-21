@@ -2,6 +2,7 @@ package com.media.interactive.cs3.hdm.interactivemedia.activties;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v7.widget.Toolbar;
 import android.text.Editable;
 import android.text.InputType;
 import android.text.TextWatcher;
@@ -39,6 +40,10 @@ public class RegisterActivity extends ImagePickerActivity
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.user_register);
+
+        final Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+        getSupportActionBar().setTitle("");
 
         register = (Button) findViewById(R.id.bn_register);
         registerUsername = (EditText) findViewById(R.id.et_register_username);

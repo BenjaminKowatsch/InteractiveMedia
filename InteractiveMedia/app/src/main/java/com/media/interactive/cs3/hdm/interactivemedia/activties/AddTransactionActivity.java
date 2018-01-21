@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.location.Location;
 import android.os.Bundle;
+import android.support.v7.widget.Toolbar;
 import android.text.InputType;
 import android.util.Log;
 import android.view.View;
@@ -110,6 +111,11 @@ public class AddTransactionActivity extends ImagePickerActivity {
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.activity_add_transaction);
+
+    final Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+    setSupportActionBar(toolbar);
+    getSupportActionBar().setTitle("");
+
     dateEditText = findViewById(R.id.et_add_transaction_date);
     timeEditText = findViewById(R.id.et_add_transaction_time);
     userSelection = findViewById(R.id.s_add_transaction_user);
