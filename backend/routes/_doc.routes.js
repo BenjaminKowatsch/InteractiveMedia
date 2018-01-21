@@ -270,6 +270,7 @@
             "transactions" : [ ... ], // all transaction-objects, length=0 if group was just created
             "groupId" : "6367e722-e857-4d0f-bf78-278a92260418",
             "createdAt" : "2017-12-25T10:56:13.234Z"
+        }
     }
  */
 /**
@@ -294,6 +295,7 @@
             "transactions" : [ ... ], // all transaction-objects, length=0 if group was just created
             "groupId" : "6367e722-e857-4d0f-bf78-278a92260418",
             "createdAt" : "2017-12-25T10:56:13.234Z"
+        }
     }
  */
 /**
