@@ -23,24 +23,14 @@ var webpackConfig = merge(baseWebpackConfig, {
         chunkFilename: utils.assetsPath('js/[id].[chunkhash].js')
     },
     plugins: [
-        // http://vuejs.github.io/vue-loader/en/workflow/production.html
-        // new webpack.DefinePlugin({
-        //   'process.env': env
-        // }),
+
         new webpack.DefinePlugin({
             'process.env': {
                 'NODE_ENV': '"production"',
                 'WEB_SERVICE_URL': JSON.stringify(process.env.WEB_SERVICE_URL)
             }
         }),
-        /*
-        new webpack.optimize.UglifyJsPlugin({
-          compress: {
-            warnings: false
-          },
-          // bk077: toggled from true to false
-          sourceMap: false
-        }),*/
+
         // extract css into its own file
         new ExtractTextPlugin({
             filename: utils.assetsPath('css/[name].[contenthash].css')
@@ -57,14 +47,13 @@ var webpackConfig = merge(baseWebpackConfig, {
             favicon: path.join(__dirname, '../src/assets/favicon.png'),
             inject: true,
             minify: {
-                // bk077: toggled from true to false
+                //  toggled from true to false
                 removeComments: false,
-                // bk077: toggled from true to false
+                //  toggled from true to false
                 collapseWhitespace: false,
-                // bk077: toggled from true to false
+                // toggled from true to false
                 removeAttributeQuotes: false
-                    // more options:
-                    // https://github.com/kangax/html-minifier#options-quick-reference
+
             },
             // necessary to consistently work with multiple chunks via CommonsChunkPlugin
             chunksSortMode: 'dependency'
