@@ -133,13 +133,7 @@ public class LoginActivity extends AppCompatActivity
 
     private Void loginFailedHandler(Throwable error) {
         Void nil = null;
-        Context context = getApplicationContext();
-        CharSequence text = "skipping login for dev only";
-        int duration = Toast.LENGTH_SHORT;
-
-        Toast toast = Toast.makeText(context, text, duration);
-        toast.show();
-        this.navigateToHome();
+        Toast.makeText(this, "Login failed please try again.", Toast.LENGTH_SHORT).show();
         return nil;
     }
 
