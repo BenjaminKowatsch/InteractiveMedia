@@ -7,7 +7,7 @@ public class SplitTable {
     public static final String TABLE_NAME = "splits";
 
     public static final String COLUMN_ID = "_id";
-    public static final String COLUMN_TYPE = "type";
+    public static final String COLUMN_TYPE = "split_type";
     public static final String COLUMN_AMOUNT = "amount";
     public static final String COLUMN_USER_ID = "user_id";
     public static final String COLUMN_NEXT = "next";

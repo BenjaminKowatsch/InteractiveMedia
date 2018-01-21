@@ -53,8 +53,8 @@ public class SplitFactory {
         Split innermost = split;
         out.put(innermost.toJson());
         while (innermost.hasNext()) {
-            out.put(split.toJson());
             innermost = innermost.getNext();
+            out.put(innermost.toJson());
         }
         return out;
     }

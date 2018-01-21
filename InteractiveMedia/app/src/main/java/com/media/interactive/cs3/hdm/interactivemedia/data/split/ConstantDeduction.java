@@ -109,7 +109,7 @@ public class ConstantDeduction implements Split {
     @Override
     public JSONObject toJson() throws JSONException {
         final JSONObject result = new JSONObject();
-        result.put("type", "constand deduction");
+        result.put("type", "constant deduction");
         result.put("amount", amount);
         result.put("userId", toUserId);
         return result;
