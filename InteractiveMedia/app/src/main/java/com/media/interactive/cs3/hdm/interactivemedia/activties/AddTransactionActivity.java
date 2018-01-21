@@ -45,12 +45,10 @@ import com.media.interactive.cs3.hdm.interactivemedia.CallbackListener;
 import com.media.interactive.cs3.hdm.interactivemedia.R;
 import com.media.interactive.cs3.hdm.interactivemedia.RestRequestQueue;
 import com.media.interactive.cs3.hdm.interactivemedia.authorizedrequests.AuthorizedJsonObjectRequest;
-import com.media.interactive.cs3.hdm.interactivemedia.contentprovider.DatabaseHelper;
 import com.media.interactive.cs3.hdm.interactivemedia.contentprovider.DatabaseProvider;
 import com.media.interactive.cs3.hdm.interactivemedia.contentprovider.tables.GroupTable;
 import com.media.interactive.cs3.hdm.interactivemedia.contentprovider.tables.UserTable;
 import com.media.interactive.cs3.hdm.interactivemedia.data.DatabaseProviderHelper;
-import com.media.interactive.cs3.hdm.interactivemedia.data.Group;
 import com.media.interactive.cs3.hdm.interactivemedia.data.Login;
 import com.media.interactive.cs3.hdm.interactivemedia.data.Transaction;
 import com.media.interactive.cs3.hdm.interactivemedia.data.split.ConstantDeduction;
@@ -264,7 +262,8 @@ public class AddTransactionActivity extends ImagePickerActivity implements Recyc
         dialogBuilder.setPositiveButton("Done", new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int whichButton) {
                 final String userId = dialogUserAdapter.getCursor().getString(dialogUserAdapter.getCursor().getColumnIndex(UserTable.COLUMN_USER_ID));
-                splitList.add(new ConstantDeduction(parseAmount(editText), userId));
+                splitList.add(0, new ConstantDeduction(parseAmount(editText), userId));
+                splitsAdapter.update(splitList);
             }
         });
         dialogBuilder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
@@ -305,15 +304,6 @@ public class AddTransactionActivity extends ImagePickerActivity implements Recyc
             }
         });
 
-    }
-
-    private Group loadGroup() {
-        if (groupId == null) {
-            Log.e(this.getClass().getSimpleName(), "Intent is missing id of group");
-            return null;
-        } else {
-            return new DatabaseHelper(this).getGroupWithUsers(groupId);
-        }
     }
 
     private void createAndSaveTransaction(View view) {

@@ -24,6 +24,6 @@
         android:layout_height="wrap_content"
         android:text="Set an amount smaller than transaction amount before proceeding"
         android:textColor="@android:color/holo_red_dark"
-        android:visibility="gone" />
+        android:visibility="visible" />
 
 </LinearLayout>

@@ -13,6 +13,7 @@ import com.media.interactive.cs3.hdm.interactivemedia.R;
 import com.media.interactive.cs3.hdm.interactivemedia.data.split.EvenSplit;
 import com.media.interactive.cs3.hdm.interactivemedia.data.split.Split;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class SplitAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
@@ -84,6 +85,14 @@ public class SplitAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
         list.add(position, split);
         // notify item added by position
         notifyItemInserted(position);
+    }
+
+    public void update(List<Split> splitList) {
+        List<Split> copy = new ArrayList<>();
+        copy.addAll(splitList);
+        list.clear();
+        list.addAll(copy);
+        notifyDataSetChanged();
     }
 
     public class SimpleViewHolder extends RecyclerView.ViewHolder {
