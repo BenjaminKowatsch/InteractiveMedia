@@ -76,7 +76,8 @@ module.exports.getGroupById = function(groupId) {
       let groupUserObjects = userResults.map(val => ({
         userId: val.userId,
         username: val.username,
-        email: val.email
+        email: val.email,
+        imageUrl: val.imageUrl
       }));
       responseData.payload.users = groupUserObjects;
       responseData.success = true;
