@@ -13,6 +13,7 @@ import com.media.interactive.cs3.hdm.interactivemedia.contentprovider.tables.Gro
 import com.media.interactive.cs3.hdm.interactivemedia.contentprovider.tables.GroupUserTable;
 import com.media.interactive.cs3.hdm.interactivemedia.contentprovider.tables.LoginTable;
 import com.media.interactive.cs3.hdm.interactivemedia.contentprovider.tables.PaymentTable;
+import com.media.interactive.cs3.hdm.interactivemedia.contentprovider.tables.SplitTable;
 import com.media.interactive.cs3.hdm.interactivemedia.contentprovider.tables.TransactionTable;
 import com.media.interactive.cs3.hdm.interactivemedia.contentprovider.tables.UserTable;
 import com.media.interactive.cs3.hdm.interactivemedia.data.Group;
@@ -55,6 +56,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         db.execSQL(DebtTable.DATABASE_DROP);
         db.execSQL(GroupUserTable.DATABASE_DROP);
         db.execSQL(GroupTransactionTable.DATABASE_DROP);
+        db.execSQL(SplitTable.DATABASE_DROP);
 
         // Enable foreign keys
         //db.execSQL("PRAGMA foreign_keys=ON;");
@@ -68,6 +70,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         PaymentTable.onCreate(db);
         GroupTransactionTable.onCreate(db);
         GroupUserTable.onCreate(db);
+        SplitTable.onCreate(db);
     }
 
     @Override

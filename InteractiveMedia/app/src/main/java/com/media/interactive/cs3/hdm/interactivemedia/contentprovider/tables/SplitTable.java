@@ -4,7 +4,7 @@ package com.media.interactive.cs3.hdm.interactivemedia.contentprovider.tables;
 import android.database.sqlite.SQLiteDatabase;
 
 public class SplitTable {
-    public static final String TABLE_NAME = "transactions";
+    public static final String TABLE_NAME = "splits";
 
     public static final String COLUMN_ID = "_id";
     public static final String COLUMN_TYPE = "type";
