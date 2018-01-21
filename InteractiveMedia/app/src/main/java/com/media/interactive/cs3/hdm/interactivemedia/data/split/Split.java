@@ -20,7 +20,7 @@ public interface Split {
      * Adds a Split to be used after resolving this one.
      *
      * @param next split to be changed
-     * @return a split chaining this and next
+     * @return the split chained to this
      * @throws TerminatingSplitChainedException if this split already reduced the remaining
      * amount of the transaction to 0
      */

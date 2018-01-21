@@ -22,7 +22,7 @@ public class ConstantDeduction implements Split {
     @Override
     public List<Debt> split(Transaction transaction) {
         if (transaction.getAmount() < this.amount) {
-            throw new IllegalArgumentException("Cannot deduce more than its amount from " + transaction);
+            throw new IllegalArgumentException("Cannot deduce more than its amount from " + transaction.getInfoName());
         } else {
             final Group group = transaction.getGroup();
             String paidByUserId = transaction.getPaidBy();
@@ -33,8 +33,10 @@ public class ConstantDeduction implements Split {
                         "this split's toUserId");
             } else {
                 List<Debt> out = new ArrayList<>();
-                out.add(new Debt(splittingParties.getPaidBy(), toUser, amount, transaction));
-                if(next!=null) {
+                if (amount > 0.0) {
+                    out.add(new Debt(splittingParties.getPaidBy(), toUser, amount, transaction));
+                }
+                if (next != null) {
                     Transaction remaining = new Transaction(transaction);
                     remaining.setAmount(transaction.getAmount() - this.amount);
                     out.addAll(next.split(remaining));
@@ -55,9 +57,9 @@ public class ConstantDeduction implements Split {
 
     @Override
     public Split andThen(Split next) {
-        if (next != null) {
+        if (this.next == null) {
             this.next = next;
-            return this;
+            return next;
         } else {
             throw new SplitAlreadyChainedException("This split already had " + next + " as next in chain.");
         }
