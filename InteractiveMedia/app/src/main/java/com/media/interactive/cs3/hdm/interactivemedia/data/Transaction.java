@@ -6,6 +6,7 @@ import android.location.Location;
 
 import com.media.interactive.cs3.hdm.interactivemedia.contentprovider.tables.TransactionTable;
 import com.media.interactive.cs3.hdm.interactivemedia.data.split.Split;
+import com.media.interactive.cs3.hdm.interactivemedia.data.split.SplitFactory;
 import com.media.interactive.cs3.hdm.interactivemedia.util.Helper;
 
 import org.json.JSONException;
@@ -209,7 +210,7 @@ public class Transaction {
         result.put("infoImageUrl", imageUrl != null ? imageUrl : JSONObject.NULL);
         result.put("infoCreatedAt", Helper.formatDate(dateTime));
         result.put("paidBy", paidBy);
-        result.put("split", split);
+        result.put("split", SplitFactory.toJSONArray(split));
         return result;
     }
 

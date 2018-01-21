@@ -48,9 +48,10 @@ public class SplitFactory {
         }
     }
 
-    public static JSONArray toArray(Split split) throws JSONException {
+    public static JSONArray toJSONArray(Split split) throws JSONException {
         JSONArray out = new JSONArray();
         Split innermost = split;
+        out.put(innermost.toJson());
         while (innermost.hasNext()) {
             out.put(split.toJson());
             innermost = innermost.getNext();
@@ -62,7 +63,7 @@ public class SplitFactory {
         final Split outerSplit = splitList.get(0);
         Split innermost = outerSplit;
         for (int i = 1; i < splitList.size(); i++) {
-            innermost.andThen(splitList.get(i));
+            innermost = innermost.andThen(splitList.get(i));
         }
         return outerSplit;
     }
