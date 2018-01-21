@@ -121,6 +121,8 @@ import Config from "../js/Config.js";
 
     mounted: function(){
 
+      this.passwordRe = ''
+      this.password = ''
       this.getOwnUser()  
 
     },
