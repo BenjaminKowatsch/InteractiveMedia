@@ -87,6 +87,7 @@ public class ImagePickerActivity extends AppCompatActivity {
     private EditText dateTextField = null;
     private EditText dateTimeTextField = null;
     private EditText amountTextField = null;
+    private Date minimumDate;
     private Date recognizedDate = null;
     private Double recognizedAmount = null;
     private boolean ocrEnable = false;
@@ -272,14 +273,22 @@ public class ImagePickerActivity extends AppCompatActivity {
                 makeToast("Could not recognize any price or date.\nPlease try again.");
             }
             if(recognizedDate != null && dateTextField != null && dateTimeTextField != null) {
-                dateTextField.setText(sdfDate.format(recognizedDate));
-                dateTimeTextField.setText(sdfTime.format(recognizedDate));
+                if(recognizedDate.after(minimumDate)) {
+                    dateTextField.setText(sdfDate.format(recognizedDate));
+                    dateTimeTextField.setText(sdfTime.format(recognizedDate));
+                } else {
+                    makeToast("Recognized date is before group creation date.");
+                }
             }
             if(recognizedAmount != null && amountTextField != null){
                 amountTextField.setText(String.valueOf(recognizedAmount));
             }
 
         }
+    }
+
+    protected void setMinimumDate(Date minimumDate){
+        this.minimumDate = minimumDate;
     }
 
     protected void uploadImage(final CallbackListener<JSONObject, Exception> callbackListener) {
@@ -535,22 +544,6 @@ public class ImagePickerActivity extends AppCompatActivity {
 
     protected String getCurrentPhotoPath() {
         return currentPhotoPath;
-    }
-
-    public Date getRecognizedDate() {
-        return recognizedDate;
-    }
-
-    public Double getRecognizedAmount() {
-        return recognizedAmount;
-    }
-
-    public String getImageFilename() {
-        return imageFilename;
-    }
-
-    public void setImageFilename(String imageFilename) {
-        this.imageFilename = imageFilename;
     }
 
     protected void setDateTextField(EditText dateTextField) {
