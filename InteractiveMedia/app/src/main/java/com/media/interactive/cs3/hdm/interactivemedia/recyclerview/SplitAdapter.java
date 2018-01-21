@@ -47,11 +47,11 @@ public class SplitAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
     public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         if (viewType == NO_SWIPE_ITEM_TYPE) {
             final View itemView = LayoutInflater.from(parent.getContext())
-                    .inflate(R.layout.no_swipe_recycler_view_item, parent, false);
+                    .inflate(R.layout.no_swipe_split_recycler_view_item, parent, false);
             return new NoSwipeViewHolder(itemView);
         } else {
             final View itemView = LayoutInflater.from(parent.getContext())
-                    .inflate(R.layout.simple_recycler_view_item, parent, false);
+                    .inflate(R.layout.split_recycler_view_item, parent, false);
             return new SimpleViewHolder(itemView);
         }
     }
