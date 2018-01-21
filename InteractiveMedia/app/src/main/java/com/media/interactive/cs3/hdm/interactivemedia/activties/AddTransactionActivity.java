@@ -51,6 +51,7 @@ import com.media.interactive.cs3.hdm.interactivemedia.contentprovider.tables.Use
 import com.media.interactive.cs3.hdm.interactivemedia.data.DatabaseProviderHelper;
 import com.media.interactive.cs3.hdm.interactivemedia.data.Login;
 import com.media.interactive.cs3.hdm.interactivemedia.data.Transaction;
+import com.media.interactive.cs3.hdm.interactivemedia.data.User;
 import com.media.interactive.cs3.hdm.interactivemedia.data.split.ConstantDeduction;
 import com.media.interactive.cs3.hdm.interactivemedia.data.split.EvenSplit;
 import com.media.interactive.cs3.hdm.interactivemedia.data.split.Split;
@@ -135,6 +136,8 @@ public class AddTransactionActivity extends ImagePickerActivity implements Recyc
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        groupId = getIntent().getStringExtra(GROUP_TO_ADD_TO);
+        groupCreatedAt = getIntent().getStringExtra(GROUP_CREATED_AT_ADD_TO);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_transaction);
 
@@ -155,7 +158,8 @@ public class AddTransactionActivity extends ImagePickerActivity implements Recyc
         EditText amountEditText = findViewById(R.id.et_add_transaction_amount);
 
         splitList = new ArrayList<>();
-        splitsAdapter = new SplitAdapter(this, splitList);
+        List<User> userList = getAllGroupUsers();
+        splitsAdapter = new SplitAdapter(this, splitList, userList);
         splitsView.setAdapter(splitsAdapter);
         final ItemTouchHelper.SimpleCallback itemTouchHelperCallback = new RecyclerItemTouchHelper(0, ItemTouchHelper.LEFT, this);
         new ItemTouchHelper(itemTouchHelperCallback).attachToRecyclerView(splitsView);
@@ -164,8 +168,6 @@ public class AddTransactionActivity extends ImagePickerActivity implements Recyc
 
         helper = new DatabaseProviderHelper(getContentResolver());
 
-        groupId = getIntent().getStringExtra(GROUP_TO_ADD_TO);
-        groupCreatedAt = getIntent().getStringExtra(GROUP_CREATED_AT_ADD_TO);
 
         name = findViewById(R.id.et_add_transaction_purpose);
         amount = amountEditText;
@@ -243,6 +245,15 @@ public class AddTransactionActivity extends ImagePickerActivity implements Recyc
         });
 
         splitList.add(new EvenSplit());
+    }
+
+    private List<User> getAllGroupUsers() {
+        final Cursor userCursor = initializeUserAdapter().getCursor();
+        List<User> out = new ArrayList<>();
+        while (userCursor.moveToNext()) {
+            out.add(UserTable.extractUserFromCurrentPosition(userCursor));
+        }
+        return out;
     }
 
     private void showAddDeductionDialog() {

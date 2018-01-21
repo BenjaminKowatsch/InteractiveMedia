@@ -123,4 +123,13 @@ public class ConstantDeduction implements Split {
         out.put(SplitTable.COLUMN_USER_ID, toUserId);
         return out;
     }
+
+
+    public double getAmount() {
+        return amount;
+    }
+
+    public String getToUserId() {
+        return toUserId;
+    }
 }

@@ -2,6 +2,7 @@ package com.media.interactive.cs3.hdm.interactivemedia.recyclerview;
 
 
 import android.content.Context;
+import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -10,22 +11,27 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.media.interactive.cs3.hdm.interactivemedia.R;
-import com.media.interactive.cs3.hdm.interactivemedia.data.split.EvenSplit;
+import com.media.interactive.cs3.hdm.interactivemedia.data.User;
+import com.media.interactive.cs3.hdm.interactivemedia.data.split.ConstantDeduction;
 import com.media.interactive.cs3.hdm.interactivemedia.data.split.Split;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.media.interactive.cs3.hdm.interactivemedia.activties.AddTransactionActivity.CURRENCY_FORMAT;
+
 public class SplitAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     private Context context;
     private final List<Split> list;
+    private final List<User> userList;
 
     private final static int NO_SWIPE_ITEM_TYPE = 0;
     private final static int SWIPE_ITEM_TYPE = 1;
 
-    public SplitAdapter(Context context, List<Split> list) {
+    public SplitAdapter(Context context, List<Split> list, List<User> usersInGroup) {
         this.context = context;
         this.list = list;
+        this.userList = usersInGroup;
     }
 
     @Override
@@ -54,14 +60,45 @@ public class SplitAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder holder, final int position) {
         final Split split = list.get(position);
-        final String text = split instanceof EvenSplit ? "then split the remainder evenly between all users" : "deduce amount ";
         if (holder.getItemViewType() == NO_SWIPE_ITEM_TYPE) {
             final NoSwipeViewHolder rootMyViewHolder = (NoSwipeViewHolder) holder;
-            rootMyViewHolder.name.setText(text);
+            rootMyViewHolder.name.setText(createSplitText(position, split));
         } else {
             final SimpleViewHolder simpleViewHolder = (SimpleViewHolder) holder;
-            simpleViewHolder.name.setText(text);
+            simpleViewHolder.name.setText(createSplitText(position, split));
         }
+    }
+
+    @NonNull
+    private String createSplitText(int position, Split split) {
+        if (list.size() == 1 && position == 0) {
+            // even split is always in list & not removable
+            return "Split evenly between everyone in the group";
+        } else if (list.size() > 1) {
+            if (position < list.size() - 1) {
+                ConstantDeduction constantDeduction = (ConstantDeduction) split;
+                final String paymentInfo = findUserNameFor(constantDeduction.getToUserId())
+                        + " pays " + CURRENCY_FORMAT.format(constantDeduction.getAmount());
+                if (position == 0) {
+                    return "First " + paymentInfo;
+                } else {
+                    return "then " + paymentInfo;
+                }
+            } else {
+                return "then the remainder is split between everyone in the group.";
+            }
+        } else {
+            return "Error!?";
+        }
+    }
+
+    private String findUserNameFor(String toUserId) {
+        for (User user : userList) {
+            if (user.getUserId().equals(toUserId)) {
+                return user.getUsername();
+            }
+        }
+        return toUserId;
     }
 
     @Override
@@ -110,6 +147,5 @@ public class SplitAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
             viewBackground = view.findViewById(R.id.view_background);
             viewForeground = view.findViewById(R.id.view_foreground);
         }
-
     }
 }
