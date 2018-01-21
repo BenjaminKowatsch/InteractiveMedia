@@ -35,6 +35,8 @@ const authorizationMiddleware = require('../middleware/authorization.middleware'
  * @apiUse successBodyGroupUsersUserId
  * @apiUse successBodyGroupUsersName
  * @apiUse successBodyGroupUserEmail
+ * @apiUse successBodyGroupUserImageUrl
+ *
  * @apiSuccess (SuccessCode) {201} Success Group Created
  * @apiUse successExampleCreateGroup
 
