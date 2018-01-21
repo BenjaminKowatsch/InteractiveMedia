@@ -54,6 +54,7 @@ import com.media.interactive.cs3.hdm.interactivemedia.data.Transaction;
 import com.media.interactive.cs3.hdm.interactivemedia.data.split.ConstantDeduction;
 import com.media.interactive.cs3.hdm.interactivemedia.data.split.EvenSplit;
 import com.media.interactive.cs3.hdm.interactivemedia.data.split.Split;
+import com.media.interactive.cs3.hdm.interactivemedia.data.split.SplitFactory;
 import com.media.interactive.cs3.hdm.interactivemedia.recyclerview.NonScrollRecyclerView;
 import com.media.interactive.cs3.hdm.interactivemedia.recyclerview.RecyclerItemTouchHelper;
 import com.media.interactive.cs3.hdm.interactivemedia.recyclerview.SplitAdapter;
@@ -397,7 +398,7 @@ public class AddTransactionActivity extends ImagePickerActivity implements Recyc
     private Transaction buildTransaction(EditText nameText, NonScrollRecyclerView splitsView,
                                          EditText dateText, EditText timeText, EditText amountText) {
         final String purpose = nameText.getText().toString();
-        final Split split = splitsAdapter.buildSplit();
+        final Split split = SplitFactory.buildSplitFromList(splitList);
         final double amount = parseAmount(amountText);
         final Date dateTime = parseDateTime(dateText, timeText);
         Location location = null;

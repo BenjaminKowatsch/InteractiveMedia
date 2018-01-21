@@ -7,6 +7,8 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.List;
+
 public class SplitFactory {
 
     public static Split getSplitByName(String name) {
@@ -54,6 +56,15 @@ public class SplitFactory {
             innermost = innermost.getNext();
         }
         return out;
+    }
+
+    public static Split buildSplitFromList(List<Split> splitList) {
+        final Split outerSplit = splitList.get(0);
+        Split innermost = outerSplit;
+        for (int i = 1; i < splitList.size(); i++) {
+            innermost.andThen(splitList.get(i));
+        }
+        return outerSplit;
     }
 
     private static class UnknownSplitException extends RuntimeException {

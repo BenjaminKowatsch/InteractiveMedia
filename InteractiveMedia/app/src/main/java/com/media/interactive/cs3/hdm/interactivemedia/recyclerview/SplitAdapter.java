@@ -69,10 +69,6 @@ public class SplitAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
         return list.size();
     }
 
-    public Split buildSplit() {
-        return new EvenSplit();
-    }
-
     public void removeSplit(int position) {
         list.remove(position);
         // notify the item removed by position
