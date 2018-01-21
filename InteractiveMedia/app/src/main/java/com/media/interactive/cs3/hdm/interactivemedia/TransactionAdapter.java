@@ -22,7 +22,8 @@ import com.media.interactive.cs3.hdm.interactivemedia.data.Transaction;
 import com.media.interactive.cs3.hdm.interactivemedia.util.Helper;
 
 import java.io.File;
-import java.util.Date;
+
+import static com.media.interactive.cs3.hdm.interactivemedia.activties.AddTransactionActivity.CURRENCY_FORMAT;
 
 /**
  * Created by benny on 04.01.18.
@@ -75,7 +76,7 @@ public class TransactionAdapter extends CursorAdapter {
     viewHolder.transactionTitle.setText(transaction.getInfoName());
     viewHolder.transactionCreationDate.setText(Helper.READABLE_DATE_FORMAT.format(transaction.getDateTime()));
     viewHolder.transactionPaidBy.setText("Paid by: " + cursor.getString(cursor.getColumnIndexOrThrow(UserTable.COLUMN_USERNAME)));
-    viewHolder.transactionAmount.setText(String.valueOf(transaction.getAmount()));
+    viewHolder.transactionAmount.setText(CURRENCY_FORMAT.format(transaction.getAmount()));
 
     final String imageUrl = transaction.getImageUrl();
     LazyHeaders.Builder builder = new LazyHeaders.Builder();

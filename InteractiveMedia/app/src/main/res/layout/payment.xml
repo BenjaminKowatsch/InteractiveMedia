@@ -1,33 +1,39 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="wrap_content"
-    android:layout_height="wrap_content">
+    android:layout_height="20dp">
 
     <TextView
         android:id="@+id/payment_from_user_name"
-        android:layout_width="75dp"
+        android:layout_width="80dp"
         android:layout_height="wrap_content"
-        android:layout_alignParentLeft="true"
+        android:layout_marginStart="10dp"
+        android:layout_alignParentStart="true"
+        android:textAlignment="textStart"
         android:hint="From Name"
+        android:layout_centerVertical="true"
         android:ellipsize="end"
         android:maxLines="1"
         android:textSize="14sp" />
 
-    <TextView
+    <ImageView
         android:id="@+id/payment_direction_indicator"
         android:layout_width="20dp"
-        android:layout_height="wrap_content"
-        android:layout_toRightOf="@id/payment_from_user_name"
-        android:text=" > "
-        android:textAlignment="center"
-        android:textSize="14sp" />
+        android:layout_height="18dp"
+        android:layout_centerVertical="true"
+        android:layout_toEndOf="@id/payment_from_user_name"
+        app:srcCompat="@drawable/ic_arrow_forward_white_18dp" />
 
     <TextView
         android:id="@+id/payment_to_user_name"
-        android:layout_width="75dp"
+        android:layout_width="80dp"
         android:layout_height="wrap_content"
-        android:layout_toRightOf="@+id/payment_direction_indicator"
+        android:layout_marginStart="10dp"
+        android:layout_toEndOf="@+id/payment_direction_indicator"
+        android:textAlignment="textStart"
         android:hint="ToName"
+        android:layout_centerVertical="true"
         android:ellipsize="end"
         android:maxLines="1"
         android:textSize="14sp" />
@@ -36,9 +42,10 @@
         android:id="@+id/payment_amount"
         android:layout_width="70dp"
         android:layout_height="wrap_content"
-        android:layout_marginLeft="5dp"
-        android:layout_toRightOf="@id/payment_to_user_name"
+        android:layout_marginStart="5dp"
+        android:layout_toEndOf="@id/payment_to_user_name"
         android:hint="x.xxx,xx €"
+        android:layout_centerVertical="true"
         android:textAlignment="textEnd"
         android:textSize="14sp" />
 
