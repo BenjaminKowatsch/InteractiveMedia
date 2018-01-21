@@ -71,22 +71,47 @@
     "split": {
       "type": "array",
       "minItems": 1,
-      "items": [
-        {
-          "type": "object",
-          "description": "even split",
-          "properties": {
-            "type": {
-              "type": "string",
-              "enum": ["even"]
-            }
+      "items": {
+        "oneOf":[
+          {
+            "type": "object",
+            "description": "even split",
+            "properties": {
+              "type": {
+                "type": "string",
+                "enum": ["even"]
+              }
+            },
+            "required": [
+              "type"
+            ],
+            "additionalProperties": false
           },
-          "required": [
-            "type"
-          ],
-          "additionalProperties": false
-        }
-      ]
+          {
+            "type": "object",
+            "description": "constant deduction split",
+            "properties": {
+              "type": {
+                "type": "string",
+                "enum": ["constant deduction"]
+              },
+              "amount": {
+                "type":"number"
+              },
+              "userId": {
+                "type": "string",
+                "minLength": 10
+              }
+            },
+            "required": [
+              "type",
+              "amount",
+              "userId"
+            ],
+            "additionalProperties": false
+          }
+        ]
+      }
     }
   },
   "required": [

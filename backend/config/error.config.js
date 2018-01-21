@@ -26,4 +26,5 @@ module.exports = {
     RESOURCE_NOT_FOUND: 'resource not found',
     INVALID_JSON: 'invalid json',
     UNCAUGHT_ERROR: 'uncaught error',
+    INVALID_SPLIT: 'invalid split',
   };

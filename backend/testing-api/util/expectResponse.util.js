@@ -70,6 +70,13 @@ module.exports.toBe400 = {
       .withMessage('invalid time adjustment: group.createdAt is gt transaction.infoCreatedAt')
       .inResponse(res);
     },
+    invalidSplit: function(res) {
+      new ExpectError()
+      .withStatusCode(400)
+      .withDataPath('transaction')
+      .withMessage('invalid split')
+      .inResponse(res);
+    },
   },
 };
 

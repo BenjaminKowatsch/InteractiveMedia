@@ -127,6 +127,10 @@
     @apiError (ErrorCode) {400} InvalidBody Validation error for request body
  */
 /**
+ * @apiDefine error400InvalidSplit
+    @apiError (ErrorCode) {400} InvalidSplit Invalid splits in request body
+ */
+/**
  * @apiDefine error401Unauthorized
     @apiError (ErrorCode) {401} Unauthorized Missing or invalid authentication information
  */
