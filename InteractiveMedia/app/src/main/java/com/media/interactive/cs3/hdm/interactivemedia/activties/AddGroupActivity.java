@@ -11,11 +11,13 @@ import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.Toolbar;
 import android.support.v7.widget.helper.ItemTouchHelper;
 import android.text.Editable;
 import android.text.InputType;
 import android.text.TextWatcher;
 import android.util.Log;
+import android.view.ContextThemeWrapper;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
@@ -104,6 +106,10 @@ public class AddGroupActivity extends ImagePickerActivity implements View.OnClic
     super.onCreate(savedInstanceState);
     setContentView(R.layout.activity_add_group);
 
+    final Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+    setSupportActionBar(toolbar);
+    getSupportActionBar().setTitle("");
+
     linearLayout = (LinearLayout) findViewById(R.id.linearLayout);
     groupName = (EditText) findViewById(R.id.et_group_name);
     final TextView groupNameError = (TextView) findViewById(R.id.et_group_name_error);
@@ -173,7 +179,7 @@ public class AddGroupActivity extends ImagePickerActivity implements View.OnClic
 
 
   private void showAddEmailDialog() {
-    final AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(this);
+    final AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(new ContextThemeWrapper(this, R.style.AlertDialogCustom));
     final LayoutInflater inflater = this.getLayoutInflater();
     final View dialogView = inflater.inflate(R.layout.add_user_email, null);
     dialogBuilder.setView(dialogView);

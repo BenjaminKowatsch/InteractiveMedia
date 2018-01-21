@@ -22,6 +22,7 @@ import android.text.InputType;
 import android.text.TextWatcher;
 import android.util.Log;
 import android.util.SparseArray;
+import android.view.ContextThemeWrapper;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
@@ -412,7 +413,7 @@ public class ImagePickerActivity extends AppCompatActivity {
     }
 
     private Dialog createOptionsDialog() {
-        final AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        final AlertDialog.Builder builder = new AlertDialog.Builder(new ContextThemeWrapper(this, R.style.AlertDialogCustom));
         builder.setTitle(R.string.pick_image_source)
             .setItems(R.array.image_sources, new DialogInterface.OnClickListener() {
                 public void onClick(DialogInterface dialog, int which) {

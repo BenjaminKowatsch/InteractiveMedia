@@ -17,6 +17,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
+import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.SearchView;
 import android.widget.Toast;
@@ -44,7 +45,6 @@ public class GroupFragment extends ListFragment implements LoaderManager.LoaderC
     private static final String TAG = GroupFragment.class.getSimpleName();
     private static final int CURSOR_LOADER_GROUPS = 0;
     private static final int CURSOR_LOADER_USER_ID = 1;
-    private AdapterView.OnItemSelectedListener onItemSelectedListener;
     private GroupAdapter groupAdapter;
     private DatabaseProviderHelper helper;
     private String GROUP_FILTER = "search";
@@ -129,13 +129,6 @@ public class GroupFragment extends ListFragment implements LoaderManager.LoaderC
     public void onAttach(Context context) {
         super.onAttach(context);
         setHasOptionsMenu(true);
-        try {
-            onItemSelectedListener = (AdapterView.OnItemSelectedListener) context;
-        } catch (ClassCastException e) {
-            throw new ClassCastException(
-                context.toString()
-                    + " muss OnItemSelectedListener implementieren");
-        }
         userDataCompleted = new CallbackListener<JSONObject, Exception>() {
             @Override
             public void onSuccess(JSONObject response) {
@@ -156,7 +149,6 @@ public class GroupFragment extends ListFragment implements LoaderManager.LoaderC
     @Override
     public void onDetach() {
         super.onDetach();
-        onItemSelectedListener = null;
         Login.getInstance().removeOnUserDataSetListener(userDataCompleted);
     }
 
@@ -176,12 +168,8 @@ public class GroupFragment extends ListFragment implements LoaderManager.LoaderC
 
     @Override
     public void onListItemClick(ListView l, View v, int position, long id) {
-        //super.onListItemClick(l, v, position, id);
-        //onItemSelectedListener.onItemSelected(l, v, position, id);
         final Group group = ((GroupAdapter.ViewHolder) v.getTag()).getGroup();
         startGroupDetailActivity(group);
-        Toast.makeText(v.getContext(), group.getName() + group.getCreatedAt(), Toast.LENGTH_SHORT).show();
-
     }
 
     @Override

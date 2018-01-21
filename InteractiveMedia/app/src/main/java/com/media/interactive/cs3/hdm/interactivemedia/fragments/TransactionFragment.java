@@ -22,18 +22,25 @@ import android.widget.ListView;
 import android.widget.SearchView;
 import android.widget.SimpleCursorAdapter;
 import android.widget.Spinner;
+import android.widget.TextView;
 import android.widget.Toast;
 
+import com.media.interactive.cs3.hdm.interactivemedia.GroupAdapter;
 import com.media.interactive.cs3.hdm.interactivemedia.R;
 import com.media.interactive.cs3.hdm.interactivemedia.TransactionAdapter;
 import com.media.interactive.cs3.hdm.interactivemedia.activties.AddTransactionActivity;
+import com.media.interactive.cs3.hdm.interactivemedia.activties.GroupDetailViewActivity;
+import com.media.interactive.cs3.hdm.interactivemedia.activties.TransactionDetailViewActivity;
 import com.media.interactive.cs3.hdm.interactivemedia.contentprovider.DatabaseHelper;
 import com.media.interactive.cs3.hdm.interactivemedia.contentprovider.DatabaseProvider;
 import com.media.interactive.cs3.hdm.interactivemedia.contentprovider.tables.GroupTable;
 import com.media.interactive.cs3.hdm.interactivemedia.contentprovider.tables.TransactionTable;
 import com.media.interactive.cs3.hdm.interactivemedia.contentprovider.tables.UserTable;
+import com.media.interactive.cs3.hdm.interactivemedia.data.Group;
 import com.media.interactive.cs3.hdm.interactivemedia.data.Login;
+import com.media.interactive.cs3.hdm.interactivemedia.data.Transaction;
 import com.media.interactive.cs3.hdm.interactivemedia.data.settlement.PaymentAdapter;
+import com.media.interactive.cs3.hdm.interactivemedia.util.Helper;
 
 import static android.database.DatabaseUtils.dumpCursorToString;
 import static com.media.interactive.cs3.hdm.interactivemedia.activties.AddTransactionActivity.GROUP_CREATED_AT_ADD_TO;
@@ -44,8 +51,6 @@ public class TransactionFragment extends ListFragment implements LoaderManager.L
     private boolean mainMode = true;
     private static final String TAG = TransactionFragment.class.getSimpleName();
     private Spinner groupSelection;
-
-    private AdapterView.OnItemSelectedListener onItemSelectedListener;
 
     private TransactionAdapter transactionAdapter;
     private View transactionListFragment;
@@ -171,8 +176,8 @@ public class TransactionFragment extends ListFragment implements LoaderManager.L
         final String[] columns = new String[]{GroupTable.COLUMN_NAME};
         final int[] to = new int[]{android.R.id.text1};
 
-        final SimpleCursorAdapter groupAdapter = new SimpleCursorAdapter(this.getContext(), android.R.layout.simple_spinner_item, query, columns, to, 0);
-        groupAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        final SimpleCursorAdapter groupAdapter = new SimpleCursorAdapter(this.getContext(), R.layout.group_spinner_item, query, columns, to, 0);
+        groupAdapter.setDropDownViewResource(R.layout.group_spinner_dropdown_item);
         return groupAdapter;
     }
 
@@ -214,25 +219,32 @@ public class TransactionFragment extends ListFragment implements LoaderManager.L
     public void onAttach(Context context) {
         super.onAttach(context);
         setHasOptionsMenu(true);
-        try {
-            onItemSelectedListener = (AdapterView.OnItemSelectedListener) context;
-        } catch (ClassCastException e) {
-            throw new ClassCastException(
-                    context.toString()
-                            + " muss OnItemSelectedListener implementieren");
-        }
+
     }
 
     @Override
     public void onDetach() {
         super.onDetach();
-        onItemSelectedListener = null;
     }
 
     @Override
     public void onListItemClick(ListView l, View v, int position, long id) {
         super.onListItemClick(l, v, position, id);
-        onItemSelectedListener.onItemSelected(l, v, position, id);
+        final Transaction transaction = ((TransactionAdapter.ViewHolder) v.getTag()).getTransaction();
+        startTransactionDetailActivity(transaction);
+    }
+
+    private void startTransactionDetailActivity(Transaction transaction) {
+        final Intent intent = new Intent(this.getActivity(), TransactionDetailViewActivity.class);
+        final Bundle b = new Bundle();
+        b.putLong("id", transaction.getId());
+        b.putString("imageUrl", transaction.getImageUrl());
+        b.putString("name", transaction.getInfoName());
+        b.putString("createdAt", Helper.formatDate(transaction.getDateTime()));
+        b.putDouble("amount", transaction.getAmount());
+
+        intent.putExtras(b); //Put your id to your next Intent
+        startActivity(intent);
     }
 
     @Override
@@ -270,6 +282,7 @@ public class TransactionFragment extends ListFragment implements LoaderManager.L
             } else {
                 transactionAdapter.swapCursor(data);
             }
+
             setListAdapter(transactionAdapter);
         }
 

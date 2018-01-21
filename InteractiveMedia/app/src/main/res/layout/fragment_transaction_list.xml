@@ -10,6 +10,7 @@
         android:layout_alignParentStart="true"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:background="@color/colorPrimary"
         android:orientation="vertical">
 
         <RelativeLayout
@@ -70,7 +71,7 @@
                     android:layout_alignParentEnd="true"
                     android:layout_centerVertical="true"
                     android:layout_marginEnd="8dp"
-                    android:maxWidth="250dp" />
+                    android:maxWidth="230dp" />
 
             </RelativeLayout>
 
@@ -89,8 +90,9 @@
         android:id="@+id/no_group_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:backgroundTint="@android:color/white"
         android:padding="15dp"
         android:text="You have to create a group before you can add transactions"
-        android:visibility="invisible"
-        android:textAppearance="@style/TextAppearance.AppCompat.Large" />
+        android:textAppearance="@style/TextAppearance.AppCompat.Large"
+        android:visibility="invisible" />
 </RelativeLayout>

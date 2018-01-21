@@ -53,7 +53,6 @@ public class MapTransactionFragment extends Fragment implements IMyFragment,
         final Spinner spinner = item.getActionView().findViewById(R.id.menu_group_spinner);
 
         groupAdapter = initializeGroupAdapter();
-        groupAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 
         spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
@@ -90,8 +89,8 @@ public class MapTransactionFragment extends Fragment implements IMyFragment,
         final String[] columns = new String[]{GroupTable.COLUMN_NAME};
         final int[] to = new int[]{android.R.id.text1};
 
-        final SimpleCursorAdapter groupAdapter = new SimpleCursorAdapter(this.getContext(), android.R.layout.simple_spinner_item, query, columns, to, 0);
-        groupAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        final SimpleCursorAdapter groupAdapter = new SimpleCursorAdapter(this.getContext(), R.layout.group_spinner_item, query, columns, to, 0);
+        groupAdapter.setDropDownViewResource(R.layout.group_spinner_dropdown_item);
         return groupAdapter;
     }
 

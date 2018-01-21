@@ -1,14 +1,55 @@
 <?xml version="1.0" encoding="utf-8"?>
+<android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/colorPrimary"
+    tools:context="com.media.interactive.cs3.hdm.interactivemedia.activties.AddTransactionActivity">
+
+    <android.support.design.widget.AppBarLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:theme="@style/AppTheme.AppBarOverlay">
+
+        <android.support.v7.widget.Toolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            android:background="?attr/colorPrimary"
+            app:popupTheme="@style/AppTheme.PopupOverlay" >
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="30dp"
+                android:layout_gravity="center"
+                android:src="@mipmap/ic_launcher"
+                android:layout_marginRight="5sp"/>
+            <TextView
+                android:id="@+id/toolbar_title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:fontFamily="@font/architects_daughter"
+                android:text="@string/app_name" />
+
+        </android.support.v7.widget.Toolbar>
+
+    </android.support.design.widget.AppBarLayout>
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fillViewport="true"
+    android:background="@color/colorPrimary"
+    app:layout_behavior="@string/appbar_scrolling_view_behavior"
     tools:context="com.media.interactive.cs3.hdm.interactivemedia.activties.AddTransactionActivity">
 
     <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:background="@color/colorPrimary"
         android:orientation="vertical">
 
         <EditText
@@ -17,6 +58,7 @@
             android:layout_height="wrap_content"
             android:layout_marginLeft="30dp"
             android:layout_marginRight="30dp"
+            android:layout_marginBottom="10dp"
             android:hint="Transaction Name"
             android:inputType="textShortMessage" />
 
@@ -26,12 +68,14 @@
             android:layout_height="wrap_content"
             android:layout_marginLeft="30dp"
             android:layout_marginRight="30dp"
+            android:layout_marginBottom="10dp"
             android:spinnerMode="dropdown" />
 
         <EditText
             android:id="@+id/et_add_transaction_amount"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginBottom="10dp"
             android:layout_marginLeft="30dp"
             android:layout_marginRight="30dp"
             android:ems="10"
@@ -49,6 +93,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="30dp"
                 android:layout_marginRight="30dp"
+                android:layout_marginBottom="10dp"
                 android:focusable="false"
                 android:hint="Date"
                 android:inputType="date" />
@@ -58,6 +103,7 @@
                 android:layout_width="100dp"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="30dp"
+                android:layout_marginBottom="10dp"
                 android:layout_marginRight="30dp"
                 android:focusable="false"
                 android:hint="Time"
@@ -74,6 +120,7 @@
                 android:layout_gravity="center"
                 android:layout_marginLeft="30dp"
                 android:layout_marginRight="30dp"
+                android:layout_marginBottom="10dp"
                 android:text="Split Methode: "
                 android:textSize="18dp" />
 
@@ -82,6 +129,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
+                android:layout_marginBottom="10dp"
                 android:layout_marginLeft="30dp"
                 android:layout_marginRight="30dp"
                 android:text="Even"
@@ -96,6 +144,7 @@
             android:layout_marginLeft="30dp"
             android:layout_marginRight="30dp"
             android:adjustViewBounds="true"
+            android:layout_marginBottom="10dp"
             android:maxHeight="270dp"
             android:src="@drawable/anonymoususer" />
 
@@ -104,6 +153,7 @@
             android:layout_height="wrap_content"
             android:layout_marginLeft="30dp"
             android:layout_marginRight="30dp"
+            android:layout_marginBottom="10dp"
             android:text="Location:"
             android:textSize="16dp" />
 
@@ -114,12 +164,14 @@
             android:layout_gravity="center"
             android:layout_marginLeft="30dp"
             android:layout_marginRight="30dp"
+            android:layout_marginBottom="10dp"
             android:hint="No location selected" />
 
         <Button
             android:id="@+id/transaction_location"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginBottom="10dp"
             android:layout_marginLeft="30dp"
             android:layout_marginRight="30dp"
             android:hint="Choose Location" />
@@ -132,6 +184,7 @@
                 android:id="@+id/bn_add_transaction_cancel"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_gravity="left"
                 android:layout_alignParentRight="true"
                 android:layout_marginLeft="30dp"
                 android:layout_marginRight="30dp"
@@ -142,12 +195,13 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentLeft="true"
-                android:layout_gravity="center"
+                android:layout_gravity="right"
                 android:layout_marginLeft="30dp"
                 android:layout_marginRight="30dp"
-                android:text="add transaction" />
+                android:text="Add Transaction" />
         </RelativeLayout>
 
     </LinearLayout>
 
 </ScrollView>
+</android.support.design.widget.CoordinatorLayout>
