@@ -1,6 +1,7 @@
 'use strict';
 
 const userData = require('./user.data.json');
+const SPLIT = require('../config/split.config');
 
 const MINUTE = 60000;
 const HOUR = 60 * MINUTE;
@@ -79,7 +80,11 @@ module.exports = [
         infoCreatedAt: nowPlus(1 * MINUTE),
         infoImageUrl: '10896cb8-d2a4-4bb6-b4d7-c3063553fee9.image.jpg',
         //paidBy: User 0,
-        split: 'even'
+        split: [
+          {
+            type: SPLIT.EVEN
+          }
+        ]
       },
       {
         amount: 6.6,
@@ -91,7 +96,11 @@ module.exports = [
         infoCreatedAt: nowPlus(3 * HOUR),
         infoImageUrl: null,
         //paidBy: User 1,
-        split: 'even'
+        split: [
+          {
+            type: SPLIT.EVEN
+          }
+        ]
       },
       { //offline
         amount: 9,
@@ -103,7 +112,11 @@ module.exports = [
         infoCreatedAt: nowPlus(5 * HOUR),
         infoImageUrl: null,
         //paidBy: User 1,
-        split: 'even'
+        split: [
+          {
+            type: SPLIT.EVEN
+          }
+        ]
       },
       {
         amount: 3.3,
@@ -115,7 +128,11 @@ module.exports = [
         infoCreatedAt: nowPlus(12 * HOUR),
         infoImageUrl: null,
         //paidBy: User 2,
-        split: 'even'
+        split: [
+          {
+            type: SPLIT.EVEN
+          }
+        ]
       },
       { //ofline
         amount: 12.9,
@@ -127,7 +144,11 @@ module.exports = [
         infoCreatedAt: nowPlus(1 * DAY + 2 * HOUR),
         infoImageUrl: null,
         //paidBy: User 0,
-        split: 'even'
+        split: [
+          {
+            type: SPLIT.EVEN
+          }
+        ]
       },
       { //nicht durch 3 teilbar
         amount: 10,
@@ -139,7 +160,11 @@ module.exports = [
         infoCreatedAt: nowPlus(2 * DAY + 2 * HOUR),
         infoImageUrl: null,
         //paidBy:  User 2,
-        split: 'even'
+        split: [
+          {
+            type: SPLIT.EVEN
+          }
+        ]
       },
       { // wie transaktion 4 aber anderer paidBy
         amount: 9,
@@ -151,7 +176,11 @@ module.exports = [
         infoCreatedAt: nowPlus(2 * DAY + 5 * HOUR),
         infoImageUrl: null,
         //paidBy: User 0,
-        split: 'even'
+        split: [
+          {
+            type: SPLIT.EVEN
+          }
+        ]
       },
     ],
     transactionWrongUserId: {
@@ -164,7 +193,11 @@ module.exports = [
       infoCreatedAt: nowPlus(1 * DAY),
       infoImageUrl: '10896cb8-d2a4-4bb6-b4d7-c3063553fee9.image.jpg',
       paidBy: '6367e722-e857-4d0f-bf78-278a92260418',
-      split: 'even'
+      split: [
+        {
+          type: SPLIT.EVEN
+        }
+      ]
     },
     transactionWrongLocation1: {
       amount: 6.6,
@@ -176,7 +209,11 @@ module.exports = [
       infoCreatedAt: nowPlus(1 * DAY),
       infoImageUrl: null,
       //paidBy: User 1,
-      split: 'even'
+      split: [
+        {
+          type: SPLIT.EVEN
+        }
+      ]
     },
     transactionWrongLocation2: {
       amount: 6.6,
@@ -188,7 +225,11 @@ module.exports = [
       infoCreatedAt: nowPlus(1 * DAY),
       infoImageUrl: null,
       //paidBy: User 1,
-      split: 'even'
+      split: [
+        {
+          type: SPLIT.EVEN
+        }
+      ]
     },
     transactionWrongLocation3: {
       amount: 6.6,
@@ -200,7 +241,11 @@ module.exports = [
       infoCreatedAt: nowPlus(1 * DAY),
       infoImageUrl: null,
       //paidBy: User 1,
-      split: 'even'
+      split: [
+        {
+          type: SPLIT.EVEN
+        }
+      ]
     },
     transactionWrongInfoCreatedAt: {
       amount: 6.6,
@@ -212,7 +257,11 @@ module.exports = [
       infoCreatedAt: nowPlus(-1 * HOUR),
       infoImageUrl: null,
       //paidBy: User 1,
-      split: 'even'
+      split: [
+        {
+          type: SPLIT.EVEN
+        }
+      ]
     },
     setUserIdsInTransactions: function(users) {
       let transactions = module.exports[2].transactions;

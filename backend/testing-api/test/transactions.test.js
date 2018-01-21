@@ -213,6 +213,54 @@ describe('Groups-Controller: Transactions:', () => {
       });
     });
 
+    it('should fail to add a transaction due to empty split', () => {
+      let transaction = miscService.deepCopy(transactions[0]);
+      transaction.split = [];
+      return chai.request(settings.host)
+      .post(settings.url.groups.base  + '/' + groupId + '/transactions')
+      .set('Authorization', '0 ' + users[0].token)
+      .send(transaction)
+      .then(res => {
+        expectResponse.toBe400.invalidRequestBody(res);
+      });
+    });
+
+    it('should fail to add a transaction due to split with unknown type', () => {
+      let transaction = miscService.deepCopy(transactions[0]);
+      transaction.split[0].type = 'unknown_type';
+      return chai.request(settings.host)
+      .post(settings.url.groups.base  + '/' + groupId + '/transactions')
+      .set('Authorization', '0 ' + users[0].token)
+      .send(transaction)
+      .then(res => {
+        expectResponse.toBe400.invalidRequestBody(res);
+      });
+    });
+
+    it('should fail to add a transaction due to split with missing type', () => {
+      let transaction = miscService.deepCopy(transactions[0]);
+      delete transaction.split[0].type;
+      return chai.request(settings.host)
+      .post(settings.url.groups.base  + '/' + groupId + '/transactions')
+      .set('Authorization', '0 ' + users[0].token)
+      .send(transaction)
+      .then(res => {
+        expectResponse.toBe400.invalidRequestBody(res);
+      });
+    });
+
+    it('should fail to add a transaction with split "even" due to additional property', () => {
+      let transaction = miscService.deepCopy(transactions[0]);
+      transaction.split[0].additional = 'property';
+      return chai.request(settings.host)
+      .post(settings.url.groups.base  + '/' + groupId + '/transactions')
+      .set('Authorization', '0 ' + users[0].token)
+      .send(transaction)
+      .then(res => {
+        expectResponse.toBe400.invalidRequestBody(res);
+      });
+    });
+
     it('should fail to add a transaction due to additional parameter', () => {
       let transaction = miscService.deepCopy(transactions[0]);
       transaction.publishedAt = 'fooBar';
