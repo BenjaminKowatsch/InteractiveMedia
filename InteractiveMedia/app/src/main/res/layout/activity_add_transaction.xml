@@ -114,26 +114,25 @@
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal">
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:layout_marginLeft="30dp"
-                android:layout_marginRight="30dp"
-                android:layout_marginBottom="10dp"
-                android:text="Split Methode: "
-                android:textSize="18dp" />
 
-            <TextView
-                android:id="@+id/tv_add_transaction_split"
-                android:layout_width="wrap_content"
+            <Button
+                android:id="@+id/bn_add_transaction_add_split"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:layout_marginBottom="10dp"
                 android:layout_marginLeft="30dp"
                 android:layout_marginRight="30dp"
-                android:text="Even"
-                android:textSize="18dp" />
+                android:text="Add deduction" />
+
+            <com.media.interactive.cs3.hdm.interactivemedia.recyclerview.NonScrollRecyclerView
+                android:id="@+id/add_transaction_splits"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="10dp"
+                android:layout_marginLeft="30dp"
+                android:layout_marginRight="30dp"
+                android:scrollbars="vertical" />
         </LinearLayout>
 
         <ImageView

@@ -109,5 +109,4 @@ public class ConstantDeduction implements Split {
         out.put(SplitTable.COLUMN_USER_ID, toUserId);
         return out;
     }
-
 }
