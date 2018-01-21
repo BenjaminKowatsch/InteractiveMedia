@@ -13,6 +13,9 @@ chai.use(require('chai-http'));
 
 const userData = require('../data/user.data');
 
+// skip this test because Firebase Cloud Messaging does not provide a test token which is valid and does not expire
+// hence if you use a genuine token it will expire after a couple of hours (presumably 48 hours)
+// nevertheless you can use this test by pasting a valid fcmToken
 describe.skip('PushNotifications', () => {
     let token;
     let fcmToken = 'cUKrLfXhKSU:APA91bFfh3KX44JYptYsslEVtsAv4VwppWlDXJofsaEiwRiMF48' +

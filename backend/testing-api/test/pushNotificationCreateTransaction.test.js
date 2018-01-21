@@ -17,6 +17,9 @@ const userData = require('../data/user.data');
 const MINUTE = 60000;
 const nowPlus = time => new Date(new Date().getTime() + time).toISOString();
 
+// skip this test because Firebase Cloud Messaging does not provide a test token which is valid and does not expire
+// hence if you use a genuine token it will expire after a couple of hours (presumably 48 hours)
+// nevertheless you can use this test by pasting a valid fcmToken
 describe.skip('PushNotifications create transactions', function() {
     let tokens = {};
     let userIds = {};
