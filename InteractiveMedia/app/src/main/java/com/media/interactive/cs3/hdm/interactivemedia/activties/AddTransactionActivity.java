@@ -195,6 +195,7 @@ public class AddTransactionActivity extends ImagePickerActivity {
     final UUID randomUUID = UUID.randomUUID();
     final String randomFilename = randomUUID.toString() + ".png";
     initImagePickerActivity(R.id.iv_transaction_image, randomFilename, true);
+    setMinimumDate(Helper.parseDateString(groupCreatedAt));
     setDateTextField(dateEditText);
     setDateTimeTextField(timeEditText);
     setAmountTextField(amountEditText);
