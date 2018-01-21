@@ -25,6 +25,7 @@ module.exports = {
           {
             type: SPLIT.CONSTANT_DEDUCTION,
             amount: 5,
+            // userid: User 0
           }
         ]
       }
@@ -44,6 +45,7 @@ module.exports = {
           {
             type: SPLIT.CONSTANT_DEDUCTION,
             amount: 5,
+            // userid: User 0
           }
         ]
       },
@@ -91,6 +93,7 @@ module.exports = {
           {
             type: SPLIT.CONSTANT_DEDUCTION,
             amount: 5,
+            // userid: User 0
           },
           {
             type: SPLIT.EVEN
@@ -116,6 +119,7 @@ module.exports = {
           {
             type: SPLIT.CONSTANT_DEDUCTION,
             amount: 5,
+            // userid: User 0
           },
         ]
       },
