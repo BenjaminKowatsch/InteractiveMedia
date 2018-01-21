@@ -2,11 +2,11 @@
 
 const userData = require('./user.data.json');
 const SPLIT = require('../config/split.config');
+const miscService = require('../util/miscService.util');
 
 const MINUTE = 60000;
 const HOUR = 60 * MINUTE;
 const DAY = 24 * HOUR;
-const nowPlus = time => new Date(new Date().getTime() + time).toISOString();
 
 module.exports = [
   // Secenario 0:
@@ -77,7 +77,7 @@ module.exports = [
           longitude: 9.131,
           latitude: 48.947
         },
-        infoCreatedAt: nowPlus(1 * MINUTE),
+        infoCreatedAt: miscService.nowPlus(1 * MINUTE),
         infoImageUrl: '10896cb8-d2a4-4bb6-b4d7-c3063553fee9.image.jpg',
         //paidBy: User 0,
         split: [
@@ -93,7 +93,7 @@ module.exports = [
           longitude: null,
           latitude: null
         },
-        infoCreatedAt: nowPlus(3 * HOUR),
+        infoCreatedAt: miscService.nowPlus(3 * HOUR),
         infoImageUrl: null,
         //paidBy: User 1,
         split: [
@@ -109,7 +109,7 @@ module.exports = [
           longitude: null,
           latitude: null
         },
-        infoCreatedAt: nowPlus(5 * HOUR),
+        infoCreatedAt: miscService.nowPlus(5 * HOUR),
         infoImageUrl: null,
         //paidBy: User 1,
         split: [
@@ -125,7 +125,7 @@ module.exports = [
           longitude: null,
           latitude: null
         },
-        infoCreatedAt: nowPlus(12 * HOUR),
+        infoCreatedAt: miscService.nowPlus(12 * HOUR),
         infoImageUrl: null,
         //paidBy: User 2,
         split: [
@@ -141,7 +141,7 @@ module.exports = [
           longitude: 9.660790,
           latitude: 48.258534
         },
-        infoCreatedAt: nowPlus(1 * DAY + 2 * HOUR),
+        infoCreatedAt: miscService.nowPlus(1 * DAY + 2 * HOUR),
         infoImageUrl: null,
         //paidBy: User 0,
         split: [
@@ -157,7 +157,7 @@ module.exports = [
           longitude: null,
           latitude: null
         },
-        infoCreatedAt: nowPlus(2 * DAY + 2 * HOUR),
+        infoCreatedAt: miscService.nowPlus(2 * DAY + 2 * HOUR),
         infoImageUrl: null,
         //paidBy:  User 2,
         split: [
@@ -173,7 +173,7 @@ module.exports = [
           longitude: null,
           latitude: null
         },
-        infoCreatedAt: nowPlus(2 * DAY + 5 * HOUR),
+        infoCreatedAt: miscService.nowPlus(2 * DAY + 5 * HOUR),
         infoImageUrl: null,
         //paidBy: User 0,
         split: [
@@ -190,7 +190,7 @@ module.exports = [
         longitude: null,
         latitude: null
       },
-      infoCreatedAt: nowPlus(1 * DAY),
+      infoCreatedAt: miscService.nowPlus(1 * DAY),
       infoImageUrl: '10896cb8-d2a4-4bb6-b4d7-c3063553fee9.image.jpg',
       paidBy: '6367e722-e857-4d0f-bf78-278a92260418',
       split: [
@@ -206,7 +206,7 @@ module.exports = [
         longitude: 50,
         latitude: null
       },
-      infoCreatedAt: nowPlus(1 * DAY),
+      infoCreatedAt: miscService.nowPlus(1 * DAY),
       infoImageUrl: null,
       //paidBy: User 1,
       split: [
@@ -222,7 +222,7 @@ module.exports = [
         longitude: 190,
         latitude: 50
       },
-      infoCreatedAt: nowPlus(1 * DAY),
+      infoCreatedAt: miscService.nowPlus(1 * DAY),
       infoImageUrl: null,
       //paidBy: User 1,
       split: [
@@ -238,7 +238,7 @@ module.exports = [
         longitude: 50,
         latitude: 100
       },
-      infoCreatedAt: nowPlus(1 * DAY),
+      infoCreatedAt: miscService.nowPlus(1 * DAY),
       infoImageUrl: null,
       //paidBy: User 1,
       split: [
@@ -254,7 +254,7 @@ module.exports = [
         longitude: null,
         latitude: null
       },
-      infoCreatedAt: nowPlus(-1 * HOUR),
+      infoCreatedAt: miscService.nowPlus(-1 * HOUR),
       infoImageUrl: null,
       //paidBy: User 1,
       split: [

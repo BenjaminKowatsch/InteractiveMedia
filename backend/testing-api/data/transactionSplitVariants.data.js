@@ -2,11 +2,11 @@
 
 const userData = require('./user.data.json');
 const SPLIT = require('../config/split.config');
+const miscService = require('../util/miscService.util');
 
 const MINUTE = 60000;
 const HOUR = 60 * MINUTE;
 const DAY = 24 * HOUR;
-const nowPlus = time => new Date(new Date().getTime() + time).toISOString();
 
 module.exports = {
   constantDeduction: {
@@ -18,7 +18,7 @@ module.exports = {
           longitude: 9.131,
           latitude: 48.947
         },
-        infoCreatedAt: nowPlus(1 * MINUTE),
+        infoCreatedAt: miscService.nowPlus(1 * MINUTE),
         infoImageUrl: '10896cb8-d2a4-4bb6-b4d7-c3063553fee9.image.jpg',
         //paidBy: User 0,
         split: [
@@ -37,7 +37,7 @@ module.exports = {
           longitude: 9.131,
           latitude: 48.947
         },
-        infoCreatedAt: nowPlus(1 * MINUTE),
+        infoCreatedAt: miscService.nowPlus(1 * MINUTE),
         infoImageUrl: '10896cb8-d2a4-4bb6-b4d7-c3063553fee9.image.jpg',
         //paidBy: User 0,
         split: [
@@ -54,7 +54,7 @@ module.exports = {
           longitude: 9.131,
           latitude: 48.947
         },
-        infoCreatedAt: nowPlus(1 * MINUTE),
+        infoCreatedAt: miscService.nowPlus(1 * MINUTE),
         infoImageUrl: '10896cb8-d2a4-4bb6-b4d7-c3063553fee9.image.jpg',
         //paidBy: User 0,
         split: [
@@ -84,7 +84,7 @@ module.exports = {
           longitude: 9.131,
           latitude: 48.947
         },
-        infoCreatedAt: nowPlus(1 * MINUTE),
+        infoCreatedAt: miscService.nowPlus(1 * MINUTE),
         infoImageUrl: '10896cb8-d2a4-4bb6-b4d7-c3063553fee9.image.jpg',
         //paidBy: User 0,
         split: [
@@ -106,7 +106,7 @@ module.exports = {
           longitude: 9.131,
           latitude: 48.947
         },
-        infoCreatedAt: nowPlus(1 * MINUTE),
+        infoCreatedAt: miscService.nowPlus(1 * MINUTE),
         infoImageUrl: '10896cb8-d2a4-4bb6-b4d7-c3063553fee9.image.jpg',
         //paidBy: User 0,
         split: [
