@@ -178,16 +178,19 @@
 
         <RelativeLayout
             android:layout_width="fill_parent"
+            android:layout_marginBottom="10dp"
             android:layout_height="wrap_content">
 
             <Button
                 android:id="@+id/bn_add_transaction_cancel"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_gravity="left"
                 android:layout_alignParentRight="true"
+                android:layout_gravity="left"
                 android:layout_marginLeft="30dp"
                 android:layout_marginRight="30dp"
+                android:paddingLeft="12dp"
+                android:paddingRight="12dp"
                 android:text="Cancel" />
 
             <Button
@@ -198,6 +201,8 @@
                 android:layout_gravity="right"
                 android:layout_marginLeft="30dp"
                 android:layout_marginRight="30dp"
+                android:paddingLeft="12dp"
+                android:paddingRight="12dp"
                 android:text="Add Transaction" />
         </RelativeLayout>
 

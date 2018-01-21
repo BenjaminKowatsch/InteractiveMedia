@@ -7,7 +7,9 @@ import android.database.Cursor;
 import android.location.Location;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
+import android.text.Editable;
 import android.text.InputType;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -40,6 +42,7 @@ import com.media.interactive.cs3.hdm.interactivemedia.data.Group;
 import com.media.interactive.cs3.hdm.interactivemedia.data.Login;
 import com.media.interactive.cs3.hdm.interactivemedia.data.SynchronisationHelper;
 import com.media.interactive.cs3.hdm.interactivemedia.data.Transaction;
+import com.media.interactive.cs3.hdm.interactivemedia.util.Helper;
 import com.media.interactive.cs3.hdm.interactivemedia.util.MoneyTextWatcher;
 
 import org.json.JSONException;
@@ -71,6 +74,8 @@ public class AddTransactionActivity extends ImagePickerActivity {
   private TextView locationDisplay;
   private DatabaseProviderHelper helper;
   private SimpleCursorAdapter userAdapter;
+  private EditText name;
+  private EditText amount;
   private Place selectedPlace = null;
   private final static int PLACE_PICKER_REQUEST = 3;
 
@@ -127,10 +132,36 @@ public class AddTransactionActivity extends ImagePickerActivity {
     groupId = getIntent().getStringExtra(GROUP_TO_ADD_TO);
     groupCreatedAt = getIntent().getStringExtra(GROUP_CREATED_AT_ADD_TO);
 
-
+    name = findViewById(R.id.et_add_transaction_purpose);
+    amount = findViewById(R.id.et_add_transaction_amount);
     locationDisplay = findViewById(R.id.transaction_location_display);
 
     final Button addTransactionButton = findViewById(R.id.bn_add_transaction);
+    addTransactionButton.setEnabled(false);
+
+    final TextWatcher textWatcher = new TextWatcher() {
+      @Override
+      public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+      }
+
+      @Override
+      public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+      }
+
+      @Override
+      public void afterTextChanged(Editable editable) {
+        if (editable.toString().length() > 0 && amount.getText().toString().length() > 0) {
+          addTransactionButton.setEnabled(true);
+        } else {
+          addTransactionButton.setEnabled(false);
+        }
+      }
+    };
+
+    name.addTextChangedListener(textWatcher);
+    amount.addTextChangedListener(textWatcher);
+
+
     addTransactionButton.setOnClickListener(new View.OnClickListener() {
       @Override
       public void onClick(View view) {
@@ -263,9 +294,7 @@ public class AddTransactionActivity extends ImagePickerActivity {
 
 
   private Transaction buildFromCurrentView() {
-    final EditText name = findViewById(R.id.et_add_transaction_purpose);
     final TextView split = findViewById(R.id.tv_add_transaction_split);
-    final EditText amount = findViewById(R.id.et_add_transaction_amount);
     return buildTransaction(name, split, dateEditText, timeEditText, amount);
   }
 

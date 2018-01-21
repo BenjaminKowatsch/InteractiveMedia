@@ -88,18 +88,18 @@ public class GroupAdapter extends CursorAdapter {
         if(group.getSync() && group.getImageUrl() != null) {
             Glide.with(context).load(glideUrl)
                 .diskCacheStrategy(DiskCacheStrategy.SOURCE)
-                .fallback(R.drawable.anonymoususer)
-                .placeholder(R.drawable.anonymoususer)
+                .fallback(R.drawable.anonymousgroup)
+                .placeholder(R.drawable.anonymousgroup)
                 .into(viewHolder.groupIcon);
         } else if(group.getImageUrl() != null){
             Glide.with(context).load(new File(group.getImageUrl()))
                 .diskCacheStrategy(DiskCacheStrategy.SOURCE)
-                .fallback(R.drawable.anonymoususer)
-                .placeholder(R.drawable.anonymoususer)
+                .fallback(R.drawable.anonymousgroup)
+                .placeholder(R.drawable.anonymousgroup)
                 .into(viewHolder.groupIcon);
         } else {
             Glide.with(context)
-                .load(R.drawable.anonymoususer)
+                .load(R.drawable.anonymousgroup)
                 .diskCacheStrategy(DiskCacheStrategy.SOURCE)
                 .into(viewHolder.groupIcon);
         }

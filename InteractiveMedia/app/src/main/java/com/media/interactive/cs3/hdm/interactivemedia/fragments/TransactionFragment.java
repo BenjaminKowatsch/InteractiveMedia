@@ -7,7 +7,9 @@ import android.content.Context;
 import android.content.CursorLoader;
 import android.content.Intent;
 import android.content.Loader;
+import android.content.res.ColorStateList;
 import android.database.Cursor;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -18,6 +20,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.CursorAdapter;
+import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.SearchView;
 import android.widget.SimpleCursorAdapter;
@@ -187,6 +190,19 @@ public class TransactionFragment extends ListFragment implements LoaderManager.L
         transactionListFragment = inflater.inflate(R.layout.fragment_transaction_list, container, false);
 
         final SearchView searchView = transactionListFragment.findViewById(R.id.transaction_search);
+        int searchTextViewId = searchView.getContext().getResources().getIdentifier("android:id/search_src_text", null, null);
+        final TextView searchTextView = (TextView)  searchView.findViewById(searchTextViewId);
+        searchTextView.setTextColor(Color.WHITE);
+        searchTextView.setHintTextColor(Color.WHITE);
+
+        int searchImageViewId = searchView.getContext().getResources().getIdentifier("android:id/search_button", null, null);
+        ImageView icon = searchView.findViewById(searchImageViewId);
+        icon.setColorFilter(Color.WHITE);
+
+        int searchCloseImageViewId = searchView.getContext().getResources().getIdentifier("android:id/search_close_btn", null, null);
+        ImageView icon2 = searchView.findViewById(searchCloseImageViewId);
+        icon2.setColorFilter(Color.WHITE);
+
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String s) {                final Bundle bundle = new Bundle();
@@ -230,11 +246,13 @@ public class TransactionFragment extends ListFragment implements LoaderManager.L
     @Override
     public void onListItemClick(ListView l, View v, int position, long id) {
         super.onListItemClick(l, v, position, id);
-        final Transaction transaction = ((TransactionAdapter.ViewHolder) v.getTag()).getTransaction();
-        startTransactionDetailActivity(transaction);
+        final TransactionAdapter.ViewHolder viewHolder = ((TransactionAdapter.ViewHolder) v.getTag());
+        final Transaction transaction = viewHolder.getTransaction();
+        final String paidByUsername = viewHolder.getPaidByUsername();
+        startTransactionDetailActivity(transaction,paidByUsername);
     }
 
-    private void startTransactionDetailActivity(Transaction transaction) {
+    private void startTransactionDetailActivity(Transaction transaction, String paidByUsername) {
         final Intent intent = new Intent(this.getActivity(), TransactionDetailViewActivity.class);
         final Bundle b = new Bundle();
         b.putLong("id", transaction.getId());
@@ -242,6 +260,8 @@ public class TransactionFragment extends ListFragment implements LoaderManager.L
         b.putString("name", transaction.getInfoName());
         b.putString("createdAt", Helper.formatDate(transaction.getDateTime()));
         b.putDouble("amount", transaction.getAmount());
+        b.putBoolean("sync", transaction.isSynched());
+        b.putString("paidByUsername", paidByUsername);
 
         intent.putExtras(b); //Put your id to your next Intent
         startActivity(intent);
@@ -275,7 +295,6 @@ public class TransactionFragment extends ListFragment implements LoaderManager.L
 
         @Override
         public void onLoadFinished (Loader < Cursor > loader, Cursor data){
-            data.moveToFirst();
             Log.d(TAG, "Data: " + data.getCount());
             if (transactionAdapter == null) {
                 transactionAdapter = new TransactionAdapter(getContext(), R.layout.fragment_transaction, data);

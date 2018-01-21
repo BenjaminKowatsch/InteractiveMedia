@@ -74,7 +74,7 @@
             android:layout_marginLeft="30dp"
             android:layout_marginRight="30dp"
             android:adjustViewBounds="true"
-            android:src="@drawable/anonymoususer" />
+            android:src="@drawable/anonymoustransaction" />
 
         <TextView
             android:layout_width="wrap_content"
@@ -91,6 +91,28 @@
             android:id="@+id/detail_transaction_name"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:textAlignment="textEnd"
+            android:layout_gravity="center"
+            android:layout_marginBottom="10dp"
+            android:layout_marginRight="40dp"
+            android:layout_marginLeft="40dp"
+            android:text="Placholdername"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="10dp"
+            android:layout_marginRight="30dp"
+            android:layout_marginLeft="30dp"
+            android:layout_gravity="left"
+            android:text="Synchronized with Backend:"
+            android:textSize="18dp" />
+
+        <TextView
+            android:id="@+id/detail_transaction_synchronized"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textAlignment="textEnd"
             android:layout_gravity="center"
             android:layout_marginBottom="10dp"
             android:layout_marginRight="40dp"
@@ -112,6 +134,7 @@
             android:id="@+id/detail_transaction_created_at"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:textAlignment="textEnd"
             android:layout_gravity="center"
             android:layout_marginBottom="10dp"
             android:layout_marginRight="40dp"
@@ -130,6 +153,7 @@
 
         <TextView
             android:id="@+id/detail_transaction_amount"
+            android:textAlignment="textEnd"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
@@ -152,6 +176,7 @@
             android:id="@+id/chart"
             android:background="@color/colorPrimary"
             android:foregroundTint="@android:color/white"
+            android:layout_marginBottom="10dp"
             android:minHeight="400dp"
             android:layout_width="match_parent"
             android:layout_height="match_parent" />

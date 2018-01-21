@@ -22,6 +22,7 @@ import com.media.interactive.cs3.hdm.interactivemedia.contentprovider.DatabasePr
 import com.media.interactive.cs3.hdm.interactivemedia.contentprovider.tables.GroupTable;
 import com.media.interactive.cs3.hdm.interactivemedia.contentprovider.tables.UserTable;
 import com.media.interactive.cs3.hdm.interactivemedia.data.Login;
+import com.media.interactive.cs3.hdm.interactivemedia.util.Helper;
 
 /**
  * Created by benny on 04.01.18.
@@ -61,8 +62,11 @@ public class GroupDetailViewActivity extends AppCompatActivity implements Loader
         final String createdAt = extras.getString("createdAt");
         final boolean sync = extras.getBoolean("sync");
 
+        final TextView groupSynched = (TextView) findViewById(R.id.detail_group_synchronized);
+        groupSynched.setText(sync ? "Synchronized":"Not synchronized");
+
         groupName.setText(name);
-        groupCreatedAt.setText(createdAt);
+        groupCreatedAt.setText(Helper.READABLE_DATE_FORMAT.format(Helper.parseDateString(createdAt)));
 
         if(imageUrl != null) {
             LazyHeaders.Builder builder = new LazyHeaders.Builder();
@@ -74,10 +78,9 @@ public class GroupDetailViewActivity extends AppCompatActivity implements Loader
 
             Glide.with(this).load(glideUrl)
                 .diskCacheStrategy(DiskCacheStrategy.SOURCE)
-                .placeholder(ContextCompat.getDrawable(this, R.drawable.anonymoususer))
+                .placeholder(ContextCompat.getDrawable(this, R.drawable.anonymousgroup))
                 .into(groupImage);
         }
-        // TODO: link to transactions
 
         getLoaderManager().initLoader(0, null, this);
     }

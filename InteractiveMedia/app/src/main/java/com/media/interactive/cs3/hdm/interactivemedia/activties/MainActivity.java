@@ -65,7 +65,6 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onFailure(Exception error) {
                 Log.d(TAG, "Login failed due to " + error.getMessage());
-                Toast.makeText(getApplicationContext(), "Login failed", Toast.LENGTH_SHORT).show();
                 // Do first run stuff
                 Log.d(TAG, "Launching Login Activity");
                 final Intent intent = new Intent(MainActivity.this, LoginActivity.class);

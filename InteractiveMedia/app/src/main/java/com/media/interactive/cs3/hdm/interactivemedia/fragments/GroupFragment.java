@@ -205,7 +205,6 @@ public class GroupFragment extends ListFragment implements LoaderManager.LoaderC
 
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
-        data.moveToFirst();
         Log.d(TAG, "Data: " + data.getCount());
         if (groupAdapter == null) {
             groupAdapter = new GroupAdapter(getContext(), R.layout.fragment_group, data);
