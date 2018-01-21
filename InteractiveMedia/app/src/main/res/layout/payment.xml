@@ -8,7 +8,9 @@
         android:layout_width="75dp"
         android:layout_height="wrap_content"
         android:layout_alignParentLeft="true"
-        android:hint="FromNam"
+        android:hint="From Name"
+        android:ellipsize="end"
+        android:maxLines="1"
         android:textSize="14sp" />
 
     <TextView
@@ -26,6 +28,8 @@
         android:layout_height="wrap_content"
         android:layout_toRightOf="@+id/payment_direction_indicator"
         android:hint="ToName"
+        android:ellipsize="end"
+        android:maxLines="1"
         android:textSize="14sp" />
 
     <TextView
