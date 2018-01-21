@@ -49,7 +49,6 @@ public class HomeActivity extends AppCompatActivity
     private static final String TAG = "HomeActivity";
 
     private FloatingActionButton fab;
-    private CallbackListener<JSONObject, Exception> userDataCompleted;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -105,7 +104,6 @@ public class HomeActivity extends AppCompatActivity
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        Login.getInstance().removeOnUserDataSetListener(userDataCompleted);
     }
 
     private void loadUserData(NavigationView navigationView) {

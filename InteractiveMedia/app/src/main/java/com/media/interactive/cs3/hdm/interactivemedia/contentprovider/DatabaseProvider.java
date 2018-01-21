@@ -39,6 +39,8 @@ public class DatabaseProvider extends android.content.ContentProvider {
             + "_" + UserTable.TABLE_NAME;
     private static final String GROUP_ID_DEBT_JOIN_TABLE = DebtTable.TABLE_NAME
             + "_" + GroupTransactionTable.TABLE_NAME;
+    private static final String USER_DEBT_JOIN_TABLE = UserTable.TABLE_NAME
+        + "_" + DebtTable.TABLE_NAME;
 
     public static final Uri CONTENT_DEBT_URI = Uri.parse("content://"
             + AUTHORITY + "/" + DebtTable.TABLE_NAME);
@@ -64,6 +66,8 @@ public class DatabaseProvider extends android.content.ContentProvider {
             + AUTHORITY + "/" + GROUP_ID_DEBT_JOIN_TABLE);
     public static final Uri CONTENT_PAYMENT_URI = Uri.parse("content://"
             + AUTHORITY + "/" + PaymentTable.TABLE_NAME);
+    public static final Uri USER_DEBT_JOIN_URI = Uri.parse("content://"
+        + AUTHORITY + "/" + USER_DEBT_JOIN_TABLE);
     private static final int DEBT_CODE = 0;
     private static final int GROUP_CODE = 1;
     private static final int LOGIN_CODE = 2;
@@ -76,6 +80,7 @@ public class DatabaseProvider extends android.content.ContentProvider {
     private static final int GROUP_USER_TRANSACTION_JOIN_CODE = 9;
     private static final int PAYMENT_CODE = 10;
     private static final int DEBT_GROUP_ID_JOIN_CODE = 11;
+    private static final int USER_DEBT_JOIN_CODE = 12;
     private static final UriMatcher mUriMatcher = new UriMatcher(UriMatcher.NO_MATCH);
 
     static {
@@ -90,6 +95,7 @@ public class DatabaseProvider extends android.content.ContentProvider {
         mUriMatcher.addURI(AUTHORITY, GROUP_TRANSACTION_JOIN_TABLE, GROUP_TRANSACTION_JOIN_CODE);
         mUriMatcher.addURI(AUTHORITY, GROUP_USER_TRANSACTION_JOIN_TABLE, GROUP_USER_TRANSACTION_JOIN_CODE);
         mUriMatcher.addURI(AUTHORITY, GROUP_ID_DEBT_JOIN_TABLE, DEBT_GROUP_ID_JOIN_CODE);
+        mUriMatcher.addURI(AUTHORITY, USER_DEBT_JOIN_TABLE, USER_DEBT_JOIN_CODE);
 
         mUriMatcher.addURI(AUTHORITY, GroupTransactionTable.TABLE_NAME, GROUP_TRANSACTION_CODE);
         mUriMatcher.addURI(AUTHORITY, GroupUserTable.TABLE_NAME, GROUP_USER_CODE);
@@ -162,6 +168,12 @@ public class DatabaseProvider extends android.content.ContentProvider {
                 sqLiteQueryBuilder.setTables(DebtTable.TABLE_NAME
                         + " INNER JOIN "
                         + GroupTransactionTable.TABLE_NAME + " ON " + GroupTransactionTable.TABLE_NAME + "." + GroupTransactionTable.COLUMN_TRANSACTION_ID + " = " + DebtTable.TABLE_NAME + "." + DebtTable.COLUMN_TRANSACTION_ID);
+                break;
+            case USER_DEBT_JOIN_CODE:
+                sqLiteQueryBuilder.setTables(DebtTable.TABLE_NAME
+                   + " INNER JOIN "
+                    + UserTable.TABLE_NAME + " ON " + DebtTable.TABLE_NAME + "." + DebtTable.COLUMN_TO_USER + " = " + UserTable.TABLE_NAME + "." + UserTable.COLUMN_ID
+                );
                 break;
             default:
                 Log.e(TAG, "Error: Calling query method at DatabaseProvider with invalid uri.");

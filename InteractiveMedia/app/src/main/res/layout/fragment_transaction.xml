@@ -10,7 +10,7 @@
         android:contentDescription="Picture"
         android:paddingLeft="10dp"
         android:paddingRight="10dp"
-        android:src="@drawable/ic_menu_slideshow"
+        android:src="@drawable/anonymoustransaction"
         />
 
     <TextView

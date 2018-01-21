@@ -14,7 +14,7 @@
         android:paddingLeft="10dp"
         android:paddingRight="10dp"
         android:layout_marginRight="10dp"
-        android:src="@drawable/anonymoususer"
+        android:src="@drawable/anonymousgroup"
         />
 
     <TextView
