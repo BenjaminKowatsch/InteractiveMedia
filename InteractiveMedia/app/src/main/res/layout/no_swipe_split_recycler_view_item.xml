@@ -27,7 +27,7 @@
             android:maxLines="1"
             android:text="then the remainder is split between everyone in the group."
             android:textAlignment="center"
-            android:textSize="13sp" />
+            android:textSize="12sp" />
 
     </RelativeLayout>
 

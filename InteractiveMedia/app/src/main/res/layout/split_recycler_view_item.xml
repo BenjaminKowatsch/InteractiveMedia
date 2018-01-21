@@ -11,8 +11,8 @@
 
         <ImageView
             android:id="@+id/delete_icon"
-            android:layout_width="50dp"
-            android:layout_height="50dp"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
             android:layout_alignParentRight="true"
             android:layout_centerVertical="true"
             android:layout_marginRight="10dp"
@@ -25,7 +25,7 @@
             android:layout_marginRight="10dp"
             android:layout_toLeftOf="@id/delete_icon"
             android:text="Delete"
-            android:textSize="13dp" />
+            android:textSize="12sp" />
 
     </RelativeLayout>
 
@@ -45,7 +45,7 @@
             android:maxLines="1"
             android:text="then the remainder is split between everyone in the group."
             android:textAlignment="center"
-            android:textSize="13sp" />
+            android:textSize="12sp" />
 
     </RelativeLayout>
 
