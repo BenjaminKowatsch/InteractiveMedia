@@ -7,6 +7,8 @@ import com.media.interactive.cs3.hdm.interactivemedia.data.Group;
 import com.media.interactive.cs3.hdm.interactivemedia.data.Transaction;
 import com.media.interactive.cs3.hdm.interactivemedia.data.User;
 
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -140,6 +142,11 @@ public class ConstantDeductionTest {
         @Override
         public boolean isTerminating(Transaction transaction) {
             return false;
+        }
+
+        @Override
+        public JSONObject toJson() throws JSONException {
+            return null;
         }
     }
 }
