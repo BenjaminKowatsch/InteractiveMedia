@@ -6,12 +6,16 @@ import android.app.TimePickerDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
+import android.graphics.Color;
 import android.location.Location;
 import android.os.Bundle;
+import android.support.design.widget.Snackbar;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.support.v7.widget.helper.ItemTouchHelper;
 import android.text.Editable;
 import android.text.InputType;
 import android.text.TextWatcher;
@@ -22,6 +26,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.SimpleCursorAdapter;
 import android.widget.Spinner;
 import android.widget.TextView;
@@ -49,8 +54,10 @@ import com.media.interactive.cs3.hdm.interactivemedia.data.Group;
 import com.media.interactive.cs3.hdm.interactivemedia.data.Login;
 import com.media.interactive.cs3.hdm.interactivemedia.data.Transaction;
 import com.media.interactive.cs3.hdm.interactivemedia.data.split.ConstantDeduction;
+import com.media.interactive.cs3.hdm.interactivemedia.data.split.EvenSplit;
 import com.media.interactive.cs3.hdm.interactivemedia.data.split.Split;
 import com.media.interactive.cs3.hdm.interactivemedia.recyclerview.NonScrollRecyclerView;
+import com.media.interactive.cs3.hdm.interactivemedia.recyclerview.RecyclerItemTouchHelper;
 import com.media.interactive.cs3.hdm.interactivemedia.recyclerview.SplitAdapter;
 import com.media.interactive.cs3.hdm.interactivemedia.util.MoneyTextWatcher;
 
@@ -60,14 +67,16 @@ import org.json.JSONObject;
 import java.text.NumberFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
 
 import static com.google.android.gms.location.places.ui.PlacePicker.getPlace;
 
-public class AddTransactionActivity extends ImagePickerActivity {
+public class AddTransactionActivity extends ImagePickerActivity implements RecyclerItemTouchHelper.RecyclerItemTouchHelperListener {
     public static final NumberFormat CURRENCY_FORMAT = NumberFormat.getCurrencyInstance(Locale.GERMANY);
     public static final String GROUP_TO_ADD_TO = "GroupToAddTo";
     public static final String GROUP_CREATED_AT_ADD_TO = "GroupCreatedAtToAddTo";
@@ -89,6 +98,8 @@ public class AddTransactionActivity extends ImagePickerActivity {
     private final static int PLACE_PICKER_REQUEST = 3;
     private NonScrollRecyclerView splitsView;
     private SplitAdapter splitsAdapter;
+    private List<Split> splitList;
+    private LinearLayout linearLayout;
 
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -132,6 +143,7 @@ public class AddTransactionActivity extends ImagePickerActivity {
         setSupportActionBar(toolbar);
         getSupportActionBar().setTitle("");
 
+        linearLayout = findViewById(R.id.add_transaction_linear_layout);
         dateEditText = findViewById(R.id.et_add_transaction_date);
         timeEditText = findViewById(R.id.et_add_transaction_time);
         userSelection = findViewById(R.id.s_add_transaction_user);
@@ -143,7 +155,12 @@ public class AddTransactionActivity extends ImagePickerActivity {
         splitsView.addItemDecoration(new DividerItemDecoration(this, DividerItemDecoration.VERTICAL));
         EditText amountEditText = findViewById(R.id.et_add_transaction_amount);
 
-        splitsView.setAdapter(new SplitAdapter(getApplicationContext()));
+        splitList = new ArrayList<>();
+        splitsAdapter = new SplitAdapter(this, splitList);
+        splitsView.setAdapter(splitsAdapter);
+        final ItemTouchHelper.SimpleCallback itemTouchHelperCallback = new RecyclerItemTouchHelper(0, ItemTouchHelper.LEFT, this);
+        new ItemTouchHelper(itemTouchHelperCallback).attachToRecyclerView(splitsView);
+
         amountEditText.addTextChangedListener(new MoneyTextWatcher(amountEditText, CURRENCY_FORMAT));
 
         helper = new DatabaseProviderHelper(getContentResolver());
@@ -152,7 +169,7 @@ public class AddTransactionActivity extends ImagePickerActivity {
         groupCreatedAt = getIntent().getStringExtra(GROUP_CREATED_AT_ADD_TO);
 
         name = findViewById(R.id.et_add_transaction_purpose);
-        amount = findViewById(R.id.et_add_transaction_amount);
+        amount = amountEditText;
         locationDisplay = findViewById(R.id.transaction_location_display);
 
         final Button addTransactionButton = findViewById(R.id.bn_add_transaction);
@@ -222,12 +239,14 @@ public class AddTransactionActivity extends ImagePickerActivity {
         addSplitButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
+                showAddDeductionDialog();
             }
         });
+
+        splitList.add(new EvenSplit());
     }
 
-    private void showAddEmailDialog() {
+    private void showAddDeductionDialog() {
         final AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(new ContextThemeWrapper(this, R.style.AlertDialogCustom));
         final LayoutInflater inflater = this.getLayoutInflater();
         final View dialogView = inflater.inflate(R.layout.add_constant_deduction, null);
@@ -245,7 +264,7 @@ public class AddTransactionActivity extends ImagePickerActivity {
         dialogBuilder.setPositiveButton("Done", new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int whichButton) {
                 final String userId = dialogUserAdapter.getCursor().getString(dialogUserAdapter.getCursor().getColumnIndex(UserTable.COLUMN_USER_ID));
-                splitsAdapter.add(new ConstantDeduction(parseAmount(editText), userId));
+                splitList.add(new ConstantDeduction(parseAmount(editText), userId));
             }
         });
         dialogBuilder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
@@ -494,4 +513,33 @@ public class AddTransactionActivity extends ImagePickerActivity {
         return userAdapter;
     }
 
+    @Override
+    public void onSwiped(RecyclerView.ViewHolder viewHolder, int direction, int position) {
+        if (viewHolder instanceof SplitAdapter.SimpleViewHolder) {
+            // get the removed item name to display it in snack bar
+            final Split split = splitList.get(viewHolder.getAdapterPosition());
+
+            // backup of removed item for undo purpose
+            final Split deletedSplit = splitList.get(viewHolder.getAdapterPosition());
+            final int deletedIndex = viewHolder.getAdapterPosition();
+
+            // remove the item from recycler view
+            splitsAdapter.removeSplit(viewHolder.getAdapterPosition());
+
+            // showing snack bar with Undo option
+            final Snackbar snackbar = Snackbar
+                    .make(linearLayout, split + " removed from split list", Snackbar.LENGTH_LONG);
+            snackbar.setAction("UNDO", new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+
+                    // undo is selected, restore the deleted item
+                    splitsAdapter.restoreSplit(deletedSplit, deletedIndex);
+                }
+            });
+            snackbar.setActionTextColor(Color.YELLOW);
+            snackbar.show();
+        }
+
+    }
 }

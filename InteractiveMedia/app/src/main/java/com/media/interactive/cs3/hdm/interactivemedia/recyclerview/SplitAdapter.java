@@ -10,23 +10,21 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.media.interactive.cs3.hdm.interactivemedia.R;
-import com.media.interactive.cs3.hdm.interactivemedia.data.Transaction;
 import com.media.interactive.cs3.hdm.interactivemedia.data.split.EvenSplit;
 import com.media.interactive.cs3.hdm.interactivemedia.data.split.Split;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class SplitAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     private Context context;
-    private final List<SplitHolder> list;
+    private final List<Split> list;
 
     private final static int NO_SWIPE_ITEM_TYPE = 0;
     private final static int SWIPE_ITEM_TYPE = 1;
 
-    public SplitAdapter(Context context) {
+    public SplitAdapter(Context context, List<Split> list) {
         this.context = context;
-        list = new ArrayList<>();
+        this.list = list;
     }
 
     @Override
@@ -54,13 +52,14 @@ public class SplitAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
 
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder holder, final int position) {
-        final SplitHolder split = list.get(position);
+        final Split split = list.get(position);
+        final String text = split instanceof EvenSplit ? "then split the remainder evenly between all users" : "deduce amount ";
         if (holder.getItemViewType() == NO_SWIPE_ITEM_TYPE) {
             final NoSwipeViewHolder rootMyViewHolder = (NoSwipeViewHolder) holder;
-            rootMyViewHolder.name.setText(split.toString());
+            rootMyViewHolder.name.setText(text);
         } else {
             final SimpleViewHolder simpleViewHolder = (SimpleViewHolder) holder;
-            simpleViewHolder.name.setText(split.toString());
+            simpleViewHolder.name.setText(text);
         }
     }
 
@@ -73,18 +72,18 @@ public class SplitAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
         return new EvenSplit();
     }
 
-    public void add(Split split) {
-        list.add(0, new SplitHolder(split, null));
+    public void removeSplit(int position) {
+        list.remove(position);
+        // notify the item removed by position
+        // to perform recycler view delete animations
+        // NOTE: don't call notifyDataSetChanged()
+        notifyItemRemoved(position);
     }
 
-    public final class SplitHolder {
-        private Split split;
-        private Transaction source;
-
-        public SplitHolder(Split split, Transaction source) {
-            this.split = split;
-            this.source = source;
-        }
+    public void restoreSplit(Split split, int position) {
+        list.add(position, split);
+        // notify item added by position
+        notifyItemInserted(position);
     }
 
     public class SimpleViewHolder extends RecyclerView.ViewHolder {

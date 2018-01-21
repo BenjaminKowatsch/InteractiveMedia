@@ -36,21 +36,35 @@ public class ConstantDeduction implements Split {
             SplittingParties splittingParties = SplittingParties.extractFromGroup(group, paidByUserId);
             User toUser = getUserWithIdIn(splittingParties.getPaidFor(), toUserId);
             if (toUser == null) {
-                throw new IllegalArgumentException("The given transaction's group does not contain " +
-                        "this split's toUserId");
+                if (toUserId.equals(splittingParties.getPaidBy().getUserId())) {
+                    if (hasNext()) {
+                        return next.split(getRemainingFrom(transaction));
+                    } else {
+                        return new ArrayList<>();
+                    }
+                } else {
+                    throw new IllegalArgumentException("The given transaction's group does not contain " +
+                            "this split's toUserId");
+                }
             } else {
                 List<Debt> out = new ArrayList<>();
                 if (amount > 0.0) {
                     out.add(new Debt(splittingParties.getPaidBy(), toUser, amount, transaction));
                 }
                 if (hasNext()) {
-                    Transaction remaining = new Transaction(transaction);
-                    remaining.setAmount(transaction.getAmount() - this.amount);
+                    Transaction remaining = getRemainingFrom(transaction);
                     out.addAll(next.split(remaining));
                 }
                 return out;
             }
         }
+    }
+
+    @NonNull
+    private Transaction getRemainingFrom(Transaction transaction) {
+        Transaction remaining = new Transaction(transaction);
+        remaining.setAmount(transaction.getAmount() - this.amount);
+        return remaining;
     }
 
     private User getUserWithIdIn(List<User> users, String id) {
@@ -85,7 +99,7 @@ public class ConstantDeduction implements Split {
 
     @Override
     public Split getNext() {
-        if(hasNext()) {
+        if (hasNext()) {
             return next;
         } else {
             throw new LastSplitInChainException();
