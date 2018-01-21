@@ -1,5 +1,5 @@
 <!-- TEMPLATE for about view
-  * Description: Gives details about this web app and the app Debts²
+  * Description: Gives details about this web app and the app Debts². Visible for everyone.
  -->
 <template>
   <v-container fluid fill-height>

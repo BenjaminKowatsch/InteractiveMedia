@@ -1,3 +1,7 @@
+<!-- TEMPLATE for adminProfile view
+  * Description: Let the current logged in admin change specific data like his username, password, email and imageUrl.
+                 There multiple or single props allowed
+ -->
 <template>
   <v-container fluid fill-height>
     <v-layout  justify-center align-center> 

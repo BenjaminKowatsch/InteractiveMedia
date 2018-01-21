@@ -59,8 +59,7 @@
           <v-btn dark flat @click.native="errorReset = false">X</v-btn>
         </v-snackbar>
     </v-layout>
-  </v-container>
-          
+  </v-container>        
 </template>
 
 <script>
@@ -127,12 +126,12 @@ import Config from "../js/Config.js";
                             this.clear()
                         }
                         console.log("Errors reset pw: " + e);   
-                });
-              }else 
-              {
+                    });
+                }else 
+                {
                   this.noUserFound = true
                   this.clear()
-              }
+                }
             }
 
         },
@@ -148,9 +147,7 @@ import Config from "../js/Config.js";
         filter_userID: function(users) {
         return users.email == this.email;
         },
-
-
-  }
+    }
 }
 </script>
 

@@ -1,19 +1,18 @@
 // Import Vue
 import Vue from 'vue'
 
+// Import VueRouter (routing)
 import VueRouter from 'vue-router'
 
-// Import Vuetify
+// Import Vuetify (material component framework)
 import Vuetify from 'vuetify'
 import ('../node_modules/vuetify/dist/vuetify.min.css')
 
-// Import VueCharts for charts
+// Import VueCharts (charts)
 import VueCharts from 'vue-chartjs'
 
 // Import App Custom Styles
 import AppStyles from './css/app.css'
-
-
 
 // Import App Component
 import App from './app'
@@ -25,19 +24,15 @@ import about from './pages/about.vue'
 import notFound from './pages/notFound.vue'
 import noPermission from './pages/noPermission.vue'
 
-// Import Cookie JS
-import Cookie from './js/Cookie.js'
-
 // Import Config
 import Config from './js/Config.js'
 
+// Import Mixins
 import Mixins from './mixins.js'
 
+// Using directives
 Vue.use(VueRouter)
 Vue.use(Vuetify)
-
-// Init F7 Vue Plugin
-
 Vue.use(VueCharts)
 
 
