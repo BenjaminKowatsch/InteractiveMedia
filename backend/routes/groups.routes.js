@@ -62,6 +62,7 @@ router.post('/', authenticationMiddleware.isAuthenticated,
  * @apiUse successBodyGroupUsers
  * @apiUse successBodyGroupUsersUserId
  * @apiUse successBodyGroupUsersName
+ * @apiUse successBodyGroupUserEmail
  *
  * @apiSuccess (SuccessCode) {200} Success Success get group
  * @apiUse successExampleGroup

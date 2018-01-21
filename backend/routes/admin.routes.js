@@ -62,6 +62,7 @@ router.get('/groups', authenticationMiddleware.isAuthenticated, authorizationMid
  * @apiUse successBodyGroupUsers
  * @apiUse successBodyGroupUsersUserId
  * @apiUse successBodyGroupUsersName
+ * @apiUse successBodyGroupUserEmail
  *
  * @apiSuccess (SuccessCode) {200} Success Group
  * @apiUse successExampleGroup

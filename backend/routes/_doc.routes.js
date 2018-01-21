@@ -468,6 +468,10 @@
  * @apiDefine successBodyGroupUsersName
     @apiSuccess (Success) {string} users[username] Name of user
  */
+/**
+ * @apiDefine successBodyGroupUserEmail
+    @apiSuccess (Success) {string} users[email] Email of user
+ */
 
 /**
  * @apiDefine admin Administrator
