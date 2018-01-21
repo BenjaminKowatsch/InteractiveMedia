@@ -38,6 +38,12 @@
 						accept="image/*"
           	@change="checkImageFile"
 					>
+           <v-tooltip left>
+            <v-btn icon slot="activator">
+              <v-icon>fa-question-circle</v-icon>
+            </v-btn>
+            <span>Update single or multiple admin properties)</span>
+          </v-tooltip>
           <v-btn
             @click="checkUpdate"
             :disabled="!valid"
@@ -168,7 +174,7 @@ import Config from "../js/Config.js";
             this.hasData = true
             if(this.adminUserData.imageUrl != null){
 
-              this.downloadImage()
+             // this.downloadImage()
             }
         })
         .catch(e => {              
@@ -213,9 +219,7 @@ import Config from "../js/Config.js";
            headers: { Authorization: "0 " + this.authToken}}
         )
         .then(response =>  {
-const fs = require('fs');
 
-            response.data.pipe(fs.createWriteStream('image.jpg'))
          
         console.log(response)
 /*         var file = new File(response.data)
