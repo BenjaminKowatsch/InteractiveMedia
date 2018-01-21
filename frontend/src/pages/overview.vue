@@ -65,9 +65,6 @@ import UserTableVuetify from "../components/UserTableVuetify.vue";
 import GroupTableVuetify from "../components/GroupTableVuetify.vue";
 import ResetUserPw from "../components/ResetUserPw.vue";
 
-
-
-
 export default {
   name: "overview",
   mixins: [Mixins],
