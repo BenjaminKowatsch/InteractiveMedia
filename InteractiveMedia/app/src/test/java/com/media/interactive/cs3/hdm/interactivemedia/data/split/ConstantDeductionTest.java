@@ -1,6 +1,7 @@
 package com.media.interactive.cs3.hdm.interactivemedia.data.split;
 
 import android.location.Location;
+import android.support.annotation.NonNull;
 
 import com.media.interactive.cs3.hdm.interactivemedia.data.Debt;
 import com.media.interactive.cs3.hdm.interactivemedia.data.Group;
@@ -40,7 +41,7 @@ public class ConstantDeductionTest {
         testGroup.getUsers().add(testUser2);
         testGroup.getUsers().add(testUser3);
         testGroup.getUsers().add(payingUser);
-        transaction = new Transaction("TestTransaction", payingUser.getUserId(), "even",
+        transaction = new Transaction("TestTransaction", payingUser.getUserId(), new EvenSplit(),
                 new Date(System.currentTimeMillis()), new Location(""), 8.0, testGroup);
     }
 
@@ -134,6 +135,7 @@ public class ConstantDeductionTest {
             return new ArrayList<>();
         }
 
+        @NonNull
         @Override
         public Split andThen(Split next) {
             return this;
@@ -142,6 +144,16 @@ public class ConstantDeductionTest {
         @Override
         public boolean isTerminating(Transaction transaction) {
             return false;
+        }
+
+        @Override
+        public boolean hasNext() {
+            return false;
+        }
+
+        @Override
+        public Split getNext() {
+            return null;
         }
 
         @Override

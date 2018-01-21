@@ -5,7 +5,7 @@ import android.content.ContentValues;
 import android.location.Location;
 
 import com.media.interactive.cs3.hdm.interactivemedia.contentprovider.tables.TransactionTable;
-import com.media.interactive.cs3.hdm.interactivemedia.data.split.SplitFactory;
+import com.media.interactive.cs3.hdm.interactivemedia.data.split.Split;
 import com.media.interactive.cs3.hdm.interactivemedia.util.Helper;
 
 import org.json.JSONException;
@@ -18,7 +18,7 @@ public class Transaction {
     private long id;
     private String infoName;
     private String paidBy;
-    private String split;
+    private Split split;
     private Date dateTime;
     private String imageUrl;
     private Location location;
@@ -31,7 +31,7 @@ public class Transaction {
         this.group = new Group();
     }
 
-    public Transaction(String infoName, String paidBy, String split, Date dateTime,
+    public Transaction(String infoName, String paidBy, Split split, Date dateTime,
                        Location location, double amount, Group group) {
         this.infoName = infoName;
         this.paidBy = paidBy;
@@ -45,7 +45,7 @@ public class Transaction {
         this.publishedAt = null;
     }
 
-    public Transaction(String infoName, String paidBy, String split, Date dateTime,
+    public Transaction(String infoName, String paidBy, Split split, Date dateTime,
                        Location location, double amount, String groupId) {
         this.infoName = infoName;
         this.paidBy = paidBy;
@@ -81,7 +81,6 @@ public class Transaction {
         out.put(TransactionTable.COLUMN_AMOUNT, amount);
         out.put(TransactionTable.COLUMN_INFO_NAME, infoName);
         out.put(TransactionTable.COLUMN_PAID_BY, paidBy);
-        out.put(TransactionTable.COLUMN_SPLIT, split);
         out.put(TransactionTable.COLUMN_INFO_IMAGE_URL, imageUrl);
         out.put(TransactionTable.COLUMN_PUBLISHED_AT, Helper.formatDate(publishedAt));
 
@@ -93,7 +92,7 @@ public class Transaction {
     }
 
     public List<Debt> split() {
-        return SplitFactory.getSplitByName(split).split(this);
+        return split.split(this);
     }
 
     public long getId() {
@@ -120,11 +119,11 @@ public class Transaction {
         this.paidBy = paidBy;
     }
 
-    public String getSplit() {
+    public Split getSplit() {
         return split;
     }
 
-    public void setSplit(String split) {
+    public void setSplit(Split split) {
         this.split = split;
     }
 
