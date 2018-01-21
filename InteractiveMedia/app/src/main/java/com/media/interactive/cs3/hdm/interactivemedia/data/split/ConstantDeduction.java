@@ -1,6 +1,8 @@
 package com.media.interactive.cs3.hdm.interactivemedia.data.split;
 
 
+import android.support.annotation.NonNull;
+
 import com.media.interactive.cs3.hdm.interactivemedia.data.Debt;
 import com.media.interactive.cs3.hdm.interactivemedia.data.Group;
 import com.media.interactive.cs3.hdm.interactivemedia.data.Transaction;
@@ -39,7 +41,7 @@ public class ConstantDeduction implements Split {
                 if (amount > 0.0) {
                     out.add(new Debt(splittingParties.getPaidBy(), toUser, amount, transaction));
                 }
-                if (next != null) {
+                if (hasNext()) {
                     Transaction remaining = new Transaction(transaction);
                     remaining.setAmount(transaction.getAmount() - this.amount);
                     out.addAll(next.split(remaining));
@@ -58,9 +60,10 @@ public class ConstantDeduction implements Split {
         return null;
     }
 
+    @NonNull
     @Override
     public Split andThen(Split next) {
-        if (this.next == null) {
+        if (!hasNext()) {
             this.next = next;
             return next;
         } else {
@@ -71,6 +74,20 @@ public class ConstantDeduction implements Split {
     @Override
     public boolean isTerminating(Transaction transaction) {
         return this.amount >= transaction.getAmount();
+    }
+
+    @Override
+    public boolean hasNext() {
+        return this.next != null;
+    }
+
+    @Override
+    public Split getNext() {
+        if(hasNext()) {
+            return next;
+        } else {
+            throw new LastSplitInChainException();
+        }
     }
 
     @Override

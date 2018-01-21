@@ -1,6 +1,8 @@
 package com.media.interactive.cs3.hdm.interactivemedia.data.split;
 
 
+import android.support.annotation.NonNull;
+
 import com.media.interactive.cs3.hdm.interactivemedia.data.Debt;
 import com.media.interactive.cs3.hdm.interactivemedia.data.Group;
 import com.media.interactive.cs3.hdm.interactivemedia.data.Transaction;
@@ -37,6 +39,7 @@ public class EvenSplit implements Split {
         }
     }
 
+    @NonNull
     @Override
     public Split andThen(Split next) {
         throw new TerminatingSplitChainedException(this.getClass().getName() + " is always terminating");
@@ -45,6 +48,16 @@ public class EvenSplit implements Split {
     @Override
     public boolean isTerminating(Transaction transaction) {
         return true;
+    }
+
+    @Override
+    public boolean hasNext() {
+        return false;
+    }
+
+    @Override
+    public Split getNext() {
+        throw new LastSplitInChainException();
     }
 
     @Override
