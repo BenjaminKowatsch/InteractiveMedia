@@ -22,6 +22,7 @@ import com.media.interactive.cs3.hdm.interactivemedia.data.Transaction;
 import com.media.interactive.cs3.hdm.interactivemedia.util.Helper;
 
 import java.io.File;
+import java.util.Date;
 
 /**
  * Created by benny on 04.01.18.
@@ -72,7 +73,7 @@ public class TransactionAdapter extends CursorAdapter {
     Log.d(Transaction.class.getSimpleName(), transaction.toString());
     // Populate fields with extracted properties
     viewHolder.transactionTitle.setText(transaction.getInfoName());
-    viewHolder.transactionCreationDate.setText(Helper.formatDate(transaction.getDateTime()));
+    viewHolder.transactionCreationDate.setText(Helper.READABLE_DATE_FORMAT.format(transaction.getDateTime()));
     viewHolder.transactionPaidBy.setText("Paid by: " + cursor.getString(cursor.getColumnIndexOrThrow(UserTable.COLUMN_USERNAME)));
     viewHolder.transactionAmount.setText(String.valueOf(transaction.getAmount()));
 
@@ -87,18 +88,18 @@ public class TransactionAdapter extends CursorAdapter {
     if (transaction.isSynched() && transaction.getImageUrl() != null) {
       Glide.with(context).load(glideUrl)
           .diskCacheStrategy(DiskCacheStrategy.SOURCE)
-          .fallback(R.drawable.anonymoususer)
-          .placeholder(R.drawable.anonymoususer)
+          .fallback(R.drawable.anonymoustransaction)
+          .placeholder(R.drawable.anonymoustransaction)
           .into(viewHolder.transactionIcon);
     } else if (transaction.getImageUrl() != null) {
       Glide.with(context).load(new File(transaction.getImageUrl()))
           .diskCacheStrategy(DiskCacheStrategy.SOURCE)
-          .fallback(R.drawable.anonymoususer)
-          .placeholder(R.drawable.anonymoususer)
+          .fallback(R.drawable.anonymoustransaction)
+          .placeholder(R.drawable.anonymoustransaction)
           .into(viewHolder.transactionIcon);
     } else {
       Glide.with(context)
-          .load(R.drawable.anonymoususer)
+          .load(R.drawable.anonymoustransaction)
           .diskCacheStrategy(DiskCacheStrategy.SOURCE)
           .into(viewHolder.transactionIcon);
     }
@@ -122,6 +123,9 @@ public class TransactionAdapter extends CursorAdapter {
       transactionSynced = (ImageView) view.findViewById(R.id.transaction_synced_icon);
 
       transaction = new Transaction();
+    }
+    public String getPaidByUsername() {
+      return transactionPaidBy.getText().toString();
     }
 
     public Transaction getTransaction() {

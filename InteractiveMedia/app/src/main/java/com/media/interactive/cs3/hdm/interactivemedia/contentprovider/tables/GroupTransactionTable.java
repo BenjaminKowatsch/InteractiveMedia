@@ -10,7 +10,7 @@ public class GroupTransactionTable {
 
     public static final String TABLE_NAME = "group_transaction";
     /**
-     * First attribute, type integer references.
+     * First attribute, type TEXT references.
      */
     public static final String COLUMN_GROUP_ID = "group_id";
     /**
@@ -20,8 +20,8 @@ public class GroupTransactionTable {
 
     public static final String DATABASE_CREATE =
         "create table if not exists " + TABLE_NAME + "("
-          +  COLUMN_GROUP_ID + " INTEGER references " + GroupTable.TABLE_NAME
-          + " (" + GroupTable.COLUMN_ID + ") on delete cascade on update cascade,"
+          +  COLUMN_GROUP_ID + " TEXT references " + GroupTable.TABLE_NAME
+          + " (" + GroupTable.COLUMN_GROUP_ID + ") on delete cascade on update cascade,"
           +  COLUMN_TRANSACTION_ID + " INTEGER references "
           + TransactionTable.TABLE_NAME + " (" + TransactionTable.COLUMN_ID
           + ") on delete cascade on update cascade)";

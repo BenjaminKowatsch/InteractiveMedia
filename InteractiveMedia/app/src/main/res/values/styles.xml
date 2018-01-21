@@ -12,6 +12,10 @@
         <item name="android:textColor">@android:color/white</item>
         <item name="android:textColorHint">@android:color/white</item>
         <item name="android:searchViewStyle">@style/MySearchViewStyle</item>
+        <item name="autoCompleteTextViewStyle">@style/cursorColor</item>
+        <item name="android:alertDialogTheme">@style/AlertDialogCustom</item>
+        <item name="android:buttonBarNegativeButtonStyle">@style/NegativeButtonStyle</item>
+        <item name="android:buttonBarPositiveButtonStyle">@style/PositiveButtonStyle</item>
     </style>
 
 
@@ -24,16 +28,22 @@
 
     <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
 
+
+
+    <style name="cursorColor" parent="Widget.AppCompat.AutoCompleteTextView">
+        <item name="android:textCursorDrawable">@android:color/white</item>
+    </style>
+
     <style name="MySearchViewStyle" parent="@android:style/Widget.Material.SearchView">
         <item name="android:textColor">@android:color/white</item>
         <item name="android:foregroundTint">@android:color/white</item>
         <item name="android:backgroundTint">@android:color/white</item>
-        <item name="android:progressBackgroundTint">@android:color/white</item>
         <item name="android:drawableTint">@android:color/white</item>
+        <item name="android:colorAccent">@android:color/white</item>
     </style>
 
     <style name="SplashTheme" parent="Theme.AppCompat.NoActionBar">
-        <item name="android:windowBackground">@drawable/background</item>
+       <item name="android:windowBackground">@drawable/background</item>
     </style>
 
     <style name="MenuSpinner" parent="Base.Widget.AppCompat.Spinner">
@@ -42,13 +52,22 @@
         <item name="popupTheme">@style/ThemeOverlay.AppCompat.Light</item>
     </style>
 
-    <style name="AlertDialogCustom" parent="@android:style/Theme.Dialog">
+    <style name="AlertDialogCustom" parent="@android:style/Theme.Material.Dialog">
         <item name="android:textColor">@android:color/white</item>
+        <item name="android:colorActivatedHighlight">@color/colorAccent</item>
         <item name="android:backgroundTint">@color/colorPrimary</item>
+        <item name="android:textColorAlertDialogListItem" >@android:color/white</item>
+        <item name="android:colorPrimary">@android:color/white</item>
+        <item name="android:foregroundTint">@android:color/white</item>
+        <item name="colorAccent">@color/colorAccent</item>
+        <item name="android:textColorPrimary">@android:color/white</item>
+        <item name="android:background">@color/colorPrimary</item>
+        <item name="android:colorPressedHighlight">@color/colorAccent</item>
+        <item name="android:colorLongPressedHighlight">@color/colorAccent</item>
     </style>
 
 
-    <style name="EditTextColor" parent="@android:style/Widget.EditText">
+    <style name="EditTextColor" parent="@android:style/Widget.Material.EditText">
         <item name="android:textColor">@android:color/white</item>
 
     </style>
@@ -58,5 +77,12 @@
         <item name="android:background">@color/colorPrimaryLight</item>
         <item name="android:minHeight">40dp</item>
         <item name="android:colorAccent">@color/colorAccent</item>
+    </style>
+
+    <style name="NegativeButtonStyle" parent="Widget.AppCompat.Button.ButtonBar.AlertDialog">
+        <item name="android:textColor">#f00</item>
+    </style>
+    <style name="PositiveButtonStyle" parent="Widget.AppCompat.Button.ButtonBar.AlertDialog">
+        <item name="android:textColor">#f00</item>
     </style>
 </resources>

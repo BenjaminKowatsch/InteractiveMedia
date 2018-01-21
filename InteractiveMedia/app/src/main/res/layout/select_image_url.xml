@@ -9,10 +9,11 @@
     <EditText
         android:id="@+id/select_image_url"
         android:layout_width="match_parent"
+        android:minWidth="200dp"
         android:layout_height="wrap_content"
         android:layout_marginRight="30dp"
         android:layout_marginLeft="30dp"
-        android:hint="Image URL"
+        android:hint="Image Url"
         android:inputType="textWebEmailAddress" />
 
 

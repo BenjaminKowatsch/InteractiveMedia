@@ -9,6 +9,7 @@ import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Environment;
@@ -28,6 +29,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.ListAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -44,6 +46,7 @@ import com.google.android.gms.vision.Frame;
 import com.google.android.gms.vision.text.Text;
 import com.google.android.gms.vision.text.TextBlock;
 import com.google.android.gms.vision.text.TextRecognizer;
+import com.media.interactive.cs3.hdm.interactivemedia.ArrayAdapterWithIcon;
 import com.media.interactive.cs3.hdm.interactivemedia.CallbackListener;
 import com.media.interactive.cs3.hdm.interactivemedia.R;
 import com.media.interactive.cs3.hdm.interactivemedia.RestRequestQueue;
@@ -413,9 +416,12 @@ public class ImagePickerActivity extends AppCompatActivity {
     }
 
     private Dialog createOptionsDialog() {
-        final AlertDialog.Builder builder = new AlertDialog.Builder(new ContextThemeWrapper(this, R.style.AlertDialogCustom));
+        final AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        final Integer[] icons = new Integer[] {R.drawable.ic_menu_camera, R.drawable.ic_menu_share, R.drawable.ic_menu_gallery};
+        final ListAdapter adapter = new ArrayAdapterWithIcon(this, getResources().getStringArray(R.array.image_sources), icons);
+
         builder.setTitle(R.string.pick_image_source)
-            .setItems(R.array.image_sources, new DialogInterface.OnClickListener() {
+            .setAdapter(adapter, new DialogInterface.OnClickListener() {
                 public void onClick(DialogInterface dialog, int which) {
                     // The 'which' argument contains the index position
                     // of the selected item
@@ -501,7 +507,8 @@ public class ImagePickerActivity extends AppCompatActivity {
 
         final Button positiveButton = alertDialog.getButton(AlertDialog.BUTTON_POSITIVE);
         positiveButton.setEnabled(false);
-
+        positiveButton.setTextColor(Color.WHITE);
+        alertDialog.getButton(AlertDialog.BUTTON_NEGATIVE).setTextColor(Color.WHITE);
         editText.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
