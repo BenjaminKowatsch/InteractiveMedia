@@ -22,6 +22,7 @@ const database = require('./modules/database.module');
 const objectstore = require('./modules/objectstore.module');
 
 const pushNotificationService = require('./services/pushNotification.service');
+const httpResponseService = require('./services/httpResponse.service');
 
 const config = require('./config/settings.config');
 const ERROR = require('./config/error.config');
@@ -97,16 +98,16 @@ app.use(function(err, req, res, next) {
   if (err.status !== 404) {
     return next();
   }
-  const dataPath = req.method + ' ' + req.url;
+
   const notFoundResponse = {
     'success': false,
     'payload': {
-      'message': 'Not found',
-      'dataPath': dataPath
+      'dataPath': 'application',
+      'message': 'url not found'
     }
   };
-  winston.error('Endpoint not found:' + dataPath);
-  res.status(404).send(notFoundResponse);
+  winston.error('Endpoint not found:' + req.method + ' ' + req.url);
+  httpResponseService.send(res, 404, notFoundResponse);
 });
 
 function startServer() {

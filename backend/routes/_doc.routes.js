@@ -69,10 +69,17 @@
  * @apiHeader (HTTP-Header) {Request} Authorization Provide authentication: type and authtoken separated with one space
      type=(0: Password, 1:Google, 2: Facebook)
  */
-
+/**
+ * @apiDefine headerContentTypeFormUrlEncoded
+ * @apiHeader (HTTP-Header) {Request} Content-Type Provide type of content. Data has to be sent as "form-urlencoded"
+ */
 /** @apiDefine headerExampleAuthorization
  * @apiHeaderExample {string} Authorization:
       Authorization: "0 FJF7HFkA38jF6FH9JF7"
+ */
+/** @apiDefine headerExampleContentTypeFormUrlEncoded
+ * @apiHeaderExample {string} Content-Type:
+      Content-Type: "application/x-www-form-urlencoded"
  */
 
 /**
@@ -110,6 +117,10 @@
 /**
  * @apiDefine error404UnknownId
     @apiError (ErrorCode) {404} UnknownId Id for the requested resource is unknown
+ */
+/**
+ * @apiDefine error404ResourceNotFound
+    @apiError (ErrorCode) {404} NotFound Requested resource is not available
  */
 /**
  * @apiDefine error400InvalidBody

@@ -3,61 +3,25 @@
 /*jshint expr: true, node:true, mocha:true*/
 
 const chai = require('chai');
-const fs = require('fs');
 const expect = require('chai').expect;
-const databaseHelper = require('./data/databaseHelper');
+const fs = require('fs');
+
+const databaseService = require('../util/databaseService');
+const expectResponse = require('../util/expectResponse.util');
+const settings = require('../config/settings.config');
+const userService = require('../util/userService.util');
 
 chai.use(require('chai-http'));
 
-const HOST = 'http://backend:8081';
-
-const URL = {
-  BASE_USER: '/v1/users',
-  BASE_TEST: '/v1/test'
-};
-
-const https = require('https');
-const config = {
-  'facebookUrlAppToken': process.env.FACEBOOK_URL_APP_TOKEN,
-  'facebookAppId': process.env.FACEBOOK_APP_ID
-};
-
-const testData = require('./data/user.data');
-
-// ************* Helper ***********//
-
-const registerUser = index => chai.request(HOST).post(URL.BASE_USER).send(testData.users.valid[index]);
-
-function getFacebookTestAccessToken() {
-  return new Promise((resolve, reject) => {
-    https.get('https://graph.facebook.com/v2.11/' + config.facebookAppId + '/' +
-    'accounts/test-users?access_token=' +
-    config.facebookUrlAppToken, function(response) {
-      let responseMessage = '';
-
-      response.on('data', function(chunk) {
-        responseMessage += chunk;
-      });
-
-      response.on('end', function() {
-        const data = JSON.parse(responseMessage);
-        if (data.length <= 0) {
-          reject(data);
-        } else {
-          resolve(data.data[0].access_token);
-        }
-      });
-    });
-  });
-}
+const userData = require('../data/user.data');
 
 describe('User-Controller', () => {
 
   describe('Auth-Type: Facebook', function() {
-    before('Clean DB', databaseHelper.cbResetDB);
+    before('Clean DB', databaseService.cbResetDB);
     let facebookToken;
     before(function(done) {
-      getFacebookTestAccessToken()
+      userService.getFacebookTestAccessToken()
         .then((token) => {
           facebookToken = token;
           done();
@@ -69,8 +33,8 @@ describe('User-Controller', () => {
 
     // POST - Login/Register new facebook user
     it('Login/Register as facebook user', function() {
-      return chai.request(HOST)
-      .post(URL.BASE_USER + '/login?type=2')
+      return chai.request(settings.host)
+      .post(settings.url.users.base + '/login?type=2')
       .send({'accessToken': facebookToken})
       .then(res => {
         expect(res).to.have.status(200);
@@ -84,8 +48,8 @@ describe('User-Controller', () => {
     });
 
     it('Login/Register as facebook user again', function() {
-      return chai.request(HOST)
-      .post(URL.BASE_USER + '/login?type=2')
+      return chai.request(settings.host)
+      .post(settings.url.users.base + '/login?type=2')
       .send({'accessToken': facebookToken})
       .then(res => {
         expect(res).to.have.status(200);
@@ -100,8 +64,8 @@ describe('User-Controller', () => {
 
     // POST - Send user data as facebook user
     it('Send user data as facebook user', function() {
-      return chai.request(HOST)
-      .get(URL.BASE_TEST + '/authentication/required')
+      return chai.request(settings.host)
+      .get(settings.url.test.base + '/authentication/required')
       .set('Authorization', '2 ' + facebookToken)
       .then(res => {
         expect(res).to.have.status(200);
@@ -114,8 +78,8 @@ describe('User-Controller', () => {
 
     // POST - Logout as default user
     it('Logout as facebook user', function() {
-      return chai.request(HOST)
-      .post(URL.BASE_USER + '/logout')
+      return chai.request(settings.host)
+      .post(settings.url.users.base + '/logout')
       .set('Authorization', '2 ' + facebookToken)
       .then(res => {
         expect(res).to.have.status(200);
@@ -128,21 +92,18 @@ describe('User-Controller', () => {
 
     // POST - Send data with expired token as facebook user
     it('should fail to send data with expired token as facebook user', function() {
-      return chai.request(HOST)
-      .get(URL.BASE_TEST + '/authentication/required')
+      return chai.request(settings.host)
+      .get(settings.url.test.base + '/authentication/required')
       .set('Authorization', '2 ' + facebookToken)
       .then(res => {
-        expect(res).to.have.status(401);
-        expect(res).to.be.json;
-        expect(res.body).to.be.an('object');
-        expect(res.body.success).to.be.false;
+        expectResponse.toBe401.unknownUserOrExpiredToken(res);
       });
     });
 
     // POST - Relogin facebook user
     it('Relogin as facebook user', function() {
-      return chai.request(HOST)
-      .post(URL.BASE_USER + '/login?type=2')
+      return chai.request(settings.host)
+      .post(settings.url.users.base + '/login?type=2')
       .send({'accessToken': facebookToken})
       .then(res => {
         expect(res).to.have.status(200);
@@ -154,57 +115,40 @@ describe('User-Controller', () => {
     });
 
     it('should fail to login with invalid token', function() {
-      return chai.request(HOST)
-      .post(URL.BASE_USER + '/login?type=2')
+      return chai.request(settings.host)
+      .post(settings.url.users.base + '/login?type=2')
       .send({'accessToken': 'XXXXX'})
       .then(res => {
-        expect(res).to.have.status(401);
-        expect(res).to.be.json;
-        expect(res.body).to.be.an('object');
-        expect(res.body.success).to.be.false;
-        expect(res.body.payload.dataPath).to.equal('login');
-        expect(res.body.payload.message).to.equal('login failed');
+        expectResponse.toBe401.loginFailed(res);
       });
     });
 
     it('should fail to login with empty token', function() {
-      return chai.request(HOST)
-      .post(URL.BASE_USER + '/login?type=2')
+      return chai.request(settings.host)
+      .post(settings.url.users.base + '/login?type=2')
       .send({'accessToken': ''})
       .then(res => {
-        expect(res).to.have.status(400);
-        expect(res).to.be.json;
-        expect(res.body).to.be.an('object');
-        expect(res.body.success).to.be.false;
-        expect(res.body.payload).to.be.an('object');
-        expect(res.body.payload.dataPath).to.equal('validation');
-        expect(res.body.payload.message).to.equal('invalid request body');
+        expectResponse.toBe400.invalidRequestBody(res);
       });
     });
 
     it('should fail to login with empty body', function() {
-      return chai.request(HOST)
-      .post(URL.BASE_USER + '/login?type=2')
+      return chai.request(settings.host)
+      .post(settings.url.users.base + '/login?type=2')
       .send({})
       .then(res => {
-        expect(res).to.have.status(400);
-        expect(res).to.be.json;
-        expect(res.body).to.be.an('object');
-        expect(res.body.success).to.be.false;
-        expect(res.body.payload).to.be.an('object');
-        expect(res.body.payload.dataPath).to.equal('validation');
-        expect(res.body.payload.message).to.be.equal('invalid request body');
+        expectResponse.toBe400.invalidRequestBody(res);
       });
     });
   });
 
   describe('Auth-Type: Password', function() {
     describe('Register', function() {
-      before('Clean DB', databaseHelper.cbResetDB);
+      before('Clean DB', databaseService.cbResetDB);
       it('should register new user', function() {
-        return chai.request(HOST)
-        .post(URL.BASE_USER + '/')
-        .send(testData.users.valid[0])
+        return chai.request(settings.host)
+        .post(settings.url.users.base + '/')
+        .send(userData.users.valid[0])
         .then(function(res) {
           expect(res).to.have.status(201);
           expect(res).to.be.json;
@@ -217,117 +161,75 @@ describe('User-Controller', () => {
       });
 
       it('should fail to register existing user', function() {
-        return chai.request(HOST)
-        .post(URL.BASE_USER + '/')
-        .send(testData.users.valid[0])
+        return chai.request(settings.host)
+        .post(settings.url.users.base + '/')
+        .send(userData.users.valid[0])
         .then(function(res) {
-          expect(res).to.have.status(409);
-          expect(res).to.be.json;
-          expect(res.body).to.be.an('object');
-          expect(res.body.success).to.be.false;
-          expect(res.body.payload).to.be.an('object');
-          expect(res.body.payload.dataPath).to.equal('register');
-          expect(res.body.payload.message).to.equal('username already exists');
+          expectResponse.toBe409.register.userAlreadyExists(res);
         });
       });
 
       it('should fail to register user with invalid username', function() {
-        return chai.request(HOST)
-        .post(URL.BASE_USER + '/')
-        .send(testData.users.invalid.invalidUsername)
+        return chai.request(settings.host)
+        .post(settings.url.users.base + '/')
+        .send(userData.users.invalid.invalidUsername)
         .then(function(res) {
-          expect(res).to.have.status(400);
-          expect(res).to.be.json;
-          expect(res.body).to.be.an('object');
-          expect(res.body.success).to.be.false;
-          expect(res.body.payload).to.be.an('object');
-          expect(res.body.payload.dataPath).to.equal('validation');
-          expect(res.body.payload.message).to.equal('invalid request body');
+          expectResponse.toBe400.invalidRequestBody(res);
         });
       });
 
       it('should fail to register user with invalid password', function() {
-        return chai.request(HOST)
-        .post(URL.BASE_USER + '/')
-        .send(testData.users.invalid.invalidPassword)
+        return chai.request(settings.host)
+        .post(settings.url.users.base + '/')
+        .send(userData.users.invalid.invalidPassword)
         .then(function(res) {
-          expect(res).to.have.status(400);
-          expect(res).to.be.json;
-          expect(res.body).to.be.an('object');
-          expect(res.body.success).to.be.false;
-          expect(res.body.payload).to.be.an('object');
-          expect(res.body.payload.dataPath).to.equal('validation');
-          expect(res.body.payload.message).to.equal('invalid request body');
+          expectResponse.toBe400.invalidRequestBody(res);
         });
       });
 
       it('should fail to register user with missing username', function() {
-        return chai.request(HOST)
-        .post(URL.BASE_USER + '/')
-        .send(testData.users.invalid.missingUsername)
+        return chai.request(settings.host)
+        .post(settings.url.users.base + '/')
+        .send(userData.users.invalid.missingUsername)
         .then(function(res) {
-          expect(res).to.have.status(400);
-          expect(res).to.be.json;
-          expect(res.body).to.be.an('object');
-          expect(res.body.success).to.be.false;
-          expect(res.body.payload).to.be.an('object');
-          expect(res.body.payload.dataPath).to.equal('validation');
-          expect(res.body.payload.message).to.equal('invalid request body');
+          expectResponse.toBe400.invalidRequestBody(res);
         });
       });
 
       it('should fail to register user with missing email', function() {
-        return chai.request(HOST)
-        .post(URL.BASE_USER + '/')
-        .send(testData.users.invalid.missingEmail)
+        return chai.request(settings.host)
+        .post(settings.url.users.base + '/')
+        .send(userData.users.invalid.missingEmail)
         .then(function(res) {
-          expect(res).to.have.status(400);
-          expect(res).to.be.json;
-          expect(res.body).to.be.an('object');
-          expect(res.body.success).to.be.false;
-          expect(res.body.payload).to.be.an('object');
-          expect(res.body.payload.dataPath).to.equal('validation');
-          expect(res.body.payload.message).to.equal('invalid request body');
+          expectResponse.toBe400.invalidRequestBody(res);
         });
       });
 
       it('should fail to register user with missing password', function() {
-        return chai.request(HOST)
-        .post(URL.BASE_USER + '/')
-        .send(testData.users.invalid.missingPassword)
+        return chai.request(settings.host)
+        .post(settings.url.users.base + '/')
+        .send(userData.users.invalid.missingPassword)
         .then(function(res) {
-          expect(res).to.have.status(400);
-          expect(res).to.be.json;
-          expect(res.body).to.be.an('object');
-          expect(res.body.success).to.be.false;
-          expect(res.body.payload).to.be.an('object');
-          expect(res.body.payload.dataPath).to.equal('validation');
-          expect(res.body.payload.message).to.equal('invalid request body');
+          expectResponse.toBe400.invalidRequestBody(res);
         });
       });
 
       it('should fail to register user with missing imageUrl', function() {
-        return chai.request(HOST)
-        .post(URL.BASE_USER + '/')
-        .send(testData.users.invalid.missingImageUrl)
+        return chai.request(settings.host)
+        .post(settings.url.users.base + '/')
+        .send(userData.users.invalid.missingImageUrl)
         .then(function(res) {
-          expect(res).to.have.status(400);
-          expect(res).to.be.json;
-          expect(res.body).to.be.an('object');
-          expect(res.body.success).to.be.false;
-          expect(res.body.payload).to.be.an('object');
-          expect(res.body.payload.dataPath).to.equal('validation');
-          expect(res.body.payload.message).to.equal('invalid request body');
+          expectResponse.toBe400.invalidRequestBody(res);
         });
       });
     });
 
     describe('Login', function() {
-      before('Clean DB', databaseHelper.cbResetDB);
+      before('Clean DB', databaseService.cbResetDB);
       let defaultToken;
 
       before('register user 1', function(done) {
-        registerUser(1)
+        userService.register(userData.users.valid[1])
         .then((res) => {
           defaultToken = res.body.payload.accessToken;
           done();
@@ -335,10 +237,10 @@ describe('User-Controller', () => {
       });
 
       it('should login as registered user', function() {
-        return chai.request(HOST)
-        .post(URL.BASE_USER + '/login?type=0')
-        .send({username: testData.users.valid[1].username,
-          password: testData.users.valid[1].password})
+        return chai.request(settings.host)
+        .post(settings.url.users.base + '/login?type=0')
+        .send({username: userData.users.valid[1].username,
+          password: userData.users.valid[1].password})
         .then(res => {
           expect(res).to.have.status(200);
           expect(res).to.be.json;
@@ -351,107 +253,72 @@ describe('User-Controller', () => {
       });
 
       it('should fail to login with invalid password', function() {
-        return chai.request(HOST)
-        .post(URL.BASE_USER + '/login?type=0')
-        .send({username: testData.users.valid[1].username,
+        return chai.request(settings.host)
+        .post(settings.url.users.base + '/login?type=0')
+        .send({username: userData.users.valid[1].username,
           password: 'XXXXX'})
         .then(res => {
-          expect(res).to.have.status(401);
-          expect(res).to.be.json;
-          expect(res.body).to.be.an('object');
-          expect(res.body.success).to.be.false;
-          expect(res.body.payload).to.be.an('object');
-          expect(res.body.payload.dataPath).to.equal('login');
-          expect(res.body.payload.message).to.equal('login failed');
+          expectResponse.toBe401.loginFailed(res);
         });
       });
 
       it('should fail to login with empty password', function() {
-        return chai.request(HOST)
-        .post(URL.BASE_USER + '/login?type=0')
-        .send({username: testData.users.valid[1].username,
+        return chai.request(settings.host)
+        .post(settings.url.users.base + '/login?type=0')
+        .send({username: userData.users.valid[1].username,
           password: ''})
         .then(res => {
-          expect(res).to.have.status(400);
-          expect(res).to.be.json;
-          expect(res.body).to.be.an('object');
-          expect(res.body.success).to.be.false;
-          expect(res.body.payload).to.be.an('object');
-          expect(res.body.payload.dataPath).to.equal('validation');
-          expect(res.body.payload.message).to.equal('invalid request body');
+          expectResponse.toBe400.invalidRequestBody(res);
         });
       });
 
       it('should fail to login with no password', function() {
-        return chai.request(HOST)
-        .post(URL.BASE_USER + '/login?type=0')
-        .send({username: testData.users.valid[1].username})
+        return chai.request(settings.host)
+        .post(settings.url.users.base + '/login?type=0')
+        .send({username: userData.users.valid[1].username})
         .then(res => {
-          expect(res).to.have.status(400);
-          expect(res).to.be.json;
-          expect(res.body).to.be.an('object');
-          expect(res.body.success).to.be.false;
-          expect(res.body.payload).to.be.an('object');
-          expect(res.body.payload.dataPath).to.equal('validation');
-          expect(res.body.payload.message).to.equal('invalid request body');
+          expectResponse.toBe400.invalidRequestBody(res);
         });
       });
 
       it('should fail to login with no username', function() {
-        return chai.request(HOST)
-        .post(URL.BASE_USER + '/login?type=0')
-        .send({password: testData.users.valid[2].password})
+        return chai.request(settings.host)
+        .post(settings.url.users.base + '/login?type=0')
+        .send({password: userData.users.valid[2].password})
         .then(res => {
-          expect(res).to.have.status(400);
-          expect(res).to.be.json;
-          expect(res.body).to.be.an('object');
-          expect(res.body.success).to.be.false;
-          expect(res.body.payload).to.be.an('object');
-          expect(res.body.payload.dataPath).to.equal('validation');
-          expect(res.body.payload.message).to.equal('invalid request body');
+          expectResponse.toBe400.invalidRequestBody(res);
         });
       });
 
       it('should fail to login with unknown username', function() {
-        return chai.request(HOST)
-        .post(URL.BASE_USER + '/login?type=0')
+        return chai.request(settings.host)
+        .post(settings.url.users.base + '/login?type=0')
         .send({username: 'unknownUsername',
           password: 'passwordX'})
         .then(res => {
-          expect(res).to.have.status(401);
-          expect(res).to.be.json;
-          expect(res.body).to.be.an('object');
-          expect(res.body.success).to.be.false;
-          expect(res.body.payload).to.be.an('object');
-          expect(res.body.payload.dataPath).to.equal('login');
-          expect(res.body.payload.message).to.equal('login failed');
+          expectResponse.toBe401.loginFailed(res);
         });
       });
 
       it('should fail to login with empty body', function() {
-        return chai.request(HOST)
-        .post(URL.BASE_USER + '/login?type=0')
+        return chai.request(settings.host)
+        .post(settings.url.users.base + '/login?type=0')
         .send({})
         .then(res => {
-          expect(res).to.have.status(400);
-          expect(res).to.be.json;
-          expect(res.body).to.be.an('object');
-          expect(res.body.success).to.be.false;
-          expect(res.body.payload).to.be.an('object');
-          expect(res.body.payload.message).to.be.equal('invalid request body');
+          expectResponse.toBe400.invalidRequestBody(res);
         });
       });
 
     });
 
     describe('Logout', function() {
-      before('Clean DB', databaseHelper.cbResetDB);
+      before('Clean DB', databaseService.cbResetDB);
       let defaultToken;
 
       before(function(done) {
-        chai.request(HOST)
-        .post(URL.BASE_USER + '/')
-        .send(testData.users.valid[4])
+        chai.request(settings.host)
+        .post(settings.url.users.base + '/')
+        .send(userData.users.valid[4])
         .then((res) => {
           defaultToken = res.body.payload.accessToken;
           done();
@@ -460,8 +327,8 @@ describe('User-Controller', () => {
 
       // POST - Logout as default user
       it('should logout', function() {
-        return chai.request(HOST)
-        .post(URL.BASE_USER + '/logout')
+        return chai.request(settings.host)
+        .post(settings.url.users.base + '/logout')
         .set('Authorization', '0 ' + defaultToken)
         .then(res => {
           expect(res).to.have.status(200);
@@ -474,25 +341,20 @@ describe('User-Controller', () => {
 
       // POST - Send data with expired token as default user
       it('should fail to send data with expired token as default user', function() {
-        return chai.request(HOST)
-        .get(URL.BASE_TEST + '/authentication/required')
+        return chai.request(settings.host)
+        .get(settings.url.test.base + '/authentication/required')
         .set('Authorization', '0 ' + defaultToken)
         .then(res => {
-          expect(res).to.have.status(401);
-          expect(res).to.be.json;
-          expect(res.body).to.be.an('object');
-          expect(res.body.success).to.be.false;
-          expect(res.body.payload.dataPath).to.equal('user');
-          expect(res.body.payload.message).to.equal('unknown user or expired token');
+          expectResponse.toBe401.unknownUserOrExpiredToken(res);
         });
       });
 
       // POST - Relogin as default user
       it('should re-login', function() {
-        return chai.request(HOST)
-        .post(URL.BASE_USER + '/login?type=0')
-        .send({username: testData.users.valid[4].username,
-          password: testData.users.valid[4].password})
+        return chai.request(settings.host)
+        .post(settings.url.users.base + '/login?type=0')
+        .send({username: userData.users.valid[4].username,
+          password: userData.users.valid[4].password})
         .then(res => {
           expect(res).to.have.status(200);
           expect(res).to.be.json;
@@ -505,36 +367,24 @@ describe('User-Controller', () => {
   });
 
   describe('Invalid Auth-Type', function() {
-    before('Clean DB', databaseHelper.cbResetDB);
+    before('Clean DB', databaseService.cbResetDB);
     it('should fail with an invalid auth type', function() {
-      return chai.request(HOST)
-      .post(URL.BASE_USER + '/login?type=99')
-      .send({username: testData.users.valid[1].username,
-        password: testData.users.valid[1].password})
+      return chai.request(settings.host)
+      .post(settings.url.users.base + '/login?type=99')
+      .send({username: userData.users.valid[1].username,
+        password: userData.users.valid[1].password})
       .then(res => {
-        expect(res).to.have.status(400);
-        expect(res).to.be.json;
-        expect(res.body).to.be.an('object');
-        expect(res.body.success).to.be.false;
-        expect(res.body.payload).to.be.an('object');
-        expect(res.body.payload.dataPath).to.equal('authType');
-        expect(res.body.payload.message).to.equal('invalid auth type');
+        expectResponse.toBe401.invalidAuthType(res);
       });
     });
 
     it('should fail with no auth type', function() {
-      return chai.request(HOST)
-      .post(URL.BASE_USER + '/login')
-      .send({username: testData.users.valid[1].username,
-        password: testData.users.valid[1].password})
+      return chai.request(settings.host)
+      .post(settings.url.users.base + '/login')
+      .send({username: userData.users.valid[1].username,
+        password: userData.users.valid[1].password})
       .then(res => {
-        expect(res).to.have.status(400);
-        expect(res).to.be.json;
-        expect(res.body).to.be.an('object');
-        expect(res.body.success).to.be.false;
-        expect(res.body.payload).to.be.an('object');
-        expect(res.body.payload.dataPath).to.equal('authType');
-        expect(res.body.payload.message).to.equal('invalid auth type');
+        expectResponse.toBe401.invalidAuthType(res);
       });
     });
   });
@@ -543,11 +393,11 @@ describe('User-Controller', () => {
     let tokens = {};
     let facebookToken;
     before('Clean DB and register User 0 and 1', done => {
-      databaseHelper.promiseResetDB().then(()=> {
-        return chai.request(HOST).post(URL.BASE_USER  + '/').send(testData.users.valid[0]);
+      databaseService.promiseResetDB().then(()=> {
+        return chai.request(settings.host).post(settings.url.users.base  + '/').send(userData.users.valid[0]);
       }).then(res => {
         tokens[0] = res.body.payload.accessToken;
-        return chai.request(HOST).post(URL.BASE_USER  + '/').send(testData.users.valid[1]);
+        return chai.request(settings.host).post(settings.url.users.base  + '/').send(userData.users.valid[1]);
       }).then(res => {
         tokens[1] = res.body.payload.accessToken;
         done();
@@ -557,7 +407,7 @@ describe('User-Controller', () => {
     });
 
     before('get test facebook access token', function(done) {
-      getFacebookTestAccessToken()
+      userService.getFacebookTestAccessToken()
         .then((token) => {
           facebookToken = token;
           done();
@@ -568,16 +418,14 @@ describe('User-Controller', () => {
     });
 
     before('Login as facebook user', function(done) {
-      chai.request(HOST)
-      .post(URL.BASE_USER + '/login?type=2')
-      .send({'accessToken': facebookToken})
+      userService.loginFacebook({'accessToken': facebookToken})
       .then(res => {done();})
       .catch((error) => {console.log('Facbook Login Error: ' + error);});
     });
 
     it('should get the user-data of facebook_user', function() {
-      return chai.request(HOST)
-      .get(URL.BASE_USER  + '/user')
+      return chai.request(settings.host)
+      .get(settings.url.users.base  + '/user')
       .set('Authorization', '2 ' + facebookToken)
       .then(res => {
         expect(res).to.have.status(200);
@@ -597,8 +445,8 @@ describe('User-Controller', () => {
     });
 
     it('should get the user-data of user_0', function() {
-      return chai.request(HOST)
-      .get(URL.BASE_USER  + '/user')
+      return chai.request(settings.host)
+      .get(settings.url.users.base  + '/user')
       .set('Authorization', '0 ' + tokens[0])
       .then(res => {
         expect(res).to.have.status(200);
@@ -606,19 +454,19 @@ describe('User-Controller', () => {
         expect(res.body).to.be.an('object');
         expect(res.body.success).to.be.true;
         expect(res.body.payload).to.be.an('object');
-        expect(res.body.payload.username).to.equal(testData.users.valid[0].username);
-        expect(res.body.payload.email).to.equal(testData.users.valid[0].email);
+        expect(res.body.payload.username).to.equal(userData.users.valid[0].username);
+        expect(res.body.payload.email).to.equal(userData.users.valid[0].email);
         expect(res.body.payload._id).to.be.undefined;
         expect(res.body.payload.groupIds).to.be.undefined;
         expect(res.body.payload.userId).to.have.lengthOf(36).and.to.be.a('string');
         expect(res.body.payload.role).to.equal('user');
-        expect(res.body.payload.imageUrl).to.equal(testData.users.valid[0].imageUrl);
+        expect(res.body.payload.imageUrl).to.equal(userData.users.valid[0].imageUrl);
       });
     });
 
     it('should get the user-data of user_1', function() {
-      return chai.request(HOST)
-      .get(URL.BASE_USER  + '/user')
+      return chai.request(settings.host)
+      .get(settings.url.users.base  + '/user')
       .set('Authorization', '0 ' + tokens[1])
       .then(res => {
         expect(res).to.have.status(200);
@@ -626,8 +474,8 @@ describe('User-Controller', () => {
         expect(res.body).to.be.an('object');
         expect(res.body.success).to.be.true;
         expect(res.body.payload).to.be.an('object');
-        expect(res.body.payload.username).to.equal(testData.users.valid[1].username);
-        expect(res.body.payload.email).to.equal(testData.users.valid[1].email);
+        expect(res.body.payload.username).to.equal(userData.users.valid[1].username);
+        expect(res.body.payload.email).to.equal(userData.users.valid[1].email);
         expect(res.body.payload._id).to.be.undefined;
         expect(res.body.payload.groupIds).to.be.undefined;
         expect(res.body.payload.userId).to.have.lengthOf(36).and.to.be.a('string');
@@ -637,31 +485,19 @@ describe('User-Controller', () => {
     });
 
     it('should not get the user-data of user_0 due to wrong token', function() {
-      return chai.request(HOST)
-      .get(URL.BASE_USER  + '/user')
+      return chai.request(settings.host)
+      .get(settings.url.users.base  + '/user')
       .set('Authorization', '0 this_is_a_wrong_token')
       .then(res => {
-        expect(res).to.have.status(401);
-        expect(res).to.be.json;
-        expect(res.body).to.be.an('object');
-        expect(res.body.success).to.be.false;
-        expect(res.body.payload).to.be.an('object');
-        expect(res.body.payload.dataPath).to.equal('authentication');
-        expect(res.body.payload.message).to.equal('invalid authToken');
+        expectResponse.toBe401.invalidAuthToken(res);
       });
     });
 
     it('should not get the user-data of user_0 due to missing auth header', function() {
-      return chai.request(HOST)
-      .get(URL.BASE_USER  + '/user')
+      return chai.request(settings.host)
+      .get(settings.url.users.base  + '/user')
       .then(res => {
-        expect(res).to.have.status(401);
-        expect(res).to.be.json;
-        expect(res.body).to.be.an('object');
-        expect(res.body.success).to.be.false;
-        expect(res.body.payload).to.be.an('object');
-        expect(res.body.payload.dataPath).to.equal('authentication');
-        expect(res.body.payload.message).to.equal('no http request header Authorization provided');
+        expectResponse.toBe401.missingHeaderAuthorization(res);
       });
     });
   });
@@ -672,8 +508,8 @@ describe('User-Controller', () => {
       let constantUserData = {};
 
       before('Clean DB and register User 0', done => {
-        databaseHelper.promiseResetDB().then(()=> {
-          return registerUser(0);
+        databaseService.promiseResetDB().then(()=> {
+          return userService.register(userData.users.valid[0]);
         }).then(res => {
           token = res.body.payload.accessToken;
           done();
@@ -683,8 +519,8 @@ describe('User-Controller', () => {
       });
 
       it('should get the original user data of user_0', function() {
-        return chai.request(HOST)
-        .get(URL.BASE_USER  + '/user')
+        return chai.request(settings.host)
+        .get(settings.url.users.base  + '/user')
         .set('Authorization', '0 ' + token)
         .then(res => {
           expect(res).to.have.status(200);
@@ -692,23 +528,23 @@ describe('User-Controller', () => {
           expect(res.body).to.be.an('object');
           expect(res.body.success).to.be.true;
           expect(res.body.payload).to.be.an('object');
-          expect(res.body.payload.username).to.equal(testData.users.valid[0].username);
-          expect(res.body.payload.email).to.equal(testData.users.valid[0].email);
+          expect(res.body.payload.username).to.equal(userData.users.valid[0].username);
+          expect(res.body.payload.email).to.equal(userData.users.valid[0].email);
           expect(res.body.payload._id).to.be.undefined;
           expect(res.body.payload.groupIds).to.be.undefined;
           expect(res.body.payload.userId).to.have.lengthOf(36).and.to.be.a('string');
           expect(res.body.payload.role).to.equal('user');
-          expect(res.body.payload.imageUrl).to.equal(testData.users.valid[0].imageUrl);
+          expect(res.body.payload.imageUrl).to.equal(userData.users.valid[0].imageUrl);
           constantUserData.groupIds = res.body.payload.groupIds;
           constantUserData.userId = res.body.payload.userId;
         });
       });
 
       it('should update user_0', function() {
-        return chai.request(HOST)
-        .put(URL.BASE_USER  + '/user')
+        return chai.request(settings.host)
+        .put(settings.url.users.base  + '/user')
         .set('Authorization', '0 ' + token)
-        .send(testData.users.update.valid.allFields)
+        .send(userData.users.update.valid.allFields)
         .then(res => {
           expect(res).to.have.status(200);
           expect(res).to.be.json;
@@ -718,8 +554,8 @@ describe('User-Controller', () => {
       });
 
       it('should get the updated user data of user_0', function() {
-        return chai.request(HOST)
-        .get(URL.BASE_USER  + '/user')
+        return chai.request(settings.host)
+        .get(settings.url.users.base  + '/user')
         .set('Authorization', '0 ' + token)
         .then(res => {
           expect(res).to.have.status(200);
@@ -727,13 +563,13 @@ describe('User-Controller', () => {
           expect(res.body).to.be.an('object');
           expect(res.body.success).to.be.true;
           expect(res.body.payload).to.be.an('object');
-          expect(res.body.payload.username).to.equal(testData.users.update.valid.allFields.username);
-          expect(res.body.payload.email).to.equal(testData.users.update.valid.allFields.email);
+          expect(res.body.payload.username).to.equal(userData.users.update.valid.allFields.username);
+          expect(res.body.payload.email).to.equal(userData.users.update.valid.allFields.email);
           expect(res.body.payload._id).to.be.undefined;
           expect(res.body.payload.groupIds).to.equal(constantUserData.groupIds);
           expect(res.body.payload.userId).to.equal(constantUserData.userId);
           expect(res.body.payload.role).to.equal('user');
-          expect(res.body.payload.imageUrl).to.equal(testData.users.update.valid.allFields.imageUrl);
+          expect(res.body.payload.imageUrl).to.equal(userData.users.update.valid.allFields.imageUrl);
         });
       });
     });
@@ -743,8 +579,8 @@ describe('User-Controller', () => {
       let constantUserData = {};
 
       before('Clean DB and register User 0', done => {
-        databaseHelper.promiseResetDB().then(()=> {
-          return registerUser(0);
+        databaseService.promiseResetDB().then(()=> {
+          return userService.register(userData.users.valid[0]);
         }).then(res => {
           token = res.body.payload.accessToken;
           done();
@@ -754,8 +590,8 @@ describe('User-Controller', () => {
       });
 
       it('should get the original user data of user_0', function() {
-        return chai.request(HOST)
-        .get(URL.BASE_USER  + '/user')
+        return chai.request(settings.host)
+        .get(settings.url.users.base  + '/user')
         .set('Authorization', '0 ' + token)
         .then(res => {
           expect(res).to.have.status(200);
@@ -763,23 +599,23 @@ describe('User-Controller', () => {
           expect(res.body).to.be.an('object');
           expect(res.body.success).to.be.true;
           expect(res.body.payload).to.be.an('object');
-          expect(res.body.payload.username).to.equal(testData.users.valid[0].username);
-          expect(res.body.payload.email).to.equal(testData.users.valid[0].email);
+          expect(res.body.payload.username).to.equal(userData.users.valid[0].username);
+          expect(res.body.payload.email).to.equal(userData.users.valid[0].email);
           expect(res.body.payload._id).to.be.undefined;
           expect(res.body.payload.groupIds).to.be.undefined;
           expect(res.body.payload.userId).to.have.lengthOf(36).and.to.be.a('string');
           expect(res.body.payload.role).to.equal('user');
-          expect(res.body.payload.imageUrl).to.equal(testData.users.valid[0].imageUrl);
+          expect(res.body.payload.imageUrl).to.equal(userData.users.valid[0].imageUrl);
           constantUserData.groupIds = res.body.payload.groupIds;
           constantUserData.userId = res.body.payload.userId;
         });
       });
 
       it('should update user_0', function() {
-        return chai.request(HOST)
-        .put(URL.BASE_USER  + '/user')
+        return chai.request(settings.host)
+        .put(settings.url.users.base  + '/user')
         .set('Authorization', '0 ' + token)
-        .send(testData.users.update.valid.oneFieldUsername)
+        .send(userData.users.update.valid.oneFieldUsername)
         .then(res => {
           expect(res).to.have.status(200);
           expect(res).to.be.json;
@@ -789,8 +625,8 @@ describe('User-Controller', () => {
       });
 
       it('should get the updated user data of user_0', function() {
-        return chai.request(HOST)
-        .get(URL.BASE_USER  + '/user')
+        return chai.request(settings.host)
+        .get(settings.url.users.base  + '/user')
         .set('Authorization', '0 ' + token)
         .then(res => {
           expect(res).to.have.status(200);
@@ -798,13 +634,13 @@ describe('User-Controller', () => {
           expect(res.body).to.be.an('object');
           expect(res.body.success).to.be.true;
           expect(res.body.payload).to.be.an('object');
-          expect(res.body.payload.username).to.equal(testData.users.update.valid.oneFieldUsername.username);
-          expect(res.body.payload.email).to.equal(testData.users.valid[0].email);
+          expect(res.body.payload.username).to.equal(userData.users.update.valid.oneFieldUsername.username);
+          expect(res.body.payload.email).to.equal(userData.users.valid[0].email);
           expect(res.body.payload._id).to.be.undefined;
           expect(res.body.payload.groupIds).to.equal(constantUserData.groupIds);
           expect(res.body.payload.userId).to.equal(constantUserData.userId);
           expect(res.body.payload.role).to.equal('user');
-          expect(res.body.payload.imageUrl).to.equal(testData.users.valid[0].imageUrl);
+          expect(res.body.payload.imageUrl).to.equal(userData.users.valid[0].imageUrl);
         });
       });
     });
@@ -813,8 +649,8 @@ describe('User-Controller', () => {
       let token;
 
       before('Clean DB and register User 0', done => {
-        databaseHelper.promiseResetDB().then(()=> {
-          return registerUser(0);
+        databaseService.promiseResetDB().then(()=> {
+          return userService.register(userData.users.valid[0]);
         }).then(res => {
           token = res.body.payload.accessToken;
           done();
@@ -824,161 +660,101 @@ describe('User-Controller', () => {
       });
 
       it('should fail to update due to missing payload', function() {
-        return chai.request(HOST)
-        .put(URL.BASE_USER  + '/user')
+        return chai.request(settings.host)
+        .put(settings.url.users.base  + '/user')
         .set('Authorization', '0 ' + token)
         .then(res => {
-          expect(res).to.have.status(400);
-          expect(res).to.be.json;
-          expect(res.body).to.be.an('object');
-          expect(res.body.success).to.be.false;
-          expect(res.body.payload).to.be.an('object');
-          expect(res.body.payload.dataPath).to.equal('validation');
-          expect(res.body.payload.message).to.equal('invalid request body');
+          expectResponse.toBe400.invalidRequestBody(res);
         });
       });
 
       it('should fail to update userId', function() {
-        return chai.request(HOST)
-        .put(URL.BASE_USER  + '/user')
+        return chai.request(settings.host)
+        .put(settings.url.users.base  + '/user')
         .set('Authorization', '0 ' + token)
-        .send(testData.users.update.invalid.updateUserId)
+        .send(userData.users.update.invalid.updateUserId)
         .then(res => {
-          expect(res).to.have.status(400);
-          expect(res).to.be.json;
-          expect(res.body).to.be.an('object');
-          expect(res.body.success).to.be.false;
-          expect(res.body.payload).to.be.an('object');
-          expect(res.body.payload.dataPath).to.equal('validation');
-          expect(res.body.payload.message).to.equal('invalid request body');
+          expectResponse.toBe400.invalidRequestBody(res);
         });
       });
 
       it('should fail to update groupd ids', function() {
-        return chai.request(HOST)
-        .put(URL.BASE_USER  + '/user')
+        return chai.request(settings.host)
+        .put(settings.url.users.base  + '/user')
         .set('Authorization', '0 ' + token)
-        .send(testData.users.update.invalid.updateGroupIds)
+        .send(userData.users.update.invalid.updateGroupIds)
         .then(res => {
-          expect(res).to.have.status(400);
-          expect(res).to.be.json;
-          expect(res.body).to.be.an('object');
-          expect(res.body.success).to.be.false;
-          expect(res.body.payload).to.be.an('object');
-          expect(res.body.payload.dataPath).to.equal('validation');
-          expect(res.body.payload.message).to.equal('invalid request body');
+          expectResponse.toBe400.invalidRequestBody(res);
         });
       });
 
       it('should fail to update internal id', function() {
-        return chai.request(HOST)
-        .put(URL.BASE_USER  + '/user')
+        return chai.request(settings.host)
+        .put(settings.url.users.base  + '/user')
         .set('Authorization', '0 ' + token)
-        .send(testData.users.update.invalid.updateInternalId)
+        .send(userData.users.update.invalid.updateInternalId)
         .then(res => {
-          expect(res).to.have.status(400);
-          expect(res).to.be.json;
-          expect(res.body).to.be.an('object');
-          expect(res.body.success).to.be.false;
-          expect(res.body.payload).to.be.an('object');
-          expect(res.body.payload.dataPath).to.equal('validation');
-          expect(res.body.payload.message).to.equal('invalid request body');
+          expectResponse.toBe400.invalidRequestBody(res);
         });
       });
 
       it('should fail to update authType', function() {
-        return chai.request(HOST)
-        .put(URL.BASE_USER  + '/user')
+        return chai.request(settings.host)
+        .put(settings.url.users.base  + '/user')
         .set('Authorization', '0 ' + token)
-        .send(testData.users.update.invalid.updateAuthType)
+        .send(userData.users.update.invalid.updateAuthType)
         .then(res => {
-          expect(res).to.have.status(400);
-          expect(res).to.be.json;
-          expect(res.body).to.be.an('object');
-          expect(res.body.success).to.be.false;
-          expect(res.body.payload).to.be.an('object');
-          expect(res.body.payload.dataPath).to.equal('validation');
-          expect(res.body.payload.message).to.equal('invalid request body');
+          expectResponse.toBe400.invalidRequestBody(res);
         });
       });
 
       it('should fail to update role', function() {
-        return chai.request(HOST)
-        .put(URL.BASE_USER  + '/user')
+        return chai.request(settings.host)
+        .put(settings.url.users.base  + '/user')
         .set('Authorization', '0 ' + token)
-        .send(testData.users.update.invalid.updateRole)
+        .send(userData.users.update.invalid.updateRole)
         .then(res => {
-          expect(res).to.have.status(400);
-          expect(res).to.be.json;
-          expect(res.body).to.be.an('object');
-          expect(res.body.success).to.be.false;
-          expect(res.body.payload).to.be.an('object');
-          expect(res.body.payload.dataPath).to.equal('validation');
-          expect(res.body.payload.message).to.equal('invalid request body');
+          expectResponse.toBe400.invalidRequestBody(res);
         });
       });
 
       it('should fail to update unknown field', function() {
-        return chai.request(HOST)
-        .put(URL.BASE_USER  + '/user')
+        return chai.request(settings.host)
+        .put(settings.url.users.base  + '/user')
         .set('Authorization', '0 ' + token)
-        .send(testData.users.update.invalid.updateUnknownField)
+        .send(userData.users.update.invalid.updateUnknownField)
         .then(res => {
-          expect(res).to.have.status(400);
-          expect(res).to.be.json;
-          expect(res.body).to.be.an('object');
-          expect(res.body.success).to.be.false;
-          expect(res.body.payload).to.be.an('object');
-          expect(res.body.payload.dataPath).to.equal('validation');
-          expect(res.body.payload.message).to.equal('invalid request body');
+          expectResponse.toBe400.invalidRequestBody(res);
         });
       });
 
       it('should fail to update username with null', function() {
-        return chai.request(HOST)
-        .put(URL.BASE_USER  + '/user')
+        return chai.request(settings.host)
+        .put(settings.url.users.base  + '/user')
         .set('Authorization', '0 ' + token)
-        .send(testData.users.update.invalid.updateUsernameNull)
+        .send(userData.users.update.invalid.updateUsernameNull)
         .then(res => {
-          expect(res).to.have.status(400);
-          expect(res).to.be.json;
-          expect(res.body).to.be.an('object');
-          expect(res.body.success).to.be.false;
-          expect(res.body.payload).to.be.an('object');
-          expect(res.body.payload.dataPath).to.equal('validation');
-          expect(res.body.payload.message).to.equal('invalid request body');
+          expectResponse.toBe400.invalidRequestBody(res);
         });
       });
 
       it('should fail to update password with null', function() {
-        return chai.request(HOST)
-        .put(URL.BASE_USER  + '/user')
+        return chai.request(settings.host)
+        .put(settings.url.users.base  + '/user')
         .set('Authorization', '0 ' + token)
-        .send(testData.users.update.invalid.updatePasswordNull)
+        .send(userData.users.update.invalid.updatePasswordNull)
         .then(res => {
-          expect(res).to.have.status(400);
-          expect(res).to.be.json;
-          expect(res.body).to.be.an('object');
-          expect(res.body.success).to.be.false;
-          expect(res.body.payload).to.be.an('object');
-          expect(res.body.payload.dataPath).to.equal('validation');
-          expect(res.body.payload.message).to.equal('invalid request body');
+          expectResponse.toBe400.invalidRequestBody(res);
         });
       });
 
       it('should fail to update email with null', function() {
-        return chai.request(HOST)
-        .put(URL.BASE_USER  + '/user')
+        return chai.request(settings.host)
+        .put(settings.url.users.base  + '/user')
         .set('Authorization', '0 ' + token)
-        .send(testData.users.update.invalid.updateEmailNull)
+        .send(userData.users.update.invalid.updateEmailNull)
         .then(res => {
-          expect(res).to.have.status(400);
-          expect(res).to.be.json;
-          expect(res.body).to.be.an('object');
-          expect(res.body.success).to.be.false;
-          expect(res.body.payload).to.be.an('object');
-          expect(res.body.payload.dataPath).to.equal('validation');
-          expect(res.body.payload.message).to.equal('invalid request body');
+          expectResponse.toBe400.invalidRequestBody(res);
         });
       });
     });

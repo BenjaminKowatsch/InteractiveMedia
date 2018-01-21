@@ -74,8 +74,14 @@ module.exports.getObject = function(bucketName, objectName) {
         }).catch((err, etag) => {
           responseData.success = false;
           responseData.payload.dataPath = 'objectstore';
-          responseData.payload.message = 'failed to load file';
-          let errorCode = ERROR.MINIO_ERROR;
+          let errorCode;
+          if (err.code === 'NoSuchKey') {
+            errorCode = ERROR.RESOURCE_NOT_FOUND;
+            responseData.payload.message = 'file not found';
+          } else {
+            errorCode = ERROR.MINIO_ERROR;
+            responseData.payload.message = 'failed to load file';
+          }
           reject({errorCode: errorCode, responseData: responseData});
         });
       });

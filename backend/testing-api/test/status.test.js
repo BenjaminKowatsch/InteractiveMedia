@@ -4,16 +4,14 @@
 
 const chai = require('chai');
 const expect = require('chai').expect;
+const settings = require('../config/settings.config');
 
 chai.use(require('chai-http'));
 
-const host = 'http://backend:8081';
-const baseUrl = '/v1/status';
-
 describe('Get status', function() {
     it('should get current status', function() {
-      return chai.request(host)
-       .get(baseUrl + '/')
+      return chai.request(settings.host)
+       .get(settings.url.status.base)
        .then(function(res) {
           expect(res).to.have.status(200);
           expect(res).to.be.json;

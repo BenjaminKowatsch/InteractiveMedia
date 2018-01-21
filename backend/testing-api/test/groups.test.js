@@ -5,39 +5,30 @@
 const chai = require('chai');
 const expect = require('chai').expect;
 const winston = require('winston');
-const databaseHelper = require('./data/databaseHelper');
+const databaseService = require('../util/databaseService');
+const expectResponse = require('../util/expectResponse.util');
+const settings = require('../config/settings.config');
+const userService = require('../util/userService.util');
+const groupService = require('../util/groupService.util');
 
 chai.use(require('chai-http'));
 
-const HOST = 'http://backend:8081';
-
-const URL = {
-  BASE_GROUP: '/v1/groups',
-  BASE_USER: '/v1/users',
-};
-
-const userData = require('./data/user.data');
-const groupScenarios = require('./data/groupScenarios');
-
-// ************* Helper ***********//
-
-const registerUser = index => chai.request(HOST).post(URL.BASE_USER  + '/').send(userData.users.valid[index]);
-const getUserData = token => chai.request(HOST).get(URL.BASE_USER  + '/user').set('Authorization', '0 ' + token);
-const deepCopy = data => JSON.parse(JSON.stringify(data));
+const userData = require('../data/user.data');
+const groupScenarios = require('../data/groupScenarios');
 
 describe('Groups-Controller: Groups:', () => {
   describe('Create new Group', () => {
     let tokens = {};
     let groupId = {};
     before('register User 0 and 1', done => {
-      databaseHelper.promiseResetDB().then(()=> {
-        return registerUser(0);
+      databaseService.promiseResetDB().then(()=> {
+        return userService.register(userData.users.valid[0]);
       }).then(res => {
         tokens[0] = res.body.payload.accessToken;
-        return registerUser(1);
+        return userService.register(userData.users.valid[1]);
       }).then(res => {
         tokens[1] = res.body.payload.accessToken;
-        return registerUser(2);
+        return userService.register(userData.users.valid[2]);
       }).then(res => {
         tokens[2] = res.body.payload.accessToken;
         done();
@@ -48,8 +39,8 @@ describe('Groups-Controller: Groups:', () => {
 
     describe('with success', () => {
       it('should create a new group', () => {
-        return chai.request(HOST)
-        .post(URL.BASE_GROUP + '/')
+        return chai.request(settings.host)
+        .post(settings.url.groups.base + '/')
         .set('Authorization', '0 ' + tokens[0])
         .send(groupScenarios[0].create)
         .then(function(res) {
@@ -73,8 +64,8 @@ describe('Groups-Controller: Groups:', () => {
       });
 
       it('should get the groupId with userDate request of user_0', function() {
-        return chai.request(HOST)
-        .get(URL.BASE_USER  + '/user')
+        return chai.request(settings.host)
+        .get(settings.url.users.base  + '/user')
         .set('Authorization', '0 ' + tokens[0])
         .then(res => {
           expect(res).to.have.status(200);
@@ -94,114 +85,72 @@ describe('Groups-Controller: Groups:', () => {
 
     describe('with error', () => {
       it('should not create a new group due to referencing a not existing user', () => {
-        return chai.request(HOST)
-        .post(URL.BASE_GROUP  + '/')
+        return chai.request(settings.host)
+        .post(settings.url.groups.base  + '/')
         .set('Authorization', '0 ' + tokens[0])
         .send(groupScenarios[0].createWrongUser)
         .then(res => {
-          expect(res).to.have.status(409);
-          expect(res).to.be.json;
-          expect(res.body).to.be.an('object');
-          expect(res.body.success).to.be.false;
-          expect(res.body.payload).to.be.an('object');
-          expect(res.body.payload.dataPath).to.equal('groupUsers');
-          expect(res.body.payload.message).to.equal('Unknown user: ' + groupScenarios[0].createWrongUser.users[0]);
+          expectResponse.toBe409.createGroup.nonExistingUser(res, groupScenarios[0].createWrongUser.users[0]);
         });
       });
 
       it('should not create a new group due to duplicated users', () => {
-        return chai.request(HOST)
-        .post(URL.BASE_GROUP  + '/')
+        return chai.request(settings.host)
+        .post(settings.url.groups.base  + '/')
         .set('Authorization', '0 ' + tokens[0])
         .send(groupScenarios[0].createDuplicatedUser)
         .then(res => {
-          expect(res).to.have.status(400);
-          expect(res).to.be.json;
-          expect(res.body).to.be.an('object');
-          expect(res.body.success).to.be.false;
-          expect(res.body.payload).to.be.an('object');
-          expect(res.body.payload.dataPath).to.equal('groupUsers');
-          expect(res.body.payload.message).to.equal('Duplicated groupUsers');
+          expectResponse.toBe400.createGroup.duplicatedUsers(res);
         });
       });
 
       it('should not create a new group due to group without creator user', () => {
-        return chai.request(HOST)
-        .post(URL.BASE_GROUP  + '/')
+        return chai.request(settings.host)
+        .post(settings.url.groups.base  + '/')
         .set('Authorization', '0 ' + tokens[0])
         .send(groupScenarios[0].createWithoutCreatorUser)
         .then(res => {
-          expect(res).to.have.status(400);
-          expect(res).to.be.json;
-          expect(res.body).to.be.an('object');
-          expect(res.body.success).to.be.false;
-          expect(res.body.payload).to.be.an('object');
-          expect(res.body.payload.dataPath).to.equal('groupUsers');
-          expect(res.body.payload.message).to.equal('GroupCreator must be part of groupUsers');
+          expectResponse.toBe400.createGroup.missingCreator(res);
         });
       });
 
       it('should not create a new group due to create a group without users', () => {
-        return chai.request(HOST)
-        .post(URL.BASE_GROUP  + '/')
+        return chai.request(settings.host)
+        .post(settings.url.groups.base  + '/')
         .set('Authorization', '0 ' + tokens[0])
         .send(groupScenarios[0].createNullUsers)
         .then(res => {
-          expect(res).to.have.status(400);
-          expect(res).to.be.json;
-          expect(res.body).to.be.an('object');
-          expect(res.body.success).to.be.false;
-          expect(res.body.payload).to.be.an('object');
-          expect(res.body.payload.dataPath).to.equal('groupUsers');
-          expect(res.body.payload.message).to.equal('GroupCreator must be part of groupUsers');
+          expectResponse.toBe400.createGroup.missingCreator(res);
         });
       });
 
       it('should not create a new group due to invalid payload', () => {
-        return chai.request(HOST)
-        .post(URL.BASE_GROUP  + '/')
+        return chai.request(settings.host)
+        .post(settings.url.groups.base  + '/')
         .set('Authorization', '0 ' + tokens[0])
         .send(groupScenarios[0].createInvalidPayload)
         .then(res => {
-          expect(res).to.have.status(400);
-          expect(res).to.be.json;
-          expect(res.body).to.be.an('object');
-          expect(res.body.success).to.be.false;
-          expect(res.body.payload).to.be.an('object');
-          expect(res.body.payload.dataPath).to.equal('validation');
-          expect(res.body.payload.message).to.equal('invalid request body');
+          expectResponse.toBe400.invalidRequestBody(res);
         });
       });
 
       it('should not create a new group due to wrong token', () => {
-        return chai.request(HOST)
-        .post(URL.BASE_GROUP  + '/')
+        return chai.request(settings.host)
+        .post(settings.url.groups.base  + '/')
         .set('Authorization', '0 ' + 'foobar')
         .send(groupScenarios[0].create)
         .then(res => {
-          expect(res).to.have.status(401);
-          expect(res).to.be.json;
-          expect(res.body).to.be.an('object');
-          expect(res.body.success).to.be.false;
-          expect(res.body.payload).to.be.an('object');
-          expect(res.body.payload.dataPath).to.equal('authentication');
-          expect(res.body.payload.message).to.equal('invalid authToken');
+          expectResponse.toBe401.invalidAuthToken(res);
         });
       });
 
       it('should not create a new group due to missing token', () => {
-        return chai.request(HOST)
-        .post(URL.BASE_GROUP  + '/')
+        return chai.request(settings.host)
+        .post(settings.url.groups.base  + '/')
         .set('Authorization', '')
         .send(groupScenarios[0].create)
         .then(res => {
-          expect(res).to.have.status(401);
-          expect(res).to.be.json;
-          expect(res.body.success).to.be.false;
-          expect(res.body.payload).to.be.an('object');
-          expect(res.body.payload.dataPath).to.equal('authentication');
-          expect(res.body.payload.message).to.
-            equal('invalid number of arguments provided in http request header Authorization');
+          expectResponse.toBe401.invalidFormatHeaderAuthorization(res);
         });
       });
     });
@@ -212,20 +161,17 @@ describe('Groups-Controller: Groups:', () => {
     let groupId;
 
     before('register User 0 and 1', done => {
-      databaseHelper.promiseResetDB().then(()=> {
-        return registerUser(0);
+      databaseService.promiseResetDB().then(()=> {
+        return userService.register(userData.users.valid[0]);
       }).then(res => {
         tokens[0] = res.body.payload.accessToken;
-        return registerUser(1);
+        return userService.register(userData.users.valid[1]);
       }).then(res => {
         tokens[1] = res.body.payload.accessToken;
-        return registerUser(2);
+        return userService.register(userData.users.valid[2]);
       }).then(res => {
         tokens[2] = res.body.payload.accessToken;
-        return chai.request(HOST)
-          .post(URL.BASE_GROUP  + '/')
-          .set('Authorization', '0 ' + tokens[0])
-          .send(groupScenarios[0].create);
+        return groupService.create(0, tokens[0], groupScenarios[0].create);
       }).then(res => {
         groupId = res.body.payload.groupId;
         done();
@@ -236,8 +182,8 @@ describe('Groups-Controller: Groups:', () => {
 
     describe('with success', () => {
       it('should get the group by user 0', () => {
-        return chai.request(HOST)
-        .get(URL.BASE_GROUP  + '/' + groupId)
+        return chai.request(settings.host)
+        .get(settings.url.groups.base  + '/' + groupId)
         .set('Authorization', '0 ' + tokens[0])
         .then(function(res) {
           expect(res).to.have.status(200);
@@ -259,8 +205,8 @@ describe('Groups-Controller: Groups:', () => {
       });
 
       it('should get the group by user 1', () => {
-        return chai.request(HOST)
-        .get(URL.BASE_GROUP  + '/' + groupId)
+        return chai.request(settings.host)
+        .get(settings.url.groups.base  + '/' + groupId)
         .set('Authorization', '0 ' + tokens[1])
         .then(function(res) {
           expect(res).to.have.status(200);
@@ -284,32 +230,20 @@ describe('Groups-Controller: Groups:', () => {
 
     describe('with error', () => {
       it('should not get the group due to unauthorized user', () => {
-        return chai.request(HOST)
-        .get(URL.BASE_GROUP  + '/' + groupId)
+        return chai.request(settings.host)
+        .get(settings.url.groups.base  + '/' + groupId)
         .set('Authorization', '0 ' + tokens[2])
         .then(res => {
-          expect(res).to.have.status(403);
-          expect(res).to.be.json;
-          expect(res.body).to.be.an('object');
-          expect(res.body.success).to.be.false;
-          expect(res.body.payload).to.be.an('object');
-          expect(res.body.payload.dataPath).to.equal('authorization');
-          expect(res.body.payload.message).to.equal('user is not but has to be a member of the group');
+          expectResponse.toBe403.groups.userIsNotMember(res);
         });
       });
 
       it('should not get the group due to a wrong groupId', () => {
-        return chai.request(HOST)
-        .get(URL.BASE_GROUP  + '/fooBar-this-is-not-an-valid-groupId')
+        return chai.request(settings.host)
+        .get(settings.url.groups.base  + '/fooBar-this-is-not-an-valid-groupId')
         .set('Authorization', '0 ' + tokens[0])
         .then(res => {
-          expect(res).to.have.status(404);
-          expect(res).to.be.json;
-          expect(res.body).to.be.an('object');
-          expect(res.body.success).to.be.false;
-          expect(res.body.payload).to.be.an('object');
-          expect(res.body.payload.dataPath).to.equal('group');
-          expect(res.body.payload.message).to.equal('group not found');
+          expectResponse.toBe404.groupNotFound(res);
         });
       });
     });

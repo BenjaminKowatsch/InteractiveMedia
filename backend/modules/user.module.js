@@ -93,7 +93,7 @@ module.exports.verifyGoogleAccessToken = function(token, verifyDatabase) {
         // Google claims invalid token
         responseData.success = false;
         responseData.payload.dataPath = 'authentication';
-        responseData.payload.message = 'invalid auth token';
+        responseData.payload.message = 'invalid authToken';
         let errorCode = ERROR.INVALID_AUTH_TOKEN;
         winston.error('errorCode', errorCode);
         reject({errorCode: errorCode, responseData: responseData});
@@ -262,7 +262,7 @@ module.exports.verifyFacebookAccessToken = function(token, verifyDatabase, getUs
         // Facebook claimed invalid access token
         responseData.success = false;
         responseData.payload.dataPath = 'authentication';
-        responseData.payload.message = 'invalid auth token';
+        responseData.payload.message = 'invalid authToken';
         let errorCode = ERROR.INVALID_AUTH_TOKEN;
         winston.error('errorCode', errorCode);
         return Promise.reject({errorCode: errorCode, responseData: responseData});

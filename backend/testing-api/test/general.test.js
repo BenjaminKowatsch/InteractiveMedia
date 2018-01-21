@@ -4,69 +4,41 @@
 
 const chai = require('chai');
 const expect = require('chai').expect;
+const expectResponse = require('../util/expectResponse.util');
+const settings = require('../config/settings.config');
 
 chai.use(require('chai-http'));
 
-const url = {
-    'host': 'http://backend:8081',
-    'base': '/v1',
-    'unknownRoute': '/unknown'
-  };
-
 describe('Unknown endpoint', function() {
     it('should return an error for unknown GET endpoint', function() {
-      return chai.request(url.host)
-       .get(url.base + url.unknownRoute)
+      return chai.request(settings.host)
+       .get(settings.url.base + settings.url.unknown)
        .then(function(res) {
-          expect(res).to.have.status(404);
-          expect(res).to.be.json;
-          expect(res.body).to.be.an('object');
-          expect(res.body.success).to.be.false;
-          expect(res.body.payload).to.be.an('object');
-          expect(res.body.payload.message).to.equal('Not found');
-          expect(res.body.payload.dataPath).to.equal('GET ' + url.base + url.unknownRoute);
+          expectResponse.toBe404.urlNotFound(res);
         });
     });
 
     it('should return an error for unknown POST endpoint', function() {
-      return chai.request(url.host)
-       .post(url.base + url.unknownRoute)
+      return chai.request(settings.host)
+       .post(settings.url.base + settings.url.unknown)
        .then(function(res) {
-          expect(res).to.have.status(404);
-          expect(res).to.be.json;
-          expect(res.body).to.be.an('object');
-          expect(res.body.success).to.be.false;
-          expect(res.body.payload).to.be.an('object');
-          expect(res.body.payload.message).to.equal('Not found');
-          expect(res.body.payload.dataPath).to.equal('POST ' + url.base + url.unknownRoute);
+          expectResponse.toBe404.urlNotFound(res);
         });
     });
 
     it('should return an error for unknown DELETE endpoint', function() {
-      return chai.request(url.host)
-       .delete(url.base + url.unknownRoute)
+      return chai.request(settings.host)
+       .delete(settings.url.base + settings.url.unknown)
        .then(function(res) {
-          expect(res).to.have.status(404);
-          expect(res).to.be.json;
-          expect(res.body).to.be.an('object');
-          expect(res.body.success).to.be.false;
-          expect(res.body.payload).to.be.an('object');
-          expect(res.body.payload.message).to.equal('Not found');
-          expect(res.body.payload.dataPath).to.equal('DELETE ' + url.base + url.unknownRoute);
+          expectResponse.toBe404.urlNotFound(res);
         });
     });
 
     it('should return an error for unknown PUT endpoint', function() {
-      return chai.request(url.host)
-       .put(url.base + url.unknownRoute)
+      return chai.request(settings.host)
+       .put(settings.url.base + settings.url.unknown)
        .then(function(res) {
-          expect(res).to.have.status(404);
-          expect(res).to.be.json;
-          expect(res.body).to.be.an('object');
-          expect(res.body.success).to.be.false;
-          expect(res.body.payload).to.be.an('object');
-          expect(res.body.payload.message).to.equal('Not found');
-          expect(res.body.payload.dataPath).to.equal('PUT ' + url.base + url.unknownRoute);
+          expectResponse.toBe404.urlNotFound(res);
         });
     });
   });
