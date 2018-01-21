@@ -37,12 +37,14 @@
 						ref="image"
 						accept="image/*"
           	@change="checkImageFile"
+            @keyup.enter="checkUpdate()"    
+
 					>
            <v-tooltip left>
             <v-btn icon slot="activator">
               <v-icon>fa-question-circle</v-icon>
             </v-btn>
-            <span>Update single or multiple admin properties)</span>
+            <span>Update single or multiple admin properties</span>
           </v-tooltip>
           <v-btn
             @click="checkUpdate"
@@ -411,14 +413,3 @@ import Config from "../js/Config.js";
   }
   }
 </script>
-
-<style scoped>
-  .file-btn {
-    display: inline-block;
-  }
-  .file-btn input[type=file] {
-    position: absolute;
-    filter: alpha(opacity=0);
-    opacity: 0;
-  }
-</style>
