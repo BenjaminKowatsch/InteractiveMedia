@@ -61,7 +61,6 @@ services:
       context: ./frontend
       args: 
         - WEB_SERVICE_URL=http://cloudproject.mi.hdm-stuttgart.de:8081
-        - JWT_SIMPLE_SECRET=A3xFr93Yl2qTn5
     image: localhost:5000/frontend
     ports:
       - 8088:80
