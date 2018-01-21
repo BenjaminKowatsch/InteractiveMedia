@@ -6,6 +6,9 @@ import com.media.interactive.cs3.hdm.interactivemedia.data.Group;
 import com.media.interactive.cs3.hdm.interactivemedia.data.Transaction;
 import com.media.interactive.cs3.hdm.interactivemedia.data.User;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -42,6 +45,13 @@ public class EvenSplit implements Split {
     @Override
     public boolean isTerminating(Transaction transaction) {
         return true;
+    }
+
+    @Override
+    public JSONObject toJson() throws JSONException {
+        final JSONObject result = new JSONObject();
+        result.put("type", "even");
+        return result;
     }
 
 }

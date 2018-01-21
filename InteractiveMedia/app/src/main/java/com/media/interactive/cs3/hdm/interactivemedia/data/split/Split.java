@@ -4,6 +4,9 @@ package com.media.interactive.cs3.hdm.interactivemedia.data.split;
 import com.media.interactive.cs3.hdm.interactivemedia.data.Debt;
 import com.media.interactive.cs3.hdm.interactivemedia.data.Transaction;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.util.List;
 
 public interface Split {
@@ -34,4 +37,6 @@ public interface Split {
      * @return false when another split can be chained or true if none can come after this
      */
     boolean isTerminating(Transaction transaction);
+
+    JSONObject toJson() throws JSONException;
 }
