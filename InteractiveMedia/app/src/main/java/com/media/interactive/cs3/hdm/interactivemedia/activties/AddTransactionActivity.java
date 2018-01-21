@@ -5,8 +5,10 @@ import android.app.DatePickerDialog;
 import android.app.TimePickerDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.res.ColorStateList;
 import android.database.Cursor;
 import android.graphics.Color;
+import android.graphics.PorterDuff;
 import android.location.Location;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
@@ -510,8 +512,8 @@ public class AddTransactionActivity extends ImagePickerActivity implements Recyc
         String[] columns = new String[]{UserTable.COLUMN_USERNAME};
         int[] to = new int[]{android.R.id.text1};
 
-        SimpleCursorAdapter userAdapter = new SimpleCursorAdapter(this, android.R.layout.simple_spinner_item, query, columns, to, 0);
-        userAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        SimpleCursorAdapter userAdapter = new SimpleCursorAdapter(this, R.layout.group_spinner_item, query, columns, to, 0);
+        userAdapter.setDropDownViewResource(R.layout.group_spinner_dropdown_item);
         return userAdapter;
     }
 
