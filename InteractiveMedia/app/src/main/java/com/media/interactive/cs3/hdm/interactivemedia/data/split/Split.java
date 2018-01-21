@@ -28,8 +28,10 @@ public interface Split {
 
     /**
      * Indicates, whether no more split can be chained after this one using {@link #andThen(Split)}
+     * to further split the given transaction
      *
+     * @param transaction transaction for which split may be terminating
      * @return false when another split can be chained or true if none can come after this
      */
-    boolean isTerminating();
+    boolean isTerminating(Transaction transaction);
 }

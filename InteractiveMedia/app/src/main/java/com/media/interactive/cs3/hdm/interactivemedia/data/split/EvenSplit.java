@@ -40,7 +40,7 @@ public class EvenSplit implements Split {
     }
 
     @Override
-    public boolean isTerminating() {
+    public boolean isTerminating(Transaction transaction) {
         return true;
     }
 

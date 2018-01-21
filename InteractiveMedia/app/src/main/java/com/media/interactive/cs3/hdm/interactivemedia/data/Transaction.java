@@ -44,6 +44,7 @@ public class Transaction {
         this.synched = false;
         this.publishedAt = null;
     }
+
     public Transaction(String infoName, String paidBy, String split, Date dateTime,
                        Location location, double amount, String groupId) {
         this.infoName = infoName;
@@ -59,6 +60,21 @@ public class Transaction {
         this.publishedAt = null;
     }
 
+
+    public Transaction(Transaction transaction) {
+        this.id = transaction.id;
+        this.infoName = transaction.infoName;
+        this.paidBy = transaction.paidBy;
+        this.split = transaction.split;
+        this.group = transaction.group;
+        this.dateTime = transaction.dateTime;
+        this.location = transaction.location;
+        this.amount = transaction.amount;
+        this.group = transaction.group;
+        this.synched = transaction.synched;
+        this.publishedAt = transaction.publishedAt;
+    }
+
     public ContentValues toContentValues() {
         final ContentValues out = new ContentValues();
         out.put(TransactionTable.COLUMN_INFO_CREATED_AT, Helper.getDateTime());
@@ -69,7 +85,7 @@ public class Transaction {
         out.put(TransactionTable.COLUMN_INFO_IMAGE_URL, imageUrl);
         out.put(TransactionTable.COLUMN_PUBLISHED_AT, Helper.formatDate(publishedAt));
 
-        out.put(TransactionTable.COLUMN_INFO_LOCATION_LONG, location != null ? location.getLongitude(): null);
+        out.put(TransactionTable.COLUMN_INFO_LOCATION_LONG, location != null ? location.getLongitude() : null);
         out.put(TransactionTable.COLUMN_INFO_LOCATION_LAT, location != null ? location.getLatitude() : null);
 
         out.put(TransactionTable.COLUMN_SYNCHRONIZED, synched);
