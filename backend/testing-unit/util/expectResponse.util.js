@@ -26,4 +26,8 @@ module.exports.success = {
     success: true,
     payload: {}
   },
+  appVersion: {
+    name: 'Backend',
+    version: '0.1.0'
+  },
 };
