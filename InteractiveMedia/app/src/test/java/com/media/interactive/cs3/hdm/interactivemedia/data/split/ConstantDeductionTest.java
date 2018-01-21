@@ -1,5 +1,6 @@
 package com.media.interactive.cs3.hdm.interactivemedia.data.split;
 
+import android.content.ContentValues;
 import android.location.Location;
 import android.support.annotation.NonNull;
 
@@ -158,6 +159,11 @@ public class ConstantDeductionTest {
 
         @Override
         public JSONObject toJson() throws JSONException {
+            return null;
+        }
+
+        @Override
+        public ContentValues toContentValues() {
             return null;
         }
     }
