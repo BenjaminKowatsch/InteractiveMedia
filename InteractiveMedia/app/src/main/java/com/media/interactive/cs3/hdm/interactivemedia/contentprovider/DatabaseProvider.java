@@ -84,7 +84,7 @@ public class DatabaseProvider extends android.content.ContentProvider {
     private static final int PAYMENT_CODE = 10;
     private static final int DEBT_GROUP_ID_JOIN_CODE = 11;
     private static final int SPLIT_CODE = 12;
-    private static final int USER_DEBT_JOIN_CODE = 12;
+    private static final int USER_DEBT_JOIN_CODE = 13;
     private static final UriMatcher mUriMatcher = new UriMatcher(UriMatcher.NO_MATCH);
 
     static {
