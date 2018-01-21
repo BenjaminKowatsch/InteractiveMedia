@@ -187,7 +187,7 @@ public class AddTransactionActivity extends ImagePickerActivity implements Recyc
 
             @Override
             public void afterTextChanged(Editable editable) {
-                if (editable.toString().length() > 0 && amount.getText().toString().length() > 0) {
+                if ((name.getText().toString().length() > 0) && (amount.getText().toString().length() > 0)) {
                     addTransactionButton.setEnabled(true);
                 } else {
                     addTransactionButton.setEnabled(false);
