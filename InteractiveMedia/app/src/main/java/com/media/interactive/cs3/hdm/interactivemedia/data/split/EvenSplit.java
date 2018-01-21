@@ -1,8 +1,10 @@
 package com.media.interactive.cs3.hdm.interactivemedia.data.split;
 
 
+import android.content.ContentValues;
 import android.support.annotation.NonNull;
 
+import com.media.interactive.cs3.hdm.interactivemedia.contentprovider.tables.SplitTable;
 import com.media.interactive.cs3.hdm.interactivemedia.data.Debt;
 import com.media.interactive.cs3.hdm.interactivemedia.data.Group;
 import com.media.interactive.cs3.hdm.interactivemedia.data.Transaction;
@@ -65,6 +67,13 @@ public class EvenSplit implements Split {
         final JSONObject result = new JSONObject();
         result.put("type", "even");
         return result;
+    }
+
+    @Override
+    public ContentValues toContentValues() {
+        ContentValues out = new ContentValues();
+        out.put(SplitTable.COLUMN_TYPE, "even");
+        return out;
     }
 
 }

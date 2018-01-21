@@ -221,6 +221,9 @@ public class DatabaseProvider extends android.content.ContentProvider {
             case PAYMENT_CODE:
                 tablename = PaymentTable.TABLE_NAME;
                 break;
+            case SPLIT_CODE:
+                tablename = SplitTable.TABLE_NAME;
+                break;
             default:
                 Log.e(TAG, "Error: Calling insert method at DatabaseProvider with invalid uri.");
                 break;

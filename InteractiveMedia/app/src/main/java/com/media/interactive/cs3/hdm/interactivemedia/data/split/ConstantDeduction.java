@@ -1,8 +1,10 @@
 package com.media.interactive.cs3.hdm.interactivemedia.data.split;
 
 
+import android.content.ContentValues;
 import android.support.annotation.NonNull;
 
+import com.media.interactive.cs3.hdm.interactivemedia.contentprovider.tables.SplitTable;
 import com.media.interactive.cs3.hdm.interactivemedia.data.Debt;
 import com.media.interactive.cs3.hdm.interactivemedia.data.Group;
 import com.media.interactive.cs3.hdm.interactivemedia.data.Transaction;
@@ -97,6 +99,15 @@ public class ConstantDeduction implements Split {
         result.put("amount", amount);
         result.put("userId", toUserId);
         return result;
+    }
+
+    @Override
+    public ContentValues toContentValues() {
+        ContentValues out = new ContentValues();
+        out.put(SplitTable.COLUMN_TYPE, "constant deduction");
+        out.put(SplitTable.COLUMN_AMOUNT, amount);
+        out.put(SplitTable.COLUMN_USER_ID, toUserId);
+        return out;
     }
 
 }

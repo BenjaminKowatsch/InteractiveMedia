@@ -270,7 +270,12 @@ public class DatabaseProviderHelper {
     }
 
     private Uri insertSplit(Split split) {
-        return null;
+        final ContentValues splitContent = split.toContentValues();
+        if (split.hasNext()) {
+            long nextId = Long.parseLong(insertSplit(split.getNext()).getLastPathSegment());
+            splitContent.put(SplitTable.COLUMN_NEXT, nextId);
+        }
+        return contentResolver.insert(DatabaseProvider.CONTENT_SPLIT_URI, splitContent);
     }
 
     private void calculateSplit(Transaction... saved) {

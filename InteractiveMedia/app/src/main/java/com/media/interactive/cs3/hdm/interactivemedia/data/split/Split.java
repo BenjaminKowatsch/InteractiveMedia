@@ -1,6 +1,7 @@
 package com.media.interactive.cs3.hdm.interactivemedia.data.split;
 
 
+import android.content.ContentValues;
 import android.support.annotation.NonNull;
 
 import com.media.interactive.cs3.hdm.interactivemedia.data.Debt;
@@ -60,4 +61,5 @@ public interface Split {
 
     JSONObject toJson() throws JSONException;
 
+    ContentValues toContentValues();
 }
