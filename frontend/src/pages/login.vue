@@ -123,7 +123,7 @@ export default {
       //If logindata doenst match a db entry, show error and reload page
      /*  this.$f7.alert("Login failed", "Debts² Admin Panel", () => { */
         this.alertWrongCredentials = true
-        this.redirect("/", false, false, false);
+        this.redirect("/");
         console.log("redirecting to /")
       /* }); */
     },

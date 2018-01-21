@@ -95,8 +95,6 @@ var onLoadingFinished = function() {
             updateLoginStatus: function() {
                 // Check if cookies exist
                 // If a cookie exists, set the loginStatus to true
-                // The function checkAccessToken cannot be used here because at 'created' the framework7 instance is not defined ('this.$f7')
-                // and due to the redirect to the login page, you would run into an infinite loop
                 var accessToken = Cookie.getJSONCookie('accessToken')
                 if (accessToken !== '') {
 
