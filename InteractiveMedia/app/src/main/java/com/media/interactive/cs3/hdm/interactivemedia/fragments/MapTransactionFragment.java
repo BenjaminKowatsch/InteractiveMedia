@@ -129,8 +129,9 @@ public class MapTransactionFragment extends Fragment implements IMyFragment,
             mMap.clear();
             final String[] projection = {TransactionTable.TABLE_NAME + ".*"};
             final String sortOrder = TransactionTable.TABLE_NAME + "." + TransactionTable.COLUMN_INFO_CREATED_AT + " DESC";
-            final String selection = GroupTable.TABLE_NAME + "." + GroupTable.COLUMN_GROUP_ID + " = ? AND " + UserTable.TABLE_NAME + "." + UserTable.COLUMN_USER_ID + " = ?";
-            final String[] selectionArgs = {groupId, Login.getInstance().getUser().getUserId()};
+            final String selection = GroupTable.TABLE_NAME + "." + GroupTable.COLUMN_GROUP_ID + " = ? " ;
+            final String[] selectionArgs = {groupId};
+
             final Cursor transactions = getActivity().getContentResolver().query(DatabaseProvider.CONTENT_GROUP_USER_TRANSACTION_JOIN_URI, projection, selection, selectionArgs, sortOrder);
             Log.d(TAG, "Transactions Count: " + transactions.getCount());
 

@@ -17,6 +17,7 @@ import com.media.interactive.cs3.hdm.interactivemedia.contentprovider.tables.Pay
 import com.media.interactive.cs3.hdm.interactivemedia.contentprovider.tables.SplitTable;
 import com.media.interactive.cs3.hdm.interactivemedia.contentprovider.tables.TransactionTable;
 import com.media.interactive.cs3.hdm.interactivemedia.contentprovider.tables.UserTable;
+import com.media.interactive.cs3.hdm.interactivemedia.data.User;
 
 /**
  * Created by benny on 20.11.17.
@@ -178,10 +179,10 @@ public class DatabaseProvider extends android.content.ContentProvider {
                         + GroupTransactionTable.TABLE_NAME + " ON " + GroupTransactionTable.TABLE_NAME + "." + GroupTransactionTable.COLUMN_TRANSACTION_ID + " = " + DebtTable.TABLE_NAME + "." + DebtTable.COLUMN_TRANSACTION_ID);
                 break;
             case USER_DEBT_JOIN_CODE:
-                sqLiteQueryBuilder.setTables(DebtTable.TABLE_NAME
-                   + " INNER JOIN "
-                    + UserTable.TABLE_NAME + " ON " + DebtTable.TABLE_NAME + "." + DebtTable.COLUMN_TO_USER + " = " + UserTable.TABLE_NAME + "." + UserTable.COLUMN_ID
-                );
+                sqLiteQueryBuilder.setTables(UserTable.TABLE_NAME+ " as a, "
+                        + "( SELECT * FROM "+ DebtTable.TABLE_NAME + " INNER JOIN "+ UserTable.TABLE_NAME + " ON "
+                        + DebtTable.TABLE_NAME+"."+DebtTable.COLUMN_TO_USER + " = " + UserTable.TABLE_NAME + "."+UserTable.COLUMN_ID+ " ) as b "
+                   );
                 break;
             default:
                 Log.e(TAG, "Error: Calling query method at DatabaseProvider with invalid uri.");
