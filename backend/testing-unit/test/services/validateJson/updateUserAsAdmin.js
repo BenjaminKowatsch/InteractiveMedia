@@ -6,7 +6,7 @@ const chai = require('chai');
 const expect = chai.expect;
 const chaiAsPromised = require('chai-as-promised');
 const ERROR = require('../../../../config/error.config');
-const expectResponse = require('../../../util/expectResponse.util');
+const expectedResult = require('../../../util/expectedResult.util');
 
 chai.use(chaiAsPromised);
 
@@ -17,7 +17,7 @@ const testData = require('../../../data/validateJson.data').updateUserAsAdminPay
 
 describe('Service "validateJson" for "updateUserAsAdminPayload"', function() {
   describe('with success', function() {
-    const expected = expectResponse.success.emptyPayload;
+    const expected = expectedResult.success.emptyPayload;
 
     it('should resolve for valid input with all attributes', function() {
       const promise = service.reqBodyAgainstSchema(testData.valid.allFields, jsonSchema);
@@ -31,7 +31,7 @@ describe('Service "validateJson" for "updateUserAsAdminPayload"', function() {
   });
 
   describe('with error', function() {
-    const expected = expectResponse.error.invalidRequestBody;
+    const expected = expectedResult.error.invalidRequestBody;
 
     it('should reject due to empty payload', function() {
       const promise = service.reqBodyAgainstSchema({}, jsonSchema);
