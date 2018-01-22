@@ -216,6 +216,7 @@ public class DatabaseProviderHelper {
         List<Transaction> transactions = new ArrayList<>();
         for (int i = 0; i < jsonArray.length(); i++) {
             final JSONObject transactionObject = (JSONObject) jsonArray.get(i);
+            Log.d(TAG, "Received Transaction: " + transactionObject.toString());
             final Transaction transaction = new Transaction();
             transaction.getGroup().setGroupId(groupId);
             transaction.setSynched(true);
@@ -302,7 +303,7 @@ public class DatabaseProviderHelper {
                 + " " + TransactionTable.TABLE_NAME + "." + TransactionTable.COLUMN_SYNCHRONIZED + " = 0 ";
         final String[] selectionArgs = {userId};
         final Cursor cursor = contentResolver.query(DatabaseProvider.CONTENT_GROUP_USER_TRANSACTION_JOIN_URI, projection, selection, selectionArgs, null);
-        Log.d(TAG, "Cursor: Count: " + cursor.getCount());
+        Log.d(TAG, "Unsynched Transactions Cursor: Count: " + cursor.getCount());
 
         while (cursor.moveToNext()) {
             final Transaction transaction = new Transaction();
@@ -326,6 +327,7 @@ public class DatabaseProviderHelper {
         final String selection = SplitTable.COLUMN_ID + " = ?";
         final String[] selectionArgs = {"" + id};
         final Cursor cursor = contentResolver.query(DatabaseProvider.CONTENT_SPLIT_URI, projection, selection, selectionArgs, null);
+        cursor.moveToFirst();
         return extractSplitFromCurrentPosition(cursor);
     }
 
@@ -366,7 +368,7 @@ public class DatabaseProviderHelper {
                 + " " + GroupTable.TABLE_NAME + "." + GroupTable.COLUMN_SYNCHRONIZED + " = 0 ";
         final String[] selectionArgs = {userId};
         final Cursor cursor = contentResolver.query(DatabaseProvider.CONTENT_GROUP_USER_JOIN_URI, projection, selection, selectionArgs, null);
-        Log.d(TAG, "Cursor: Count: " + cursor.getCount());
+        Log.d(TAG, "Unsynched Group Cursor: Count: " + cursor.getCount());
         long oldGroupId = -1;
         Group group = null;
 
