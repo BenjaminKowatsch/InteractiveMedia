@@ -116,7 +116,7 @@ module.exports.verifyGoogleAccessToken = function(token, verifyDatabase) {
 module.exports.verifyPasswordAccessToken = function(token) {
   return new Promise((resolve, reject) => {
     let responseData = {payload: {}};
-    tokenService.decodeToken(token).then(promiseData => {
+    tokenService.decodeToken(token, config.jwtSimpleSecret).then(promiseData => {
       const query = {
         userId: promiseData.payload.userId,
         authType: AUTH_TYPE.PASSWORD,
@@ -402,7 +402,7 @@ module.exports.passwordLogin = function(username, password) {
       };
       responseData.success = true;
       responseData.payload = {
-        'accessToken': tokenService.generateAccessToken(toEncode),
+        'accessToken': tokenService.generateAccessToken(toEncode, config.jwtSimpleSecret),
         'authType': AUTH_TYPE.PASSWORD
       };
       winston.debug('Login successful');
@@ -490,7 +490,7 @@ module.exports.register = function(username, password, email, role, imageUrl) {
           'expiryDate': userToRegister.expiryDate
         };
         responseData.payload = {
-          'accessToken': tokenService.generateAccessToken(toEncode),
+          'accessToken': tokenService.generateAccessToken(toEncode, config.jwtSimpleSecret),
           'authType': AUTH_TYPE.PASSWORD
         };
         winston.debug('Registration successful', responseData.payload.accessToken);

@@ -3,7 +3,10 @@
 build backend and run api tests
 `docker-compose -f docker-compose.local.yml build && docker-compose -f docker-compose.backend-testing-api.yml rm -fsv && docker-compose -f docker-compose.backend-testing-api.yml build && docker-compose -f docker-compose.backend-testing-api.yml up --abort-on-container-exit`
 
-build and run local stack
+build local backend with disabled cache for unit tests
+`docker-compose -f docker-compose.local.yml build --build-arg CACHEBUST=$(date +%s) backend`
+
+build and run local stack 
 `docker-compose -f docker-compose.local.yml up --build`
 
 generate api docs

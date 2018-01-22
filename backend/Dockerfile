@@ -42,6 +42,12 @@ COPY . .
 # run static code analysis
 RUN npm run static-code-analysis
 
+# provide ability to disable caching after this line
+# reason: if you do not make any changes, docker will use its cache and hence will not run unit tests
+# provide the following build argument to disable cache: --build-arg CACHEBUST=$(date +%s)
+# source: https://github.com/moby/moby/issues/1996#issuecomment-185872769
+ARG CACHEBUST=1
+
 # run unit tests
 RUN npm run unit-test
 
