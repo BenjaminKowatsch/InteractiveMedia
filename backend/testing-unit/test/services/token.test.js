@@ -14,7 +14,7 @@ chai.use(chaiAsPromised);
 const service = require('../../../services/token.service');
 const testData = require('../../data/token.data');
 
-describe.only('Service "token"', function() {
+describe('Service "token"', function() {
   describe('with success', function() {
 
     it('should generate correct auth token', function() {
