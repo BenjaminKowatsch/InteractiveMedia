@@ -5,7 +5,7 @@
     <color name="colorPrimaryLight">#2d3a41</color>
     <color name="colorText">#c9c9c9</color>
     <color name="colorTextInverse">#263238</color>
-    <color name="veryLightBlue">#78909c</color>
-    <color name="colorAccent">@color/colorAccentGreen</color>
-    <color name="colorAccentGreen">#00e676</color>
+    <color name="colorLightBlue">#78909c</color>
+    <color name="colorAccent">@color/colorLightGreen</color>
+    <color name="colorLightGreen">#00e676</color>
 </resources>
