@@ -10,6 +10,7 @@ import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
+import android.graphics.Matrix;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Environment;
@@ -185,106 +186,118 @@ public class ImagePickerActivity extends AppCompatActivity {
         imageView.setImageBitmap(bitmap);
     }
 
-    private void doOCR(Bitmap bitmap) {
+    private void doOCR(Bitmap bitmapOrg) {
         if(ocrEnable) {
             recognizedAmount = null;
             recognizedDate = null;
             final SimpleDateFormat sdfDate = new SimpleDateFormat("dd.MM.yyyy");
             final SimpleDateFormat sdfTime = new SimpleDateFormat("hh:mm");
-            if (detector.isOperational() && bitmap != null) {
-                final Frame frame = new Frame.Builder().setBitmap(bitmap).build();
-                final SparseArray<TextBlock> textBlocks = detector.detect(frame);
 
-                final List<Double> parsedNumbers = new ArrayList<>();
-                Date date = null;
-                Date time = null;
-                double meanValue = 0;
-                for (int i = 0; i < textBlocks.size(); i++) {
-                    //extract scanned text blocks here
-                    final TextBlock tBlock = textBlocks.valueAt(i);
-                    for (Text line : tBlock.getComponents()) {
-                        //extract scanned text lines here
-                        final String lineElement = line.getValue().replace(" ", "");
-                        try {
-                            double parsed = Double.parseDouble(lineElement.replace(",", "."));
-                            parsedNumbers.add(parsed);
-                            meanValue += parsed;
-                        } catch (NumberFormatException e) {
-                        }
-                        for (Text element : line.getComponents()) {
-                            //extract scanned text words here
-                            final String elem = element.getValue().replace(" ", "");
+            final int rotationAngle = 90;
+
+            for(int j = 1;j <= 4; j++) {
+                final Matrix matrix = new Matrix();
+                matrix.postRotate(rotationAngle*j);
+                final Bitmap scaledBitmap = Bitmap.createScaledBitmap(bitmapOrg, bitmapOrg.getWidth(), bitmapOrg.getHeight(), true);
+                final Bitmap bitmap = Bitmap.createBitmap(scaledBitmap, 0, 0, scaledBitmap.getWidth(), scaledBitmap.getHeight(), matrix, true);
+
+                if (detector.isOperational() && bitmap != null) {
+                    final Frame frame = new Frame.Builder().setBitmap(bitmap).build();
+                    final SparseArray<TextBlock> textBlocks = detector.detect(frame);
+
+                    final List<Double> parsedNumbers = new ArrayList<>();
+                    Date date = null;
+                    Date time = null;
+                    double meanValue = 0;
+                    for (int i = 0; i < textBlocks.size(); i++) {
+                        //extract scanned text blocks here
+                        final TextBlock tBlock = textBlocks.valueAt(i);
+                        for (Text line : tBlock.getComponents()) {
+                            //extract scanned text lines here
+                            final String lineElement = line.getValue().replace(" ", "");
                             try {
-                                date = sdfDate.parse(elem);
-                            } catch (ParseException e) {
+                                double parsed = Double.parseDouble(lineElement.replace(",", "."));
+                                parsedNumbers.add(parsed);
+                                meanValue += parsed;
+                            } catch (NumberFormatException e) {
                             }
-                            try {
-                                time = sdfTime.parse(elem);
-                            } catch (ParseException e) {
+                            for (Text element : line.getComponents()) {
+                                //extract scanned text words here
+                                final String elem = element.getValue().replace(" ", "");
+                                try {
+                                    date = sdfDate.parse(elem);
+                                } catch (ParseException e) {
+                                }
+                                try {
+                                    time = sdfTime.parse(elem);
+                                } catch (ParseException e) {
+                                }
                             }
                         }
+                    }
+                    if (textBlocks.size() > 0) {
+                        if (date != null) {
+                            recognizedDate = new Date(date.getTime());
+                        }
+                        if (time != null && recognizedDate != null) {
+                            recognizedDate = new Date(recognizedDate.getTime() + time.getTime());
+                        }
+                        // Sort ascending
+                        Collections.sort(parsedNumbers, new Comparator<Double>() {
+                            public int compare(Double o1, Double o2) {
+                                return o1.compareTo(o2);
+                            }
+                        });
+                        meanValue /= parsedNumbers.size();
+                        double variance = 0;
+                        for (double possiblePrice : parsedNumbers) {
+                            variance += ((possiblePrice - meanValue) * (possiblePrice - meanValue)) / (parsedNumbers.size() - 1);
+                        }
+                        double varianceCoefficient = Math.sqrt(variance) / meanValue;
+                        // Remove autliers based on variance coefficient
+                        while (varianceCoefficient > 1.1) {
+                            // Remove highest entry and recalculate
+                            parsedNumbers.remove(parsedNumbers.size() - 1);
+                            // recalculate mean value
+                            meanValue = 0;
+                            for (double number : parsedNumbers) {
+                                meanValue += number / parsedNumbers.size();
+                            }
+                            variance = 0;
+                            for (double number : parsedNumbers) {
+                                variance += ((number - meanValue) * (number - meanValue)) / (parsedNumbers.size() - 1);
+                            }
+                            varianceCoefficient = Math.sqrt(variance) / meanValue;
+                        }
+                        // Set second highest amount to recognizedAmount
+                        if (parsedNumbers.size() >= 2) {
+                            recognizedAmount = parsedNumbers.get(parsedNumbers.size() - 2);
+                        }
+                    }
+                } else {
+                    Log.d(TAG, "Could not set up the detector!");
+                }
+                Log.d(TAG, "Possible price: " + recognizedAmount);
+                Log.d(TAG, "Possible date: " + recognizedDate);
+                if (recognizedDate != null && dateTextField != null && dateTimeTextField != null) {
+                    if (recognizedDate.after(minimumDate)) {
+                        dateTextField.setText(sdfDate.format(recognizedDate));
+                        dateTimeTextField.setText(sdfTime.format(recognizedDate));
+                        break;
+                    } else {
+                        makeToast("Recognized date is before group creation date.");
                     }
                 }
-                if (textBlocks.size() > 0) {
-                    if (date != null) {
-                        recognizedDate = new Date(date.getTime());
-                    }
-                    if (time != null && recognizedDate != null) {
-                        recognizedDate = new Date(recognizedDate.getTime() + time.getTime());
-                    }
-                    // Sort ascending
-                    Collections.sort(parsedNumbers, new Comparator<Double>() {
-                        public int compare(Double o1, Double o2) {
-                            return o1.compareTo(o2);
-                        }
-                    });
-                    meanValue /= parsedNumbers.size();
-                    double variance = 0;
-                    for (double possiblePrice : parsedNumbers) {
-                        variance += ((possiblePrice - meanValue) * (possiblePrice - meanValue)) / (parsedNumbers.size() - 1);
-                    }
-                    double varianceCoefficient = Math.sqrt(variance) / meanValue;
-                    // Remove autliers based on variance coefficient
-                    while (varianceCoefficient > 1.1) {
-                        // Remove highest entry and recalculate
-                        parsedNumbers.remove(parsedNumbers.size() - 1);
-                        // recalculate mean value
-                        meanValue = 0;
-                        for (double number : parsedNumbers) {
-                            meanValue += number / parsedNumbers.size();
-                        }
-                        variance = 0;
-                        for (double number : parsedNumbers) {
-                            variance += ((number - meanValue) * (number - meanValue)) / (parsedNumbers.size() - 1);
-                        }
-                        varianceCoefficient = Math.sqrt(variance) / meanValue;
-                    }
-                    // Set second highest amount to recognizedAmount
-                    if (parsedNumbers.size() >= 2) {
-                        recognizedAmount = parsedNumbers.get(parsedNumbers.size() - 2);
-                    }
+                if (recognizedAmount != null && amountTextField != null) {
+                    amountTextField.setText(String.valueOf(recognizedAmount));
+                    break;
                 }
-            } else {
-                Log.d(TAG, "Could not set up the detector!");
             }
-            Log.d(TAG, "Possible price: " + recognizedAmount);
-            Log.d(TAG, "Possible date: " + recognizedDate);
-            if(recognizedAmount == null && recognizedDate == null){
+            if (recognizedAmount == null && recognizedDate == null) {
                 makeToast("Could not recognize any price or date.\nPlease try again.");
             }
-            if(recognizedDate != null && dateTextField != null && dateTimeTextField != null) {
-                if(recognizedDate.after(minimumDate)) {
-                    dateTextField.setText(sdfDate.format(recognizedDate));
-                    dateTimeTextField.setText(sdfTime.format(recognizedDate));
-                } else {
-                    makeToast("Recognized date is before group creation date.");
-                }
-            }
-            if(recognizedAmount != null && amountTextField != null){
-                amountTextField.setText(String.valueOf(recognizedAmount));
-            }
-
         }
+
     }
 
     protected void setMinimumDate(Date minimumDate){
