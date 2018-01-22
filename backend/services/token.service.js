@@ -5,13 +5,6 @@ const winston = require('winston');
 
 const ERROR = require('../config/error.config');
 
-/**
- * Function to calculate a new expiry date for tokens.
- *
- * @param {Int} validTime  Time in millisecond the token should be valid
- * @param  {Date} startDate  Optional. Use startDate instead of current date to calculate expiry date
- * @return {Date}  new epxiry date
- */
 module.exports.getNewExpiryDate = function(validTime, startDate) {
     let newExpDate;
     if (startDate) {

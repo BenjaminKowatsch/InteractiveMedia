@@ -101,18 +101,7 @@ module.exports.verifyGoogleAccessToken = function(token, verifyDatabase) {
     });
   });
 };
-/**
- * Function to verify an own access token.
- *
- * @param  {String} token    AccessToken to be verified
- * @return {Promise}                then: {JSONObject} promiseData Containing the following properties:
- *                                                 {Date} expiryDate Date to indicate the expiration of the accessToken
- *                                                 {String} userId String to uniquely identify the user
- *                                  catch: {JSONObject} error Containing the following properties:
- *                                                 {String} message String containing the error message
- *                                                OR
- *                                                MongoDB Error
- */
+
 module.exports.verifyPasswordAccessToken = function(token) {
   return new Promise((resolve, reject) => {
     let responseData = {payload: {}};
@@ -156,12 +145,6 @@ module.exports.verifyPasswordAccessToken = function(token) {
   });
 };
 
-/**
- * [httpsGetRequest description]
- *
- * @param  {[type]} options [description]
- * @return {[type]}         [description]
- */
 function httpsGetRequest(options) {
   return new Promise((resolve, reject) => {
     winston.debug('get: https://' + options.host + options.path);
@@ -235,17 +218,6 @@ function verifyFacbookTokenAtDatabase(data, verifyDatabase) {
   });
 }
 
-/**
- * Function to verify a access token from facebook.
- *
- * @param  {String} token    AccessToken to be verified
- * @return {Promise}                then: {JSONObject} promiseData Containing the following properties:
- *                                                 {Object} userCollection  Reference to the database collection based on the authentication type
- *                                                 {Date} expiryDate Date to indicate the expiration of the accessToken
- *                                                 {String} userId String to uniquely identify the user
- *                                  catch: {JSONObject} error Containing the following properties:
- *                                                 {String} message String containing the error message or facebook error
- */
 module.exports.verifyFacebookAccessToken = function(token, verifyDatabase, getUserInfo) {
   let responseData = {payload: {}};
   const options = {

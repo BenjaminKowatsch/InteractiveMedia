@@ -4,7 +4,6 @@ let database = module.exports = {};
 
 const winston = require('winston');
 
-/* MongoDB Client */
 const MongoClient = require('mongodb').MongoClient;
 
 const mongoConnectConfig = {
@@ -21,24 +20,19 @@ const tryConnectOptions = {
   reject: undefined
 };
 
-/**
- * Export access variablse for interaction with the database
- */
 database.collections = {
   'users': undefined,
   'groups': undefined
 };
 database.db = undefined;
 
-/**
- * Export the function 'tryToConnectToDatabase'
- */
 database.tryConnect = function(url, resolve, reject) {
   tryConnectOptions.url = url;
   tryConnectOptions.resolve = resolve;
   tryConnectOptions.reject = reject;
   tryToConnectToDatabase();
 };
+
 /**
  * Function which asynchronously loops until either a connection to the database could be established
  * or the maximum number of retries have been reached.
@@ -62,9 +56,6 @@ function tryToConnectToDatabase() {
  * Function to connect to mongodb, if it fails the properties at the JSON object 'collections' will be set to 'undefined'.
  * Otherwise the properties will be initialized with a reference to the corresponding collection at the database.
  * Attention: Callbacks are uses because default JS Promises do not support timeouts
- *
- * @param  {function} resolve Called when the database connection has been established
- * @param  {function} reject  Called when the database connection could not be established
  */
 function connect(resolve, reject) {
   /* Connect to mongodb once to reduce the number of connection pools created by our application  */
