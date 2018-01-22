@@ -163,14 +163,7 @@ public class AddGroupActivity extends ImagePickerActivity implements View.OnClic
 
     // Get email of current user
     final User admin = new User();
-    String adminEmail = Login.getInstance().getUser().getEmail();
-    if (adminEmail != null) {
-      admin.setEmail(Login.getInstance().getUser().getEmail());
-    } else {
-      // debug purpose: TODO comment
-      admin.setEmail("Admin.User@gmail.com");
-    }
-
+    admin.setEmail(Login.getInstance().getUser().getEmail());
     userList.add(admin);
   }
 
@@ -186,14 +179,14 @@ public class AddGroupActivity extends ImagePickerActivity implements View.OnClic
     final EditText editText = (EditText) dialogView.findViewById(R.id.add_user_email);
     editText.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_EMAIL_ADDRESS);
 
-    dialogBuilder.setTitle("Add new user email");
-    dialogBuilder.setMessage("Enter email below");
-    dialogBuilder.setPositiveButton("Done", new DialogInterface.OnClickListener() {
+    dialogBuilder.setTitle(R.string.AddEmailDialogTitle);
+    dialogBuilder.setMessage(R.string.AddEmailDialogMessage);
+    dialogBuilder.setPositiveButton(R.string.AddEmailDialogPositiveButton, new DialogInterface.OnClickListener() {
       public void onClick(DialogInterface dialog, int whichButton) {
         userList.add(new User(editText.getText().toString()));
       }
     });
-    dialogBuilder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+    dialogBuilder.setNegativeButton(R.string.AddEmailDialogNegativeButton, new DialogInterface.OnClickListener() {
       public void onClick(DialogInterface dialog, int whichButton) {
         //pass
       }
@@ -273,7 +266,7 @@ public class AddGroupActivity extends ImagePickerActivity implements View.OnClic
           e.printStackTrace();
         }
         final String newImageUrl = getResources().getString(R.string.web_service_url)
-            .concat("/v1/object-store/download?filename=").concat(imageName);
+            .concat(getString(R.string.requestPathDownload)).concat(imageName);
         toAdd.setImageUrl(newImageUrl);
         try {
           sendToBackend(toAdd);
@@ -297,7 +290,7 @@ public class AddGroupActivity extends ImagePickerActivity implements View.OnClic
 
   private void sendToBackend(final Group group) throws JSONException {
     helper.insertGroupAtDatabase(group);
-    final String url = getResources().getString(R.string.web_service_url).concat("/v1/groups/");
+    final String url = getResources().getString(R.string.web_service_url).concat(getString(R.string.requestPathCreateGroup));
     Log.d(TAG, "url: " + url);
     final AuthorizedJsonObjectRequest jsonObjectRequest = new AuthorizedJsonObjectRequest(
         Request.Method.POST, url, group.toJson(), new Response.Listener<JSONObject>() {
@@ -337,9 +330,9 @@ public class AddGroupActivity extends ImagePickerActivity implements View.OnClic
               final String[] userSelectionArgs = {userEmail};
               contentResolver.update(DatabaseProvider.CONTENT_USER_URI, userUpdateValues, userSelection, userSelectionArgs);
             }
-            makeToast("Updated group and users.");
+            makeToast(getString(R.string.messageUpdatedGroup));
           } else {
-            makeToast("Error while creating group at backend.");
+            makeToast(getString(R.string.errorMessageUpdatedGroup));
           }
           finish();
         } catch (JSONException e) {
@@ -349,7 +342,7 @@ public class AddGroupActivity extends ImagePickerActivity implements View.OnClic
     }, new Response.ErrorListener() {
       @Override
       public void onErrorResponse(VolleyError error) {
-        makeToast("Error while sending the group to backend.");
+        makeToast(getString(R.string.requestErrorMessageCreateGroup));
         finish();
       }
     });

@@ -70,8 +70,7 @@
             android:layout_marginRight="30dp"
             android:layout_marginBottom="10dp"
             android:adjustViewBounds="true"
-            android:src="@drawable/anonymoususer"
-            app:srcCompat="@android:drawable/btn_star" />
+            android:src="@drawable/anonymoususer" />
 
         <TextView
             android:layout_width="wrap_content"
@@ -164,6 +163,8 @@
             android:id="@+id/bn_register"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:background="@color/colorAccent"
+            android:textColor="@color/colorPrimary"
             android:layout_gravity="center"
             android:layout_marginLeft="30dp"
             android:layout_marginRight="30dp"

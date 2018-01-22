@@ -41,7 +41,7 @@ import org.json.JSONObject;
 public class LoginActivity extends AppCompatActivity
     implements View.OnClickListener, GoogleApiClient.OnConnectionFailedListener {
 
-    private static final String TAG = "LoginActivity";
+    private static final String TAG = LoginActivity.class.getSimpleName();
     private static final int REQ_CODE = 9001;
     // Google SignIn variables
     private SignInButton signIn;

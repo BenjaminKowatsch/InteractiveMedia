@@ -181,7 +181,7 @@
                 android:layout_marginRight="30dp"
                 android:adjustViewBounds="true"
                 android:maxHeight="270dp"
-                android:src="@drawable/anonymoususer" />
+                android:src="@drawable/anonymoustransaction" />
 
             <TextView
                 android:layout_width="match_parent"

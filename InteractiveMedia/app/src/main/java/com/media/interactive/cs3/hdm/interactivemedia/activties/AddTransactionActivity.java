@@ -117,8 +117,8 @@ public class AddTransactionActivity extends ImagePickerActivity implements Recyc
                 if (selectedPlace != null) {
                     final LatLng latLng = selectedPlace.getLatLng();
                     locationDisplay.setText("Location: \n" + selectedPlace.getAddress() + "\n"
-                            + "Latitude: " + latLng.latitude + "\n"
-                            + "Longitude: " + latLng.longitude);
+                            + "Latitude:  " + String.format("%.2f", latLng.latitude) + "\n"
+                            + "Longitude:  " + String.format("%.2f", latLng.longitude));
 
                 } else {
                     locationDisplay.setText(null);

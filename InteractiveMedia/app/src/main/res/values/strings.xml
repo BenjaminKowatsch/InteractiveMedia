@@ -23,5 +23,14 @@
     <!-- Emulator Setup -->
     <!--<string name="web_service_url">http://10.0.2.2:8081</string>-->
     <string name="pick_image_source">Image Source</string>
+    <string name="AddEmailDialogTitle">Add new user email</string>
+    <string name="AddEmailDialogMessage">Enter email below</string>
+    <string name="AddEmailDialogPositiveButton">Done</string>
+    <string name="AddEmailDialogNegativeButton">Cancel</string>
+    <string name="requestPathDownload">/v1/object-store/download?filename=</string>
+    <string name="requestPathCreateGroup">/v1/groups/</string>
+    <string name="messageUpdatedGroup">Updated group and users.</string>
+    <string name="errorMessageUpdatedGroup">Error while creating group at backend.</string>
+    <string name="requestErrorMessageCreateGroup">Error while sending the group to backend.</string>
 
 </resources>
