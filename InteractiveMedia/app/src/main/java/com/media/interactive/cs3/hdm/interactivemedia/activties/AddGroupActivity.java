@@ -290,7 +290,7 @@ public class AddGroupActivity extends ImagePickerActivity implements View.OnClic
 
       @Override
       public void onFailure(Exception error) {
-        makeToast(error.getMessage());
+        Log.d(TAG,error.getMessage());
         try {
           sendToBackend(toAdd);
         } catch (JSONException e) {

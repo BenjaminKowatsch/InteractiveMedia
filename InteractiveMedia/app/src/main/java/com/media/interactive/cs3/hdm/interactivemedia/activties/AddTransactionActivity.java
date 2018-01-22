@@ -82,6 +82,7 @@ public class AddTransactionActivity extends ImagePickerActivity implements Recyc
     public static final String GROUP_TO_ADD_TO = "GroupToAddTo";
     public static final String GROUP_CREATED_AT_ADD_TO = "GroupCreatedAtToAddTo";
     private static final String TAG = AddTransactionActivity.class.getSimpleName();
+    private static final String CURRENCY_PATTERN = "#.###";
     private final SimpleDateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyy");
     private final SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm");
     private final SimpleDateFormat dateTimeFormat = new SimpleDateFormat(dateFormat.toPattern() + timeFormat.toPattern());
@@ -165,7 +166,7 @@ public class AddTransactionActivity extends ImagePickerActivity implements Recyc
         final ItemTouchHelper.SimpleCallback itemTouchHelperCallback = new RecyclerItemTouchHelper(0, ItemTouchHelper.LEFT, this);
         new ItemTouchHelper(itemTouchHelperCallback).attachToRecyclerView(splitsView);
 
-        amountEditText.addTextChangedListener(new MoneyTextWatcher(amountEditText, CURRENCY_FORMAT));
+        amountEditText.addTextChangedListener(new MoneyTextWatcher(amountEditText, CURRENCY_PATTERN));
 
         helper = new DatabaseProviderHelper(getContentResolver());
 
@@ -264,7 +265,7 @@ public class AddTransactionActivity extends ImagePickerActivity implements Recyc
 
         final TextView errorMessage = dialogView.findViewById(R.id.add_split_error);
         final EditText editText = dialogView.findViewById(R.id.add_split_amount);
-        editText.addTextChangedListener(new MoneyTextWatcher(editText, CURRENCY_FORMAT));
+        editText.addTextChangedListener(new MoneyTextWatcher(editText, CURRENCY_PATTERN));
         final Spinner userSelection = dialogView.findViewById(R.id.add_split_user);
         final SimpleCursorAdapter dialogUserAdapter = initializeUserAdapter();
         userSelection.setAdapter(dialogUserAdapter);
@@ -300,19 +301,20 @@ public class AddTransactionActivity extends ImagePickerActivity implements Recyc
 
             @Override
             public void afterTextChanged(Editable editable) {
-                final Number parse;
-                try {
-                    parse = CURRENCY_FORMAT.parse(editable.toString());
-                    if (parse.doubleValue() < parseAmount(amount)) {
+                //final Number parse;
+                //try {
+                    //parse = CURRENCY_FORMAT.parse(editable.toString());
+                    double parse = Double.parseDouble(editable.toString().replace("€",""));
+                    if (parse < parseAmount(amount)) {
                         errorMessage.setVisibility(View.GONE);
                         positiveButton.setEnabled(true);
                     } else {
                         errorMessage.setVisibility(View.VISIBLE);
                         positiveButton.setEnabled(false);
                     }
-                } catch (ParseException e) {
+               /* } catch (ParseException e) {
                     Log.e(TAG, "Text in " + editable + " could not be parsed", e);
-                }
+                }*/
             }
         });
 
@@ -343,7 +345,7 @@ public class AddTransactionActivity extends ImagePickerActivity implements Recyc
 
             @Override
             public void onFailure(Exception error) {
-                makeToast(error.getMessage());
+                Log.d(TAG, error.getMessage());
                 try {
                     sendToBackend(toSave);
                 } catch (JSONException e) {
@@ -425,13 +427,7 @@ public class AddTransactionActivity extends ImagePickerActivity implements Recyc
     }
 
     private double parseAmount(EditText amountText) {
-        try {
-            final Number parsed = CURRENCY_FORMAT.parse(amountText.getText().toString());
-            return parsed.doubleValue();
-        } catch (ParseException e) {
-            Log.e(this.getClass().getName(), e.getMessage());
-        }
-        return -1d;
+        return Double.parseDouble(amountText.getText().toString().replace("€",""));
     }
 
     private Date parseDateTime(EditText dateText, EditText timeText) {
