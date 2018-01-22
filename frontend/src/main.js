@@ -95,8 +95,6 @@ var onLoadingFinished = function() {
                 // If a cookie exists, set the loginStatus to true
                 var accessToken = Cookie.getJSONCookie('accessToken')
                 if (accessToken !== '') {
-
-                    console.log(authOptions[accessToken.authType] + " Cookie exists. Redirecting ...");
                     this.loginStatus = true;
                 };
             }

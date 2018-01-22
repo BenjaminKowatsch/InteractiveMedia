@@ -231,23 +231,19 @@
       // Trys to update a specific user property
       updateUser: function(prop){
 
-          console.log("Hello Updatefunction")
           var credentials = ""
 
           if(this.isUsername)
           {
             this.credentials = { username: prop}
-            console.log(JSON.stringify(this.credentials))
             this.isUsername = false
 
             axios.put(Config.webServiceURL + "/v1/admin/users/" + this.userId, this.credentials, {
                 headers: { Authorization: "0 " + this.authToken }
               })
               .then(response => 
-                  console.log(JSON.stringify(response)),               
                   this.successFulUpdate = true                 
               ).then(
-                console.log(this.tmp.username),
                 this.saveEditUsername(this.tmp)
               )
               .catch(e => {
@@ -261,17 +257,14 @@
           if(this.isEmail)
           {
             this.credentials = { email: prop}
-            console.log(JSON.stringify(this.credentials))
             this.isEmail = false
 
             axios.put(Config.webServiceURL + "/v1/admin/users/" + this.userId, this.credentials, {
                 headers: { Authorization: "0 " + this.authToken }
               })
               .then(response => 
-                  console.log(JSON.stringify(response)),               
                   this.successFulUpdate = true                 
               ).then(
-                console.log(this.tmp.email),
                 this.saveEditEmail(this.tmp)
               )
               .catch(e => {
@@ -284,8 +277,6 @@
 
           if(this.isRole)
           {
-            console.log("Own: " + this.ownUserId)
-            console.log("Other: " + this.userId)
 
             // Noobfilter to prevent admin to revoke his own admin rights...
             if(this.userId == this.ownUserId && prop == "user"){
@@ -295,14 +286,12 @@
             else
             {
               this.credentials = { role: prop}
-              console.log(JSON.stringify(this.credentials))
               this.isRole = false
 
               axios.put(Config.webServiceURL + "/v1/admin/users/" + this.userId, this.credentials, {
                   headers: { Authorization: "0 " + this.authToken }
                 })
                 .then(response => 
-                    console.log(JSON.stringify(response)),               
                     this.successFulUpdate = true                 
                 ).then(
                   this.saveEditRole(this.tmp)
@@ -317,29 +306,32 @@
             }
           },
 
+    // Save the successful updated value in the table row
     saveEditUsername(row) {
       row.username = this.username
     },
     
-
+    // Cancel the edit/update
     cancelEditUsername(row) {
       this.username = ''
     },
 
-
+    // Save the successful updated value in the table row
     saveEditEmail(row) {
       row.email = this.email
     },
 
+    // Cancel the edit/update
     cancelEditEmail(row) {
       this.email = ''
     },
 
-
+    // Save the successful updated value in the table row
     saveEditRole(row) {
       row.role = this.role
     },
 
+    // Cancel the edit/update
     cancelEditRole(row) {
       this.role = ''
     }

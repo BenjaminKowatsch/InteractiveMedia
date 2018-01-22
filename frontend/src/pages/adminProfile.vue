@@ -129,12 +129,14 @@ import Config from "../js/Config.js";
     },
 
     methods: {
-  
-      pickFile () {
 
-              this.$refs.image.click ()
+      // Is called if a image file is going to be picked in the form
+      pickFile () {
+        this.$refs.image.click ()
       },
-      
+ 
+      // Is called if a image file is picked to process them and write the file into a formdata
+      // Later on, the formdata will be send to the object store to store the image
       checkImageFile (e) {
         const files = e.target.files
         if(files[0] !== undefined) {
@@ -155,7 +157,8 @@ import Config from "../js/Config.js";
           this.imageUrl = ''
         }
       },
-      
+ 
+      // Get the own user details to display them on the admin profile page
       getOwnUser: function(){
 
         this.authToken = Cookie.getJSONCookie("accessToken").accessToken;
@@ -167,28 +170,26 @@ import Config from "../js/Config.js";
         .then(response => {
             this.adminUserData = response.data.payload
             this.hasData = true
-            console.log(JSON.stringify(this.adminUserData))
         })
         .catch(e => {              
               console.log("Errors own user request (UserTableVuetify): " + e);           
             });
         },
       
+      // Is called when a image is picked and the update button is pushed
+      // Sends the image file to the object store and calls another method to update 
+      // the users imageUrl. This image will then be shown in the android app as profile picture
       uploadImage: function (data){
       
-        console.log(data)
         var upload = {
             uploadField : data
         }
           
         axios
-            .post(Config.webServiceURL + "/v1/object-store/upload", data, {
-            headers: { Authorization: "0 " + this.authToken, 'content-type': 'multipart/form-data' }
+          .post(Config.webServiceURL + "/v1/object-store/upload", data, {
+          headers: { Authorization: "0 " + this.authToken, 'content-type': 'multipart/form-data' }
           })
           .then(response => {
-            console.log("Uploaded Picture"),
-            console.log(JSON.stringify(response)),
-            console.log(JSON.stringify(response.data.payload.path)),
             this.imageFileUrl = response.data.payload.path,
             this.updateImageUrl(this.imageFileUrl)          
           })
@@ -197,21 +198,21 @@ import Config from "../js/Config.js";
             console.log(e)
           });       
       },
-        
+  
+      // Updates the users imageUrl after a new image was uploaded to the object store
       updateImageUrl: function(imageFileUrl){
 
         var createdImageUrl = Config.webServiceURL + "/v1/object-store/download?filename=" + imageFileUrl
+        console.log("ImageURL to update users informations: ")
         console.log(createdImageUrl)
 
         var userUpdateImage = {
           imageUrl: createdImageUrl
         }
-        console.log(userUpdateImage)
         axios.put(Config.webServiceURL + "/v1/users/user", userUpdateImage, {
           headers: { Authorization: "0 " + this.authToken }
         })
         .then(response => 
-          console.log(JSON.stringify(response)), 
           this.clear(),
           this.successUpdate = true
         )
@@ -220,6 +221,8 @@ import Config from "../js/Config.js";
         });
       },
 
+      // If the update button is pushed, check for all the desired updates and give the update informations
+      // to the uploadImage() and update() methods
       checkUpdate: function () {
 
         if (this.$refs.form.validate()) {
@@ -252,7 +255,8 @@ import Config from "../js/Config.js";
             this.passwordMatching = true
             }
           }
-          if(this.username.length > 0 && this.password.length > 0 && this.email.length > 0)
+
+          else if(this.username.length > 0 && this.password.length > 0 && this.email.length > 0)
           {
             if(this.password == this.passwordRe){
 
@@ -269,8 +273,7 @@ import Config from "../js/Config.js";
             }
           }
 
-
-          if(this.username.length > 0 && this.password.length == 0 && this.email.length > 0)
+          else if(this.username.length > 0 && this.password.length == 0 && this.email.length > 0)
           {
               var updateField = {
                 username: this.username,
@@ -279,7 +282,7 @@ import Config from "../js/Config.js";
               this.update(updateField)
           }
 
-          if(this.username.length == 0 && this.password.length > 0 && this.email.length > 0)
+          else if(this.username.length == 0 && this.password.length > 0 && this.email.length > 0)
           {
             if(this.password == this.passwordRe)
             {
@@ -295,7 +298,7 @@ import Config from "../js/Config.js";
             }
           }
 
-          if(this.username.length == 0 && this.password.length > 0 && this.email.length == 0)
+          else if(this.username.length == 0 && this.password.length > 0 && this.email.length == 0)
           {
             if(this.password == this.passwordRe)
             {
@@ -310,7 +313,7 @@ import Config from "../js/Config.js";
             }
           }
 
-          if(this.username.length == 0 && this.password.length == 0 && this.email.length > 0)
+          else if(this.username.length == 0 && this.password.length == 0 && this.email.length > 0)
           {
               var updateField = {
                 email: this.email,
@@ -320,14 +323,14 @@ import Config from "../js/Config.js";
         }      
       },
 
+      // Handles the provided informations from the checkUpdate() method and send a request to the
+      // backend to update the desired user properties
       update: function(field){
 
         axios.put(Config.webServiceURL + "/v1/users/user", field, {
           headers: { Authorization: "0 " + this.authToken }
         })
         .then(response => {
-          console.log("Update response")
-          console.log(JSON.stringify(response))
           if(response.data.success == true){
             this.successUpdate = true
             this.clear()
@@ -345,6 +348,7 @@ import Config from "../js/Config.js";
         });
       },
 
+      // Resets all form data. Is called when pushing the clear button is pressed and after each update call 
       clear: function () {
         this.$refs.form.reset()
         this.username = '',

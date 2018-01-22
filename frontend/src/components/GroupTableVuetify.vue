@@ -1,5 +1,5 @@
 <!-- TEMPLATE for group table
-  * Description: Table to display all groups
+  * Description: Table to display all groups and update the groupname property
  -->
 <template>
   <v-container>
@@ -60,12 +60,7 @@ import Config from "../js/Config.js";
           { text: 'Transactions', value: 'countTransactions' },
         ],
         items: this.groups,
-        amounts: []
       }
-    },
-
-    mounted: function(){
-      this.amounts = []      
     },
   }
 </script>
