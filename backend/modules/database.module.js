@@ -91,11 +91,8 @@ function connect(resolve, reject) {
         return database.collections.users.createIndex(keys, options);
       })
       .then(() => {
-        winston.debug('create index: user: userId, loginType unique');
-        const keys = {
-          userId: 1,
-          loginType: 1
-        };
+        winston.debug('create index: user: userId unique');
+        const keys = {userId: 1};
         const options = {unique: true};
         return database.collections.users.createIndex(keys, options);
       })
