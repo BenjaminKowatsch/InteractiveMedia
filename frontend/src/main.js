@@ -39,7 +39,6 @@ Vue.use(Vuetify)
 Vue.use(VueCharts)
 
 
-
 var startApp = function(onLoadingFinished) {
     onLoadingFinished();
 }

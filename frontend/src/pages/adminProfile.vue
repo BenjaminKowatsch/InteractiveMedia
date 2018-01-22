@@ -244,9 +244,11 @@ import Config from "../js/Config.js";
           {
             if(this.password == this.passwordRe){
 
+              var sha256 = require('js-sha256')
+              var hashedPassword = sha256(this.password)
               var updateField = {
                 username: this.username,
-                password: this.password
+                password: hashedPassword
               }
               this.update(updateField)
             } 
@@ -260,9 +262,11 @@ import Config from "../js/Config.js";
           {
             if(this.password == this.passwordRe){
 
+              var sha256 = require('js-sha256')
+              var hashedPassword = sha256(this.password)
               var updateField = {
                 username: this.username,
-                password: this.password,
+                password: hashedPassword,
                 email: this.email
               }
               this.update(updateField)
@@ -286,8 +290,10 @@ import Config from "../js/Config.js";
           {
             if(this.password == this.passwordRe)
             {
+              var sha256 = require('js-sha256')
+              var hashedPassword = sha256(this.password)
               var updateField = {
-                password: this.password,
+                password: hashedPassword,
                 email: this.email
               }
               this.update(updateField)
@@ -302,8 +308,10 @@ import Config from "../js/Config.js";
           {
             if(this.password == this.passwordRe)
             {
+              var sha256 = require('js-sha256')
+              var hashedPassword = sha256(this.password)
               var updateField = {
-                password: this.password
+                password: hashedPassword
               }
               this.update(updateField)
             }

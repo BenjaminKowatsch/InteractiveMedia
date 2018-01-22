@@ -149,11 +149,14 @@ export default {
     */
     checkLogin: function() {
         if (this.$refs.form.validate()){
-
+        var sha256 = require('js-sha256')
+        var hashedPassword = sha256(this.password)
+        console.log(hashedPassword)
         var credentials = {
           username: this.username,
-          password: this.password
+          password: hashedPassword
         };
+        console.log(credentials)
         axios
           .post(Config.webServiceURL + "/v1/users/login?type=0", credentials)
           .then(this.loginResponseHandler)
