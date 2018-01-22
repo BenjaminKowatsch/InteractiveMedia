@@ -101,13 +101,16 @@ import Config from "../js/Config.js";
                 this.user = this.users.filter(this.filter_userID)
 
                 if(this.user.length > 0){
+
                     this.userId = this.user[0].userId
-                    var pw = "interactive"
+                    var sha256 = require('js-sha256')
+                    var hashedPassword = sha256('interactive')
 
                     var reset = {
-                        password: pw
+                        password: hashedPassword
                     }
-
+                    console.log(hashedPassword)
+                    console.log(reset)
                     axios.put(Config.webServiceURL + "/v1/admin/users/" + this.userId, reset, {
                     headers: { Authorization: "0 " + this.authToken }
                     })
