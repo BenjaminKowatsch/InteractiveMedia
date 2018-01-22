@@ -36,7 +36,7 @@ describe.skip('PushNotifications create transactions', function() {
       }).then(res => {
         tokens[1] = res.body.payload.accessToken;
         done();
-      }).catch((error) => {console.log('Register User Error: ' + error);});
+      }).catch((error) => {winston.error('Register User Error:', error);});
     });
 
     before('create group', function(done) {
@@ -53,7 +53,7 @@ describe.skip('PushNotifications create transactions', function() {
         done();
       })
       .catch(error => {
-        console.log('Create group error: ' + error);
+        winston.error('Create group error', error);
       });
     });
 
@@ -63,7 +63,7 @@ describe.skip('PushNotifications create transactions', function() {
       .set('Authorization', '0 ' + tokens[0])
       .send({fcmToken: fcmToken})
       .then(res => {done();})
-      .catch((error) => {console.log('Set fcm token error: ' + error);});
+      .catch((error) => {winston.error('Set fcm token error', error);});
     });
 
     it('create transaction with user_1', function() {

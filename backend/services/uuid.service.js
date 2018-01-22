@@ -1,10 +1,5 @@
 'use strict';
 
-/**
- * Generates a new Universal Unique Identifier
- *
- * @return {String} Generated new Universal Unique Identifier
- */
 module.exports.generateUUID = function() {
   let d = new Date().getTime();
   const uuid = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {

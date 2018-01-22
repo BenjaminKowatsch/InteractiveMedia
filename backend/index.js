@@ -1,9 +1,5 @@
 'use strict';
 
-/**
- * imports
- * ===================
- */
 const express = require('express');
 const bodyParser = require('body-parser');
 const winston = require('winston');
@@ -32,14 +28,14 @@ const MONGO_DB_CONNECTION_ERROR_CODE = 10;
 
 /**
  * Configure logger
- * ===========================
+ * ----------------
  */
 winston.level = config.logLevel;
 winston.info('logLevel', winston.level);
 
 /**
  * Initialize express instance
- * ===========================
+ * ----------------
  */
 const app = express();
 let server;
@@ -78,6 +74,7 @@ app.use(function(req, res, next) {
   next();
 });
 
+// Prerouting
 app.use('/v1/users', usersRoutes);
 app.use('/v1/object-store', objectStoreRoutes);
 app.use('/v1/version', versionRoutes);
@@ -110,19 +107,17 @@ app.use(function(err, req, res, next) {
   httpResponseService.send(res, 404, notFoundResponse);
 });
 
+/**
+ * start webserver + initialize external services
+ * ----------------
+ */
 function startServer() {
-  // Starts the http server and prints out the host and the port
   server = app.listen(config.port, function() {
     const host = server.address().address;
     const port = server.address().port;
     winston.info('Server listening on http://%s:%s', host, port);
   });
 }
-
-/**
- * Database connection
- * ===================
- */
 database.tryConnect(config.mongodbURL, function() {
   pushNotificationService.initFcm()
   .then(() => objectstore.makeBucket(config.minioBucketName))

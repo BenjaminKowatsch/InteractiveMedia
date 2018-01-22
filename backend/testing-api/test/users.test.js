@@ -4,6 +4,7 @@
 
 const chai = require('chai');
 const expect = require('chai').expect;
+const winston = require('winston');
 const fs = require('fs');
 
 const databaseService = require('../util/databaseService');
@@ -26,7 +27,7 @@ describe('User-Controller', () => {
           facebookToken = token;
           done();
         }).catch((error) => {
-          console.log('Facbook Login Error: ' + error);
+          winston.error('Facbook Login Error', error);
           done();
         });
     });
@@ -402,7 +403,7 @@ describe('User-Controller', () => {
         tokens[1] = res.body.payload.accessToken;
         done();
       }).catch((error) => {
-        console.log('Register User Error: ' + error);
+        winston.error('Register User Error:', error);
       });
     });
 
@@ -412,7 +413,7 @@ describe('User-Controller', () => {
           facebookToken = token;
           done();
         }).catch((error) => {
-          console.log('failed to get test facebook access token: ' + error);
+          winston.error('failed to get test facebook access token', error);
           done();
         });
     });
@@ -420,7 +421,7 @@ describe('User-Controller', () => {
     before('Login as facebook user', function(done) {
       userService.loginFacebook({'accessToken': facebookToken})
       .then(res => {done();})
-      .catch((error) => {console.log('Facbook Login Error: ' + error);});
+      .catch((error) => {winston.error('Facbook Login Error', error);});
     });
 
     it('should get the user-data of facebook_user', function() {
@@ -514,7 +515,7 @@ describe('User-Controller', () => {
           token = res.body.payload.accessToken;
           done();
         }).catch((error) => {
-          console.log('Register User Error: ' + error);
+          winston.error('Register User Error:', error);
         });
       });
 
@@ -585,7 +586,7 @@ describe('User-Controller', () => {
           token = res.body.payload.accessToken;
           done();
         }).catch((error) => {
-          console.log('Register User Error: ' + error);
+          winston.error('Register User Error:', error);
         });
       });
 
@@ -655,7 +656,7 @@ describe('User-Controller', () => {
           token = res.body.payload.accessToken;
           done();
         }).catch((error) => {
-          console.log('Register User Error: ' + error);
+          winston.error('Register User Error:', error);
         });
       });
 

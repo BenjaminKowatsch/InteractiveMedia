@@ -5,6 +5,7 @@
 const chai = require('chai');
 const fs = require('fs');
 const expect = require('chai').expect;
+const winston = require('winston');
 const databaseService = require('../util/databaseService');
 const expectResponse = require('../util/expectResponse.util');
 const settings = require('../config/settings.config');
@@ -30,7 +31,7 @@ describe('Object-store', function() {
         token = res.body.payload.accessToken;
         done();
       }).catch((error) => {
-        console.log('Register User Error: ' + error);
+        winston.error('Register User Error:', error);
       });
     });
 
@@ -81,7 +82,7 @@ describe('Object-store', function() {
           token = res.body.payload.accessToken;
           done();
         }).catch((error) => {
-          console.log('Register User Error: ' + error);
+          winston.error('Register User Error:', error);
         });
       });
 

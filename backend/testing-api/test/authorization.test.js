@@ -27,7 +27,7 @@ describe('Authorization', () => {
       .then(res => {
           adminToken = res.body.payload.accessToken;
           done();
-        }).catch((err) => {console.error('Error add admin');});
+        }).catch((err) => {winston.error('Error add admin');});
     });
 
     before('register User 0', done => {
@@ -35,7 +35,7 @@ describe('Authorization', () => {
         userToken = res.body.payload.accessToken;
         done();
       }).catch((error) => {
-        console.log('Register User Error: ' + error);
+        winston.error('Register User Error:', error);
       });
     });
 
@@ -90,7 +90,7 @@ describe('Authorization', () => {
       .then(res => {
           adminToken = res.body.payload.accessToken;
           done();
-        }).catch((err) => {console.error('Error add admin');});
+        }).catch((err) => {winston.error('Error add admin');});
     });
 
     before('register User 0', done => {
@@ -98,7 +98,7 @@ describe('Authorization', () => {
         userToken = res.body.payload.accessToken;
         done();
       }).catch((error) => {
-        console.log('Register User Error: ' + error);
+        winston.error('Register User Error:', error);
       });
     });
 
