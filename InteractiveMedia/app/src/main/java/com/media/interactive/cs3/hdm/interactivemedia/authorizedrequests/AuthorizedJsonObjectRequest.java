@@ -16,20 +16,12 @@ import java.util.Map;
 public class AuthorizedJsonObjectRequest extends JsonObjectRequest {
 
 
-    private static final int MY_SOCKET_TIMEOUT_MS = 1000;
-    private static DefaultRetryPolicy POLICY = new DefaultRetryPolicy(
-        MY_SOCKET_TIMEOUT_MS,
-        DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
-        DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
-
     public AuthorizedJsonObjectRequest(int method, String url, JSONObject jsonRequest, Response.Listener<JSONObject> listener, Response.ErrorListener errorListener) {
         super(method, url, jsonRequest, listener, errorListener);
-        setRetryPolicy(POLICY);
     }
 
     public AuthorizedJsonObjectRequest(String url, JSONObject jsonRequest, Response.Listener<JSONObject> listener, Response.ErrorListener errorListener) {
         super(url, jsonRequest, listener, errorListener);
-        setRetryPolicy(POLICY);
     }
 
     @Override
