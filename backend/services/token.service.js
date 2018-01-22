@@ -3,7 +3,6 @@
 const jwt = require('jwt-simple');
 const winston = require('winston');
 
-const config = require('../config/settings.config');
 const ERROR = require('../config/error.config');
 
 /**
@@ -23,16 +22,17 @@ module.exports.getNewExpiryDate = function(validTime, startDate) {
     return new Date(newExpDate);
   };
 
-module.exports.generateAccessToken = function(toEncode) {
-    return jwt.encode(toEncode, config.jwtSimpleSecret);
+module.exports.generateAccessToken = function(toEncode, secret) {
+    return jwt.encode(toEncode, secret);
   };
 
-module.exports.decodeToken = function(token) {
+module.exports.decodeToken = function(token, secret) {
   let responseData = {payload: {}};
   try {
-    const decodeResult = jwt.decode(token, config.jwtSimpleSecret);
+    const decodeResult = jwt.decode(token, secret);
     responseData.success = true;
     responseData.payload.userId = decodeResult.userId;
+    responseData.payload.expiryDate = decodeResult.expiryDate;
     return Promise.resolve(responseData);
   } catch (error) {
     responseData.success = false;

@@ -19,6 +19,16 @@ module.exports.error = {
       }
     }
   },
+  invalidAuthToken: {
+    errorCode: ERROR.INVALID_AUTH_TOKEN,
+    responseData: {
+      success: false,
+      payload: {
+        dataPath: 'authentication',
+        message: 'invalid authToken'
+      }
+    }
+  },
 };
 
 module.exports.success = {
@@ -29,5 +39,8 @@ module.exports.success = {
   appVersion: {
     name: 'Backend',
     version: '0.1.0'
+  },
+  withPayload: function(payload) {
+    return {success: true, payload: payload};
   },
 };
