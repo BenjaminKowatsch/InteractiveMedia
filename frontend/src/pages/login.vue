@@ -96,21 +96,20 @@ export default {
   }),
   methods: {
     /**
-         * Callback function for printing out the error response of a POST request
-         * @param  {JSONObject} error Object which holds error information
-         */
+    * Callback function for printing out the error response of a POST request
+    * @param  {JSONObject} error Object which holds error information
+    */
     defaultErrorHandler: function(error) {
       console.log("Error: " + JSON.stringify(error)); // logs an error to the console
-      //If logindata doenst match a db entry, show error and reload page
+      //If login data doenst match a db entry, show error and reload page
         this.alertWrongCredentials = true
         this.redirect("/");
-        console.log("redirecting to /")
       
     },
-    /**
-         * Callback function for handling the non error response of the login POST requests
-         * @param  {JSONObject} response Containing the valid accessToken for the session and an authentication type to be stored into a cookie
-         */
+    
+    /* Callback function for handling the non error response of the login POST requests
+       Then check if the user is a admin and is using the password login method (no google/facebook users allowed)
+       by requesting the user details */
     loginResponseHandler: function(response) {
       //read authToken for getUser request
       var authToken = response.data.payload.accessToken;
@@ -125,7 +124,6 @@ export default {
           //check role for admin and send informations to create a cookie and redirect admin to overview page
           console.log(this.userDataRole)
           if (this.userDataRole === "admin") {
-            this.altertLoggedIn = true;
             this.checkServerResponse(response, payload => {
               console.log("Login corret: Role 'admin'"); // logs to console when the login data was correct with the database
               this.loginUser(payload);
@@ -146,9 +144,9 @@ export default {
         });
     },
     /**
-         * This function sends a POST request with the user credentials to the backend.
-         * If a non error response was received the loginResponseHandler will be called and the user will be logged in.
-         */
+    * This function sends a POST request with the user credentials to the backend.
+    * If a non error response was received the loginResponseHandler will be called.
+    */
     checkLogin: function() {
         if (this.$refs.form.validate()){
 
@@ -156,13 +154,13 @@ export default {
           username: this.username,
           password: this.password
         };
-
         axios
           .post(Config.webServiceURL + "/v1/users/login?type=0", credentials)
           .then(this.loginResponseHandler)
           .catch(this.defaultErrorHandler);
       } 
     },
+    
     reset: function() {
         this.$refs.form.reset()
     }

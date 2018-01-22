@@ -28,7 +28,7 @@
     </v-flex>
     <p></p>
     <v-flex xs12 sm12 md12 lg6 xl6>
-        <v-btn slot="activator" large @click="showResetPW = toggleState(showResetPW)">ResetPW</v-btn>
+        <v-btn slot="activator" large @click="showResetPW = toggleState(showResetPW)">Reset PW</v-btn>
         <reset-user-pw v-if="usersLoaded && showResetPW" :users="users" :authToken="authToken"></reset-user-pw>
     </v-flex>
     </v-layout>    
@@ -94,7 +94,7 @@ export default {
 
     this.groups = [];
     this.users = [];
-
+    // Request initial groups and user data to pass them to other components in the template
     this.getGroups();
     this.getUsers();
 
@@ -102,6 +102,7 @@ export default {
 
   methods: {
     
+    // Request all groups from backend
     getGroups: function() {
       axios
         .get(Config.webServiceURL + "/v1/admin/groups", {
@@ -110,11 +111,10 @@ export default {
         .then(response => {
           this.groups = response.data.payload;
           this.groupCount = this.groups.length;
-          console.log("Anzahl Gruppen: " + this.groupCount);
           this.transactionGroups = this.groups.filter(this.filter_transactionGroups)  
-          console.log("Anzahl Gruppen mit Transaktionen: " + this.transactionGroups.length)
+          console.log("Groups with transactions: " + this.transactionGroups.length)
           this.groupsLoaded = true;
-          console.log(JSON.stringify(this.transactionGroups))
+          // If groups with transactions exists, call the prepareTransactionAmounts method
           if(this.transactionGroups.length > 0){
             this.prepareTransactionAmouts()
           }
@@ -125,13 +125,12 @@ export default {
         });
     },
 
+    // Make a promise to receive the totalAmount of all transactions of each group and sort them in descending order
     prepareTransactionAmouts() {
         return Promise.all(this.transactionGroups.map((group, i) => 
         		this.calculateTransactionAmounts(group.groupId)
             .then(promiseData => group.totalAmount = promiseData)
         )).then(results => {
-            console.log("Unsorted Transactiongroups")
-            console.log(JSON.stringify(this.transactionGroups))
             this.transactionGroups.sort(this.GetSortOrder("totalAmount"));
             console.log("Sorted Transactiongroups")
             console.log(JSON.stringify(this.transactionGroups))
@@ -139,6 +138,7 @@ export default {
         });
     },
 
+    // Request all transactions for each group with transactions and calculate the total amount of money spending of these transactions
     calculateTransactionAmounts(groupId) {
         return axios.get(Config.webServiceURL + "/v1/admin/groups/" + groupId, {
             headers: {
@@ -150,7 +150,7 @@ export default {
         );
     },
 
-
+    // Sort the properties of an json-array in descending order (i.e. the total amount of money spending of transactions)
     GetSortOrder: function(prop) {  
         return function(a, b) {  
             if (a[prop] < b[prop]) {  
@@ -162,6 +162,7 @@ export default {
         }  
       },
 
+    // Request all users from the backend
     getUsers: function() {
       axios
         .get(Config.webServiceURL + "/v1/admin/users", {
@@ -175,12 +176,6 @@ export default {
           this.passwordUsers = this.users.filter(this.filter_loginPassword).length
           this.facebookUsers = this.users.filter(this.filter_loginFacebook).length
           this.googleUsers = this.users.filter(this.filter_loginGoogle).length
-
-          console.log("Count Users: " + this.userCount);
-          console.log("Count PasswordUsers: " + this.passwordUsers);
-          console.log("Count FacebookUsers: " + this.facebookUsers);
-          console.log("Count GoogleUsers: " + this.googleUsers);
-
           this.usersLoaded = true;
         })
         .catch(e => {
@@ -211,7 +206,6 @@ export default {
 
     //Toggles state of boolean variables
     toggleState: function(state) {
-      console.log(state);
       if (state) {
         return (state = false);
       } else {

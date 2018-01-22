@@ -1,3 +1,6 @@
+/* TEMPLATE for LoginTypeChart.js
+Description: A pie chart which shows the amount of registrated password/facebook/google users */
+
 import { Pie } from 'vue-chartjs';
 import axios from "axios";
 import Cookie from "../js/Cookie.js";
@@ -24,6 +27,7 @@ export default Pie.extend({
 
     mounted: function() {
 
+        // Renders the chart with the given data and chart options
         this.renderChart({
             labels: ['Password', 'Facebook', 'Google'],
             datasets: [{

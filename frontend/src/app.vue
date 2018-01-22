@@ -1,5 +1,5 @@
 <!-- TEMPLATE for main view
-  * Description: Entrypoint for the app. Contains a app wide toolbar and sidepanel (navigation-drawer)
+  * Description: Entrypoint for the app. Contains an app wide toolbar and sidepanel (navigation-drawer)
  -->
 <template>
   <main>
@@ -12,7 +12,6 @@
       disable-resize-watcher="true"
       disable-route-watcher="true"
       app>
-
         <v-list>
           <v-list-tile @click="checkForDashboard">
             <v-list-tile-action>
@@ -86,7 +85,7 @@
         <span>&copy; 2017 Debts² Dev Team </span>
       </v-footer>
     </v-app>
-       <v-app id="inspire" :dark="isDark" v-if="!isDark">
+    <v-app id="inspire" :dark="isDark" v-if="!isDark">
       <v-navigation-drawer
       clipped
       fixed
@@ -95,7 +94,6 @@
       disable-route-watcher="true"
       class="green lighten-2"    
       app>
-
         <v-list>
           <v-list-tile @click="checkForDashboard">
             <v-list-tile-action>
@@ -195,6 +193,7 @@ export default {
 
    methods: {
 
+     // Checks if darkTheme is enabled or not
      changeTheme: function() {
 
       if(this.isDark == true)
@@ -209,6 +208,7 @@ export default {
       }
      },
 
+    // Toogles the Sidepanel
      toogleDrawer: function(){
 
        if(this.drawer == true)
@@ -221,6 +221,8 @@ export default {
        }
      },
 
+     // When navigating to the dashboard over sidepanel, checks if the user is logged in (a cookie exists)
+     // If yes, he will be redirected to the overview page, if not he will be redirected to the noPermission site
      checkForDashboard: function(){
 
         var authToken = Cookie.getJSONCookie('accessToken').accessToken
@@ -235,7 +237,8 @@ export default {
         }
     },
      
-
+     // When navigating to the adminProfile over sidepanel, checks if the user is logged in (a cookie exists)
+     // If yes, he will be redirected to the adminPanel page, if not he will be redirected to the noPermission site
      checkForAdminProfile: function(){
 
       var authToken = Cookie.getJSONCookie('accessToken').accessToken
@@ -249,7 +252,8 @@ export default {
         this.redirect("/noPermission")
       }
      },
- 
+
+     // Logs out the current user and delets the accessToken
      logout: function() {
 
       var authToken = Cookie.getJSONCookie('accessToken').accessToken
@@ -275,6 +279,7 @@ export default {
             this.loggedOut = true
           })
           .catch(e => {
+            console.log("Error while logging out:")
             console.log(JSON.stringify(e));
           });              
     }

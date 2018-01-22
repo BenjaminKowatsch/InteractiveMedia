@@ -1,3 +1,6 @@
+/* TEMPLATE for TransactionAmountChart
+Description: Table to display the three most valued transaction groups.
+Only shown if there are at least three groups with transactions in the database */
 import { Bar } from 'vue-chartjs'
 
 export default {
@@ -31,6 +34,7 @@ export default {
 
     mounted() {
 
+        // Renders the chart with the desired chartData and chartOptions (shown above)
         this.renderChart(this.chartData, this.chartOptions)
     }
 }

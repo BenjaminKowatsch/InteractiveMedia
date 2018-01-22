@@ -1,3 +1,7 @@
+<!-- TEMPLATE for ResetUserPw.vue
+  * Description: A form to reset the password of any "password" registered user to a default value ("interactive"). 
+  You should not try to reset the password of facebook or google users
+ -->
 <template>
   <v-container fluid fill-height>
     <v-layout  justify-center align-center> 
@@ -12,7 +16,7 @@
             <v-btn icon slot="activator">
               <v-icon>fa-question-circle</v-icon>
             </v-btn>
-            <span>Reset user password to default "interactive" (for support purpose)</span>
+          <span>Passwordlogin only (Logintype 0): Reset user password to default "interactive" (for support purpose)</span>
           </v-tooltip>
            <v-btn
             @click="resetPW"
@@ -89,6 +93,7 @@ import Config from "../js/Config.js";
 
     methods: {
 
+        // Resets the password of a existing user (via email) to a default value
         resetPW: function(){
 
             if(this.email.length > 0){
@@ -97,8 +102,6 @@ import Config from "../js/Config.js";
 
                 if(this.user.length > 0){
                     this.userId = this.user[0].userId
-                    console.log(this.userId)
-                    console.log(JSON.stringify(this.user))
                     var pw = "interactive"
 
                     var reset = {
@@ -109,7 +112,6 @@ import Config from "../js/Config.js";
                     headers: { Authorization: "0 " + this.authToken }
                     })
                     .then(response => {
-                        console.log(JSON.stringify(response))
                         if(response.data.success == true) {
                             this.successReset = true
                             this.clear()
@@ -136,7 +138,7 @@ import Config from "../js/Config.js";
 
         },
 
-
+        // Resets the form after update attempt or canceling 
         clear: function () {
             this.$refs.form.reset()
             this.email = '',
@@ -144,6 +146,7 @@ import Config from "../js/Config.js";
             this.userId = ''
         },
 
+        // Used to get the userID from a given email to perform the update request
         filter_userID: function(users) {
         return users.email == this.email;
         },

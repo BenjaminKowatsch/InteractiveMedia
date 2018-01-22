@@ -27,6 +27,9 @@ import noPermission from './pages/noPermission.vue'
 // Import Config
 import Config from './js/Config.js'
 
+// Import Cookie
+import Cookie from "./js/Cookie.js";
+
 // Import Mixins
 import Mixins from './mixins.js'
 
@@ -92,10 +95,6 @@ var onLoadingFinished = function() {
                 // If a cookie exists, set the loginStatus to true
                 var accessToken = Cookie.getJSONCookie('accessToken')
                 if (accessToken !== '') {
-
-                    var authOptions = "Debts² Admin Panel";
-
-                    console.log(authOptions[accessToken.authType] + " Cookie exists. Redirecting ...");
                     this.loginStatus = true;
                 };
             }
