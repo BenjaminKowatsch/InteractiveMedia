@@ -6,18 +6,18 @@ const winston = require('winston');
 const ERROR = require('../config/error.config');
 
 module.exports.getNewExpiryDate = function(validTime, startDate) {
-    let newExpDate;
-    if (startDate) {
-      newExpDate = startDate.getTime() + validTime;
-    } else {
-      newExpDate = new Date().getTime() + validTime;
-    }
-    return new Date(newExpDate);
-  };
+  let newExpDate;
+  if (startDate) {
+    newExpDate = startDate.getTime() + validTime;
+  } else {
+    newExpDate = new Date().getTime() + validTime;
+  }
+  return new Date(newExpDate);
+};
 
 module.exports.generateAccessToken = function(toEncode, secret) {
-    return jwt.encode(toEncode, secret);
-  };
+  return jwt.encode(toEncode, secret);
+};
 
 module.exports.decodeToken = function(token, secret) {
   let responseData = {payload: {}};

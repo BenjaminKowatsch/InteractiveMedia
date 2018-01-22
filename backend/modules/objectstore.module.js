@@ -44,45 +44,45 @@ module.exports.makeBucket = function(bucketName) {
 };
 
 module.exports.putObject = function(bucketName, objectName, stream) {
-    return new Promise((resolve, reject) => {
-      winston.debug('storing file: ' + objectName + ' at bucket: ' + bucketName);
+  return new Promise((resolve, reject) => {
+    winston.debug('storing file: ' + objectName + ' at bucket: ' + bucketName);
+    let responseData = {payload: {}};
+
+    minioClient.putObject(bucketName, objectName, stream).then(arg => {
+      responseData.success = true;
+      resolve(responseData);
+    }).catch((err, etag) => {
+      winston.debug('minio put error:', JSON.stringify(err));
+      responseData.success = false;
+      responseData.payload.dataPath = 'objectstore';
+      responseData.payload.message = 'failed to store file';
+      let errorCode = ERROR.MINIO_ERROR;
+      reject({errorCode: errorCode, responseData: responseData});
+    });
+  });
+};
+
+module.exports.getObject = function(bucketName, objectName) {
+  return new Promise((resolve, reject) => {
+      winston.debug('loading file: ' + objectName + ' at bucket: ' + bucketName);
       let responseData = {payload: {}};
 
-      minioClient.putObject(bucketName, objectName, stream).then(arg => {
+      minioClient.getObject(bucketName, objectName).then(stream => {
         responseData.success = true;
+        responseData.payload.stream = stream;
         resolve(responseData);
       }).catch((err, etag) => {
-        winston.debug('minio put error:', JSON.stringify(err));
         responseData.success = false;
         responseData.payload.dataPath = 'objectstore';
-        responseData.payload.message = 'failed to store file';
-        let errorCode = ERROR.MINIO_ERROR;
+        let errorCode;
+        if (err.code === 'NoSuchKey') {
+          errorCode = ERROR.RESOURCE_NOT_FOUND;
+          responseData.payload.message = 'file not found';
+        } else {
+          errorCode = ERROR.MINIO_ERROR;
+          responseData.payload.message = 'failed to load file';
+        }
         reject({errorCode: errorCode, responseData: responseData});
       });
     });
-  };
-
-module.exports.getObject = function(bucketName, objectName) {
-    return new Promise((resolve, reject) => {
-        winston.debug('loading file: ' + objectName + ' at bucket: ' + bucketName);
-        let responseData = {payload: {}};
-
-        minioClient.getObject(bucketName, objectName).then(stream => {
-          responseData.success = true;
-          responseData.payload.stream = stream;
-          resolve(responseData);
-        }).catch((err, etag) => {
-          responseData.success = false;
-          responseData.payload.dataPath = 'objectstore';
-          let errorCode;
-          if (err.code === 'NoSuchKey') {
-            errorCode = ERROR.RESOURCE_NOT_FOUND;
-            responseData.payload.message = 'file not found';
-          } else {
-            errorCode = ERROR.MINIO_ERROR;
-            responseData.payload.message = 'failed to load file';
-          }
-          reject({errorCode: errorCode, responseData: responseData});
-        });
-      });
-  };
+};
