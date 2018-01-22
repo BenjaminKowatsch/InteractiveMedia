@@ -14,7 +14,7 @@ function waitOrOrderForDB() {
       resolve();
     } else {
       MongoClient.connect(settings.mongoDb.connect.url, settings.mongoDb.connect.options).then(db => {
-        console.log('DB connection established');
+        winston.info('DB connection established');
         database.db = db;
         resolve();
       }).catch(err => {

@@ -46,7 +46,7 @@ describe('Admin', () => {
       .then(res => {
           adminToken = res.body.payload.accessToken;
           done();
-        }).catch((err) => {console.error('Error add admin');});
+        }).catch((err) => {winston.error('Error add admin');});
     });
 
     it('should get user data of admin', () => {
@@ -82,7 +82,7 @@ describe('Admin', () => {
         .then(res => {
             adminToken = res.body.payload.accessToken;
             done();
-          }).catch((err) => {console.error('Error add admin');});
+          }).catch((err) => {winston.error('Error add admin');});
       });
 
       before('register users, create groups', done => {
@@ -102,7 +102,7 @@ describe('Admin', () => {
           groupIds[1] = res.body.payload.groupId;
           done();
         }).catch((error) => {
-          console.log('Register User Error: ' + error);
+          winston.error('Register User Error:', error);
         });
       });
 
@@ -153,7 +153,7 @@ describe('Admin', () => {
         .then(res => {
             adminToken = res.body.payload.accessToken;
             done();
-          }).catch((err) => {console.error('Error add admin');});
+          }).catch((err) => {winston.error('Error add admin');});
       });
 
       before('register users, create group', done => {
@@ -170,7 +170,7 @@ describe('Admin', () => {
           groupId = res.body.payload.groupId;
           done();
         }).catch((error) => {
-          console.log('Register User Error: ' + error);
+          winston.error('Register User Error:', error);
         });
       });
 
@@ -232,7 +232,7 @@ describe('Admin', () => {
         .then(res => {
             adminToken = res.body.payload.accessToken;
             done();
-          }).catch((err) => {console.error('Error add admin');});
+          }).catch((err) => {winston.error('Error add admin');});
       });
 
       before('register users, create group', done => {
@@ -246,7 +246,7 @@ describe('Admin', () => {
           groupId = res.body.payload.groupId;
           done();
         }).catch((error) => {
-          console.log('Register User Error: ' + error);
+          winston.error('Register User Error:', error);
         });
       });
 
@@ -304,7 +304,7 @@ describe('Admin', () => {
         .then(res => {
             adminToken = res.body.payload.accessToken;
             done();
-          }).catch((err) => {console.error('Error add admin');});
+          }).catch((err) => {winston.error('Error add admin');});
       });
 
       before('register users, create group', done => {
@@ -320,7 +320,7 @@ describe('Admin', () => {
         }).then(res => {
           groupId = res.body.payload.groupId;
           done();
-        }).catch((error) => {console.log('Register User Error: ' + error);});
+        }).catch((error) => {winston.error('Register User Error:', error);});
       });
 
       before('get userId of user_0', done => {
@@ -330,7 +330,7 @@ describe('Admin', () => {
         .then(res => {
           userIds[0] = res.body.payload.userId;
           done();
-        }).catch(error => {console.error('Unable to get userId of user_0');});
+        }).catch(error => {winston.error('Unable to get userId of user_0');});
       });
 
       it('should get user by id', () => {
@@ -387,14 +387,14 @@ describe('Admin', () => {
           .then(res => {
               adminToken = res.body.payload.accessToken;
               done();
-            }).catch((err) => {console.error('Error add admin');});
+            }).catch((err) => {winston.error('Error add admin');});
         });
 
         before('register user 0', done => {
           userService.register(userData.users.valid[0]).then(res => {
             tokens[0] = res.body.payload.accessToken;
             done();
-          }).catch((error) => {console.log('Register User Error: ' + error);});
+          }).catch((error) => {winston.error('Register User Error:', error);});
         });
 
         before('get userId of user_0', done => {
@@ -404,7 +404,7 @@ describe('Admin', () => {
           .then(res => {
             userIds[0] = res.body.payload.userId;
             done();
-          }).catch(error => {console.error('Unable to get userId of user_0');});
+          }).catch(error => {winston.error('Unable to get userId of user_0');});
         });
 
         it('should get original user data of user_0 by id', () => {
@@ -475,14 +475,14 @@ describe('Admin', () => {
           .then(res => {
               adminToken = res.body.payload.accessToken;
               done();
-            }).catch((err) => {console.error('Error add admin');});
+            }).catch((err) => {winston.error('Error add admin');});
         });
 
         before('register user 0', done => {
           userService.register(userData.users.valid[0]).then(res => {
             tokens[0] = res.body.payload.accessToken;
             done();
-          }).catch((error) => {console.log('Register User Error: ' + error);});
+          }).catch((error) => {winston.error('Register User Error:', error);});
         });
 
         before('get userId of user_0', done => {
@@ -492,7 +492,7 @@ describe('Admin', () => {
           .then(res => {
             userIds[0] = res.body.payload.userId;
             done();
-          }).catch(error => {console.error('Unable to get userId of user_0');});
+          }).catch(error => {winston.error('Unable to get userId of user_0');});
         });
 
         it('should get original user data of user_0 by id', () => {
@@ -563,14 +563,14 @@ describe('Admin', () => {
           .then(res => {
               adminToken = res.body.payload.accessToken;
               done();
-            }).catch((err) => {console.error('Error add admin');});
+            }).catch((err) => {winston.error('Error add admin');});
         });
 
         before('register user 0', done => {
           userService.register(userData.users.valid[0]).then(res => {
             tokens[0] = res.body.payload.accessToken;
             done();
-          }).catch((error) => {console.log('Register User Error: ' + error);});
+          }).catch((error) => {winston.error('Register User Error:', error);});
         });
 
         before('get userId of user_0', done => {
@@ -580,7 +580,7 @@ describe('Admin', () => {
           .then(res => {
             userIds[0] = res.body.payload.userId;
             done();
-          }).catch(error => {console.error('Unable to get userId of user_0');});
+          }).catch(error => {winston.error('Unable to get userId of user_0');});
         });
 
         it('should fail to update due to missing payload', function() {

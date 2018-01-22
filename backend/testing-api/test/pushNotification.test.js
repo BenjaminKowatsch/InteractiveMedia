@@ -28,7 +28,7 @@ describe.skip('PushNotifications', () => {
         token = res.body.payload.accessToken;
         done();
       }).catch((error) => {
-        console.log('Register User Error: ' + error);
+        winston.error('Register User Error:', error);
       });
     });
 

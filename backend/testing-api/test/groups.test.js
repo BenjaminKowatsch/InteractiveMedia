@@ -33,7 +33,7 @@ describe('Groups-Controller: Groups:', () => {
         tokens[2] = res.body.payload.accessToken;
         done();
       }).catch((error) => {
-        console.log('Register User Error: ' + error);
+        winston.error('Register User Error:', error);
       });
     });
 
@@ -179,7 +179,7 @@ describe('Groups-Controller: Groups:', () => {
         groupId = res.body.payload.groupId;
         done();
       }).catch((error) => {
-        console.log('Register User Error: ' + error);
+        winston.error('Register User Error:', error);
       });
     });
 

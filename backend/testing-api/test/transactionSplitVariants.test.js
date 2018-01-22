@@ -47,7 +47,7 @@ describe('Groups-Controller: Transactions: Split variants', () => {
           splitVariants.combination.setUserIdsInTransactions(users);
           done();
         }).catch((error) => {
-          console.log('Register User or Group Error: ' + error);
+          winston.error('Register User or Group Error:', error);
         });
       });
 
@@ -128,7 +128,7 @@ describe('Groups-Controller: Transactions: Split variants', () => {
           splitVariants.combination.setUserIdsInTransactions(users);
           done();
         }).catch((error) => {
-          console.log('Register User or Group Error: ' + error);
+          winston.error('Register User or Group Error:', error);
         });
       });
 

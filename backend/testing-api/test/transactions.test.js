@@ -55,7 +55,7 @@ describe('Groups-Controller: Transactions:', () => {
         scenario1GroupId = res.body.payload.groupId;
         done();
       }).catch((error) => {
-        console.log('Register User or Group Error: ' + error);
+        winston.error('Register User or Group Error:', error);
       });
     });
 
@@ -318,7 +318,7 @@ describe('Groups-Controller: Transactions:', () => {
       }).then(res => miscService.wait(2000)).then(() => {
         done();
       }).catch((error) => {
-        console.log('Register User or Group Error: ' + error);
+        winston.error('Register User or Group Error:', error);
       });
     });
 
@@ -406,7 +406,7 @@ describe('Groups-Controller: Transactions:', () => {
         groupScenarios[2].setUserIdsInTransactions(users);
         done();
       }).catch((error) => {
-        console.log('Register User or Group Error: ' + error);
+        winston.error('Register User or Group Error:', error);
       });
     });
 
