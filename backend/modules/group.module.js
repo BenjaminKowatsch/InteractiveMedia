@@ -77,7 +77,8 @@ module.exports.getGroupById = function(groupId) {
       let groupUserObjects = userResults.map(val => ({
         userId: val.userId,
         username: val.username,
-        email: val.email
+        email: val.email,
+        imageUrl: val.imageUrl
       }));
       responseData.payload.users = groupUserObjects;
       responseData.success = true;
@@ -280,7 +281,8 @@ function checkForInvalidCreateGroupValues(findUsersResult, requestedUserEmails, 
   let groupUserObjects = findUsersResult.map(val => val ? {
     userId: val.userId,
     username: val.username,
-    email: val.email
+    email: val.email,
+    imageUrl: val.imageUrl
   } : null);
   // checken if an id is null => unknonw user
   if (groupUserIds.includes(null)) {

@@ -400,6 +400,10 @@ public class SynchronisationHelper {
                                     final User user = new User();
                                     user.setEmail(jsonObject.getString("email"));
                                     user.setUserId(jsonObject.getString("userId"));
+                                    try {
+                                        user.setImageUrl(jsonObject.getString("imageUrl"));
+                                    } catch(JSONException e){
+                                    }
                                     user.setUsername(jsonObject.getString("username"));
                                     user.setSync(true);
                                     newGroup.getUsers().add(user);

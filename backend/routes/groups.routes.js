@@ -26,8 +26,19 @@ const authorizationMiddleware = require('../middleware/authorization.middleware'
  * @apiUse headerAuthorization
  * @apiUse headerExampleAuthorization
  *
+ * @apiUse successBodyGroupName
+ * @apiUse successBodyGroupImageUrl
+ * @apiUse successBodyGroupId
+ * @apiUse successBodyGroupCreatedAt
+ * @apiUse successBodyGroupTransactions
+ * @apiUse successBodyGroupUsers
+ * @apiUse successBodyGroupUsersUserId
+ * @apiUse successBodyGroupUsersName
+ * @apiUse successBodyGroupUserEmail
+ * @apiUse successBodyGroupUserImageUrl
+ *
  * @apiSuccess (SuccessCode) {201} Success Group Created
- * @apiUse successExampleGroup
+ * @apiUse successExampleCreateGroup
 
  * @apiUse error400InvalidBody
  * @apiUse error400DuplicatedUsers
@@ -62,9 +73,11 @@ router.post('/', authenticationMiddleware.isAuthenticated,
  * @apiUse successBodyGroupUsers
  * @apiUse successBodyGroupUsersUserId
  * @apiUse successBodyGroupUsersName
+ * @apiUse successBodyGroupUserEmail
+ * @apiUse successBodyGroupUserImageUrl
  *
  * @apiSuccess (SuccessCode) {200} Success Success get group
- * @apiUse successExampleGroup
+ * @apiUse successExampleGetGroupById
  *
  * @apiUse error400MissingUnknownUrlParameter
  * @apiUse error401Unauthorized

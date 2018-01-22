@@ -332,6 +332,11 @@ public class AddGroupActivity extends ImagePickerActivity implements View.OnClic
               if (jsonObject.has("username")) {
                 userUpdateValues.put(UserTable.COLUMN_USERNAME, jsonObject.getString("username"));
               }
+              try{
+                userUpdateValues.put(UserTable.COLUMN_IMAGE_URL, jsonObject.getString("imageUrl"));
+              }catch(JSONException error){
+
+              }
               userUpdateValues.put(UserTable.COLUMN_USER_ID, jsonObject.getString("userId"));
               userUpdateValues.put(UserTable.COLUMN_SYNCHRONIZED, true);
               final String userSelection = UserTable.COLUMN_EMAIL.concat(" = ?");

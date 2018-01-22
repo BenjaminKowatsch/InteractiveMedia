@@ -255,7 +255,7 @@
  */
 
 /**
- * @apiDefine successExampleGroup
+ * @apiDefine successExampleCreateGroup
     @apiSuccessExample {type} Success-Response
     {
         "success": true,
@@ -265,15 +265,43 @@
             "users" : [{
                 "userId": "f2bed6b9-6a5a-4363-a9fa-e1f10579c0c1",
                 "username": "user_1_name",
-                "email": "user_1_email"
+                "email": "user_1_email",
+                "imageUrl": "http://example.com/image.png"
             },{
                 "userId": "2368218d-b5ec-4d4d-bc3c-6c249776ee11",
                 "username": "user_2_name",
                 "email": "user_2_email"
+                "imageUrl": null
             }]
             "transactions" : [ ... ], // all transaction-objects, length=0 if group was just created
             "groupId" : "6367e722-e857-4d0f-bf78-278a92260418",
             "createdAt" : "2017-12-25T10:56:13.234Z"
+        }
+    }
+ */
+/**
+ * @apiDefine successExampleGetGroupById
+    @apiSuccessExample {type} Success-Response
+    {
+        "success": true,
+        "payload": {
+            "name" : "test_group_1",
+            "imageUrl" : null,
+            "users" : [{
+                "userId": "f2bed6b9-6a5a-4363-a9fa-e1f10579c0c1",
+                "username": "user_1_name",
+                "email": "user_1_email",
+                "imageUrl": "http://example.com/image.png"
+            },{
+                "userId": "2368218d-b5ec-4d4d-bc3c-6c249776ee11",
+                "username": "user_2_name",
+                "email": "user_2_email",
+                "imageUrl": null
+            }]
+            "transactions" : [ ... ], // all transaction-objects, length=0 if group was just created
+            "groupId" : "6367e722-e857-4d0f-bf78-278a92260418",
+            "createdAt" : "2017-12-25T10:56:13.234Z"
+        }
     }
  */
 /**
@@ -471,6 +499,14 @@
 /**
  * @apiDefine successBodyGroupUsersName
     @apiSuccess (Success) {string} users[username] Name of user
+ */
+/**
+ * @apiDefine successBodyGroupUserEmail
+    @apiSuccess (Success) {string} users[email] Email of user
+ */
+/**
+ * @apiDefine successBodyGroupUserImageUrl
+    @apiSuccess (Success) {string} users[imageUrl] Url of user's profile image
  */
 
 /**

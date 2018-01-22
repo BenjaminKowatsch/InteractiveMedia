@@ -64,9 +64,13 @@ public class UserAdapter extends CursorAdapter {
         final String imageUrl = user.getImageUrl();
         LazyHeaders.Builder builder = new LazyHeaders.Builder();
         GlideUrl glideUrl = null;
-        if (imageUrl != null && imageUrl.startsWith(context.getResources().getString(R.string.web_service_url))) {
-            builder = builder.addHeader("Authorization", Login.getInstance().getUserType().getValue() + " " + Login.getInstance().getAccessToken());
-            glideUrl = new GlideUrl(imageUrl, builder.build());
+        if (imageUrl != null ){
+            if(imageUrl.startsWith(context.getResources().getString(R.string.web_service_url))) {
+                builder = builder.addHeader("Authorization", Login.getInstance().getUserType().getValue() + " " + Login.getInstance().getAccessToken());
+                glideUrl = new GlideUrl(imageUrl, builder.build());
+            } else {
+                glideUrl = new GlideUrl(imageUrl, builder.build());
+            }
         }
 
         Glide.with(context).load(glideUrl)

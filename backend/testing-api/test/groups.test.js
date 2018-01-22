@@ -56,6 +56,9 @@ describe('Groups-Controller: Groups:', () => {
           .to.have.members([userData.users.valid[0].username, userData.users.valid[1].username]);
           expect(res.body.payload.users.map(val => val.email))
           .to.have.members([userData.users.valid[0].email, userData.users.valid[1].email]);
+          expect(res.body.payload.users.map(val => val.userId)).to.have.lengthOf(2);
+          expect(res.body.payload.users.map(val => val.imageUrl))
+          .to.have.members([userData.users.valid[0].imageUrl, userData.users.valid[1].imageUrl]);
           expect(res.body.payload.transactions).to.be.empty;
           expect(res.body.payload.groupId).to.be.an('string').and.not.to.be.empty;
           expect(res.body.payload.createdAt).to.be.an('string').and.not.to.be.empty;
@@ -198,6 +201,9 @@ describe('Groups-Controller: Groups:', () => {
           .to.have.members([userData.users.valid[0].username, userData.users.valid[1].username]);
           expect(res.body.payload.users.map(val => val.email))
           .to.have.members([userData.users.valid[0].email, userData.users.valid[1].email]);
+          expect(res.body.payload.users.map(val => val.userId)).to.have.lengthOf(2);
+          expect(res.body.payload.users.map(val => val.imageUrl))
+          .to.have.ordered.members([userData.users.valid[0].imageUrl, userData.users.valid[1].imageUrl]);
           expect(res.body.payload.transactions).to.be.empty;
           expect(res.body.payload.groupId).to.equal(groupId);
           expect(res.body.payload.createdAt).to.be.an('string').and.not.to.be.empty;
@@ -221,6 +227,9 @@ describe('Groups-Controller: Groups:', () => {
           .to.have.members([userData.users.valid[0].username, userData.users.valid[1].username]);
           expect(res.body.payload.users.map(val => val.email))
           .to.have.members([userData.users.valid[0].email, userData.users.valid[1].email]);
+          expect(res.body.payload.users.map(val => val.userId)).to.have.lengthOf(2);
+          expect(res.body.payload.users.map(val => val.imageUrl))
+          .to.have.ordered.members([userData.users.valid[0].imageUrl, userData.users.valid[1].imageUrl]);
           expect(res.body.payload.transactions).to.be.empty;
           expect(res.body.payload.groupId).to.equal(groupId);
           expect(res.body.payload.createdAt).to.be.an('string').and.not.to.be.empty;

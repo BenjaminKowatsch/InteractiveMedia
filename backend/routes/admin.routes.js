@@ -62,9 +62,11 @@ router.get('/groups', authenticationMiddleware.isAuthenticated, authorizationMid
  * @apiUse successBodyGroupUsers
  * @apiUse successBodyGroupUsersUserId
  * @apiUse successBodyGroupUsersName
+ * @apiUse successBodyGroupUserEmail
+ * @apiUse successBodyGroupUserImageUrl
  *
  * @apiSuccess (SuccessCode) {200} Success Group
- * @apiUse successExampleGroup
+ * @apiUse successExampleGetGroupById
  *
  * @apiUse error400MissingUnknownUrlParameter
  * @apiUse error401Unauthorized
