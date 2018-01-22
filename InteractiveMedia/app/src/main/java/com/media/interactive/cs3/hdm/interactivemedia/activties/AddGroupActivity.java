@@ -59,7 +59,6 @@ public class AddGroupActivity extends ImagePickerActivity implements View.OnClic
   private EditText groupName;
   private Button addNewUser;
   private Button saveGroup;
-  private Button cancel;
 
   private LinearLayout linearLayout;
   private NonScrollRecyclerView recyclerView;
@@ -115,7 +114,6 @@ public class AddGroupActivity extends ImagePickerActivity implements View.OnClic
     final TextView groupNameError = (TextView) findViewById(R.id.et_group_name_error);
     addNewUser = (Button) findViewById(R.id.bn_group_add_user);
     saveGroup = (Button) findViewById(R.id.bn_group_save);
-    cancel = (Button) findViewById(R.id.bn_group_cancel);
     recyclerView = (NonScrollRecyclerView) findViewById(R.id.recycler_view);
 
     saveGroup.setEnabled(false);
@@ -126,7 +124,6 @@ public class AddGroupActivity extends ImagePickerActivity implements View.OnClic
     addNewUser.setOnClickListener(this);
     addNewUser.setOnClickListener(this);
     saveGroup.setOnClickListener(this);
-    cancel.setOnClickListener(this);
 
     userList = new ArrayList<>();
     mAdapter = new UserEmailAdapter(this, userList);
@@ -242,9 +239,6 @@ public class AddGroupActivity extends ImagePickerActivity implements View.OnClic
         } catch (JSONException e) {
           e.printStackTrace();
         }
-        break;
-      case R.id.bn_group_cancel:
-        finish();
         break;
       default:
         Log.e(TAG, "Unhandled onclick event.");

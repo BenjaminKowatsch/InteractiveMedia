@@ -17,6 +17,7 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.support.v7.widget.helper.ItemTouchHelper;
 import android.text.Editable;
+import android.text.InputFilter;
 import android.text.InputType;
 import android.text.TextWatcher;
 import android.util.Log;
@@ -59,11 +60,12 @@ import com.media.interactive.cs3.hdm.interactivemedia.data.split.SplitFactory;
 import com.media.interactive.cs3.hdm.interactivemedia.recyclerview.NonScrollRecyclerView;
 import com.media.interactive.cs3.hdm.interactivemedia.recyclerview.RecyclerItemTouchHelper;
 import com.media.interactive.cs3.hdm.interactivemedia.recyclerview.SplitAdapter;
+import com.media.interactive.cs3.hdm.interactivemedia.util.DecimalDigitsInputFilter;
 import com.media.interactive.cs3.hdm.interactivemedia.util.Helper;
-import com.media.interactive.cs3.hdm.interactivemedia.util.MoneyTextWatcher;
 
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.w3c.dom.Text;
 
 import java.text.NumberFormat;
 import java.text.ParseException;
@@ -82,7 +84,8 @@ public class AddTransactionActivity extends ImagePickerActivity implements Recyc
     public static final String GROUP_TO_ADD_TO = "GroupToAddTo";
     public static final String GROUP_CREATED_AT_ADD_TO = "GroupCreatedAtToAddTo";
     private static final String TAG = AddTransactionActivity.class.getSimpleName();
-    private static final String CURRENCY_PATTERN = "#.###";
+    private static final int DECIMALS_BEFORE_POINT = 8;
+    private static final int DECIMALS_AFTER_POINT = 2;
     private final SimpleDateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyy");
     private final SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm");
     private final SimpleDateFormat dateTimeFormat = new SimpleDateFormat(dateFormat.toPattern() + timeFormat.toPattern());
@@ -102,6 +105,8 @@ public class AddTransactionActivity extends ImagePickerActivity implements Recyc
     private SplitAdapter splitsAdapter;
     private List<Split> splitList;
     private LinearLayout linearLayout;
+    private boolean validAmount;
+    private final InputFilter decimalFilter = new DecimalDigitsInputFilter(DECIMALS_BEFORE_POINT, DECIMALS_AFTER_POINT);
 
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -119,7 +124,6 @@ public class AddTransactionActivity extends ImagePickerActivity implements Recyc
                     locationDisplay.setText(null);
                 }
                 Log.d(TAG, toastMsg);
-                Toast.makeText(this, toastMsg, Toast.LENGTH_LONG).show();
             }
         }
     }
@@ -166,10 +170,12 @@ public class AddTransactionActivity extends ImagePickerActivity implements Recyc
         final ItemTouchHelper.SimpleCallback itemTouchHelperCallback = new RecyclerItemTouchHelper(0, ItemTouchHelper.LEFT, this);
         new ItemTouchHelper(itemTouchHelperCallback).attachToRecyclerView(splitsView);
 
-        amountEditText.addTextChangedListener(new MoneyTextWatcher(amountEditText, CURRENCY_PATTERN));
+        final TextView amountError = findViewById(R.id.et_add_transaction_amount_error);
+        final TextView nameError = findViewById(R.id.et_add_transaction_purpose_error);
+
+        amountEditText.setFilters(new InputFilter[] {decimalFilter});
 
         helper = new DatabaseProviderHelper(getContentResolver());
-
 
         name = findViewById(R.id.et_add_transaction_purpose);
         amount = amountEditText;
@@ -177,6 +183,15 @@ public class AddTransactionActivity extends ImagePickerActivity implements Recyc
 
         final Button addTransactionButton = findViewById(R.id.bn_add_transaction);
         addTransactionButton.setEnabled(false);
+
+        final Button addSplitButton = findViewById(R.id.bn_add_transaction_add_split);
+        addSplitButton.setEnabled(false);
+        addSplitButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                showAddDeductionDialog();
+            }
+        });
 
         final TextWatcher textWatcher = new TextWatcher() {
             @Override
@@ -189,11 +204,13 @@ public class AddTransactionActivity extends ImagePickerActivity implements Recyc
 
             @Override
             public void afterTextChanged(Editable editable) {
-                if ((name.getText().toString().length() > 0) && (amount.getText().toString().length() > 0)) {
-                    addTransactionButton.setEnabled(true);
-                } else {
-                    addTransactionButton.setEnabled(false);
-                }
+                validAmount = amount.getText().toString().length() > 0 && !amount.getText().toString().equals(".");
+                boolean validName = (name.getText().toString().length() > 0);
+
+                addSplitButton.setEnabled(validAmount);
+                amountError.setVisibility(validAmount ? View.GONE : View.VISIBLE);
+                nameError.setVisibility(validName ? View.GONE : View.VISIBLE);
+                addTransactionButton.setEnabled(validName && validName);
             }
         };
 
@@ -205,13 +222,6 @@ public class AddTransactionActivity extends ImagePickerActivity implements Recyc
             @Override
             public void onClick(View view) {
                 createAndSaveTransaction(view);
-            }
-        });
-        final Button cancel = findViewById(R.id.bn_add_transaction_cancel);
-        cancel.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                finish();
             }
         });
 
@@ -237,14 +247,6 @@ public class AddTransactionActivity extends ImagePickerActivity implements Recyc
         setAmountTextField(amountEditText);
         setMinimumDate(Helper.parseDateString(groupCreatedAt));
 
-        final Button addSplitButton = findViewById(R.id.bn_add_transaction_add_split);
-        addSplitButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                showAddDeductionDialog();
-            }
-        });
-
         splitList.add(new EvenSplit());
     }
 
@@ -265,7 +267,9 @@ public class AddTransactionActivity extends ImagePickerActivity implements Recyc
 
         final TextView errorMessage = dialogView.findViewById(R.id.add_split_error);
         final EditText editText = dialogView.findViewById(R.id.add_split_amount);
-        editText.addTextChangedListener(new MoneyTextWatcher(editText, CURRENCY_PATTERN));
+        final TextView dotErrorMessage = dialogView.findViewById(R.id.add_split_dot_error);
+        editText.setFilters(new InputFilter[] {decimalFilter});
+
         final Spinner userSelection = dialogView.findViewById(R.id.add_split_user);
         final SimpleCursorAdapter dialogUserAdapter = initializeUserAdapter();
         userSelection.setAdapter(dialogUserAdapter);
@@ -301,20 +305,23 @@ public class AddTransactionActivity extends ImagePickerActivity implements Recyc
 
             @Override
             public void afterTextChanged(Editable editable) {
-                //final Number parse;
-                //try {
-                    //parse = CURRENCY_FORMAT.parse(editable.toString());
-                    double parse = Double.parseDouble(editable.toString().replace("€",""));
-                    if (parse < parseAmount(amount)) {
-                        errorMessage.setVisibility(View.GONE);
-                        positiveButton.setEnabled(true);
+                try {
+                    if(editable.toString().length() > 0 && !editable.toString().equals(".")) {
+                        dotErrorMessage.setVisibility(View.GONE);
+                        double parse = Double.parseDouble(editable.toString());
+                        if (parse < parseAmount(amount)) {
+                            errorMessage.setVisibility(View.GONE);
+                            positiveButton.setEnabled(true);
+                        } else {
+                            errorMessage.setVisibility(View.VISIBLE);
+                            positiveButton.setEnabled(false);
+                        }
                     } else {
-                        errorMessage.setVisibility(View.VISIBLE);
-                        positiveButton.setEnabled(false);
+                        dotErrorMessage.setVisibility(View.VISIBLE);
                     }
-               /* } catch (ParseException e) {
+                } catch (NumberFormatException e) {
                     Log.e(TAG, "Text in " + editable + " could not be parsed", e);
-                }*/
+                }
             }
         });
 
@@ -427,7 +434,7 @@ public class AddTransactionActivity extends ImagePickerActivity implements Recyc
     }
 
     private double parseAmount(EditText amountText) {
-        return Double.parseDouble(amountText.getText().toString().replace("€",""));
+        return Double.parseDouble(amountText.getText().toString());
     }
 
     private Date parseDateTime(EditText dateText, EditText timeText) {
