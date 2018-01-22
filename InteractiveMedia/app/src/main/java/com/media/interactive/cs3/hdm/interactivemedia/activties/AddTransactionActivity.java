@@ -5,10 +5,8 @@ import android.app.DatePickerDialog;
 import android.app.TimePickerDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.res.ColorStateList;
 import android.database.Cursor;
 import android.graphics.Color;
-import android.graphics.PorterDuff;
 import android.location.Location;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
@@ -61,6 +59,7 @@ import com.media.interactive.cs3.hdm.interactivemedia.data.split.SplitFactory;
 import com.media.interactive.cs3.hdm.interactivemedia.recyclerview.NonScrollRecyclerView;
 import com.media.interactive.cs3.hdm.interactivemedia.recyclerview.RecyclerItemTouchHelper;
 import com.media.interactive.cs3.hdm.interactivemedia.recyclerview.SplitAdapter;
+import com.media.interactive.cs3.hdm.interactivemedia.util.Helper;
 import com.media.interactive.cs3.hdm.interactivemedia.util.MoneyTextWatcher;
 
 import org.json.JSONException;
@@ -218,8 +217,6 @@ public class AddTransactionActivity extends ImagePickerActivity implements Recyc
         final Button locationButton = findViewById(R.id.transaction_location);
         locationButton.setText(locationButton.getHint());
 
-    setMinimumDate(Helper.parseDateString(groupCreatedAt));
-
         setupDatePicker();
 
         userAdapter = initializeUserAdapter();
@@ -231,6 +228,7 @@ public class AddTransactionActivity extends ImagePickerActivity implements Recyc
         setDateTextField(dateEditText);
         setDateTimeTextField(timeEditText);
         setAmountTextField(amountEditText);
+        setMinimumDate(Helper.parseDateString(groupCreatedAt));
 
         final Button addSplitButton = findViewById(R.id.bn_add_transaction_add_split);
         addSplitButton.setOnClickListener(new View.OnClickListener() {
