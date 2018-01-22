@@ -29,7 +29,7 @@
 
             <ListView
                 android:id="@+id/payment_list"
-                android:layout_width="280dp"
+                android:layout_width="270dp"
                 android:layout_height="80dp"
                 android:layout_below="@+id/transaction_debt_overview_title"
                 android:layout_gravity="start"
@@ -52,6 +52,7 @@
                     android:layout_height="match_parent"
                     android:ellipsize="end"
                     android:lines="1"
+                    android:textSize="14sp"
                     android:textAlignment="center"
                     android:textAppearance="@android:style/TextAppearance.Material.Large"
                     android:textColor="@color/colorLightBlue" />
@@ -60,6 +61,7 @@
                     android:id="@+id/should_pay_text"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
+                    android:textSize="14sp"
                     android:ellipsize="end"
                     android:lines="1"
                     android:text="should pay"
