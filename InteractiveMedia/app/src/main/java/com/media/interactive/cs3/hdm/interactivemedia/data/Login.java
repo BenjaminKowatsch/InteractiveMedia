@@ -87,7 +87,7 @@ public class Login {
           final boolean success = response.getBoolean("success");
           if (success) {
             Log.d(TAG, "Updated fcmToken");
-            sendDummyPushNotification(context);
+            //sendDummyPushNotification(context);
           }
         } catch (JSONException e) {
           e.printStackTrace();
