@@ -11,3 +11,7 @@ module.exports.deepCopy = function(data) {
 module.exports.wait = function(milliSeconds) {
   return new Promise(resolve => setTimeout(resolve, milliSeconds));
 };
+
+module.exports.nowPlus = function(time) {
+  return new Date(new Date().getTime() + time).toISOString();
+};

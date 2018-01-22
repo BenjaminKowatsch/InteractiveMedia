@@ -84,6 +84,7 @@ module.exports.createNewTransaction = function(req, res) {
       case ERROR.INVALID_REQUEST_BODY:
       case ERROR.INVALID_CREATE_TRANSACTION_VALUES:
       case ERROR.USER_NOT_IN_GROUP:
+      case ERROR.INVALID_SPLIT:
         statusCode = 400;
         break;
       case ERROR.DB_ERROR:

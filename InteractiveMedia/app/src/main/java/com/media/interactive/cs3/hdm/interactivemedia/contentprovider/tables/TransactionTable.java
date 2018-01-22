@@ -63,7 +63,8 @@ public class TransactionTable {
                     + COLUMN_INFO_CREATED_AT + " TIMESTAMP DEFAULT CURRENT_TIMESTAMP,"
                     + COLUMN_SYNCHRONIZED + " INTEGER NOT NULL,"
                     + COLUMN_PUBLISHED_AT + " TIMESTAMP, "
-                    + COLUMN_SPLIT + " TEXT NOT NULL"
+                    + COLUMN_SPLIT + " INTEGER references " + SplitTable.TABLE_NAME
+                    + " (" + SplitTable.COLUMN_ID + ") on delete cascade on update cascade"
                     + ")";
 
     public static final String DATABASE_DROP = "drop table if exists " + TABLE_NAME;

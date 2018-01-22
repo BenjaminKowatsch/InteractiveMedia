@@ -14,6 +14,7 @@ import com.media.interactive.cs3.hdm.interactivemedia.contentprovider.tables.Gro
 import com.media.interactive.cs3.hdm.interactivemedia.contentprovider.tables.GroupUserTable;
 import com.media.interactive.cs3.hdm.interactivemedia.contentprovider.tables.LoginTable;
 import com.media.interactive.cs3.hdm.interactivemedia.contentprovider.tables.PaymentTable;
+import com.media.interactive.cs3.hdm.interactivemedia.contentprovider.tables.SplitTable;
 import com.media.interactive.cs3.hdm.interactivemedia.contentprovider.tables.TransactionTable;
 import com.media.interactive.cs3.hdm.interactivemedia.contentprovider.tables.UserTable;
 
@@ -58,6 +59,8 @@ public class DatabaseProvider extends android.content.ContentProvider {
             + AUTHORITY + "/" + TransactionTable.TABLE_NAME);
     public static final Uri CONTENT_USER_URI = Uri.parse("content://"
             + AUTHORITY + "/" + UserTable.TABLE_NAME);
+    public static final Uri CONTENT_SPLIT_URI = Uri.parse("content://"
+            + AUTHORITY + "/" + SplitTable.TABLE_NAME);
     public static final Uri CONTENT_GROUP_TRANSACTION_URI = Uri.parse("content://"
             + AUTHORITY + "/" + GroupTransactionTable.TABLE_NAME);
     public static final Uri CONTENT_GROUP_USER_URI = Uri.parse("content://"
@@ -80,7 +83,8 @@ public class DatabaseProvider extends android.content.ContentProvider {
     private static final int GROUP_USER_TRANSACTION_JOIN_CODE = 9;
     private static final int PAYMENT_CODE = 10;
     private static final int DEBT_GROUP_ID_JOIN_CODE = 11;
-    private static final int USER_DEBT_JOIN_CODE = 12;
+    private static final int SPLIT_CODE = 12;
+    private static final int USER_DEBT_JOIN_CODE = 13;
     private static final UriMatcher mUriMatcher = new UriMatcher(UriMatcher.NO_MATCH);
 
     static {
@@ -90,6 +94,7 @@ public class DatabaseProvider extends android.content.ContentProvider {
         mUriMatcher.addURI(AUTHORITY, TransactionTable.TABLE_NAME, TRANSACTION_CODE);
         mUriMatcher.addURI(AUTHORITY, UserTable.TABLE_NAME, USER_CODE);
         mUriMatcher.addURI(AUTHORITY, PaymentTable.TABLE_NAME, PAYMENT_CODE);
+        mUriMatcher.addURI(AUTHORITY, SplitTable.TABLE_NAME, SPLIT_CODE);
 
         mUriMatcher.addURI(AUTHORITY, GROUP_USER_JOIN_TABLE, GROUP_USER_JOIN_CODE);
         mUriMatcher.addURI(AUTHORITY, GROUP_TRANSACTION_JOIN_TABLE, GROUP_TRANSACTION_JOIN_CODE);
@@ -140,6 +145,9 @@ public class DatabaseProvider extends android.content.ContentProvider {
                 break;
             case PAYMENT_CODE:
                 sqLiteQueryBuilder.setTables(PaymentTable.TABLE_NAME);
+                break;
+            case SPLIT_CODE:
+                sqLiteQueryBuilder.setTables(SplitTable.TABLE_NAME);
                 break;
             case GROUP_USER_JOIN_CODE:
                 sqLiteQueryBuilder.setTables(UserTable.TABLE_NAME
@@ -224,6 +232,9 @@ public class DatabaseProvider extends android.content.ContentProvider {
                 break;
             case PAYMENT_CODE:
                 tablename = PaymentTable.TABLE_NAME;
+                break;
+            case SPLIT_CODE:
+                tablename = SplitTable.TABLE_NAME;
                 break;
             default:
                 Log.e(TAG, "Error: Calling insert method at DatabaseProvider with invalid uri.");

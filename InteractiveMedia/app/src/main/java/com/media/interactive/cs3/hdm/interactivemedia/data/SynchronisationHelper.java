@@ -96,7 +96,7 @@ public class SynchronisationHelper {
                         Log.d(TAG, "Upserted User: " + Login.getInstance().getUser());
 
                     } else {
-                        Log.e(TAG, "Error while setting user data.");
+                        Log.e(TAG, "User Request unsuccessful");
                     }
                 } catch (JSONException e) {
                     e.printStackTrace();
@@ -105,7 +105,8 @@ public class SynchronisationHelper {
         }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
-                Log.e(TAG, "Error while setting user data.");
+                error.printStackTrace();
+                Log.e(TAG, "User Request network error.");
                 for (CallbackListener<JSONObject, Exception> onUserDataSet : onUserDataSetList) {
                     onUserDataSet.onFailure(error);
                 }
@@ -188,6 +189,7 @@ public class SynchronisationHelper {
         final String url = context.getResources().getString(R.string.web_service_url).concat("/v1/groups/").concat(transaction.getGroup().getGroupId()).concat("/transactions");
         Log.d(TAG, "url: " + url);
         try {
+            Log.d(TAG, "UploadTransaction: " + transaction.toJson().toString());
             final AuthorizedJsonObjectRequest jsonObjectRequest = new AuthorizedJsonObjectRequest(
                 Request.Method.POST, url, transaction.toJson(), new Response.Listener<JSONObject>() {
                 @Override
@@ -357,7 +359,8 @@ public class SynchronisationHelper {
         }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
-                Log.e(TAG, "Error while setting user data.");
+                error.printStackTrace();
+                Log.e(TAG, "TransactionsAfter network error.");
                 if (callback != null) {
                     callback.onFailure(null);
                 }
@@ -410,7 +413,7 @@ public class SynchronisationHelper {
                                     }
                                 }
                             } else {
-                                Log.e(TAG, "Error while setting user data.");
+                                Log.e(TAG, "Requesting groups unsuccessful");
                             }
                         } catch (JSONException e) {
                             e.printStackTrace();
@@ -419,7 +422,8 @@ public class SynchronisationHelper {
                 }, new Response.ErrorListener() {
                     @Override
                     public void onErrorResponse(VolleyError error) {
-                        Log.e(TAG, "Error while setting user data.");
+                        error.printStackTrace();
+                        Log.e(TAG, "Requesting groups network error.");
                     }
                 });
                 jsonObjectRequest.setShouldCache(false);
