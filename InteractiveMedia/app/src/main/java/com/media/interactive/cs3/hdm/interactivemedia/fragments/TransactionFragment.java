@@ -7,7 +7,6 @@ import android.content.Context;
 import android.content.CursorLoader;
 import android.content.Intent;
 import android.content.Loader;
-import android.content.res.ColorStateList;
 import android.database.Cursor;
 import android.graphics.Color;
 import android.os.Bundle;
@@ -28,29 +27,28 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.media.interactive.cs3.hdm.interactivemedia.GroupAdapter;
 import com.media.interactive.cs3.hdm.interactivemedia.R;
 import com.media.interactive.cs3.hdm.interactivemedia.TransactionAdapter;
 import com.media.interactive.cs3.hdm.interactivemedia.activties.AddTransactionActivity;
-import com.media.interactive.cs3.hdm.interactivemedia.activties.GroupDetailViewActivity;
 import com.media.interactive.cs3.hdm.interactivemedia.activties.TransactionDetailViewActivity;
 import com.media.interactive.cs3.hdm.interactivemedia.contentprovider.DatabaseHelper;
 import com.media.interactive.cs3.hdm.interactivemedia.contentprovider.DatabaseProvider;
 import com.media.interactive.cs3.hdm.interactivemedia.contentprovider.tables.GroupTable;
+import com.media.interactive.cs3.hdm.interactivemedia.contentprovider.tables.PaymentTable;
 import com.media.interactive.cs3.hdm.interactivemedia.contentprovider.tables.TransactionTable;
 import com.media.interactive.cs3.hdm.interactivemedia.contentprovider.tables.UserTable;
-import com.media.interactive.cs3.hdm.interactivemedia.data.Group;
 import com.media.interactive.cs3.hdm.interactivemedia.data.Login;
 import com.media.interactive.cs3.hdm.interactivemedia.data.Transaction;
 import com.media.interactive.cs3.hdm.interactivemedia.data.settlement.PaymentAdapter;
 import com.media.interactive.cs3.hdm.interactivemedia.util.Helper;
 
-import static android.database.DatabaseUtils.dumpCursorToString;
+import static com.media.interactive.cs3.hdm.interactivemedia.activties.AddTransactionActivity.CURRENCY_FORMAT;
 import static com.media.interactive.cs3.hdm.interactivemedia.activties.AddTransactionActivity.GROUP_CREATED_AT_ADD_TO;
 import static com.media.interactive.cs3.hdm.interactivemedia.activties.AddTransactionActivity.GROUP_TO_ADD_TO;
 
 
 public class TransactionFragment extends ListFragment implements LoaderManager.LoaderCallbacks<Cursor>, IMyFragment {
+    public static final String PAYMENT_FROM_NAME = DatabaseHelper.PAYMENT_USER_JOIN_COLUMN_FROM_USER;
     private boolean mainMode = true;
     private static final String TAG = TransactionFragment.class.getSimpleName();
     private Spinner groupSelection;
@@ -63,6 +61,9 @@ public class TransactionFragment extends ListFragment implements LoaderManager.L
     private ListView paymentListView;
     private static final int CURSOR_LOADER_TRANSACTIONS_NAME = 0;
     private static final String TRANSACTION_NAME_FILTER = "transactionName";
+    private TextView totalPaymentsText;
+    private TextView shouldPayName;
+    private TextView shouldPayText;
 
     /**
      * Mandatory empty constructor for the fragment manager to instantiate the
@@ -122,7 +123,6 @@ public class TransactionFragment extends ListFragment implements LoaderManager.L
 
     private CursorAdapter initPaymentListAdapter() {
         final Cursor payments = getPaymentCoursorForCurrentGroup();
-        Log.d(TAG, dumpCursorToString(payments));
         return new PaymentAdapter(this.getContext(), payments);
     }
 
@@ -134,9 +134,32 @@ public class TransactionFragment extends ListFragment implements LoaderManager.L
     private void refreshPaymentAdapter() {
         if (mainMode) {
             final Cursor cursor = getPaymentCoursorForCurrentGroup();
-            Log.d(TAG, dumpCursorToString(cursor));
             paymentListAdapter.swapCursor(cursor);
+            updatePaymentTexts();
         }
+    }
+
+    private void updatePaymentTexts() {
+        Cursor payments = getPaymentCoursorForCurrentGroup();
+        double paymentSum = 0.0;
+        double highestPayment = -1.0;
+        String highestPaymentName = null;
+        while (payments.moveToNext()) {
+            final double paymentAmount = payments.getDouble(payments.getColumnIndex(PaymentTable.COLUMN_AMOUNT));
+            paymentSum += paymentAmount;
+            if (paymentAmount > highestPayment) {
+                highestPayment = paymentAmount;
+                highestPaymentName = payments.getString(payments.getColumnIndex(PAYMENT_FROM_NAME));
+            }
+        }
+        if (highestPayment > 0) {
+            shouldPayName.setText(highestPaymentName);
+            shouldPayText.setVisibility(View.VISIBLE);
+        } else {
+            shouldPayName.setText("");
+            shouldPayText.setVisibility(View.INVISIBLE);
+        }
+        totalPaymentsText.setText(CURRENCY_FORMAT.format(paymentSum));
     }
 
     private void initOrRestartLoaderWithGroupId() {
@@ -189,9 +212,13 @@ public class TransactionFragment extends ListFragment implements LoaderManager.L
                              Bundle savedInstanceState) {
         transactionListFragment = inflater.inflate(R.layout.fragment_transaction_list, container, false);
 
+        totalPaymentsText = transactionListFragment.findViewById(R.id.total_payments);
+        shouldPayName = transactionListFragment.findViewById(R.id.should_pay_name);
+        shouldPayText = transactionListFragment.findViewById(R.id.should_pay_text);
+
         final SearchView searchView = transactionListFragment.findViewById(R.id.transaction_search);
         int searchTextViewId = searchView.getContext().getResources().getIdentifier("android:id/search_src_text", null, null);
-        final TextView searchTextView = (TextView)  searchView.findViewById(searchTextViewId);
+        final TextView searchTextView = (TextView) searchView.findViewById(searchTextViewId);
         searchTextView.setTextColor(Color.WHITE);
         searchTextView.setHintTextColor(Color.WHITE);
 
@@ -205,7 +232,8 @@ public class TransactionFragment extends ListFragment implements LoaderManager.L
 
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
-            public boolean onQueryTextSubmit(String s) {                final Bundle bundle = new Bundle();
+            public boolean onQueryTextSubmit(String s) {
+                final Bundle bundle = new Bundle();
                 bundle.putString(TRANSACTION_NAME_FILTER, s);
                 getLoaderManager().restartLoader(CURSOR_LOADER_TRANSACTIONS_NAME, bundle, TransactionFragment.this);
                 return true;
@@ -249,7 +277,7 @@ public class TransactionFragment extends ListFragment implements LoaderManager.L
         final TransactionAdapter.ViewHolder viewHolder = ((TransactionAdapter.ViewHolder) v.getTag());
         final Transaction transaction = viewHolder.getTransaction();
         final String paidByUsername = viewHolder.getPaidByUsername();
-        startTransactionDetailActivity(transaction,paidByUsername);
+        startTransactionDetailActivity(transaction, paidByUsername);
     }
 
     private void startTransactionDetailActivity(Transaction transaction, String paidByUsername) {
@@ -290,47 +318,47 @@ public class TransactionFragment extends ListFragment implements LoaderManager.L
         } else {
             selectionArgs = new String[]{"", search, search};
         }
-            return new CursorLoader(getActivity(), DatabaseProvider.CONTENT_GROUP_USER_TRANSACTION_JOIN_URI, projection, selection, selectionArgs, sortOrder);
-        }
-
-        @Override
-        public void onLoadFinished (Loader < Cursor > loader, Cursor data){
-            Log.d(TAG, "Data: " + data.getCount());
-            if (transactionAdapter == null) {
-                transactionAdapter = new TransactionAdapter(getContext(), R.layout.fragment_transaction, data);
-            } else {
-                transactionAdapter.swapCursor(data);
-            }
-
-            setListAdapter(transactionAdapter);
-        }
-
-        @Override
-        public void onLoaderReset (Loader < Cursor > loader) {
-            transactionAdapter.swapCursor(null);
-        }
-
-
-        @Override
-        public View.OnClickListener getOnFabClickListener () {
-            return new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    Log.d(TAG, "Hello from " + TAG);
-                    if (isMainMode()) {
-                        final Intent intent = new Intent(view.getContext(), AddTransactionActivity.class);
-                        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
-                        intent.putExtra(GROUP_TO_ADD_TO, getCurrentGroupId());
-                        intent.putExtra(GROUP_CREATED_AT_ADD_TO, getCurrentGroupCreatedAt());
-                        startActivity(intent);
-                    } else {
-                        Toast.makeText(getContext(), "Create a group before adding transactions", Toast.LENGTH_LONG).show();
-                    }
-                }
-            };
-        }
-
-        public boolean isMainMode() {
-            return mainMode;
-        }
+        return new CursorLoader(getActivity(), DatabaseProvider.CONTENT_GROUP_USER_TRANSACTION_JOIN_URI, projection, selection, selectionArgs, sortOrder);
     }
+
+    @Override
+    public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
+        Log.d(TAG, "Data: " + data.getCount());
+        if (transactionAdapter == null) {
+            transactionAdapter = new TransactionAdapter(getContext(), R.layout.fragment_transaction, data);
+        } else {
+            transactionAdapter.swapCursor(data);
+        }
+
+        setListAdapter(transactionAdapter);
+    }
+
+    @Override
+    public void onLoaderReset(Loader<Cursor> loader) {
+        transactionAdapter.swapCursor(null);
+    }
+
+
+    @Override
+    public View.OnClickListener getOnFabClickListener() {
+        return new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Log.d(TAG, "Hello from " + TAG);
+                if (isMainMode()) {
+                    final Intent intent = new Intent(view.getContext(), AddTransactionActivity.class);
+                    intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+                    intent.putExtra(GROUP_TO_ADD_TO, getCurrentGroupId());
+                    intent.putExtra(GROUP_CREATED_AT_ADD_TO, getCurrentGroupCreatedAt());
+                    startActivity(intent);
+                } else {
+                    Toast.makeText(getContext(), "Create a group before adding transactions", Toast.LENGTH_LONG).show();
+                }
+            }
+        };
+    }
+
+    public boolean isMainMode() {
+        return mainMode;
+    }
+}

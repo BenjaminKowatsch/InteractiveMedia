@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/colorPrimary"
+    android:orientation="vertical"
+    android:padding="10dp">
+
+    <EditText
+        android:id="@+id/add_split_amount"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:inputType="numberDecimal" />
+
+    <Spinner
+        android:id="@+id/add_split_user"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:spinnerMode="dropdown" />
+
+    <TextView
+        android:id="@+id/add_split_error"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Set an amount smaller than transaction amount before proceeding"
+        android:textColor="@android:color/holo_red_dark"
+        android:visibility="visible" />
+
+</LinearLayout>

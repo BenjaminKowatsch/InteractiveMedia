@@ -16,7 +16,7 @@ import java.util.Map;
 public class AuthorizedJsonObjectRequest extends JsonObjectRequest {
 
 
-    private static final int MY_SOCKET_TIMEOUT_MS = 300;
+    private static final int MY_SOCKET_TIMEOUT_MS = 1000;
     private static DefaultRetryPolicy POLICY = new DefaultRetryPolicy(
         MY_SOCKET_TIMEOUT_MS,
         DefaultRetryPolicy.DEFAULT_MAX_RETRIES,

@@ -1,0 +1,155 @@
+<template>
+  <v-container fluid fill-height>
+    <v-layout  justify-center align-center> 
+      <span class="text-md-center">  
+        <v-form v-model="valid" ref="form" lazy-validation>
+          <v-text-field
+            label="Email of user"
+            v-model="email"
+            @keyup.enter="resetPW()"    
+          ></v-text-field>
+          <v-tooltip top>
+            <v-btn icon slot="activator">
+              <v-icon>fa-question-circle</v-icon>
+            </v-btn>
+            <span>Reset user password to default "interactive" (for support purpose)</span>
+          </v-tooltip>
+           <v-btn
+            @click="resetPW"
+            :disabled="!valid"
+          >
+            Reset PW
+          </v-btn>
+          <v-btn @click="clear">Clear</v-btn>
+      </span>
+      <v-snackbar
+          :timeout="3000"
+          :bottom="true"
+          class="green darken-4"
+          v-model="successReset"
+        >
+          Password resetted ("interactive")
+          <v-btn dark flat @click.native="successReset = false">X</v-btn>
+        </v-snackbar>
+        <v-snackbar
+          :timeout="3000"
+          :bottom="true"
+          class="red darken-4"
+          v-model="passwordAlreadyResetted"
+        >
+          Password has already been resetted
+          <v-btn dark flat @click.native="passwordAlreadyResetted = false">X</v-btn>
+        </v-snackbar>
+        <v-snackbar
+          :timeout="3000"
+          :bottom="true"
+          class="red darken-4"
+          v-model="noUserFound"
+        >
+          Email doesn't exists
+        <v-btn dark flat @click.native="noUserFound = false">X</v-btn>
+        </v-snackbar>
+        <v-snackbar
+          :timeout="3000"
+          :bottom="true"
+          class="red darken-4"
+          v-model="errorReset"
+        >
+          Error in request
+          <v-btn dark flat @click.native="errorReset = false">X</v-btn>
+        </v-snackbar>
+    </v-layout>
+  </v-container>        
+</template>
+
+<script>
+
+import axios from "axios";
+import Cookie from "../js/Cookie.js";
+import Config from "../js/Config.js";
+
+ export default {
+      props: ['authToken', 'users'],
+
+    data () {
+      return {
+        email: '',
+        userId: '',
+        user: [],
+        successReset: false,
+        noUserFound: false,
+        passwordAlreadyResetted: false,
+        requestError: false
+      }
+    },
+
+    mounted: function(){
+
+    },
+
+    methods: {
+
+        resetPW: function(){
+
+            if(this.email.length > 0){
+
+                this.user = this.users.filter(this.filter_userID)
+
+                if(this.user.length > 0){
+                    this.userId = this.user[0].userId
+                    console.log(this.userId)
+                    console.log(JSON.stringify(this.user))
+                    var pw = "interactive"
+
+                    var reset = {
+                        password: pw
+                    }
+
+                    axios.put(Config.webServiceURL + "/v1/admin/users/" + this.userId, reset, {
+                    headers: { Authorization: "0 " + this.authToken }
+                    })
+                    .then(response => {
+                        console.log(JSON.stringify(response))
+                        if(response.data.success == true) {
+                            this.successReset = true
+                            this.clear()
+                        }
+                    })
+                    .catch(e => {
+                        if(e.response.status == 500) {                          
+                            this.passwordAlreadyResetted = true
+                            this.clear()                       
+                        }
+                        else 
+                        {
+                            this.requestError = true
+                            this.clear()
+                        }
+                        console.log("Errors reset pw: " + e);   
+                    });
+                }else 
+                {
+                  this.noUserFound = true
+                  this.clear()
+                }
+            }
+
+        },
+
+
+        clear: function () {
+            this.$refs.form.reset()
+            this.email = '',
+            this.user = [],
+            this.userId = ''
+        },
+
+        filter_userID: function(users) {
+        return users.email == this.email;
+        },
+    }
+}
+</script>
+
+
+ 

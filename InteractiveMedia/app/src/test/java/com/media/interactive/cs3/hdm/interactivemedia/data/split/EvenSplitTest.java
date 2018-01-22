@@ -2,7 +2,6 @@ package com.media.interactive.cs3.hdm.interactivemedia.data.split;
 
 import android.location.Location;
 
-import com.google.android.gms.maps.model.LatLng;
 import com.media.interactive.cs3.hdm.interactivemedia.data.Debt;
 import com.media.interactive.cs3.hdm.interactivemedia.data.Group;
 import com.media.interactive.cs3.hdm.interactivemedia.data.Transaction;
@@ -90,8 +89,8 @@ public class EvenSplitTest {
     }
 
     @Test
-    public void isTerminating_newSplit_returnsTrue() throws Exception {
-        assertTrue(split.isTerminating());
+    public void isTerminating_newSplitAnyParam_returnsTrue() throws Exception {
+        assertTrue(split.isTerminating(null));
     }
 
 }

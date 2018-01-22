@@ -31,6 +31,8 @@ import com.media.interactive.cs3.hdm.interactivemedia.util.Helper;
 
 import java.util.ArrayList;
 
+import static com.media.interactive.cs3.hdm.interactivemedia.activties.AddTransactionActivity.CURRENCY_FORMAT;
+
 /**
  * Created by benny on 04.01.18.
  */
@@ -79,7 +81,7 @@ public class TransactionDetailViewActivity extends AppCompatActivity implements 
 
         transactionName.setText(name);
         transactionCreatedAt.setText(Helper.READABLE_DATE_FORMAT.format(Helper.parseDateString(createdAt)));
-        transactionAmount.setText(String.valueOf(amountValue));
+        transactionAmount.setText(CURRENCY_FORMAT.format(amountValue));
 
         pieChart = (PieChart) findViewById(R.id.chart);
 

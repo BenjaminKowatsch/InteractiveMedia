@@ -1,10 +1,17 @@
 package com.media.interactive.cs3.hdm.interactivemedia.data.split;
 
 
+import android.content.ContentValues;
+import android.support.annotation.NonNull;
+
+import com.media.interactive.cs3.hdm.interactivemedia.contentprovider.tables.SplitTable;
 import com.media.interactive.cs3.hdm.interactivemedia.data.Debt;
 import com.media.interactive.cs3.hdm.interactivemedia.data.Group;
 import com.media.interactive.cs3.hdm.interactivemedia.data.Transaction;
 import com.media.interactive.cs3.hdm.interactivemedia.data.User;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -34,14 +41,39 @@ public class EvenSplit implements Split {
         }
     }
 
+    @NonNull
     @Override
     public Split andThen(Split next) {
         throw new TerminatingSplitChainedException(this.getClass().getName() + " is always terminating");
     }
 
     @Override
-    public boolean isTerminating() {
+    public boolean isTerminating(Transaction transaction) {
         return true;
+    }
+
+    @Override
+    public boolean hasNext() {
+        return false;
+    }
+
+    @Override
+    public Split getNext() {
+        throw new LastSplitInChainException();
+    }
+
+    @Override
+    public JSONObject toJson() throws JSONException {
+        final JSONObject result = new JSONObject();
+        result.put("type", "even");
+        return result;
+    }
+
+    @Override
+    public ContentValues toContentValues() {
+        ContentValues out = new ContentValues();
+        out.put(SplitTable.COLUMN_TYPE, "even");
+        return out;
     }
 
 }

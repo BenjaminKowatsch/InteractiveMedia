@@ -65,10 +65,7 @@
 </template>
  
 <script>
-/*
-* START JScript Elements for establishing the view according to the template elements
-* imports jwt, axios, Cookie, Config
-*/
+
 import Mixins from "../mixins.js";
 
 import axios from "axios";
@@ -96,24 +93,8 @@ export default {
       alertAccessDenied: false,
       alertWrongCredentials: false,
       alertUnknownRole: false,
-      // sets the variables and defines them
   }),
   methods: {
-    /*     registerDummyUser: function() {
-      axios
-        .post(Config.webServiceURL + "/v1/users", {
-          username: "yxcvbn",
-          email: "yxcvb@web.de",
-          password: "yxcvb"
-        })
-        .then(function(response) {
-          console.log(response);
-        })
-        .catch(function(error) {
-          console.log(error);
-        });
-    }, */
-
     /**
          * Callback function for printing out the error response of a POST request
          * @param  {JSONObject} error Object which holds error information
@@ -121,11 +102,10 @@ export default {
     defaultErrorHandler: function(error) {
       console.log("Error: " + JSON.stringify(error)); // logs an error to the console
       //If logindata doenst match a db entry, show error and reload page
-     /*  this.$f7.alert("Login failed", "Debts² Admin Panel", () => { */
         this.alertWrongCredentials = true
-        this.redirect("/", false, false, false);
+        this.redirect("/");
         console.log("redirecting to /")
-      /* }); */
+      
     },
     /**
          * Callback function for handling the non error response of the login POST requests
@@ -171,35 +151,17 @@ export default {
          */
     checkLogin: function() {
         if (this.$refs.form.validate()){
-      /* if (this.username !== "" && this.password !== "") { */
-        // function to check the login data
+
         var credentials = {
           username: this.username,
           password: this.password
-          // sets the variables and defines them as the tiped in data
         };
-        // Sending credentials to database
-        //mocking!!!!!
-        /* /          this.loginResponseHandler({
-              "data":{
-                "success": true,
-                "payload": {
-                  "accessToken": "this_is_the_token_lol",
-                  "authType": 0
-                },
-              "status": 201
-              }
-            });  */
+
         axios
           .post(Config.webServiceURL + "/v1/users/login?type=0", credentials)
           .then(this.loginResponseHandler)
           .catch(this.defaultErrorHandler);
-      } /* else {
-        this.$f7.alert(
-          "Username oder Passwort darf nicht leer sein",
-          "Debts² Admin Panel"
-        );
-      } */
+      } 
     },
     reset: function() {
         this.$refs.form.reset()
