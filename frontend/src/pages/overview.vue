@@ -28,7 +28,7 @@
     </v-flex>
     <p></p>
     <v-flex xs12 sm12 md12 lg6 xl6>
-        <v-btn slot="activator" large @click="showResetPW = toggleState(showResetPW)">ResetPW</v-btn>
+        <v-btn slot="activator" large @click="showResetPW = toggleState(showResetPW)">Reset PW</v-btn>
         <reset-user-pw v-if="usersLoaded && showResetPW" :users="users" :authToken="authToken"></reset-user-pw>
     </v-flex>
     </v-layout>    
