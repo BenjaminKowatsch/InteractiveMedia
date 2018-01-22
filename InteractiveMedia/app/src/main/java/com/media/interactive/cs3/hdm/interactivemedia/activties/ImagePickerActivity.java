@@ -308,7 +308,7 @@ public class ImagePickerActivity extends AppCompatActivity {
         uploadImage(currentPhotoPath, callbackListener);
     }
 
-    private void uploadImage(String imageFilePath, final CallbackListener<JSONObject, Exception> callbackListener) {
+    private void uploadImage(final String imageFilePath, final CallbackListener<JSONObject, Exception> callbackListener) {
         if (imageFilePath != null && imageFilePath.length() > 0) {
             final String url = getResources().getString(R.string.web_service_url) + "/v1/object-store/upload?filename=image.png";
             final SimpleMultiPartRequest simpleMultiPartRequest = new SimpleMultiPartRequest(Request.Method.POST, url, new Response.Listener<String>() {
@@ -319,6 +319,9 @@ public class ImagePickerActivity extends AppCompatActivity {
                         if (object.getBoolean("success") == false) {
                             callbackListener.onFailure(new Exception("Image upload failed"));
                         } else {
+                            final File file = new File(imageFilePath);
+                            boolean deleted = file.delete();
+                            Log.d(TAG,"Deleted uploaded file: "+ deleted);
                             callbackListener.onSuccess(object);
                         }
                         Log.d(TAG, response);
