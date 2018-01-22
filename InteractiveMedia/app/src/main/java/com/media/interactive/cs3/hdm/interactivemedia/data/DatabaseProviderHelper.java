@@ -51,8 +51,16 @@ public class DatabaseProviderHelper {
 
   public void upsertUser(User user) {
     final String[] projection = {UserTable.COLUMN_ID};
-    final String selection = UserTable.COLUMN_EMAIL + " = ?";
-    final String[] selectionArgs = {user.getEmail()};
+
+    String selection;
+    String[] selectionArgs;
+    if(user.getUserId() == null) {
+      selection = UserTable.COLUMN_EMAIL + " = ?";
+      selectionArgs = new String[]{user.getEmail()};
+    } else {
+      selection = UserTable.COLUMN_USER_ID + " = ?";
+      selectionArgs = new String[]{user.getUserId()};
+    }
     final Cursor search = contentResolver.query(DatabaseProvider.CONTENT_USER_URI, projection, selection, selectionArgs, null);
     long foundId = -1;
     if (search.moveToNext()) {
@@ -185,23 +193,31 @@ public class DatabaseProviderHelper {
   public void findInsertUsersAtDatabase(Group group) {
     for (User user : group.getUsers()) {
       final String[] projection = {UserTable.COLUMN_ID};
-      final String selection = UserTable.COLUMN_EMAIL + " = ?";
-      final String[] selectionArgs = {user.getEmail()};
+      String selection;
+      String[] selectionArgs;
+      if(user.getUserId() == null){
+        selection = UserTable.COLUMN_EMAIL + " = ?";
+        selectionArgs = new String[]{user.getEmail()};
+      } else {
+        selection = UserTable.COLUMN_USER_ID + " = ?";
+        selectionArgs = new String[]{user.getUserId()};
+      }
       final Cursor search = contentResolver.query(DatabaseProvider.CONTENT_USER_URI, projection, selection, selectionArgs, null);
       long foundId = -1;
       if (search.moveToNext()) {
         foundId = search.getLong(0);
       }
+      final ContentValues userValues = new ContentValues();
+      userValues.put(UserTable.COLUMN_USERNAME, user.getUsername());
+      userValues.put(UserTable.COLUMN_IMAGE_URL, user.getImageUrl());
+      userValues.put(UserTable.COLUMN_EMAIL, user.getEmail());
+      userValues.put(UserTable.COLUMN_USER_ID, user.getUserId());
+      userValues.put(UserTable.COLUMN_SYNCHRONIZED, user.getSync());
       if (foundId < 0) {
-        final ContentValues userValues = new ContentValues();
-        userValues.put(UserTable.COLUMN_USERNAME, user.getUsername());
-        userValues.put(UserTable.COLUMN_IMAGE_URL, user.getImageUrl());
-        userValues.put(UserTable.COLUMN_EMAIL, user.getEmail());
-        userValues.put(UserTable.COLUMN_USER_ID, user.getUserId());
-        userValues.put(UserTable.COLUMN_SYNCHRONIZED, user.getSync());
         final Uri result = contentResolver.insert(DatabaseProvider.CONTENT_USER_URI, userValues);
         user.setId(Long.parseLong(result.getLastPathSegment()));
       } else {
+        contentResolver.update(DatabaseProvider.CONTENT_USER_URI, userValues, selection, selectionArgs);
         user.setId(foundId);
       }
     }

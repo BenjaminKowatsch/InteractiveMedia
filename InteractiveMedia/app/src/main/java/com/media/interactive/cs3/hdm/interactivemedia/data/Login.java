@@ -119,7 +119,7 @@ public class Login {
           final boolean success = response.getBoolean("success");
           if (success) {
             Log.d(TAG, "Updated imageUrl");
-            sendDummyPushNotification(context);
+            helper.upsertUser(user);
           }
         } catch (JSONException e) {
           e.printStackTrace();

@@ -195,6 +195,7 @@ public class AddTransactionActivity extends ImagePickerActivity {
     final UUID randomUUID = UUID.randomUUID();
     final String randomFilename = randomUUID.toString() + ".png";
     initImagePickerActivity(R.id.iv_transaction_image, randomFilename, true);
+    setMinimumDate(Helper.parseDateString(groupCreatedAt));
     setDateTextField(dateEditText);
     setDateTimeTextField(timeEditText);
     setAmountTextField(amountEditText);
@@ -329,7 +330,9 @@ public class AddTransactionActivity extends ImagePickerActivity {
 
   private Date parseDateTime(EditText dateText, EditText timeText) {
     final String dateTimeText = dateText.getText().toString() + timeText.getText().toString();
+    Log.d(TAG,dateTimeText+" String");
     try {
+      Log.d(TAG,dateTimeFormat.parse(dateTimeText)+" DateString");
       return dateTimeFormat.parse(dateTimeText);
     } catch (ParseException e) {
       Log.e(this.getClass().getName(), "Could not parse dateTime from text " + dateTimeText
