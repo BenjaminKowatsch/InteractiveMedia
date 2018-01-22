@@ -47,7 +47,7 @@ public class InteractiveMediaMessagingService extends FirebaseMessagingService {
 
         final Uri defaultSoundUri= RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
         final NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(this)
-            .setSmallIcon(R.mipmap.ic_launcher)
+            .setSmallIcon(R.mipmap.logo_notificatoin_mdpi)
             .setContentTitle(data.get("title"))
             .setContentText(data.get("body"))
             .setAutoCancel(true)

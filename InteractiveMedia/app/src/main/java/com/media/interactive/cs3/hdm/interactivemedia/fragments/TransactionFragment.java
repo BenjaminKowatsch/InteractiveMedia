@@ -153,7 +153,11 @@ public class TransactionFragment extends ListFragment implements LoaderManager.L
             }
         }
         if (highestPayment > 0) {
-            shouldPayName.setText(highestPaymentName);
+            if(highestPaymentName.contains(" ")){
+                shouldPayName.setText(highestPaymentName.split(" ")[0]);
+            }else {
+                shouldPayName.setText(highestPaymentName);
+            }
             shouldPayText.setVisibility(View.VISIBLE);
         } else {
             shouldPayName.setText("");

@@ -129,10 +129,11 @@ public class TransactionDetailViewActivity extends AppCompatActivity implements 
         ArrayList<PieEntry> entries = new ArrayList<>();
         double sum = 0;
         while(cursor.moveToNext()){
-            double amount = cursor.getDouble(cursor.getColumnIndex(DebtTable.COLUMN_AMOUNT));
-            String username = cursor.getString(cursor.getColumnIndex(UserTable.COLUMN_USERNAME));
+            double amount = cursor.getDouble(0);
+            String fromUsername = cursor.getString(1);
+            String toUsername = cursor.getString(2);
             sum += amount;
-            final PieEntry pieEntry = new PieEntry((float)amount, "To: "+username);
+            final PieEntry pieEntry = new PieEntry((float)amount, fromUsername+" to "+toUsername);
             entries.add(pieEntry);
         }
         final PieEntry pieEntry = new PieEntry((float)(amountValue-sum), paidByUsername);
@@ -142,9 +143,10 @@ public class TransactionDetailViewActivity extends AppCompatActivity implements 
 
     @Override
     public Loader<Cursor> onCreateLoader(int i, Bundle bundle) {
-        final String[] projection = { DebtTable.TABLE_NAME + ".*", UserTable.TABLE_NAME+".*" };
-        final String selection = DebtTable.TABLE_NAME + "." + DebtTable.COLUMN_TRANSACTION_ID + " = ? ";
+        final String[] projection = { "b."+DebtTable.COLUMN_AMOUNT , "a."+UserTable.COLUMN_USERNAME, "b."+UserTable.COLUMN_USERNAME };
+        final String selection = " b.from_user = a._id AND b." + DebtTable.COLUMN_TRANSACTION_ID + " = ? ";
         final String[] selectionArgs = {String.valueOf(transactionId)};
+
         return new CursorLoader(TransactionDetailViewActivity.this, DatabaseProvider.USER_DEBT_JOIN_URI, projection, selection, selectionArgs,null);
     }
 
@@ -153,16 +155,9 @@ public class TransactionDetailViewActivity extends AppCompatActivity implements 
         Log.d(TAG,"Debts for transaction: "+transactionId+" "+cursor.getCount());
         setPieChartData(pieChart, cursor);
 
-       /* if(userAdapter == null) {
-            userAdapter = new UserAdapter(this, R.layout.detail_group_user, cursor);
-        } else {
-            userAdapter.swapCursor(cursor);
-        }*/
     }
 
     @Override
     public void onLoaderReset(Loader<Cursor> loader) {
-
-        //userAdapter.swapCursor(null);
     }
 }
