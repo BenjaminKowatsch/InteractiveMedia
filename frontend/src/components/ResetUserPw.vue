@@ -12,7 +12,7 @@
             <v-btn icon slot="activator">
               <v-icon>fa-question-circle</v-icon>
             </v-btn>
-            <span>Reset user password to default "interactive" (for support purpose)</span>
+          <span>Passwordlogin only (Logintype 0): Reset user password to default "interactive" (for support purpose)</span>
           </v-tooltip>
            <v-btn
             @click="resetPW"
