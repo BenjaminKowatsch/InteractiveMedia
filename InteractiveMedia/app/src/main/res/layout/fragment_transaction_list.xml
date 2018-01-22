@@ -22,8 +22,8 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentStart="true"
-                android:layout_marginTop="10dp"
                 android:layout_marginStart="10dp"
+                android:layout_marginTop="10dp"
                 android:text="Debt Overview"
                 android:textAppearance="@android:style/TextAppearance.Material.Large" />
 
@@ -31,19 +31,62 @@
                 android:id="@+id/payment_list"
                 android:layout_width="280dp"
                 android:layout_height="80dp"
-                android:layout_marginStart="5dp"
                 android:layout_below="@+id/transaction_debt_overview_title"
                 android:layout_gravity="start"
+                android:layout_marginStart="5dp"
                 android:divider="@android:color/transparent"
                 android:fadeScrollbars="false" />
 
+            <LinearLayout
+                android:orientation="vertical"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="5dp"
+                android:layout_below="@+id/transaction_debt_overview_title"
+                android:layout_toEndOf="@+id/payment_list">
+
+                <TextView
+                    android:id="@+id/should_pay_name"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:ellipsize="end"
+                    android:lines="1"
+                    android:textAlignment="center"
+                    android:textAppearance="@android:style/TextAppearance.Material.Large"
+                    android:textColor="@color/veryLightBlue" />
+
+                <TextView
+                    android:id="@+id/should_pay_text"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:ellipsize="end"
+                    android:lines="1"
+                    android:text="should pay"
+                    android:textAlignment="center"
+                    android:textAppearance="@android:style/TextAppearance.Material.Medium"
+                    android:visibility="gone"
+                    android:textColor="@color/veryLightBlue" />
+            </LinearLayout>
+
             <TextView
+                android:id="@+id/total_payment_title"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_below="@id/payment_list"
-                android:layout_marginTop="10dp"
                 android:layout_marginStart="10dp"
+                android:layout_marginTop="10dp"
                 android:hint="Total Payments: "
+                android:textAppearance="@android:style/TextAppearance.Material.Medium" />
+
+            <TextView
+                android:id="@+id/total_payments"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/payment_list"
+                android:layout_marginStart="10dp"
+                android:layout_marginTop="10dp"
+                android:layout_toEndOf="@id/total_payment_title"
+                android:hint="x.xxx,xx €"
                 android:textAppearance="@android:style/TextAppearance.Material.Medium" />
 
         </RelativeLayout>
@@ -99,6 +142,8 @@
         android:id="@+id/no_group_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
         android:backgroundTint="@android:color/white"
         android:padding="15dp"
         android:text="You have to create a group before you can add transactions"
