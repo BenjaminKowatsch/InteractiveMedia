@@ -19,7 +19,6 @@ export default {
 
                 responsive: true,
                 maintainAspectRatio: false,
-                //ToDo: Add some specific chart options
                 legend: {
                     position: 'bottom',
                     labels: {
@@ -33,6 +32,5 @@ export default {
     mounted() {
 
         this.renderChart(this.chartData, this.chartOptions)
-
     }
 }

@@ -159,7 +159,7 @@
         class="green darken-4"
         v-model="loggedOut"
       >
-        Sucessfully logged out
+        Successfully logged out
         <v-btn dark flat @click.native="notLoggedInAlert = false">X</v-btn>
       </v-snackbar>
       <v-content class="green lighten-3">
@@ -220,9 +220,6 @@ export default {
          this.drawer = true
        }
      },
-/*     reload: function () {
-       location.reload();
-     } */
 
      checkForDashboard: function(){
 

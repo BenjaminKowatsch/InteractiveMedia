@@ -1,9 +1,7 @@
 import Cookie from './js/Cookie.js'
 export default {
     data() {
-        return {
-            // sets the variables and defines them     
-        }
+        return {}
     },
     methods: {
 
@@ -18,9 +16,8 @@ export default {
             if (accessToken !== '') {
                 onValid(accessToken)
             } else {
-                /* this.$f7.alert('Sie sind nicht eingeloggt, bitte loggen Sie sich ein', 'Debts² Admin Panel', () => { */
-                this.redirect('/', false, true, true)
-                    /* }) */
+                this.redirect('/')
+
             }
         },
         /**
@@ -38,20 +35,14 @@ export default {
         /**
          * This function redirects the user to the specified url.
          * @param  {String} url          URL to be routed to
-         * @param  {Boolean} animatePages Flag to indicate if an animation should be applied
-         * @param  {Boolean} pushState    Flag to indicate if this route change should be added to the browser history
-         * @param  {Boolean} reload       Flag to indicate if after the route change the page should be reloaded
          */
-        redirect: function(url, animatePages, pushState, reload) {
-            /*  this.$f7.mainView.router.load({ 'url': url, 'animatePages': animatePages, 'pushState': pushState })
-             if (reload) {
-                 location.reload()
-             } */
+        redirect: function(url) {
+
             this.$router.replace(url);
         },
 
         /**
-         * [description]
+         * 
          * @param  {JSONObject} response The response object sent by the backend
          * @param  {function} onValid  Callback function to be called if the response carries the flag success set to 'true'
          * @param  {function} failure  Callback function to be called if the response carries the flag success set to 'false' and
