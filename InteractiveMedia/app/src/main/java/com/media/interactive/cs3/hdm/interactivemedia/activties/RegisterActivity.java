@@ -185,7 +185,8 @@ public class RegisterActivity extends ImagePickerActivity
                                 final String newImageUrl = getResources().getString(R.string.web_service_url)
                                         .concat("/v1/object-store/download?filename=").concat(imageName);
                                 Login.getInstance().getUser().setImageUrl(newImageUrl);
-                                //TODO: Update User ImageUrl
+                                Login.getInstance().updateImageUrl(RegisterActivity.this);
+
                                 navigateToHome();
                             }
 
@@ -211,4 +212,5 @@ public class RegisterActivity extends ImagePickerActivity
                 break;
         }
     }
+
 }

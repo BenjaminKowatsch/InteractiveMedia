@@ -218,13 +218,7 @@ public class AddTransactionActivity extends ImagePickerActivity implements Recyc
         final Button locationButton = findViewById(R.id.transaction_location);
         locationButton.setText(locationButton.getHint());
 
-        locationButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                //Toast.makeText(AddTransactionActivity.this, "Soon implemented", Toast.LENGTH_SHORT).show();
-                startLocationSelection();
-            }
-        });
+    setMinimumDate(Helper.parseDateString(groupCreatedAt));
 
         setupDatePicker();
 

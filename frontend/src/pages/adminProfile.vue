@@ -1,11 +1,14 @@
+<!-- TEMPLATE for adminProfile view
+  * Description: Let the current logged in admin change specific data like his username, password, email and imageUrl.
+                 There multiple or single props allowed
+ -->
 <template>
   <v-container fluid fill-height>
     <v-layout  justify-center align-center> 
       <span class="text-md-center">  
-        <img v-if="hasImageUrl" v-bind:src="dummy" alt="No picture found">
-        <img v-else src="../assets/logo.png"  alt="Debts² logo" class="logo">
+        <img src="../assets/logo.png"  alt="Debts² logo" class="logo">
         <h1 v-if="hasData">Welcome back, {{adminUserData.username}}!</h1>
-        <h3>Current email: {{adminUserData.email}}</h3>
+        <h3 v-if="hasData">Current email: {{adminUserData.email}}</h3>
         <br/>
         <v-form v-model="valid" ref="form" lazy-validation>
           <v-text-field
@@ -37,12 +40,14 @@
 						ref="image"
 						accept="image/*"
           	@change="checkImageFile"
+            @keyup.enter="checkUpdate()"    
+
 					>
            <v-tooltip left>
             <v-btn icon slot="activator">
               <v-icon>fa-question-circle</v-icon>
             </v-btn>
-            <span>Update single or multiple admin properties)</span>
+            <span>Update single or multiple admin properties</span>
           </v-tooltip>
           <v-btn
             @click="checkUpdate"
@@ -53,9 +58,7 @@
           <v-btn @click="clear">Clear</v-btn>
         </v-form>
         <v-btn :to="{path:'/overview'}">Back</v-btn>
-        
-        <span v-if="hasImageUrl">{{adminUserData.imageUrl}}</span> 
-      </span>
+        </span>
         <v-snackbar
           :timeout="3000"
           :bottom="true"
@@ -103,8 +106,6 @@ import Config from "../js/Config.js";
         imageFileUrl: '',
         imageName: '',
         imageUrl: '',
-        hasImageUrl: false,
-        //imageDataUrl: '',
         hasData: false,
         valid: true,
         username: '',
@@ -128,40 +129,33 @@ import Config from "../js/Config.js";
     },
 
     methods: {
+  
+      pickFile () {
 
-
-
+              this.$refs.image.click ()
+      },
       
-    pickFile () {
+      checkImageFile (e) {
+        const files = e.target.files
+        if(files[0] !== undefined) {
+          this.imageName = files[0].name
+          if(this.imageName.lastIndexOf('.') <= 0) {
+            return
+          }
+          const fr = new FileReader ()
+          fr.readAsDataURL(files[0])
+          fr.addEventListener('load', () => {
 
-            this.$refs.image.click ()
-        },
-		
-		checkImageFile (e) {
-			const files = e.target.files
-			if(files[0] !== undefined) {
-				this.imageName = files[0].name
-				if(this.imageName.lastIndexOf('.') <= 0) {
-					return
-				}
-				const fr = new FileReader ()
-				fr.readAsDataURL(files[0])
-				fr.addEventListener('load', () => {
-
-          this.data = new FormData();   
-          let file = files[0];
-          this.data.append('uploadField', file, file.name);
-       
-					//this.imageUrl = fr.result
-          //this.uploadPicture(data) // this is an image file that can be sent to server...
-				})
-			} else {
-				this.imageName = ''
-				this.imageUrl = ''
-			}
-		},
-    
-
+            this.data = new FormData();   
+            let file = files[0];
+            this.data.append('uploadField', file, file.name);
+          })
+        } else {
+          this.imageName = ''
+          this.imageUrl = ''
+        }
+      },
+      
       getOwnUser: function(){
 
         this.authToken = Cookie.getJSONCookie("accessToken").accessToken;
@@ -171,124 +165,76 @@ import Config from "../js/Config.js";
            headers: { Authorization: "0 " + this.authToken }
         })
         .then(response => {
-            this.adminUserData = response.data.payload 
-            console.log(JSON.stringify(this.adminUserData))
+            this.adminUserData = response.data.payload
             this.hasData = true
-            if(this.adminUserData.imageUrl != null){
-
-             // this.downloadImage()
-            }
+            console.log(JSON.stringify(this.adminUserData))
         })
         .catch(e => {              
               console.log("Errors own user request (UserTableVuetify): " + e);           
             });
         },
       
-
-     uploadImage: function (data){
-    
-      console.log(data)
-      var upload = {
-          uploadField : data
-      }
+      uploadImage: function (data){
+      
+        console.log(data)
+        var upload = {
+            uploadField : data
+        }
+          
+        axios
+            .post(Config.webServiceURL + "/v1/object-store/upload", data, {
+            headers: { Authorization: "0 " + this.authToken, 'content-type': 'multipart/form-data' }
+          })
+          .then(response => {
+            console.log("Uploaded Picture"),
+            console.log(JSON.stringify(response)),
+            console.log(JSON.stringify(response.data.payload.path)),
+            this.imageFileUrl = response.data.payload.path,
+            this.updateImageUrl(this.imageFileUrl)          
+          })
+          .catch(e => {
+            console.log("Errors in POST Upload: " + e);
+            console.log(e)
+          });       
+      },
         
-      console.log(upload)
+      updateImageUrl: function(imageFileUrl){
 
-       axios
-          .post(Config.webServiceURL + "/v1/object-store/upload", data, {
-          headers: { Authorization: "0 " + this.authToken, 'content-type': 'multipart/form-data' }
+        var createdImageUrl = Config.webServiceURL + "/v1/object-store/download?filename=" + imageFileUrl
+        console.log(createdImageUrl)
+
+        var userUpdateImage = {
+          imageUrl: createdImageUrl
+        }
+        console.log(userUpdateImage)
+        axios.put(Config.webServiceURL + "/v1/users/user", userUpdateImage, {
+          headers: { Authorization: "0 " + this.authToken }
         })
-        .then(response => {
-          console.log("Uploaded Picture"),
-          console.log(JSON.stringify(response)),
-          console.log(JSON.stringify(response.data.payload.path)),
-          this.imageFileUrl = response.data.payload.path,
-          this.updateImageUrl(this.imageFileUrl)          
-        })
-        .catch(e => {
-          console.log("Errors in POST Upload: " + e);
-          console.log(e)
-        });       
-     },
-     
-  downloadImage: function(){
-
-    var downloadUrl = this.adminUserData.imageUrl
-    console.log(downloadUrl)
-
-    axios
-        .get(downloadUrl, {  
-           headers: { Authorization: "0 " + this.authToken}}
+        .then(response => 
+          console.log(JSON.stringify(response)), 
+          this.clear(),
+          this.successUpdate = true
         )
-        .then(response =>  {
+        .catch(e => {
+          console.log("Errors update imageUrl: " + e);
+        });
+      },
 
-         
-        console.log(response)
-/*         var file = new File(response.data)
-        //file = response.data
-        const fr = new FileReader ()
-				fr.readAsDataURL(file)
-				fr.addEventListener('load', () => {    
-        this.URL = fr.result
-        console.log("URL: ")
-        console.log(URL)
-            
-        console.log(this.hasImageUrl)
-        })  */
-  })
-
-/*             var reader = new window.FileReader();
-            reader.readAsDataURL(response.data); 
-
-            reader.onload = function() {
-
-            this.imageDataUrl = reader.result;
-            console.log("ImageDataUrl")
-            console.log(this.imageDataUrl)
-            imageElement.setAttribute("src", this.imageDataUrl); 
-            }  */
-        
-        .catch(e => {              
-              console.log("Errors download image " + e);           
-            });
-    },
-  
-   updateImageUrl: function(imageFileUrl){
-
-     var createdImageUrl = Config.webServiceURL + "/v1/object-store/download?filename=" + imageFileUrl
-     console.log(createdImageUrl)
-
-     var userUpdateImage = {
-       imageUrl: createdImageUrl
-     }
-     console.log(userUpdateImage)
-    axios.put(Config.webServiceURL + "/v1/users/user", userUpdateImage, {
-                headers: { Authorization: "0 " + this.authToken }
-              })
-              .then(response => 
-                  console.log(JSON.stringify(response)), 
-                  this.clear(),
-                  this.successUpdate = true
-              )
-              .catch(e => {
-                console.log("Errors update imageUrl: " + e);
-              });
-   },
-
-   checkUpdate: function () {
+      checkUpdate: function () {
 
         if (this.$refs.form.validate()) {
 
-          if(this.imageName.length > 0){
+          if(this.imageName.length > 0)
+          {
             this.uploadImage(this.data)
           }
 
           if(this.username.length > 0 && this.password.length == 0 && this.email.length == 0)
           {
-              var updateField = {
-                username: this.username
-              }
-              this.update(updateField)
+            var updateField = {
+              username: this.username
+            }
+            this.update(updateField)
           }
 
           else if(this.username.length > 0 && this.password.length > 0 && this.email.length == 0)
@@ -316,7 +262,7 @@ import Config from "../js/Config.js";
                 email: this.email
               }
               this.update(updateField)
-          }
+            }
             else
             {
             this.passwordMatching = true
@@ -372,32 +318,32 @@ import Config from "../js/Config.js";
               this.update(updateField)            
           }
         }      
-   },
+      },
 
-   update: function(field){
+      update: function(field){
 
-            axios.put(Config.webServiceURL + "/v1/users/user", field, {
-                headers: { Authorization: "0 " + this.authToken }
-              })
-              .then(response => {
-                  console.log("Update response")
-                  console.log(JSON.stringify(response))
-                  if(response.data.success == true){
-                    this.successUpdate = true
-                    this.clear()
-                    this.getOwnUser()
-                  }
-                  else{
-                    this.errorUpdate = true
-                    this.clear()
-                  }
-              })             
-              .catch(e => {
-                console.log("Errors update admin: " + e);
-                this.errorUpdate = true
-                this.clear
-              });
-   },
+        axios.put(Config.webServiceURL + "/v1/users/user", field, {
+          headers: { Authorization: "0 " + this.authToken }
+        })
+        .then(response => {
+          console.log("Update response")
+          console.log(JSON.stringify(response))
+          if(response.data.success == true){
+            this.successUpdate = true
+            this.clear()
+            this.getOwnUser()
+          }
+          else{
+            this.errorUpdate = true
+            this.clear()
+          }
+        })             
+        .catch(e => {
+          console.log("Errors update admin: " + e);
+          this.errorUpdate = true
+          this.clear
+        });
+      },
 
       clear: function () {
         this.$refs.form.reset()
@@ -408,17 +354,6 @@ import Config from "../js/Config.js";
         this.data = ''
         this.imageName = ''
       }
-  }
+    }
   }
 </script>
-
-<style scoped>
-  .file-btn {
-    display: inline-block;
-  }
-  .file-btn input[type=file] {
-    position: absolute;
-    filter: alpha(opacity=0);
-    opacity: 0;
-  }
-</style>

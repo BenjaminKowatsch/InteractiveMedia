@@ -54,10 +54,18 @@ public class DatabaseProviderHelper {
         this.contentResolver = contentResolver;
     }
 
-    public void upsertUser(User user) {
-        final String[] projection = {UserTable.COLUMN_ID};
-        final String selection = UserTable.COLUMN_EMAIL + " = ?";
-        final String[] selectionArgs = {user.getEmail()};
+  public void upsertUser(User user) {
+    final String[] projection = {UserTable.COLUMN_ID};
+
+    String[] selectionArgs;
+    String selection;
+    if(user.getUserId() == null) {
+      selection = UserTable.COLUMN_EMAIL + " = ?";
+      selectionArgs = new String[]{user.getEmail()};
+    } else {
+      selection = UserTable.COLUMN_USER_ID + " = ?";
+      selectionArgs = new String[]{user.getUserId()};
+    }
         final Cursor search = contentResolver.query(DatabaseProvider.CONTENT_USER_URI, projection, selection, selectionArgs, null);
         long foundId = -1;
         if (search.moveToNext()) {

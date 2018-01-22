@@ -103,6 +103,38 @@ public class Login {
     RestRequestQueue.getInstance(context).addToRequestQueue(jsonObjectRequest);
   }
 
+  public void updateImageUrl(final Context context) {
+    final String url = context.getResources().getString(R.string.web_service_url).concat("/v1/users/user");
+    final JSONObject data = new JSONObject();
+    try {
+      data.put("imageUrl", user.getImageUrl());
+    } catch (JSONException e) {
+      e.printStackTrace();
+    }
+    final AuthorizedJsonObjectRequest jsonObjectRequest = new AuthorizedJsonObjectRequest(
+        Request.Method.PUT, url, data, new Response.Listener<JSONObject>() {
+      @Override
+      public void onResponse(final JSONObject response) {
+        try {
+          final boolean success = response.getBoolean("success");
+          if (success) {
+            Log.d(TAG, "Updated imageUrl");
+            helper.upsertUser(user);
+          }
+        } catch (JSONException e) {
+          e.printStackTrace();
+        }
+      }
+    }, new Response.ErrorListener() {
+      @Override
+      public void onErrorResponse(VolleyError error) {
+        Log.e(TAG, "Error while setting user data.");
+      }
+    });
+    jsonObjectRequest.setShouldCache(false);
+    RestRequestQueue.getInstance(context).addToRequestQueue(jsonObjectRequest);
+  }
+
   private void sendDummyPushNotification(final Context context) {
     new Thread(new Runnable() {
       @Override

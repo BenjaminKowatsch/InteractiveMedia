@@ -12,7 +12,6 @@ export default Pie.extend({
             options: {
                 responsive: true,
                 maintainAspectRatio: false,
-                //ToDo: Add some specific chart options
                 legend: {
                     position: 'bottom',
                     labels: {
@@ -24,9 +23,6 @@ export default Pie.extend({
     },
 
     mounted: function() {
-
-        //ToDo: Integrate Options
-        //Resolve promise to render chart with desired counts
 
         this.renderChart({
             labels: ['Password', 'Facebook', 'Google'],
