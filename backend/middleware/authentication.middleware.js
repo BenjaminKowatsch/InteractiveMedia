@@ -45,16 +45,7 @@ module.exports.isAuthenticated = function(req, res, next) {
   });
 };
 
-/**
- * Function to verify each type of access token (google, facebook or password)
- *
- * @param  {String} token    AccessToken to be verified
- * @param  {AUTH_TYPE} authType Authentication type specifing whether the user belongs to google, facebook or password authentication
- * @return {Promise}          then: {JSONObject} promiseData JSON object containing the following properties:
- *                                                 {Date} expiryDate Date to indicate the expiration of the accessToken
- *                                                 {String} userId String to uniquely identify the user
- *                            catch: {JSONObject} error JSON object containing the following properties:
- */
+// verify access token for every auth type
 function verifyAccessToken(token, authType) {
   switch (authType) {
     case AUTH_TYPE.PASSWORD:

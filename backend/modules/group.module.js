@@ -8,19 +8,6 @@ const tokenService = require('../services/token.service');
 const ERROR = require('../config/error.config');
 const SPLIT = require('../config/split.config');
 
-/**
- * @param  {String} authToken auth token of user
- * @param  {String} groupData.name name of new group
- * @param  {String} groupData.imageUrl url of group image, can be null
- * @param  {Array<String>} groupData.users array of user emails for group
- * @return {Promise}
- *    then: {Object}
- *      {Boolean} success Flag to indicate the successful request
- *      {Object} groupData Object which was inserted
- *    catch: {Object}
- *      {String} errorCode Kind of error which occured
- *      {Object} responseData Object with error details
- **/
 module.exports.createNewGroup = function(creatorId, groupData) {
   return new Promise((resolve, reject) => {
     winston.debug('Hello from module createNewGroup');

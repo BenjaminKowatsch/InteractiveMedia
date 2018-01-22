@@ -14,7 +14,7 @@ function waitOrOrderForDB() {
       resolve();
     } else {
       MongoClient.connect(settings.mongoDb.connect.url, settings.mongoDb.connect.options).then(db => {
-        console.log('DB connection established');
+        winston.info('DB connection established');
         database.db = db;
         resolve();
       }).catch(err => {
@@ -77,11 +77,8 @@ function promiseResetDB() {
           return database.collections.users.createIndex(keys, options);
         })
         .then(() => {
-          winston.debug('create index: user: userId, loginType unique');
-          const keys = {
-            userId: 1,
-            loginType: 1
-          };
+          winston.debug('create index: user: userId unique');
+          const keys = {userId: 1};
           const options = {unique: true};
           return database.collections.users.createIndex(keys, options);
         })
