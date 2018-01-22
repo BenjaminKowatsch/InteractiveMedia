@@ -40,7 +40,7 @@ public class EvenSplitTest {
         testGroup.getUsers().add(testUser2);
         testGroup.getUsers().add(testUser3);
         testGroup.getUsers().add(payingUser);
-        transaction = new Transaction("TestTransaction", payingUser.getUserId(), "even",
+        transaction = new Transaction("TestTransaction", payingUser.getUserId(), new EvenSplit(),
                 new Date(System.currentTimeMillis()), new Location(""), 0.0, testGroup);
     }
 
