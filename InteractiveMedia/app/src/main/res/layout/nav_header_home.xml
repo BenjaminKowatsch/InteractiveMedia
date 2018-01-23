@@ -16,6 +16,8 @@
         android:id="@+id/nav_profile_image"
         android:layout_width="match_parent"
         android:layout_height="100dp"
+        android:adjustViewBounds="true"
+        android:scaleType="centerInside"
         android:paddingTop="@dimen/nav_header_vertical_spacing"
         app:srcCompat="@drawable/anonymoususer" />
 

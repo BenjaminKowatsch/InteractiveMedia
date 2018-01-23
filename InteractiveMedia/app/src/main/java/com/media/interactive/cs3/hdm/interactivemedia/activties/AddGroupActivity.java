@@ -128,6 +128,9 @@ public class AddGroupActivity extends ImagePickerActivity implements View.OnClic
     userList = new ArrayList<>();
     mAdapter = new UserEmailAdapter(this, userList);
 
+    final Button cancel = findViewById(R.id.bn_group_save_cancel);
+    cancel.setOnClickListener(this);
+
     final RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getApplicationContext());
     recyclerView.setLayoutManager(mLayoutManager);
     recyclerView.setItemAnimator(new DefaultItemAnimator());
@@ -232,6 +235,9 @@ public class AddGroupActivity extends ImagePickerActivity implements View.OnClic
         } catch (JSONException e) {
           e.printStackTrace();
         }
+        break;
+      case R.id.bn_group_save_cancel:
+        finish();
         break;
       default:
         Log.e(TAG, "Unhandled onclick event.");

@@ -27,7 +27,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         databaseHelper = new DatabaseHelper(this);
 
-        databaseHelper.resetDatabase();
+        //databaseHelper.resetDatabase();
 
         Login.getInstance().clear();
 

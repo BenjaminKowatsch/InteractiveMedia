@@ -54,6 +54,9 @@ public class RegisterActivity extends ImagePickerActivity
         registerPasswordError = (TextView) findViewById(R.id.et_register_password_error);
         register.setOnClickListener(this);
 
+        final Button cancel = findViewById(R.id.bn_register_cancel);
+        cancel.setOnClickListener(this);
+
         register.setEnabled(false);
 
         registerEmail.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_EMAIL_ADDRESS);
@@ -206,7 +209,9 @@ public class RegisterActivity extends ImagePickerActivity
                 });
 
                 break;
-
+            case R.id.bn_register_cancel:
+                finish();
+                break;
             default:
                 Log.e(TAG, "OnClick error occurred");
                 break;
