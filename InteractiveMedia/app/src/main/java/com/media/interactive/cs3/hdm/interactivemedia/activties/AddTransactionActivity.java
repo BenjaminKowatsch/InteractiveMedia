@@ -163,6 +163,14 @@ public class AddTransactionActivity extends ImagePickerActivity implements Recyc
         splitsView.addItemDecoration(new DividerItemDecoration(this, DividerItemDecoration.VERTICAL));
         EditText amountEditText = findViewById(R.id.et_add_transaction_amount);
 
+        final Button cancel = findViewById(R.id.bn_add_transaction_cancel);
+        cancel.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                finish();
+            }
+        });
+
         splitList = new ArrayList<>();
         List<User> userList = getAllGroupUsers();
         splitsAdapter = new SplitAdapter(this, splitList, userList);

@@ -360,7 +360,7 @@ public class Login {
 
   private void cachedGoogleLogin(final Context context, final CallbackListener<JSONObject, Exception> callbackListener) {
     // Check if the accessToken is not set
-    // If the accessToken is not set there is no need to check the cache
+    // If the accessToken is set there is no need to check the cache
     if (accessToken == null) {
 
       final String serverClientId = context.getString(R.string.server_client_id);
@@ -393,7 +393,7 @@ public class Login {
     } catch (JSONException e) {
       e.printStackTrace();
     }
-    Log.d(TAG, "data: " + data.toString());
+    Log.d(TAG, "Google Login data: " + data.toString());
 
     final JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(
         Request.Method.POST, url, data, new Response.Listener<JSONObject>() {
@@ -432,7 +432,7 @@ public class Login {
     } catch (JSONException e) {
       e.printStackTrace();
     }
-    Log.d(TAG, "data: " + data.toString());
+    Log.d(TAG, "Google Facebook data: " + data.toString());
 
     final JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(
         Request.Method.POST, url, data, new Response.Listener<JSONObject>() {
@@ -463,7 +463,7 @@ public class Login {
     } catch (JSONException e) {
       e.printStackTrace();
     }
-    Log.d(TAG, "data: " + data.toString());
+    Log.d(TAG, "Default Login data:: " + data.toString());
 
     final JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(
         Request.Method.POST, url, data, new Response.Listener<JSONObject>() {

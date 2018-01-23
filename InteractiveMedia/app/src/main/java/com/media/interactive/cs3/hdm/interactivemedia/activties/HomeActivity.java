@@ -46,7 +46,7 @@ public class HomeActivity extends AppCompatActivity
     implements NavigationView.OnNavigationItemSelectedListener,
     AdapterView.OnItemSelectedListener {
 
-    private static final String TAG = "HomeActivity";
+    private static final String TAG = HomeActivity.class.getSimpleName();
 
     private FloatingActionButton fab;
 
@@ -81,7 +81,7 @@ public class HomeActivity extends AppCompatActivity
             Log.d(TAG, "Started from Notification Intent to reload transactions");
             displayFragment(R.id.nav_transactions);
         } else {
-            displayFragment(R.id.nav_groups);
+            displayFragment(R.id.nav_transactions);
         }
         registerNetworkStatusChangeReceiver();
     }
