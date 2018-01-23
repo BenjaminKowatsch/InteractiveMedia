@@ -276,7 +276,9 @@ module.exports.verifyFacebookAccessToken = function(token, verifyDatabase, getUs
                 }
                 result.payload.email = email;
                 result.payload.username = username;
-                result.payload.imageUrl = graphResult.picture.data.url;
+                // result.payload.imageUrl = graphResult.picture.data.url;
+                result.payload.imageUrl = 'https://graph.facebook.com/v2.11/' + result.payload.userId +
+                  '/picture?type=normal';
                 return result;
               }
             })
