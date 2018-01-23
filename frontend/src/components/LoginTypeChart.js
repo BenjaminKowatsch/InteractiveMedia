@@ -29,10 +29,10 @@ export default Pie.extend({
 
         // Renders the chart with the given data and chart options
         this.renderChart({
-            labels: ['Password', 'Facebook', 'Google'],
+            labels: ['Password', 'Google', 'Facebook'],
             datasets: [{
                 backgroundColor: ['#6E6E6E', '#585858', '#424242'],
-                data: [this.passwordUsers, this.facebookUsers, this.googleUsers]
+                data: [this.passwordUsers, this.googleUsers, this.facebookUsers]
             }, ],
         }, this.options)
     },
