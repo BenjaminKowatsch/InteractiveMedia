@@ -440,8 +440,10 @@ describe('User-Controller', () => {
         expect(res.body.payload.groupIds).to.be.undefined;
         expect(res.body.payload.userId).to.equal('110340223090296');
         expect(res.body.payload.role).to.equal('user');
-        expect(res.body.payload.imageUrl).to.equal('https://scontent.xx.fbcdn.net/v/t1.0-1/c15.0.50.50' +
-        '/p50x50/10354686_10150004552801856_220367501106153455_n.jpg?oh=baf3745408876788393e9ca2b7e1dc94&oe=5AEBF02F');
+        // expect(res.body.payload.imageUrl).to.equal('https://scontent.xx.fbcdn.net/v/t1.0-1/c15.0.50.50' +
+        // '/p50x50/10354686_10150004552801856_220367501106153455_n.jpg?oh=baf3745408876788393e9ca2b7e1dc94&oe=5AEBF02F');
+        expect(res.body.payload.imageUrl).to.equal('https://graph.facebook.com/v2.11/110340223090296' +
+        '/picture?type=normal');
       });
     });
 
