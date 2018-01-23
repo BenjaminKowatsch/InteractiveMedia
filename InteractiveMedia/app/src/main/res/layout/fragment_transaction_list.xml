@@ -24,7 +24,7 @@
                 android:layout_alignParentStart="true"
                 android:layout_marginStart="10dp"
                 android:layout_marginTop="10dp"
-                android:text="Debt Overview"
+                android:text="Payment Overview"
                 android:textAppearance="@android:style/TextAppearance.Material.Large" />
 
             <ListView

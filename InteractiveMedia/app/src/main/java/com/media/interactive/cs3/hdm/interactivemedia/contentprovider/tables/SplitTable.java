@@ -17,7 +17,8 @@ public class SplitTable {
                     + COLUMN_ID + " integer unique primary key AUTOINCREMENT,"
                     + COLUMN_TYPE + " TEXT NOT NULL,"
                     + COLUMN_AMOUNT + " REAL NULL,"
-                    + COLUMN_USER_ID + " TEXT NULL,"
+                    + COLUMN_USER_ID + " TEXT NULL references " + UserTable.TABLE_NAME
+                + " (" + UserTable.COLUMN_USER_ID + "),"
                     + COLUMN_NEXT + " INTEGER NULL references " + SplitTable.TABLE_NAME
                     + " (" + SplitTable.COLUMN_ID + ") on delete cascade on update cascade"
                     + ")";
