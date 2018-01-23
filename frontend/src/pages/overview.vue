@@ -194,15 +194,17 @@ export default {
       return users.authType == 0;
     },
 
-    //filters users object for loginType = Facebook
-    filter_loginFacebook: function(users) {
+    //filters users object for loginType = Google
+    filter_loginGoogle: function(users) {
       return users.authType == 1;
     },
 
-    //filters users object for loginType = Google
-    filter_loginGoogle: function(users) {
+    //filters users object for loginType = Facebook
+    filter_loginFacebook: function(users) {
       return users.authType == 2;
     },
+
+
 
     //Toggles state of boolean variables
     toggleState: function(state) {

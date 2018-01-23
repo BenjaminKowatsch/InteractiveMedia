@@ -67,7 +67,6 @@
 <script>
 
 import Mixins from "../mixins.js";
-
 import axios from "axios";
 import Cookie from "../js/Cookie.js";
 import Config from "../js/Config.js";
