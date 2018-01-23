@@ -83,7 +83,7 @@ var onLoadingFinished = function() {
             // Redirect to '/overview' if user is still logged in
             console.log("Login Status: " + this.loginStatus);
             if (true === this.loginStatus) {
-                this.redirect("/overview", false, false, false);
+                this.redirect("/overview");
             }
 
         },
@@ -92,8 +92,8 @@ var onLoadingFinished = function() {
             updateLoginStatus: function() {
                 // Check if cookies exist
                 // If a cookie exists, set the loginStatus to true
-                var accessToken = Cookie.getJSONCookie('accessToken')
-                if (accessToken !== '') {
+                var accessToken = Cookie.getJSONCookie("accessToken").accessToken;
+                if (accessToken !== '' && accessToken !== undefined && accessToken !== 'undefined') {
                     this.loginStatus = true;
                 };
             }

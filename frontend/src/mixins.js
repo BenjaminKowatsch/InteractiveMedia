@@ -17,7 +17,6 @@ export default {
                 onValid(accessToken)
             } else {
                 this.redirect('/')
-
             }
         },
         /**
@@ -30,7 +29,7 @@ export default {
             // sets a cookie to a logged in user
             var jsonCookie = { 'accessToken': payload.accessToken, '/* authT */ype': payload.authType }
             Cookie.createJSONCookie('accessToken', jsonCookie) // creates the cookie
-            this.redirect('overview', true, false, false)
+            this.redirect('overview')
         },
         /**
          * This function redirects the user to the specified url.
