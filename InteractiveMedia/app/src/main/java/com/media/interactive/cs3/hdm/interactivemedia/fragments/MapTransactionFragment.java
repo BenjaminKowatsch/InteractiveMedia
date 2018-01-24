@@ -30,20 +30,45 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.media.interactive.cs3.hdm.interactivemedia.R;
-import com.media.interactive.cs3.hdm.interactivemedia.contentprovider.DatabaseProvider;
-import com.media.interactive.cs3.hdm.interactivemedia.contentprovider.tables.GroupTable;
-import com.media.interactive.cs3.hdm.interactivemedia.contentprovider.tables.TransactionTable;
-import com.media.interactive.cs3.hdm.interactivemedia.contentprovider.tables.UserTable;
 import com.media.interactive.cs3.hdm.interactivemedia.data.Login;
+import com.media.interactive.cs3.hdm.interactivemedia.database.DatabaseProvider;
+import com.media.interactive.cs3.hdm.interactivemedia.database.tables.GroupTable;
+import com.media.interactive.cs3.hdm.interactivemedia.database.tables.TransactionTable;
+import com.media.interactive.cs3.hdm.interactivemedia.database.tables.UserTable;
 import com.media.interactive.cs3.hdm.interactivemedia.transforms.CircleTransform;
 
 
-public class MapTransactionFragment extends Fragment implements IMyFragment,
-        OnMapReadyCallback {
+/**
+ * The Class MapTransactionFragment.
+ */
+public class MapTransactionFragment extends Fragment implements IFragment,
+    OnMapReadyCallback {
+
+    /**
+     * The Constant TAG.
+     */
     private static final String TAG = MapTransactionFragment.class.getSimpleName();
-    private GoogleMap mMap;
+
+    /**
+     * The map.
+     */
+    private GoogleMap map;
+
+    /**
+     * The group adapter.
+     */
     private SimpleCursorAdapter groupAdapter;
 
+    /**
+     * Instantiates a new map transaction fragment.
+     */
+    public MapTransactionFragment() {
+        // Required empty public constructor
+    }
+
+    /* (non-Javadoc)
+     * @see android.app.Fragment#onCreateOptionsMenu(android.view.Menu, android.view.MenuInflater)
+     */
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         inflater.inflate(R.menu.fragment_map_transaction, menu);
@@ -71,41 +96,58 @@ public class MapTransactionFragment extends Fragment implements IMyFragment,
         super.onCreateOptionsMenu(menu, inflater);
     }
 
+    /**
+     * Gets the current group id.
+     *
+     * @return the current group id
+     */
     private String getCurrentGroupId() {
-        if(groupAdapter.getCursor().getCount() > 0){
-        return groupAdapter.getCursor().getString(groupAdapter.getCursor().getColumnIndex(GroupTable.COLUMN_GROUP_ID));
+        if (groupAdapter.getCursor().getCount() > 0) {
+            return groupAdapter.getCursor().getString(groupAdapter.getCursor().getColumnIndex(GroupTable.COLUMN_GROUP_ID));
         }
         return null;
     }
 
+    /**
+     * Initialize group adapter.
+     *
+     * @return the simple cursor adapter
+     */
     private SimpleCursorAdapter initializeGroupAdapter() {
 
         final String[] projection = {GroupTable.TABLE_NAME + ".*"};
         final String sortOrder = GroupTable.TABLE_NAME + "." + GroupTable.COLUMN_CREATED_AT + " DESC";
-        final String selection = UserTable.TABLE_NAME + "." + UserTable.COLUMN_USER_ID + " = ? AND " + GroupTable.TABLE_NAME + "." + GroupTable.COLUMN_SYNCHRONIZED + " = 1";
+        final String selection = UserTable.TABLE_NAME + "." + UserTable.COLUMN_USER_ID
+            + " = ? AND " + GroupTable.TABLE_NAME + "." + GroupTable.COLUMN_SYNCHRONIZED
+            + " = 1";
         final String[] selectionArgs = {Login.getInstance().getUser().getUserId()};
-        final Cursor query = getActivity().getContentResolver().query(DatabaseProvider.CONTENT_GROUP_USER_JOIN_URI, projection, selection, selectionArgs, sortOrder);
+        final Cursor query = getActivity().getContentResolver()
+            .query(DatabaseProvider.CONTENT_GROUP_USER_JOIN_URI,
+                projection, selection, selectionArgs, sortOrder);
 
-        final String[] columns = new String[]{GroupTable.COLUMN_NAME};
-        final int[] to = new int[]{android.R.id.text1};
+        final String[] columns = new String[] {GroupTable.COLUMN_NAME};
+        final int[] to = new int[] {android.R.id.text1};
 
-        final SimpleCursorAdapter groupAdapter = new SimpleCursorAdapter(this.getContext(), R.layout.group_spinner_item, query, columns, to, 0);
+        final SimpleCursorAdapter groupAdapter = new SimpleCursorAdapter(this.getContext(),
+            R.layout.group_spinner_item, query, columns, to, 0);
         groupAdapter.setDropDownViewResource(R.layout.group_spinner_dropdown_item);
         return groupAdapter;
     }
 
+    /* (non-Javadoc)
+     * @see android.app.Fragment#onCreateView(android.view.LayoutInflater, android.view.ViewGroup, android.os.Bundle)
+     */
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         final View view = inflater.inflate(R.layout.fragment_map_transaction, container, false);
 
         final MapFragment mapFragment = (MapFragment) this.getChildFragmentManager()
-                .findFragmentById(R.id.map);
+            .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
 
         return view;
     }
-
 
     /**
      * Manipulates the map once available.
@@ -115,24 +157,30 @@ public class MapTransactionFragment extends Fragment implements IMyFragment,
      * If Google Play services is not installed on the device, the user will be prompted to install
      * it inside the SupportMapFragment. This method will only be triggered once the user has
      * installed Google Play services and returned to the app.
+     *
+     * @param googleMap the google map
      */
     @Override
     public void onMapReady(GoogleMap googleMap) {
-        mMap = googleMap;
+        map = googleMap;
         setMarkers();
     }
 
-
+    /**
+     * Sets the markers.
+     */
     private void setMarkers() {
         final String groupId = getCurrentGroupId();
-        if (mMap != null && groupId != null) {
-            mMap.clear();
+        if (map != null && groupId != null) {
+            map.clear();
             final String[] projection = {TransactionTable.TABLE_NAME + ".*"};
             final String sortOrder = TransactionTable.TABLE_NAME + "." + TransactionTable.COLUMN_INFO_CREATED_AT + " DESC";
-            final String selection = GroupTable.TABLE_NAME + "." + GroupTable.COLUMN_GROUP_ID + " = ? " ;
+            final String selection = GroupTable.TABLE_NAME + "." + GroupTable.COLUMN_GROUP_ID + " = ? ";
             final String[] selectionArgs = {groupId};
 
-            final Cursor transactions = getActivity().getContentResolver().query(DatabaseProvider.CONTENT_GROUP_USER_TRANSACTION_JOIN_URI, projection, selection, selectionArgs, sortOrder);
+            final Cursor transactions = getActivity().getContentResolver()
+                .query(DatabaseProvider.CONTENT_GROUP_USER_TRANSACTION_JOIN_URI,
+                    projection, selection, selectionArgs, sortOrder);
             Log.d(TAG, "Transactions Count: " + transactions.getCount());
 
             LatLngBounds.Builder builder = LatLngBounds.builder();
@@ -150,53 +198,58 @@ public class MapTransactionFragment extends Fragment implements IMyFragment,
                     final MarkerOptions markerOptions = new MarkerOptions().position(position).title(name);
                     if (imageUrl != null) {
                         Glide.with(this)
-                                .load(imageUrl)
-                                .asBitmap()
-                                .diskCacheStrategy(DiskCacheStrategy.SOURCE)
-                                .centerCrop()
-                                .transform(new CircleTransform(getContext())) // applying the image transformer
-                                .override(100, 100)
-                                .into(new SimpleTarget<Bitmap>() {
-                                    @Override
-                                    public void onResourceReady(Bitmap bitmap, GlideAnimation<? super Bitmap> glideAnimation) {
-                                        mMap.addMarker(markerOptions.icon(BitmapDescriptorFactory.fromBitmap(bitmap)));
-                                    }
-                                });
+                            .load(imageUrl)
+                            .asBitmap()
+                            .diskCacheStrategy(DiskCacheStrategy.SOURCE)
+                            .centerCrop()
+                            .transform(new CircleTransform(getContext())) // applying the image transformer
+                            .override(100, 100)
+                            .into(new SimpleTarget<Bitmap>() {
+                                @Override
+                                public void onResourceReady(Bitmap bitmap, GlideAnimation<? super Bitmap> glideAnimation) {
+                                    map.addMarker(markerOptions.icon(BitmapDescriptorFactory.fromBitmap(bitmap)));
+                                }
+                            });
                     } else {
-                        mMap.addMarker(markerOptions);
+                        map.addMarker(markerOptions);
                     }
                     builder = builder.include(position);
                 }
             }
             if (markers > 0) {
-                mMap.animateCamera(CameraUpdateFactory.newLatLngBounds(builder.build(), 150));
+                map.animateCamera(CameraUpdateFactory.newLatLngBounds(builder.build(), 150));
             }
         }
     }
 
-    public MapTransactionFragment() {
-        // Required empty public constructor
-    }
-
+    /* (non-Javadoc)
+     * @see android.app.Fragment#onCreate(android.os.Bundle)
+     */
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
     }
 
-
-    // TODO: Rename method, update argument and hook method into UI event
-
+    /* (non-Javadoc)
+     * @see android.app.Fragment#onAttach(android.content.Context)
+     */
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
     }
 
+    /* (non-Javadoc)
+     * @see android.app.Fragment#onDetach()
+     */
     @Override
     public void onDetach() {
         super.onDetach();
     }
 
+    /* (non-Javadoc)
+     * @see com.media.interactive.cs3.hdm.interactivemedia.fragments.IFragment#getOnFabClickListener()
+     */
     @Override
     public View.OnClickListener getOnFabClickListener() {
         return new View.OnClickListener() {

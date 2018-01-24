@@ -13,9 +13,6 @@
 
     <string name="action_settings">Settings</string>
 
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
-
     <!-- Local WLAN Device Setup -->
     <string name="web_service_url">http://10.0.0.107:8081</string>
     <!-- Production Setup -->
@@ -32,5 +29,23 @@
     <string name="messageUpdatedGroup">Updated group and users.</string>
     <string name="errorMessageUpdatedGroup">Error while creating group at backend.</string>
     <string name="requestErrorMessageCreateGroup">Error while sending the group to backend.</string>
+    <string name="requestPathAddTransaction1">/v1/groups/</string>
+    <string name="requestPathAddTransaction2">/transactions</string>
+    <string name="requestErrorMessageAddTransaction">Error while sending the group to backend.</string>
+    <string name="requestErrorMessagePullTransactions">Could not pull transactions before pushing.</string>
+    <string name="errorMessageOcrInvalidDate">Recognized date is before group creation date.</string>
+    <string name="errorMessageOcrFailed">Could not recognize any price or date. Please try again.</string>
+    <string name="requestPathUpload">/v1/object-store/upload?filename=image.png</string>
+    <string name="requestPathUpdateUser">/v1/users/user</string>
+    <string name="requestPathTestPushNotification">/v1/test/notification/user</string>
+    <string name="requestPathRegisterUser">/v1/users/</string>
+    <string name="requestPathGoogleLogin">/v1/users/login?type=1</string>
+    <string name="requestPathFacebookLogin">/v1/users/login?type=2</string>
+    <string name="requestPathDefaultLogin">/v1/users/login?type=0</string>
+    <string name="requestPathLogout">/v1/users/logout</string>
+    <string name="requestPathGetUser">/v1/users/user</string>
+    <string name="requestPathPullTransactionsAfter1">/v1/groups/</string>
+    <string name="requestPathPullTransactionsAfter2">/transactions?after=</string>
+    <string name="requestPathGetGroup">/v1/groups/</string>
 
 </resources>

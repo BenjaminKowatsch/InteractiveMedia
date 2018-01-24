@@ -124,7 +124,7 @@
                 android:layout_marginRight="30dp"
                 android:text="Add new user" />
 
-            <com.media.interactive.cs3.hdm.interactivemedia.recyclerview.NonScrollRecyclerView
+            <com.media.interactive.cs3.hdm.interactivemedia.views.NonScrollRecyclerView
                 android:id="@+id/recycler_view"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"

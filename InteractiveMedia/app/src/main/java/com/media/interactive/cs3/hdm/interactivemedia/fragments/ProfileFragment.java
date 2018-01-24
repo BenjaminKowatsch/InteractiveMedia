@@ -2,9 +2,7 @@ package com.media.interactive.cs3.hdm.interactivemedia.fragments;
 
 import android.app.Fragment;
 import android.content.Context;
-import android.net.Uri;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -20,18 +18,36 @@ import com.media.interactive.cs3.hdm.interactivemedia.data.Login;
 import com.media.interactive.cs3.hdm.interactivemedia.data.User;
 
 
-public class ProfileFragment extends Fragment implements IMyFragment {
+
+
+/**
+ * The Class ProfileFragment.
+ */
+public class ProfileFragment extends Fragment implements IFragment {
+
+    /**
+     * The Constant TAG.
+     */
     private static final String TAG = ProfileFragment.class.getSimpleName();
 
+    /**
+     * Instantiates a new profile fragment.
+     */
     public ProfileFragment() {
         // Required empty public constructor
     }
 
+    /* (non-Javadoc)
+     * @see android.app.Fragment#onCreate(android.os.Bundle)
+     */
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
     }
 
+    /* (non-Javadoc)
+     * @see android.app.Fragment#onCreateView(android.view.LayoutInflater, android.view.ViewGroup, android.os.Bundle)
+     */
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -47,7 +63,8 @@ public class ProfileFragment extends Fragment implements IMyFragment {
             GlideUrl glideUrl = null;
             if (imageUrl != null) {
                 if (imageUrl.startsWith(getResources().getString(R.string.web_service_url))) {
-                    builder = builder.addHeader("Authorization", Login.getInstance().getUserType().getValue() + " " + Login.getInstance().getAccessToken());
+                    builder = builder.addHeader("Authorization", Login.getInstance().getUserType().getValue()
+                        + " " + Login.getInstance().getAccessToken());
                 }
                 glideUrl = new GlideUrl(imageUrl, builder.build());
                 Glide.with(this).load(glideUrl)
@@ -70,23 +87,31 @@ public class ProfileFragment extends Fragment implements IMyFragment {
     }
 
 
+    /* (non-Javadoc)
+     * @see android.app.Fragment#onAttach(android.content.Context)
+     */
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
     }
 
+    /* (non-Javadoc)
+     * @see android.app.Fragment#onDetach()
+     */
     @Override
     public void onDetach() {
         super.onDetach();
     }
 
+    /* (non-Javadoc)
+     * @see com.media.interactive.cs3.hdm.interactivemedia.fragments.IFragment#getOnFabClickListener()
+     */
     @Override
     public View.OnClickListener getOnFabClickListener() {
         return new View.OnClickListener() {
             @Override
             public void onClick(View view) {
 
-                Log.d(TAG, "Hello from " + TAG);
             }
         };
     }

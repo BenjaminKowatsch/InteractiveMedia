@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content">
+
+    <ImageView
+        android:id="@+id/transaction_icon"
+        android:layout_margin="2dp"
+        android:layout_width="76dp"
+        android:layout_height="76dp"
+        android:contentDescription="Picture"
+        android:paddingLeft="10dp"
+        android:paddingRight="10dp"
+        android:src="@drawable/anonymoustransaction"
+        />
+
+    <TextView
+        android:id="@+id/transaction_title"
+        android:layout_marginTop="5dp"
+        android:layout_marginStart="5dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_toEndOf="@+id/transaction_icon"
+        android:hint="TransactionTitle"
+        android:paddingBottom="10dp"
+        android:textSize="16dp" />
+
+    <TextView
+        android:id="@+id/transaction_creation_date"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/transaction_payed_by"
+        android:layout_toEndOf="@+id/transaction_icon"
+        android:hint="TransactionDate"
+        android:paddingLeft="2dp"
+        android:layout_marginStart="5dp"
+        android:textSize="14dp" />
+
+    <TextView
+        android:id="@+id/transaction_payed_by"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
+        android:layout_below="@+id/transaction_title"
+        android:layout_marginEnd="15dp"
+        android:hint="Unknown user"
+        android:paddingLeft="100dp"
+        android:textSize="14dp" />
+
+    <TextView
+        android:id="@+id/transaction_amount"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
+        android:layout_marginEnd="15dp"
+        android:layout_below="@+id/transaction_payed_by"
+        android:hint="Amount"
+        android:paddingLeft="2dp"
+        android:textSize="14dp"
+        android:textAlignment="textEnd"/>
+
+
+    <ImageView
+        android:id="@+id/transaction_synced_icon"
+        android:layout_marginTop="10dp"
+        android:layout_marginEnd="15dp"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentTop="true"
+        android:adjustViewBounds="true"
+        android:src="@android:drawable/stat_notify_sync_noanim"/>
+
+</RelativeLayout>

@@ -12,10 +12,15 @@ import org.json.JSONObject;
 
 import java.util.List;
 
+
+
+/**
+ * The Interface Split.
+ */
 public interface Split {
 
     /**
-     * Splits a transaction into a List of Debts targeting the transactions' payer
+     * Splits a transaction into a List of Debts targeting the transactions' payer.
      *
      * @param transaction to be split into debts
      * @return list of debts
@@ -28,14 +33,14 @@ public interface Split {
      * @param next split to be changed
      * @return the split chained to this
      * @throws TerminatingSplitChainedException if this split already reduced the remaining
-     * amount of the transaction to 0
+     *                                          amount of the transaction to 0
      */
     @NonNull
     Split andThen(Split next);
 
     /**
      * Indicates, whether no more split can be chained after this one using {@link #andThen(Split)}
-     * to further split the given transaction
+     * to further split the given transaction.
      *
      * @param transaction transaction for which split may be terminating
      * @return false when another split can be chained or true if none can come after this
@@ -53,13 +58,24 @@ public interface Split {
     boolean hasNext();
 
     /**
-     * Returns next split in split chain
+     * Returns next split in split chain.
      *
      * @return split following this directly in split chain.
      */
     Split getNext();
 
+    /**
+     * To json.
+     *
+     * @return the JSON object
+     * @throws JSONException the JSON exception
+     */
     JSONObject toJson() throws JSONException;
 
+    /**
+     * To content values.
+     *
+     * @return the content values
+     */
     ContentValues toContentValues();
 }

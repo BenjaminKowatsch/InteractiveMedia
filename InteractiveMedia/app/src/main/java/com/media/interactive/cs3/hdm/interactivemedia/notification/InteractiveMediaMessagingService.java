@@ -2,7 +2,6 @@ package com.media.interactive.cs3.hdm.interactivemedia.notification;
 
 import android.app.NotificationManager;
 import android.app.PendingIntent;
-import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
 import android.media.RingtoneManager;
@@ -13,24 +12,34 @@ import android.util.Log;
 import com.google.firebase.messaging.FirebaseMessagingService;
 import com.google.firebase.messaging.RemoteMessage;
 import com.media.interactive.cs3.hdm.interactivemedia.R;
-import com.media.interactive.cs3.hdm.interactivemedia.activties.HomeActivity;
 import com.media.interactive.cs3.hdm.interactivemedia.activties.MainActivity;
 
 import java.util.Map;
+
+
 
 /**
  * Created by benny on 23.12.17.
  */
 
 public class InteractiveMediaMessagingService extends FirebaseMessagingService {
+
+    /**
+     * The Constant TAG.
+     */
     private static final String TAG = InteractiveMediaMessagingService.class.getSimpleName();
 
+    /**
+     * On message received.
+     *
+     * @param remoteMessage the remote message
+     */
     @Override
     public void onMessageReceived(RemoteMessage remoteMessage) {
         final Map<String, String> data = remoteMessage.getData();
         sendNotification(data);
-        for(Map.Entry<String,String> entry :data.entrySet()){
-            Log.d(TAG, entry.getKey()+": " + entry.getValue());
+        for (Map.Entry<String, String> entry : data.entrySet()) {
+            Log.d(TAG, entry.getKey() + ": " + entry.getValue());
         }
         // If the application is in the foreground handle both data and notification messages here.
         // Also if you intend on generating your own notifications as a result of a received FCM
@@ -39,13 +48,18 @@ public class InteractiveMediaMessagingService extends FirebaseMessagingService {
         //Log.d(TAG, "Notification Message Body: " + remoteMessage.getNotification().getBody());
     }
 
+    /**
+     * Send notification.
+     *
+     * @param data the data
+     */
     private void sendNotification(Map<String, String> data) {
         final Intent intent = new Intent(this, MainActivity.class);
-        intent.putExtra("transactionReload",true);
+        intent.putExtra("transactionReload", true);
         final PendingIntent pendingIntent = PendingIntent.getActivity(this, 0 /* Request code */, intent,
             PendingIntent.FLAG_ONE_SHOT);
 
-        final Uri defaultSoundUri= RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
+        final Uri defaultSoundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
         final NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(this)
             .setSmallIcon(R.mipmap.logo_notificatoin_mdpi)
             .setContentTitle(data.get("title"))

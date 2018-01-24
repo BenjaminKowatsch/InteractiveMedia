@@ -9,19 +9,37 @@ import org.json.JSONObject;
 
 import java.util.List;
 
+
+
+/**
+ * A factory for creating Split objects.
+ */
 public class SplitFactory {
 
+    /**
+     * Gets the split by name.
+     *
+     * @param name the name
+     * @return the split by name
+     */
     public static Split getSplitByName(String name) {
         switch (name.toLowerCase()) {
             case "even":
                 return new EvenSplit();
             default:
                 throw new UnknownSplitException("No split named " + name
-                        + " known to this factory");
+                    + " known to this factory");
         }
     }
 
-    public static Split fromJSON(JSONArray splitArray) throws JSONException {
+    /**
+     * From JSON.
+     *
+     * @param splitArray the split array
+     * @return the split
+     * @throws JSONException the JSON exception
+     */
+    public static Split fromJson(JSONArray splitArray) throws JSONException {
         final Split outerSplit = toSplit(splitArray.getJSONObject(0));
         Split innermostSplit = outerSplit;
         for (int i = 1; i < splitArray.length(); i++) {
@@ -33,6 +51,13 @@ public class SplitFactory {
         return outerSplit;
     }
 
+    /**
+     * To split.
+     *
+     * @param splitObject the split object
+     * @return the split
+     * @throws JSONException the JSON exception
+     */
     @NonNull
     private static Split toSplit(JSONObject splitObject) throws JSONException {
         final String type = splitObject.getString("type");
@@ -48,8 +73,15 @@ public class SplitFactory {
         }
     }
 
-    public static JSONArray toJSONArray(Split split) throws JSONException {
-        JSONArray out = new JSONArray();
+    /**
+     * To JSON array.
+     *
+     * @param split the split
+     * @return the JSON array
+     * @throws JSONException the JSON exception
+     */
+    public static JSONArray toJsonArray(Split split) throws JSONException {
+        final JSONArray out = new JSONArray();
         Split innermost = split;
         out.put(innermost.toJson());
         while (innermost.hasNext()) {
@@ -59,6 +91,12 @@ public class SplitFactory {
         return out;
     }
 
+    /**
+     * Builds the split from list.
+     *
+     * @param splitList the split list
+     * @return the split
+     */
     public static Split buildSplitFromList(List<Split> splitList) {
         final Split outerSplit = splitList.get(0);
         Split innermost = outerSplit;
@@ -68,7 +106,16 @@ public class SplitFactory {
         return outerSplit;
     }
 
+    /**
+     * The Class UnknownSplitException.
+     */
     private static class UnknownSplitException extends RuntimeException {
+
+        /**
+         * Instantiates a new unknown split exception.
+         *
+         * @param s the s
+         */
         UnknownSplitException(String s) {
             super(s);
         }

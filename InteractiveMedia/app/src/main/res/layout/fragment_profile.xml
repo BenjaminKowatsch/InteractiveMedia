@@ -7,8 +7,6 @@
     android:background="@color/colorPrimary"
     tools:context="com.media.interactive.cs3.hdm.interactivemedia.fragments.ProfileFragment">
 
-    <!-- TODO: Update blank fragment layout -->
-
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

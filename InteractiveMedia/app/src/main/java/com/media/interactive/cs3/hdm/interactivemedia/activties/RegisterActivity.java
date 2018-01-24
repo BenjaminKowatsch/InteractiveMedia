@@ -7,35 +7,75 @@ import android.text.Editable;
 import android.text.InputType;
 import android.text.TextWatcher;
 import android.util.Log;
-import android.util.Patterns;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.media.interactive.cs3.hdm.interactivemedia.CallbackListener;
 import com.media.interactive.cs3.hdm.interactivemedia.R;
 import com.media.interactive.cs3.hdm.interactivemedia.data.Hash;
 import com.media.interactive.cs3.hdm.interactivemedia.data.Login;
 import com.media.interactive.cs3.hdm.interactivemedia.data.UserType;
+import com.media.interactive.cs3.hdm.interactivemedia.util.CallbackListener;
+import com.media.interactive.cs3.hdm.interactivemedia.util.Helper;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
-public class RegisterActivity extends ImagePickerActivity
-        implements View.OnClickListener {
 
+
+/**
+ * The type Register activity.
+ */
+public class RegisterActivity extends ImagePickerActivity
+    implements View.OnClickListener {
+
+    /**
+     * The Constant TAG.
+     */
     private static final String TAG = RegisterActivity.class.getSimpleName();
 
+    /**
+     * The register.
+     */
     private Button register;
+
+    /**
+     * The register username.
+     */
     private EditText registerUsername;
+
+    /**
+     * The register username error.
+     */
     private TextView registerUsernameError;
+
+    /**
+     * The register email.
+     */
     private EditText registerEmail;
+
+    /**
+     * The register email error.
+     */
     private TextView registerEmailError;
+
+    /**
+     * The register password.
+     */
     private EditText registerPassword;
+
+    /**
+     * The register password error.
+     */
     private TextView registerPasswordError;
 
+    /**
+     * On create.
+     *
+     * @param savedInstanceState the saved instance state
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -93,7 +133,7 @@ public class RegisterActivity extends ImagePickerActivity
 
             @Override
             public void afterTextChanged(Editable editable) {
-                if (isEmailValid(editable.toString())) {
+                if (Helper.isEmailValid(editable.toString())) {
                     registerEmailError.setVisibility(View.GONE);
                     register.setEnabled(isRegisterEnabled());
                 } else {
@@ -124,31 +164,44 @@ public class RegisterActivity extends ImagePickerActivity
             }
         });
 
-        initImagePickerActivity(R.id.register_profile_picture, "profile_picture.png",false);
+        initImagePickerActivity(R.id.register_profile_picture, "profile_picture.png", false);
     }
 
+    /**
+     * Checks if is register enabled.
+     *
+     * @return true, if is register enabled
+     */
     private boolean isRegisterEnabled() {
-        boolean isNameValid = isNameValid(registerUsername.getText().toString());
-        boolean isPasswordValid = isPasswordValid(registerPassword.getText().toString());
-        boolean isEmailValid = isEmailValid(registerEmail.getText().toString());
+        final boolean isNameValid = isNameValid(registerUsername.getText().toString());
+        final boolean isPasswordValid = isPasswordValid(registerPassword.getText().toString());
+        final boolean isEmailValid = Helper.isEmailValid(registerEmail.getText().toString());
         return isEmailValid && isNameValid && isPasswordValid;
     }
 
+    /**
+     * Checks if is name valid.
+     *
+     * @param name the name
+     * @return true, if is name valid
+     */
     private boolean isNameValid(String name) {
         return name != null && name.length() > 4;
     }
 
+    /**
+     * Checks if is password valid.
+     *
+     * @param password the password
+     * @return true, if is password valid
+     */
     private boolean isPasswordValid(String password) {
         return password != null && password.length() > 3;
     }
 
-    private boolean isEmailValid(String email) {
-        if (Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
-            return true;
-        }
-        return false;
-    }
-
+    /**
+     * Navigate to home.
+     */
     private void navigateToHome() {
         final Intent toHome = new Intent(RegisterActivity.this, HomeActivity.class);
         toHome.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
@@ -156,6 +209,11 @@ public class RegisterActivity extends ImagePickerActivity
         finish();
     }
 
+    /**
+     * On click.
+     *
+     * @param v the v
+     */
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
@@ -169,8 +227,8 @@ public class RegisterActivity extends ImagePickerActivity
                     @Override
                     public void onSuccess(JSONObject param) {
                         Toast.makeText(getApplicationContext(),
-                                "Success fully logged in",
-                                Toast.LENGTH_SHORT).show();
+                            "Success fully logged in",
+                            Toast.LENGTH_SHORT).show();
 
                         uploadImage(new CallbackListener<JSONObject, Exception>() {
                             @Override
@@ -186,7 +244,7 @@ public class RegisterActivity extends ImagePickerActivity
                                     e.printStackTrace();
                                 }
                                 final String newImageUrl = getResources().getString(R.string.web_service_url)
-                                        .concat("/v1/object-store/download?filename=").concat(imageName);
+                                    .concat("/v1/object-store/download?filename=").concat(imageName);
                                 Login.getInstance().getUser().setImageUrl(newImageUrl);
                                 Login.getInstance().updateImageUrl(RegisterActivity.this);
 
