@@ -20,7 +20,7 @@ import java.util.List;
 
 import static com.media.interactive.cs3.hdm.interactivemedia.activties.AddTransactionActivity.CURRENCY_FORMAT;
 
-// TODO: Auto-generated Javadoc
+
 
 /**
  * The Class SplitAdapter.
@@ -30,11 +30,11 @@ public class SplitAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
     /**
      * The Constant NO_SWIPE_ITEM_TYPE.
      */
-    private final static int NO_SWIPE_ITEM_TYPE = 0;
+    private static final int NO_SWIPE_ITEM_TYPE = 0;
     /**
      * The Constant SWIPE_ITEM_TYPE.
      */
-    private final static int SWIPE_ITEM_TYPE = 1;
+    private static final int SWIPE_ITEM_TYPE = 1;
     /**
      * The list.
      */
@@ -218,9 +218,14 @@ public class SplitAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
         public TextView name;
 
         /**
+         * The view background.
+         */
+        public RelativeLayout viewBackground;
+
+        /**
          * The view foreground.
          */
-        public RelativeLayout viewBackground, viewForeground;
+        public RelativeLayout viewForeground;
 
         /**
          * Instantiates a new simple view holder.

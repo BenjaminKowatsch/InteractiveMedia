@@ -17,7 +17,7 @@ import com.media.interactive.cs3.hdm.interactivemedia.data.User;
 
 import java.util.List;
 
-// TODO: Auto-generated Javadoc
+
 
 /**
  * Created by benny on 29.12.17.
@@ -28,11 +28,11 @@ public class UserEmailAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
     /**
      * The Constant NO_SWIPE_ITEM_TYPE.
      */
-    private final static int NO_SWIPE_ITEM_TYPE = 0;
+    private static final int NO_SWIPE_ITEM_TYPE = 0;
     /**
      * The Constant SWIPE_ITEM_TYPE.
      */
-    private final static int SWIPE_ITEM_TYPE = 1;
+    private static final int SWIPE_ITEM_TYPE = 1;
     /**
      * The context.
      */
@@ -154,9 +154,14 @@ public class UserEmailAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
         public TextView name;
 
         /**
+         * The view background.
+         */
+        public RelativeLayout viewBackground;
+
+        /**
          * The view foreground.
          */
-        public RelativeLayout viewBackground, viewForeground;
+        public RelativeLayout viewForeground;
 
         /**
          * Instantiates a new simple view holder.
