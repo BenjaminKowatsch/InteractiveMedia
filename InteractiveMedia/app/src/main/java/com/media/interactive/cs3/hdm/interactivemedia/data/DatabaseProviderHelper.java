@@ -40,7 +40,6 @@ import java.util.List;
 import static com.media.interactive.cs3.hdm.interactivemedia.database.tables.DebtTable.extractDebtFromCurrentPosition;
 
 
-
 /**
  * Created by benny on 08.01.18.
  */
@@ -67,9 +66,9 @@ public class DatabaseProviderHelper {
     }
 
     /**
-     * Upsert user.
+     * Updates or inserts the user object at the database.
      *
-     * @param user the user
+     * @param user the user object to be upserted
      */
     public void upsertUser(User user) {
         final String[] projection = {UserTable.COLUMN_ID};
@@ -78,10 +77,10 @@ public class DatabaseProviderHelper {
         String[] selectionArgs;
         if (user.getUserId() == null) {
             selection = UserTable.COLUMN_EMAIL + " = ?";
-            selectionArgs = new String[] {user.getEmail()};
+            selectionArgs = new String[]{user.getEmail()};
         } else {
             selection = UserTable.COLUMN_USER_ID + " = ?";
-            selectionArgs = new String[] {user.getUserId()};
+            selectionArgs = new String[]{user.getUserId()};
         }
         final Cursor search = contentResolver.query(DatabaseProvider.CONTENT_USER_URI, projection, selection, selectionArgs, null);
         long foundId = -1;
@@ -125,13 +124,13 @@ public class DatabaseProviderHelper {
     }
 
     /**
-     * Sets the image url by response.
+     * Sets the image url of the group using the JSON response object.
      *
      * @param context  the context
      * @param group    the group
      * @param response the response
      */
-    public void setImageUrlByResponse(Context context, Group group, JSONObject response) {
+    public void setGroupImageUrlByResponse(Context context, Group group, JSONObject response) {
         JSONObject payload = null;
         String imageName = null;
         try {
@@ -142,7 +141,7 @@ public class DatabaseProviderHelper {
             e.printStackTrace();
         }
         final String newImageUrl = context.getResources().getString(R.string.web_service_url)
-            .concat(context.getString(R.string.requestPathDownload)).concat(imageName);
+                .concat(context.getString(R.string.requestPathDownload)).concat(imageName);
         group.setImageUrl(newImageUrl);
     }
 
@@ -185,8 +184,9 @@ public class DatabaseProviderHelper {
         }
     }
 
+
     /**
-     * Sets the transaction image url by response.
+     * Sets the transaction image url using the JSON response.
      *
      * @param context     the context
      * @param transaction the transaction
@@ -203,12 +203,12 @@ public class DatabaseProviderHelper {
             e.printStackTrace();
         }
         final String newImageUrl = context.getResources().getString(R.string.web_service_url)
-            .concat(context.getString(R.string.requestPathDownload)).concat(imageName);
+                .concat(context.getString(R.string.requestPathDownload)).concat(imageName);
         transaction.setImageUrl(newImageUrl);
     }
 
     /**
-     * Update transaction with response.
+     * Update transaction entry at the database using the JSON response.
      *
      * @param transaction the transaction
      * @param payload     the payload
@@ -235,7 +235,7 @@ public class DatabaseProviderHelper {
     }
 
     /**
-     * Update group with response.
+     * Update the group at the database with the JSON response.
      *
      * @param group   the group
      * @param payload the payload
@@ -273,9 +273,9 @@ public class DatabaseProviderHelper {
     }
 
     /**
-     * Find insert users at database.
+     * Find or insert users from a group at the database.
      *
-     * @param group the group
+     * @param group the group containing the users to be inserted or found
      */
     public void findInsertUsersAtDatabase(Group group) {
         for (User user : group.getUsers()) {
@@ -284,10 +284,10 @@ public class DatabaseProviderHelper {
             String[] selectionArgs;
             if (user.getUserId() == null) {
                 selection = UserTable.COLUMN_EMAIL + " = ?";
-                selectionArgs = new String[] {user.getEmail()};
+                selectionArgs = new String[]{user.getEmail()};
             } else {
                 selection = UserTable.COLUMN_USER_ID + " = ?";
-                selectionArgs = new String[] {user.getUserId()};
+                selectionArgs = new String[]{user.getUserId()};
             }
             final Cursor search = contentResolver.query(DatabaseProvider.CONTENT_USER_URI, projection, selection, selectionArgs, null);
             long foundId = -1;
@@ -306,7 +306,7 @@ public class DatabaseProviderHelper {
     }
 
     /**
-     * Adds the transactions.
+     * Adds the transactions to the database.
      *
      * @param jsonArray the json array
      * @param groupId   the group id
@@ -345,11 +345,12 @@ public class DatabaseProviderHelper {
             saveTransactionImpl(transaction);
             transactions.add(transaction);
         }
-        calculateSplit(transactions.toArray(new Transaction[] {}));
+        calculateSplit(transactions.toArray(new Transaction[]{}));
     }
 
     /**
-     * Save transaction.
+     * Saves a single transaction at the database.
+     * Also the split for the transaction is calculated.
      *
      * @param transaction the transaction
      */
@@ -380,7 +381,7 @@ public class DatabaseProviderHelper {
     }
 
     /**
-     * Insert split.
+     * Insert split at the database.
      *
      * @param split the split
      * @return the uri
@@ -405,7 +406,17 @@ public class DatabaseProviderHelper {
     }
 
     /**
-     * Save debt.
+     * Calculate split.
+     *
+     * @param saved the saved
+     */
+    private void calculateSplit(Transaction saved) {
+        final TransactionSplittingTask task = new TransactionSplittingTask(this, new PairBasedSettlement());
+        task.execute(saved);
+    }
+
+    /**
+     * Save debt at the database.
      *
      * @param debt the debt
      */
@@ -416,7 +427,7 @@ public class DatabaseProviderHelper {
     }
 
     /**
-     * Gets the unsynced transactions.
+     * Gets the unsynced transactions from the database for a specific user.
      *
      * @param userId the user id
      * @return the unsynced transactions
@@ -426,11 +437,11 @@ public class DatabaseProviderHelper {
 
         final String[] projection = {TransactionTable.TABLE_NAME + ".*", GroupTable.TABLE_NAME + "." + GroupTable.COLUMN_GROUP_ID};
         final String selection = UserTable.TABLE_NAME + "." + UserTable.COLUMN_USER_ID + " = ? AND"
-            + " " + GroupTable.TABLE_NAME + "." + GroupTable.COLUMN_SYNCHRONIZED + " = 1 AND"
-            + " " + TransactionTable.TABLE_NAME + "." + TransactionTable.COLUMN_SYNCHRONIZED + " = 0 ";
+                + " " + GroupTable.TABLE_NAME + "." + GroupTable.COLUMN_SYNCHRONIZED + " = 1 AND"
+                + " " + TransactionTable.TABLE_NAME + "." + TransactionTable.COLUMN_SYNCHRONIZED + " = 0 ";
         final String[] selectionArgs = {userId};
         final Cursor cursor = contentResolver.query(DatabaseProvider.CONTENT_GROUP_USER_TRANSACTION_JOIN_URI,
-            projection, selection, selectionArgs, null);
+                projection, selection, selectionArgs, null);
         Log.d(TAG, "Unsynched Transactions Cursor: Count: " + cursor.getCount());
 
         while (cursor.moveToNext()) {
@@ -494,18 +505,7 @@ public class DatabaseProviderHelper {
     }
 
     /**
-     * Calculate split.
-     *
-     * @param saved the saved
-     */
-    private void calculateSplit(Transaction saved) {
-        final TransactionSplittingTask task = new TransactionSplittingTask(this, new PairBasedSettlement());
-        task.execute(saved);
-    }
-
-
-    /**
-     * Gets the unsynced groups.
+     * Gets the unsynced groups from the database for a specific user.
      *
      * @param userId the user id
      * @return the unsynced groups
@@ -515,8 +515,8 @@ public class DatabaseProviderHelper {
 
         final String[] projection = {GroupTable.TABLE_NAME + ".*", UserTable.TABLE_NAME + "." + UserTable.COLUMN_EMAIL};
         final String selection = "(" + UserTable.TABLE_NAME + "." + UserTable.COLUMN_USER_ID + " = ?  OR"
-            + " " + UserTable.TABLE_NAME + "." + UserTable.COLUMN_USER_ID + " IS NULL ) AND"
-            + " " + GroupTable.TABLE_NAME + "." + GroupTable.COLUMN_SYNCHRONIZED + " = 0 ";
+                + " " + UserTable.TABLE_NAME + "." + UserTable.COLUMN_USER_ID + " IS NULL ) AND"
+                + " " + GroupTable.TABLE_NAME + "." + GroupTable.COLUMN_SYNCHRONIZED + " = 0 ";
         final String[] selectionArgs = {userId};
         final Cursor cursor = contentResolver.query(DatabaseProvider.CONTENT_GROUP_USER_JOIN_URI, projection, selection, selectionArgs, null);
         Log.d(TAG, "Unsynched Group Cursor: Count: " + cursor.getCount());
@@ -546,7 +546,7 @@ public class DatabaseProviderHelper {
     }
 
     /**
-     * Check for cached credentials.
+     * Check for cached credentials at the database.
      *
      * @param login the login
      * @return true, if successful
@@ -555,8 +555,8 @@ public class DatabaseProviderHelper {
         if (contentResolver != null) {
             boolean result = false;
             final Cursor cursor = contentResolver.query(DatabaseProvider.CONTENT_LOGIN_URI,
-                null, null, null,
-                LoginTable.COLUMN_CREATED_AT + " DESC LIMIT 1");
+                    null, null, null,
+                    LoginTable.COLUMN_CREATED_AT + " DESC LIMIT 1");
             result = cursor.getCount() > 0;
             while (cursor.moveToNext()) {
                 login.setId(cursor.getLong(0));
@@ -572,7 +572,7 @@ public class DatabaseProviderHelper {
     }
 
     /**
-     * Gets the latest transaction pub date by group id.
+     * Gets the latest transaction publication date by group id.
      *
      * @param groupId the group id
      * @return the latest transaction pub date by group id
@@ -583,8 +583,8 @@ public class DatabaseProviderHelper {
         final String selection = GroupTable.TABLE_NAME + "." + GroupTable.COLUMN_GROUP_ID + " = ?";
         final String[] selectionArgs = {groupId};
         final Cursor cursor = contentResolver.query(DatabaseProvider.CONTENT_GROUP_TRANSACTION_JOIN_URI,
-            projection, selection, selectionArgs,
-            TransactionTable.COLUMN_PUBLISHED_AT + " DESC LIMIT 1");
+                projection, selection, selectionArgs,
+                TransactionTable.COLUMN_PUBLISHED_AT + " DESC LIMIT 1");
         Log.d(TAG, "LatestTransaction Count: " + cursor.getCount());
         if (cursor.moveToFirst()) {
             result = cursor.getString(0);
@@ -593,7 +593,7 @@ public class DatabaseProviderHelper {
     }
 
     /**
-     * Removes the existing group ids.
+     * Removes the group ids existing at the database from the JSON array.
      *
      * @param groupIds the group ids
      * @return the list
@@ -632,7 +632,7 @@ public class DatabaseProviderHelper {
     }
 
     /**
-     * Save payment.
+     * Save payment at the database.
      *
      * @param payment           the payment
      * @param creationTimestamp the creation timestamp
@@ -664,7 +664,7 @@ public class DatabaseProviderHelper {
     }
 
     /**
-     * Load users for group.
+     * Load users for group from the database.
      *
      * @param group the group
      * @return the list
@@ -675,7 +675,7 @@ public class DatabaseProviderHelper {
         final String selection = GroupTable.TABLE_NAME + "." + GroupTable.COLUMN_ID + " = ?";
         final String[] selectionArgs = {"" + group.getId()};
         final Cursor cursor = contentResolver.query(DatabaseProvider.CONTENT_GROUP_USER_JOIN_URI,
-            projection, selection, selectionArgs, null);
+                projection, selection, selectionArgs, null);
         if (cursor != null) {
             List<User> out = new ArrayList<>();
             while (cursor.moveToNext()) {
@@ -688,7 +688,7 @@ public class DatabaseProviderHelper {
     }
 
     /**
-     * Load group for transaction.
+     * Load group for transaction from the database.
      *
      * @param transaction the transaction
      * @return the group
@@ -698,7 +698,7 @@ public class DatabaseProviderHelper {
         final String selection = TransactionTable.TABLE_NAME + "." + TransactionTable.COLUMN_ID + " = ?";
         final String[] selectionArgs = {"" + transaction.getId()};
         final Cursor cursor = contentResolver.query(DatabaseProvider.CONTENT_GROUP_TRANSACTION_JOIN_URI,
-            projection, selection, selectionArgs, null);
+                projection, selection, selectionArgs, null);
         if (cursor != null) {
             final boolean hadFirst = cursor.moveToFirst();
             if (hadFirst) {
@@ -712,7 +712,7 @@ public class DatabaseProviderHelper {
     }
 
     /**
-     * Delete login.
+     * Delete login credentials at the database.
      *
      * @param login the login
      * @return true, if successful
@@ -720,9 +720,9 @@ public class DatabaseProviderHelper {
     public boolean deleteLogin(Login login) {
         if (contentResolver != null) {
             final int result = contentResolver.delete(DatabaseProvider.CONTENT_LOGIN_URI,
-                LoginTable.COLUMN_ID + "=?", new String[] {String.valueOf(login.getId())});
+                    LoginTable.COLUMN_ID + "=?", new String[]{String.valueOf(login.getId())});
             Log.d(TAG, "delete Login: " + login + " to "
-                + DatabaseProvider.CONTENT_LOGIN_URI + "  " + result);
+                    + DatabaseProvider.CONTENT_LOGIN_URI + "  " + result);
             return result > 0;
         }
         Log.e(TAG, "Could not cache credentials, contentResolver is null.");
@@ -730,7 +730,7 @@ public class DatabaseProviderHelper {
     }
 
     /**
-     * Cache credentials.
+     * Cache credentials at the database.
      *
      * @param login the login
      * @return true, if successful
@@ -754,20 +754,20 @@ public class DatabaseProviderHelper {
     }
 
     /**
-     * Gets the all debts for group.
+     * Gets the all debts for group from the database.
      *
      * @param id the id
      * @return the all debts for group
      */
     public List<Debt> getAllDebtsForGroup(String id) {
         final String[] projection = {DebtTable.COLUMN_ID, DebtTable.COLUMN_AMOUNT,
-            DebtTable.COLUMN_FROM_USER, DebtTable.COLUMN_TO_USER,
-            DebtTable.TABLE_NAME + "." + DebtTable.COLUMN_TRANSACTION_ID,
-            GroupTransactionTable.TABLE_NAME + "." + GroupTransactionTable.COLUMN_GROUP_ID};
+                DebtTable.COLUMN_FROM_USER, DebtTable.COLUMN_TO_USER,
+                DebtTable.TABLE_NAME + "." + DebtTable.COLUMN_TRANSACTION_ID,
+                GroupTransactionTable.TABLE_NAME + "." + GroupTransactionTable.COLUMN_GROUP_ID};
         final String selection = GroupTransactionTable.COLUMN_GROUP_ID + " = ?";
-        final String[] selectionArgs = new String[] {id};
+        final String[] selectionArgs = new String[]{id};
         final Cursor query = contentResolver.query(DatabaseProvider.CONTENT_GROUP_ID_DEBT_JOIN_URI, projection,
-            selection, selectionArgs, null);
+                selection, selectionArgs, null);
         List<Debt> out = new ArrayList<>();
         if (query != null) {
             while (query.moveToNext()) {

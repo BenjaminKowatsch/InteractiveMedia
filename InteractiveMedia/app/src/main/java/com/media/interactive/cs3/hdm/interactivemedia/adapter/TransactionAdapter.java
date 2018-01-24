@@ -35,9 +35,9 @@ import static com.media.interactive.cs3.hdm.interactivemedia.activties.AddTransa
 public class TransactionAdapter extends CursorAdapter {
 
     /**
-     * The m layout inflater.
+     * The layout inflater.
      */
-    private LayoutInflater mLayoutInflater;
+    private LayoutInflater layoutInflater;
 
     /**
      * The helper.
@@ -59,7 +59,7 @@ public class TransactionAdapter extends CursorAdapter {
     public TransactionAdapter(Context context, int layout, Cursor c) {
         super(context, c, 0);
         this.layout = layout;
-        mLayoutInflater = LayoutInflater.from(context);
+        layoutInflater = LayoutInflater.from(context);
         helper = new DatabaseProviderHelper(context.getContentResolver());
     }
 
@@ -73,14 +73,14 @@ public class TransactionAdapter extends CursorAdapter {
      */
     @Override
     public View newView(Context context, Cursor cursor, ViewGroup viewGroup) {
-        final View view = mLayoutInflater.inflate(layout, viewGroup, false);
+        final View view = layoutInflater.inflate(layout, viewGroup, false);
         view.setTag(new ViewHolder(view));
         // no need to bind data here. you do in later
         return view;
     }
 
     /**
-     * Bind view.
+     * Bind the view with the transaction data from the cursor using the ViewHolder pattern.
      *
      * @param view    the view
      * @param context the context

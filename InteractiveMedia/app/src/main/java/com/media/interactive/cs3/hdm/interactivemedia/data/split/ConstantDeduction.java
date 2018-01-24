@@ -128,7 +128,8 @@ public class ConstantDeduction implements Split {
     }
 
     /* (non-Javadoc)
-     * @see com.media.interactive.cs3.hdm.interactivemedia.data.split.Split#isTerminating(com.media.interactive.cs3.hdm.interactivemedia.data.Transaction)
+     * @see com.media.interactive.cs3.hdm.interactivemedia.data.split.Split#isTerminating(
+     * com.media.interactive.cs3.hdm.interactivemedia.data.Transaction)
      */
     @Override
     public boolean isTerminating(Transaction transaction) {

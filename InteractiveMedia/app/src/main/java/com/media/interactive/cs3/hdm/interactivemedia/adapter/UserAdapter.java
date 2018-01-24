@@ -68,7 +68,7 @@ public class UserAdapter extends CursorAdapter {
     }
 
     /**
-     * Bind view.
+     * Bind the view with the user data from the cursor using the ViewHolder pattern
      *
      * @param view    the view
      * @param context the context

@@ -212,7 +212,7 @@ public class ImagePickerActivity extends AppCompatActivity {
     }
 
     /**
-     * Creates the image file.
+     * Creates the image file using the specified filename.
      *
      * @return the file
      * @throws IOException Signals that an I/O exception has occurred.
@@ -229,7 +229,7 @@ public class ImagePickerActivity extends AppCompatActivity {
     }
 
     /**
-     * Sets the pic.
+     * Sets the picture on the specified image view.
      */
     private void setPic() {
         // Get the dimensions of the View
@@ -260,7 +260,13 @@ public class ImagePickerActivity extends AppCompatActivity {
     }
 
     /**
-     * Do OCR.
+     * Does the optical character recognition using google vision.
+     * Sets the recognized date and amount to specified EditText objects.
+     * During the algorithm the image is rotated four times to make sure every
+     * chance is used to process the image. After some outlier detection the second highest
+     * value is picked as suggested amount.
+     * The recognized date is set only if it's past the specified minimum date due to
+     * a transaction cannot be created before a group was created.
      *
      * @param bitmapOrg the bitmap org
      */
@@ -382,7 +388,8 @@ public class ImagePickerActivity extends AppCompatActivity {
     }
 
     /**
-     * Sets the minimum date.
+     * Sets the minimum date. This is equal to the group creation date.
+     * Is required for OCR to make sure the recognized date is past this group creation date.
      *
      * @param minimumDate the new minimum date
      */
@@ -391,7 +398,7 @@ public class ImagePickerActivity extends AppCompatActivity {
     }
 
     /**
-     * Upload image.
+     * Calls the private method to uploads the selected image using the current photo path.
      *
      * @param callbackListener the callback listener
      */
@@ -400,10 +407,10 @@ public class ImagePickerActivity extends AppCompatActivity {
     }
 
     /**
-     * Upload image.
+     * Uploads the image to the backend server. If succeeded the local copy of the image is deleted.
      *
      * @param imageFilePath    the image file path
-     * @param callbackListener the callback listener
+     * @param callbackListener the callback listener will be called with the upload result
      */
     private void uploadImage(final String imageFilePath, final CallbackListener<JSONObject, Exception> callbackListener) {
         if (imageFilePath != null && imageFilePath.length() > 0) {
@@ -460,7 +467,8 @@ public class ImagePickerActivity extends AppCompatActivity {
     }
 
     /**
-     * On activity result.
+     * On activity result. Handles the event for taking a picture with the camera and
+     * for picking a picture from the gallery.
      *
      * @param requestCode the request code
      * @param resultCode  the result code
@@ -566,7 +574,7 @@ public class ImagePickerActivity extends AppCompatActivity {
     }
 
     /**
-     * Creates the options dialog.
+     * Creates the options dialog. The user may select to pick an image via camera, url or gallery.
      *
      * @return the dialog
      */

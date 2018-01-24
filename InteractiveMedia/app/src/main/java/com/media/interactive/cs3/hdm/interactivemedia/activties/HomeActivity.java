@@ -102,6 +102,7 @@ public class HomeActivity extends AppCompatActivity
 
     /**
      * Register network status change receiver.
+     * Triggers the data synchronization process if the network status changes to 'connected'.
      */
     private void registerNetworkStatusChangeReceiver() {
         final IntentFilter intentFilter = new IntentFilter(NetworkStateChangeReceiver.NETWORK_AVAILABLE_ACTION);
@@ -127,7 +128,8 @@ public class HomeActivity extends AppCompatActivity
     }
 
     /**
-     * Load user data.
+     * Load user data. Sets the UI elements for the profile picture,
+     * email and username using the data provided by the Login singleton.
      *
      * @param navigationView the navigation view
      */

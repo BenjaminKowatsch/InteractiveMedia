@@ -88,9 +88,9 @@ public class AddGroupActivity extends ImagePickerActivity implements View.OnClic
     private List<User> userList;
 
     /**
-     * The m adapter.
+     * The adapter.
      */
-    private UserEmailAdapter mAdapter;
+    private UserEmailAdapter adapter;
 
     /**
      * The helper.
@@ -103,7 +103,7 @@ public class AddGroupActivity extends ImagePickerActivity implements View.OnClic
     private Group toAdd;
 
     /**
-     * On swiped.
+     * On swiped. Handles the action if a user swipes to the left to remove an email.
      *
      * @param viewHolder the view holder
      * @param direction  the direction
@@ -120,17 +120,17 @@ public class AddGroupActivity extends ImagePickerActivity implements View.OnClic
             final int deletedIndex = viewHolder.getAdapterPosition();
 
             // remove the item from recycler view
-            mAdapter.removeUser(viewHolder.getAdapterPosition());
+            adapter.removeUser(viewHolder.getAdapterPosition());
 
             // showing snack bar with Undo option
             final Snackbar snackbar = Snackbar
-                .make(linearLayout, user.getEmail() + " removed from user list", Snackbar.LENGTH_LONG);
+                    .make(linearLayout, user.getEmail() + " removed from user list", Snackbar.LENGTH_LONG);
             snackbar.setAction("UNDO", new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
 
                     // undo is selected, restore the deleted item
-                    mAdapter.restoreUser(deletedUser, deletedIndex);
+                    adapter.restoreUser(deletedUser, deletedIndex);
                 }
             });
             snackbar.setActionTextColor(Color.YELLOW);
@@ -169,7 +169,7 @@ public class AddGroupActivity extends ImagePickerActivity implements View.OnClic
         saveGroup.setOnClickListener(this);
 
         userList = new ArrayList<>();
-        mAdapter = new UserEmailAdapter(this, userList);
+        adapter = new UserEmailAdapter(this, userList);
 
         final Button cancel = findViewById(R.id.bn_group_save_cancel);
         cancel.setOnClickListener(this);
@@ -178,7 +178,7 @@ public class AddGroupActivity extends ImagePickerActivity implements View.OnClic
         recyclerView.setLayoutManager(mLayoutManager);
         recyclerView.setItemAnimator(new DefaultItemAnimator());
         recyclerView.addItemDecoration(new DividerItemDecoration(this, DividerItemDecoration.VERTICAL));
-        recyclerView.setAdapter(mAdapter);
+        recyclerView.setAdapter(adapter);
 
         final ItemTouchHelper.SimpleCallback itemTouchHelperCallback = new RecyclerItemTouchHelper(0, ItemTouchHelper.LEFT, this);
         new ItemTouchHelper(itemTouchHelperCallback).attachToRecyclerView(recyclerView);
@@ -329,7 +329,7 @@ public class AddGroupActivity extends ImagePickerActivity implements View.OnClic
                     e.printStackTrace();
                 }
                 final String newImageUrl = getResources().getString(R.string.web_service_url)
-                    .concat(getString(R.string.requestPathDownload)).concat(imageName);
+                        .concat(getString(R.string.requestPathDownload)).concat(imageName);
                 toAdd.setImageUrl(newImageUrl);
                 try {
                     sendToBackend(toAdd);
@@ -363,7 +363,7 @@ public class AddGroupActivity extends ImagePickerActivity implements View.OnClic
         final String url = getResources().getString(R.string.web_service_url).concat(getString(R.string.requestPathCreateGroup));
         Log.d(TAG, "url: " + url);
         final AuthorizedJsonObjectRequest jsonObjectRequest = new AuthorizedJsonObjectRequest(
-            Request.Method.POST, url, group.toJson(), new Response.Listener<JSONObject>() {
+                Request.Method.POST, url, group.toJson(), new Response.Listener<JSONObject>() {
             @Override
             public void onResponse(JSONObject response) {
 
