@@ -5,12 +5,17 @@ import android.database.sqlite.SQLiteDatabase;
 
 import com.media.interactive.cs3.hdm.interactivemedia.data.Debt;
 
+
+
 /**
  * Created by benny on 20.11.17.
  */
 
 public class DebtTable {
 
+    /**
+     * The Constant TABLE_NAME.
+     */
     public static final String TABLE_NAME = "debt";
     /**
      * First attribute, type integer.
@@ -37,24 +42,41 @@ public class DebtTable {
      */
     public static final String COLUMN_CREATED_AT = "created_at";
 
+    /**
+     * The Constant DATABASE_CREATE.
+     */
     public static final String DATABASE_CREATE =
-            "create table if not exists " + TABLE_NAME + "("
-                    + COLUMN_ID + " integer unique primary key AUTOINCREMENT,"
-                    + COLUMN_TRANSACTION_ID + " INTEGER references " + TransactionTable.TABLE_NAME
-                    + " (" + TransactionTable.COLUMN_ID + ") on delete cascade on update cascade,"
-                    + COLUMN_AMOUNT + " REAL NOT NULL,"
-                    + COLUMN_FROM_USER + " INTEGER references " + UserTable.TABLE_NAME
-                    + " (" + UserTable.COLUMN_ID + ") on delete cascade on update cascade,"
-                    + COLUMN_TO_USER + " INTEGER references " + UserTable.TABLE_NAME
-                    + " (" + UserTable.COLUMN_ID + ") on delete cascade on update cascade,"
-                    + COLUMN_CREATED_AT + " TIMESTAMP DEFAULT CURRENT_TIMESTAMP)";
+        "create table if not exists " + TABLE_NAME + "("
+            + COLUMN_ID + " integer unique primary key AUTOINCREMENT,"
+            + COLUMN_TRANSACTION_ID + " INTEGER references " + TransactionTable.TABLE_NAME
+            + " (" + TransactionTable.COLUMN_ID + ") on delete cascade on update cascade,"
+            + COLUMN_AMOUNT + " REAL NOT NULL,"
+            + COLUMN_FROM_USER + " INTEGER references " + UserTable.TABLE_NAME
+            + " (" + UserTable.COLUMN_ID + ") on delete cascade on update cascade,"
+            + COLUMN_TO_USER + " INTEGER references " + UserTable.TABLE_NAME
+            + " (" + UserTable.COLUMN_ID + ") on delete cascade on update cascade,"
+            + COLUMN_CREATED_AT + " TIMESTAMP DEFAULT CURRENT_TIMESTAMP)";
 
+    /**
+     * The Constant DATABASE_DROP.
+     */
     public static final String DATABASE_DROP = "drop table if exists " + TABLE_NAME;
 
+    /**
+     * On create.
+     *
+     * @param database the database
+     */
     public static void onCreate(SQLiteDatabase database) {
         database.execSQL(DATABASE_CREATE);
     }
 
+    /**
+     * Extract debt from current position.
+     *
+     * @param cursor the cursor
+     * @return the debt
+     */
     public static Debt extractDebtFromCurrentPosition(Cursor cursor) {
         final long transactionId = cursor.getLong(cursor.getColumnIndex(COLUMN_TRANSACTION_ID));
         final long creditorId = cursor.getLong(cursor.getColumnIndex(COLUMN_TO_USER));

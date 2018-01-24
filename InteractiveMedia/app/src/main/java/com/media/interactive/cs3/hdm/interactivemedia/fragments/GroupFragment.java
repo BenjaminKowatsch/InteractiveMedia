@@ -16,40 +16,70 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
-import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.SearchView;
-import android.widget.Toast;
 
-import com.media.interactive.cs3.hdm.interactivemedia.CallbackListener;
-import com.media.interactive.cs3.hdm.interactivemedia.GroupAdapter;
 import com.media.interactive.cs3.hdm.interactivemedia.R;
 import com.media.interactive.cs3.hdm.interactivemedia.activties.AddGroupActivity;
 import com.media.interactive.cs3.hdm.interactivemedia.activties.GroupDetailViewActivity;
-import com.media.interactive.cs3.hdm.interactivemedia.contentprovider.DatabaseProvider;
-import com.media.interactive.cs3.hdm.interactivemedia.contentprovider.tables.GroupTable;
-import com.media.interactive.cs3.hdm.interactivemedia.contentprovider.tables.UserTable;
+import com.media.interactive.cs3.hdm.interactivemedia.adapter.GroupAdapter;
 import com.media.interactive.cs3.hdm.interactivemedia.data.DatabaseProviderHelper;
 import com.media.interactive.cs3.hdm.interactivemedia.data.Group;
 import com.media.interactive.cs3.hdm.interactivemedia.data.Login;
+import com.media.interactive.cs3.hdm.interactivemedia.database.DatabaseProvider;
+import com.media.interactive.cs3.hdm.interactivemedia.database.tables.GroupTable;
+import com.media.interactive.cs3.hdm.interactivemedia.database.tables.UserTable;
+import com.media.interactive.cs3.hdm.interactivemedia.util.CallbackListener;
 
-import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.util.List;
 
 
-public class GroupFragment extends ListFragment implements LoaderManager.LoaderCallbacks<Cursor>, IMyFragment {
 
+/**
+ * The Class GroupFragment.
+ */
+public class GroupFragment extends ListFragment implements LoaderManager.LoaderCallbacks<Cursor>, IFragment {
+
+    /**
+     * The Constant TAG.
+     */
     private static final String TAG = GroupFragment.class.getSimpleName();
+
+    /**
+     * The Constant CURSOR_LOADER_GROUPS.
+     */
     private static final int CURSOR_LOADER_GROUPS = 0;
+
+    /**
+     * The Constant CURSOR_LOADER_USER_ID.
+     */
     private static final int CURSOR_LOADER_USER_ID = 1;
+
+    /**
+     * The group adapter.
+     */
     private GroupAdapter groupAdapter;
+
+    /**
+     * The helper.
+     */
     private DatabaseProviderHelper helper;
-    private String GROUP_FILTER = "search";
-    private String USER_ID_FILTER = "userId";
-    private CallbackListener<JSONObject,Exception> userDataCompleted;
+
+    /**
+     * The group filter.
+     */
+    private static final String GROUP_FILTER = "search";
+
+    /**
+     * The user id filter.
+     */
+    private static final String USER_ID_FILTER = "userId";
+
+    /**
+     * The user data completed.
+     */
+    private CallbackListener<JSONObject, Exception> userDataCompleted;
 
     /**
      * Mandatory empty constructor for the fragment manager to instantiate the
@@ -60,6 +90,9 @@ public class GroupFragment extends ListFragment implements LoaderManager.LoaderC
     }
 
 
+    /* (non-Javadoc)
+     * @see android.app.Fragment#onCreateOptionsMenu(android.view.Menu, android.view.MenuInflater)
+     */
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         inflater.inflate(R.menu.fragment_group, menu);
@@ -88,6 +121,9 @@ public class GroupFragment extends ListFragment implements LoaderManager.LoaderC
         super.onCreateOptionsMenu(menu, inflater);
     }
 
+    /* (non-Javadoc)
+     * @see android.app.Fragment#onCreate(android.os.Bundle)
+     */
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -99,32 +135,45 @@ public class GroupFragment extends ListFragment implements LoaderManager.LoaderC
         initOrRestartLoaderWithUserId();
     }
 
+    /**
+     * Inits the or restart loader with user id.
+     */
     private void initOrRestartLoaderWithUserId() {
         final String userId = Login.getInstance().getUser().getUserId();
         Log.d(TAG, "Loading UserId: " + userId);
         final Bundle bundle = new Bundle();
         bundle.putString(USER_ID_FILTER, userId);
-        if (getLoaderManager().getLoader(CURSOR_LOADER_USER_ID) == null || getLoaderManager().getLoader(CURSOR_LOADER_USER_ID).isStarted() == false) {
+        if (getLoaderManager().getLoader(CURSOR_LOADER_USER_ID) == null
+            || getLoaderManager().getLoader(CURSOR_LOADER_USER_ID).isStarted() == false) {
             getLoaderManager().initLoader(CURSOR_LOADER_USER_ID, bundle, GroupFragment.this);
         } else {
             getLoaderManager().restartLoader(CURSOR_LOADER_USER_ID, bundle, GroupFragment.this);
         }
     }
 
+    /* (non-Javadoc)
+     * @see android.app.ListFragment#onCreateView(android.view.LayoutInflater, android.view.ViewGroup, android.os.Bundle)
+     */
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_group_list, container, false);
+        final View view = inflater.inflate(R.layout.fragment_group_list, container, false);
 
         return view;
     }
 
+    /* (non-Javadoc)
+     * @see android.app.Fragment#onResume()
+     */
     @Override
     public void onResume() {
         super.onResume();
         getLoaderManager().restartLoader(CURSOR_LOADER_USER_ID, null, GroupFragment.this);
     }
 
+    /* (non-Javadoc)
+     * @see android.app.Fragment#onAttach(android.content.Context)
+     */
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
@@ -146,12 +195,20 @@ public class GroupFragment extends ListFragment implements LoaderManager.LoaderC
         Login.getInstance().addOnUserDataSetListener(userDataCompleted);
     }
 
+    /* (non-Javadoc)
+     * @see android.app.Fragment#onDetach()
+     */
     @Override
     public void onDetach() {
         super.onDetach();
         Login.getInstance().removeOnUserDataSetListener(userDataCompleted);
     }
 
+    /**
+     * Start group detail activity.
+     *
+     * @param group the group
+     */
     private void startGroupDetailActivity(Group group) {
         final Intent intent = new Intent(this.getActivity(), GroupDetailViewActivity.class);
         final Bundle b = new Bundle();
@@ -166,12 +223,18 @@ public class GroupFragment extends ListFragment implements LoaderManager.LoaderC
         startActivity(intent);
     }
 
+    /* (non-Javadoc)
+     * @see android.app.ListFragment#onListItemClick(android.widget.ListView, android.view.View, int, long)
+     */
     @Override
     public void onListItemClick(ListView l, View v, int position, long id) {
         final Group group = ((GroupAdapter.ViewHolder) v.getTag()).getGroup();
         startGroupDetailActivity(group);
     }
 
+    /* (non-Javadoc)
+     * @see android.app.LoaderManager.LoaderCallbacks#onCreateLoader(int, android.os.Bundle)
+     */
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
         String userId = Login.getInstance().getUser().getUserId();
@@ -200,9 +263,13 @@ public class GroupFragment extends ListFragment implements LoaderManager.LoaderC
             + GroupTable.TABLE_NAME + "." + GroupTable.COLUMN_CREATED_AT + " like ? ) ";
         final String[] selectionArgs = {userId, search, search};
         final String sortOrder = GroupTable.TABLE_NAME + "." + GroupTable.COLUMN_CREATED_AT + " DESC";
-        return new CursorLoader(getContext(), DatabaseProvider.CONTENT_GROUP_USER_JOIN_URI, projection, selection, selectionArgs, sortOrder);
+        return new CursorLoader(getContext(), DatabaseProvider.CONTENT_GROUP_USER_JOIN_URI,
+            projection, selection, selectionArgs, sortOrder);
     }
 
+    /* (non-Javadoc)
+     * @see android.app.LoaderManager.LoaderCallbacks#onLoadFinished(android.content.Loader, java.lang.Object)
+     */
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
         Log.d(TAG, "Data: " + data.getCount());
@@ -214,17 +281,22 @@ public class GroupFragment extends ListFragment implements LoaderManager.LoaderC
         setListAdapter(groupAdapter);
     }
 
+    /* (non-Javadoc)
+     * @see android.app.LoaderManager.LoaderCallbacks#onLoaderReset(android.content.Loader)
+     */
     @Override
     public void onLoaderReset(Loader<Cursor> loader) {
         groupAdapter.swapCursor(null);
     }
 
+    /* (non-Javadoc)
+     * @see com.media.interactive.cs3.hdm.interactivemedia.fragments.IFragment#getOnFabClickListener()
+     */
     @Override
     public View.OnClickListener getOnFabClickListener() {
         return new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Log.d(TAG, "Hello from Groupfragment ");
                 final Intent intent = new Intent(view.getContext(), AddGroupActivity.class);
                 intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
                 startActivity(intent);

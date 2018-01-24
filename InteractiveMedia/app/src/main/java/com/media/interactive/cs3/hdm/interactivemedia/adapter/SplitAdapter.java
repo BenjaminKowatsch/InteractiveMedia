@@ -20,20 +20,53 @@ import java.util.List;
 
 import static com.media.interactive.cs3.hdm.interactivemedia.activties.AddTransactionActivity.CURRENCY_FORMAT;
 
+// TODO: Auto-generated Javadoc
+
+/**
+ * The Class SplitAdapter.
+ */
 public class SplitAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
-    private Context context;
-    private final List<Split> list;
-    private final List<User> userList;
 
+    /**
+     * The Constant NO_SWIPE_ITEM_TYPE.
+     */
     private final static int NO_SWIPE_ITEM_TYPE = 0;
+    /**
+     * The Constant SWIPE_ITEM_TYPE.
+     */
     private final static int SWIPE_ITEM_TYPE = 1;
+    /**
+     * The list.
+     */
+    private final List<Split> list;
+    /**
+     * The user list.
+     */
+    private final List<User> userList;
+    /**
+     * The context.
+     */
+    private Context context;
 
+    /**
+     * Instantiates a new split adapter.
+     *
+     * @param context      the context
+     * @param list         the list
+     * @param usersInGroup the users in group
+     */
     public SplitAdapter(Context context, List<Split> list, List<User> usersInGroup) {
         this.context = context;
         this.list = list;
         this.userList = usersInGroup;
     }
 
+    /**
+     * Gets the item view type.
+     *
+     * @param position the position
+     * @return the item view type
+     */
     @Override
     public int getItemViewType(int position) {
         // Choose last item to be not swipeable
@@ -43,20 +76,32 @@ public class SplitAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
         return SWIPE_ITEM_TYPE;
     }
 
+    /**
+     * On create view holder.
+     *
+     * @param parent   the parent
+     * @param viewType the view type
+     * @return the recycler view. view holder
+     */
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         if (viewType == NO_SWIPE_ITEM_TYPE) {
             final View itemView = LayoutInflater.from(parent.getContext())
-                    .inflate(R.layout.no_swipe_split_recycler_view_item, parent, false);
+                .inflate(R.layout.no_swipe_split_recycler_view_item, parent, false);
             return new NoSwipeViewHolder(itemView);
         } else {
             final View itemView = LayoutInflater.from(parent.getContext())
-                    .inflate(R.layout.split_recycler_view_item, parent, false);
+                .inflate(R.layout.split_recycler_view_item, parent, false);
             return new SimpleViewHolder(itemView);
         }
     }
 
-
+    /**
+     * On bind view holder.
+     *
+     * @param holder   the holder
+     * @param position the position
+     */
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder holder, final int position) {
         final Split split = list.get(position);
@@ -69,6 +114,13 @@ public class SplitAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
         }
     }
 
+    /**
+     * Creates the split text.
+     *
+     * @param position the position
+     * @param split    the split
+     * @return the string
+     */
     @NonNull
     private String createSplitText(int position, Split split) {
         if (list.size() == 1 && position == 0) {
@@ -78,7 +130,7 @@ public class SplitAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
             if (position < list.size() - 1) {
                 final ConstantDeduction constantDeduction = (ConstantDeduction) split;
                 final String paymentInfo = findUserNameFor(constantDeduction.getToUserId())
-                        + " pays " + CURRENCY_FORMAT.format(constantDeduction.getAmount());
+                    + " pays " + CURRENCY_FORMAT.format(constantDeduction.getAmount());
                 if (position == 0) {
                     return "First " + paymentInfo;
                 } else {
@@ -92,6 +144,12 @@ public class SplitAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
         }
     }
 
+    /**
+     * Find user name for.
+     *
+     * @param toUserId the to user id
+     * @return the string
+     */
     private String findUserNameFor(String toUserId) {
         for (User user : userList) {
             if (user.getUserId().equals(toUserId)) {
@@ -101,11 +159,21 @@ public class SplitAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
         return toUserId;
     }
 
+    /**
+     * Gets the item count.
+     *
+     * @return the item count
+     */
     @Override
     public int getItemCount() {
         return list.size();
     }
 
+    /**
+     * Removes the split.
+     *
+     * @param position the position
+     */
     public void removeSplit(int position) {
         list.remove(position);
         // notify the item removed by position
@@ -114,12 +182,23 @@ public class SplitAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
         notifyItemRemoved(position);
     }
 
+    /**
+     * Restore split.
+     *
+     * @param split    the split
+     * @param position the position
+     */
     public void restoreSplit(Split split, int position) {
         list.add(position, split);
         // notify item added by position
         notifyItemInserted(position);
     }
 
+    /**
+     * Update.
+     *
+     * @param splitList the split list
+     */
     public void update(List<Split> splitList) {
         final List<Split> copy = new ArrayList<>();
         copy.addAll(splitList);
@@ -128,10 +207,26 @@ public class SplitAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
         notifyDataSetChanged();
     }
 
+    /**
+     * The Class SimpleViewHolder.
+     */
     public class SimpleViewHolder extends RecyclerView.ViewHolder {
+
+        /**
+         * The name.
+         */
         public TextView name;
+
+        /**
+         * The view foreground.
+         */
         public RelativeLayout viewBackground, viewForeground;
 
+        /**
+         * Instantiates a new simple view holder.
+         *
+         * @param view the view
+         */
         public SimpleViewHolder(View view) {
             super(view);
             name = view.findViewById(R.id.recycler_view_text);
@@ -140,7 +235,16 @@ public class SplitAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
         }
     }
 
+    /**
+     * The Class NoSwipeViewHolder.
+     */
     public class NoSwipeViewHolder extends SplitAdapter.SimpleViewHolder {
+
+        /**
+         * Instantiates a new no swipe view holder.
+         *
+         * @param view the view
+         */
         public NoSwipeViewHolder(View view) {
             super(view);
             name = view.findViewById(R.id.recycler_view_text);

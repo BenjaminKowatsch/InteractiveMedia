@@ -15,32 +15,62 @@ import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.load.model.GlideUrl;
 import com.bumptech.glide.load.model.LazyHeaders;
-import com.media.interactive.cs3.hdm.interactivemedia.NonScrollListView;
 import com.media.interactive.cs3.hdm.interactivemedia.R;
-import com.media.interactive.cs3.hdm.interactivemedia.UserAdapter;
-import com.media.interactive.cs3.hdm.interactivemedia.contentprovider.DatabaseProvider;
-import com.media.interactive.cs3.hdm.interactivemedia.contentprovider.tables.GroupTable;
-import com.media.interactive.cs3.hdm.interactivemedia.contentprovider.tables.UserTable;
+import com.media.interactive.cs3.hdm.interactivemedia.adapter.UserAdapter;
 import com.media.interactive.cs3.hdm.interactivemedia.data.Login;
+import com.media.interactive.cs3.hdm.interactivemedia.database.DatabaseProvider;
+import com.media.interactive.cs3.hdm.interactivemedia.database.tables.GroupTable;
+import com.media.interactive.cs3.hdm.interactivemedia.database.tables.UserTable;
 import com.media.interactive.cs3.hdm.interactivemedia.util.Helper;
+import com.media.interactive.cs3.hdm.interactivemedia.views.NonScrollListView;
+
 
 /**
  * Created by benny on 04.01.18.
  */
 
-public class GroupDetailViewActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor>{
+public class GroupDetailViewActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor> {
 
-    private final static String TAG = GroupDetailViewActivity.class.getSimpleName();
+    /**
+     * The Constant TAG.
+     */
+    private static final String TAG = GroupDetailViewActivity.class.getSimpleName();
 
+    /**
+     * The group image.
+     */
     private ImageView groupImage;
+
+    /**
+     * The group name.
+     */
     private TextView groupName;
+
+    /**
+     * The group created at.
+     */
     private TextView groupCreatedAt;
+
+    /**
+     * The list view.
+     */
     private NonScrollListView listView;
 
+    /**
+     * The user adapter.
+     */
     private UserAdapter userAdapter;
 
+    /**
+     * The group id.
+     */
     private long groupId;
 
+    /**
+     * On create.
+     *
+     * @param savedInstanceState the saved instance state
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -63,16 +93,19 @@ public class GroupDetailViewActivity extends AppCompatActivity implements Loader
         final boolean sync = extras.getBoolean("sync");
 
         final TextView groupSynched = (TextView) findViewById(R.id.detail_group_synchronized);
-        groupSynched.setText(sync ? "Synchronized":"Not synchronized");
+        groupSynched.setText(sync ? "Synchronized" : "Not synchronized");
 
         groupName.setText(name);
         groupCreatedAt.setText(Helper.READABLE_DATE_FORMAT.format(Helper.parseDateString(createdAt)));
 
-        if(imageUrl != null) {
-            LazyHeaders.Builder builder = new LazyHeaders.Builder();
+        if (imageUrl != null) {
+            LazyHeaders.Builder builder = null;
 
             if (imageUrl.startsWith(getResources().getString(R.string.web_service_url))) {
-                builder = builder.addHeader("Authorization", Login.getInstance().getUserType().getValue() + " " + Login.getInstance().getAccessToken());
+                builder = new LazyHeaders.Builder().addHeader("Authorization", Login.getInstance().getUserType().getValue()
+                    + " " + Login.getInstance().getAccessToken());
+            } else {
+                builder = new LazyHeaders.Builder();
             }
             final GlideUrl glideUrl = new GlideUrl(imageUrl, builder.build());
 
@@ -85,18 +118,32 @@ public class GroupDetailViewActivity extends AppCompatActivity implements Loader
         getLoaderManager().initLoader(0, null, this);
     }
 
+    /**
+     * On create loader.
+     *
+     * @param i      the i
+     * @param bundle the bundle
+     * @return the loader
+     */
     @Override
     public Loader<Cursor> onCreateLoader(int i, Bundle bundle) {
-        final String[] projection = { UserTable.TABLE_NAME + ".*" };
+        final String[] projection = {UserTable.TABLE_NAME + ".*"};
         final String selection = GroupTable.TABLE_NAME + "." + GroupTable.COLUMN_ID + " = ? ";
         final String[] selectionArgs = {String.valueOf(groupId)};
-        return new CursorLoader(GroupDetailViewActivity.this, DatabaseProvider.CONTENT_GROUP_USER_JOIN_URI, projection, selection, selectionArgs,null);
+        return new CursorLoader(GroupDetailViewActivity.this, DatabaseProvider.CONTENT_GROUP_USER_JOIN_URI,
+            projection, selection, selectionArgs, null);
     }
 
+    /**
+     * On load finished.
+     *
+     * @param loader the loader
+     * @param cursor the cursor
+     */
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor cursor) {
         cursor.moveToFirst();
-        if(userAdapter == null) {
+        if (userAdapter == null) {
             userAdapter = new UserAdapter(this, R.layout.detail_group_user, cursor);
         } else {
             userAdapter.swapCursor(cursor);
@@ -104,6 +151,11 @@ public class GroupDetailViewActivity extends AppCompatActivity implements Loader
         listView.setAdapter(userAdapter);
     }
 
+    /**
+     * On loader reset.
+     *
+     * @param loader the loader
+     */
     @Override
     public void onLoaderReset(Loader<Cursor> loader) {
         userAdapter.swapCursor(null);

@@ -28,18 +28,18 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.media.interactive.cs3.hdm.interactivemedia.R;
-import com.media.interactive.cs3.hdm.interactivemedia.TransactionAdapter;
 import com.media.interactive.cs3.hdm.interactivemedia.activties.AddTransactionActivity;
 import com.media.interactive.cs3.hdm.interactivemedia.activties.TransactionDetailViewActivity;
-import com.media.interactive.cs3.hdm.interactivemedia.contentprovider.DatabaseHelper;
-import com.media.interactive.cs3.hdm.interactivemedia.contentprovider.DatabaseProvider;
-import com.media.interactive.cs3.hdm.interactivemedia.contentprovider.tables.GroupTable;
-import com.media.interactive.cs3.hdm.interactivemedia.contentprovider.tables.PaymentTable;
-import com.media.interactive.cs3.hdm.interactivemedia.contentprovider.tables.TransactionTable;
-import com.media.interactive.cs3.hdm.interactivemedia.contentprovider.tables.UserTable;
+import com.media.interactive.cs3.hdm.interactivemedia.adapter.TransactionAdapter;
 import com.media.interactive.cs3.hdm.interactivemedia.data.Login;
 import com.media.interactive.cs3.hdm.interactivemedia.data.Transaction;
 import com.media.interactive.cs3.hdm.interactivemedia.data.settlement.PaymentAdapter;
+import com.media.interactive.cs3.hdm.interactivemedia.database.DatabaseHelper;
+import com.media.interactive.cs3.hdm.interactivemedia.database.DatabaseProvider;
+import com.media.interactive.cs3.hdm.interactivemedia.database.tables.GroupTable;
+import com.media.interactive.cs3.hdm.interactivemedia.database.tables.PaymentTable;
+import com.media.interactive.cs3.hdm.interactivemedia.database.tables.TransactionTable;
+import com.media.interactive.cs3.hdm.interactivemedia.database.tables.UserTable;
 import com.media.interactive.cs3.hdm.interactivemedia.util.Helper;
 
 import static com.media.interactive.cs3.hdm.interactivemedia.activties.AddTransactionActivity.CURRENCY_FORMAT;
@@ -47,22 +47,74 @@ import static com.media.interactive.cs3.hdm.interactivemedia.activties.AddTransa
 import static com.media.interactive.cs3.hdm.interactivemedia.activties.AddTransactionActivity.GROUP_TO_ADD_TO;
 
 
-public class TransactionFragment extends ListFragment implements LoaderManager.LoaderCallbacks<Cursor>, IMyFragment {
-    public static final String PAYMENT_FROM_NAME = DatabaseHelper.PAYMENT_USER_JOIN_COLUMN_FROM_USER;
-    private boolean mainMode = true;
-    private static final String TAG = TransactionFragment.class.getSimpleName();
-    private Spinner groupSelection;
 
-    private TransactionAdapter transactionAdapter;
-    private View transactionListFragment;
-    private ContentResolver contentResolver;
-    private SimpleCursorAdapter groupAdapter;
-    private CursorAdapter paymentListAdapter;
-    private ListView paymentListView;
+
+/**
+ * The Class TransactionFragment.
+ */
+public class TransactionFragment extends ListFragment implements LoaderManager.LoaderCallbacks<Cursor>, IFragment {
+
+    /**
+     * The Constant PAYMENT_FROM_NAME.
+     */
+    public static final String PAYMENT_FROM_NAME = DatabaseHelper.PAYMENT_USER_JOIN_COLUMN_FROM_USER;
+    /**
+     * The Constant TAG.
+     */
+    private static final String TAG = TransactionFragment.class.getSimpleName();
+    /**
+     * The Constant CURSOR_LOADER_TRANSACTIONS_NAME.
+     */
     private static final int CURSOR_LOADER_TRANSACTIONS_NAME = 0;
+    /**
+     * The Constant TRANSACTION_NAME_FILTER.
+     */
     private static final String TRANSACTION_NAME_FILTER = "transactionName";
+    /**
+     * The main mode.
+     */
+    private boolean mainMode = true;
+    /**
+     * The group selection.
+     */
+    private Spinner groupSelection;
+    /**
+     * The transaction adapter.
+     */
+    private TransactionAdapter transactionAdapter;
+    /**
+     * The transaction list fragment.
+     */
+    private View transactionListFragment;
+    /**
+     * The content resolver.
+     */
+    private ContentResolver contentResolver;
+    /**
+     * The group adapter.
+     */
+    private SimpleCursorAdapter groupAdapter;
+    /**
+     * The payment list adapter.
+     */
+    private CursorAdapter paymentListAdapter;
+    /**
+     * The payment list view.
+     */
+    private ListView paymentListView;
+    /**
+     * The total payments text.
+     */
     private TextView totalPaymentsText;
+
+    /**
+     * The should pay name.
+     */
     private TextView shouldPayName;
+
+    /**
+     * The should pay text.
+     */
     private TextView shouldPayText;
 
     /**
@@ -74,6 +126,9 @@ public class TransactionFragment extends ListFragment implements LoaderManager.L
     }
 
 
+    /* (non-Javadoc)
+     * @see android.app.Fragment#onCreateOptionsMenu(android.view.Menu, android.view.MenuInflater)
+     */
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         inflater.inflate(R.menu.fragment_transaction, menu);
@@ -102,6 +157,9 @@ public class TransactionFragment extends ListFragment implements LoaderManager.L
         super.onCreateOptionsMenu(menu, inflater);
     }
 
+    /* (non-Javadoc)
+     * @see android.app.Fragment#onCreate(android.os.Bundle)
+     */
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -121,16 +179,29 @@ public class TransactionFragment extends ListFragment implements LoaderManager.L
         }
     }
 
+    /**
+     * Inits the payment list adapter.
+     *
+     * @return the cursor adapter
+     */
     private CursorAdapter initPaymentListAdapter() {
         final Cursor payments = getPaymentCoursorForCurrentGroup();
         return new PaymentAdapter(this.getContext(), payments);
     }
 
+    /**
+     * Gets the payment coursor for current group.
+     *
+     * @return the payment coursor for current group
+     */
     private Cursor getPaymentCoursorForCurrentGroup() {
         return new DatabaseHelper(this.getContext())
-                .getNewestPaymentsWithUserNamesForGroup(getCurrentGroupInternalId());
+            .getNewestPaymentsWithUserNamesForGroup(getCurrentGroupInternalId());
     }
 
+    /**
+     * Refresh payment adapter.
+     */
     private void refreshPaymentAdapter() {
         if (mainMode) {
             final Cursor cursor = getPaymentCoursorForCurrentGroup();
@@ -139,6 +210,9 @@ public class TransactionFragment extends ListFragment implements LoaderManager.L
         }
     }
 
+    /**
+     * Update payment texts.
+     */
     private void updatePaymentTexts() {
         Cursor payments = getPaymentCoursorForCurrentGroup();
         double paymentSum = 0.0;
@@ -153,9 +227,9 @@ public class TransactionFragment extends ListFragment implements LoaderManager.L
             }
         }
         if (highestPayment > 0) {
-            if(highestPaymentName.contains(" ")){
+            if (highestPaymentName.contains(" ")) {
                 shouldPayName.setText(highestPaymentName.split(" ")[0]);
-            }else {
+            } else {
                 shouldPayName.setText(highestPaymentName);
             }
             shouldPayText.setVisibility(View.VISIBLE);
@@ -166,14 +240,21 @@ public class TransactionFragment extends ListFragment implements LoaderManager.L
         totalPaymentsText.setText(CURRENCY_FORMAT.format(paymentSum));
     }
 
+    /**
+     * Inits the or restart loader with group id.
+     */
     private void initOrRestartLoaderWithGroupId() {
-        if (getLoaderManager().getLoader(CURSOR_LOADER_TRANSACTIONS_NAME) == null || getLoaderManager().getLoader(CURSOR_LOADER_TRANSACTIONS_NAME).isStarted() == false) {
+        if (getLoaderManager().getLoader(CURSOR_LOADER_TRANSACTIONS_NAME) == null
+            || getLoaderManager().getLoader(CURSOR_LOADER_TRANSACTIONS_NAME).isStarted() == false) {
             getLoaderManager().initLoader(CURSOR_LOADER_TRANSACTIONS_NAME, null, TransactionFragment.this);
         } else {
             getLoaderManager().restartLoader(CURSOR_LOADER_TRANSACTIONS_NAME, null, TransactionFragment.this);
         }
     }
 
+    /* (non-Javadoc)
+     * @see android.app.Fragment#onResume()
+     */
     @Override
     public void onResume() {
         super.onResume();
@@ -182,39 +263,64 @@ public class TransactionFragment extends ListFragment implements LoaderManager.L
     }
 
 
+    /**
+     * Gets the current group id.
+     *
+     * @return the current group id
+     */
     private String getCurrentGroupId() {
         return groupAdapter.getCursor().getString(groupAdapter.getCursor().getColumnIndex(GroupTable.COLUMN_GROUP_ID));
     }
 
+    /**
+     * Gets the current group internal id.
+     *
+     * @return the current group internal id
+     */
     private long getCurrentGroupInternalId() {
         return groupAdapter.getCursor().getLong(groupAdapter.getCursor().getColumnIndex(GroupTable.COLUMN_ID));
     }
 
+    /**
+     * Gets the current group created at.
+     *
+     * @return the current group created at
+     */
     private String getCurrentGroupCreatedAt() {
         return groupAdapter.getCursor().getString(groupAdapter.getCursor().getColumnIndex(GroupTable.COLUMN_CREATED_AT));
     }
 
+    /**
+     * Initialize group adapter.
+     *
+     * @return the simple cursor adapter
+     */
     private SimpleCursorAdapter initializeGroupAdapter() {
 
         final String[] projection = {GroupTable.TABLE_NAME + ".*"};
         final String sortOrder = GroupTable.TABLE_NAME + "." + GroupTable.COLUMN_CREATED_AT + " DESC";
         final String selection = UserTable.TABLE_NAME + "." + UserTable.COLUMN_USER_ID + " = ? AND "
-                + GroupTable.TABLE_NAME + "." + GroupTable.COLUMN_SYNCHRONIZED + " = 1 ";
+            + GroupTable.TABLE_NAME + "." + GroupTable.COLUMN_SYNCHRONIZED + " = 1 ";
         final String[] selectionArgs = {Login.getInstance().getUser().getUserId()};
-        final Cursor query = contentResolver.query(DatabaseProvider.CONTENT_GROUP_USER_JOIN_URI, projection, selection, selectionArgs, sortOrder);
+        final Cursor query = contentResolver.query(DatabaseProvider.CONTENT_GROUP_USER_JOIN_URI,
+            projection, selection, selectionArgs, sortOrder);
 
-        final String[] columns = new String[]{GroupTable.COLUMN_NAME};
-        final int[] to = new int[]{android.R.id.text1};
+        final String[] columns = new String[] {GroupTable.COLUMN_NAME};
+        final int[] to = new int[] {android.R.id.text1};
 
-        final SimpleCursorAdapter groupAdapter = new SimpleCursorAdapter(this.getContext(), R.layout.group_spinner_item, query, columns, to, 0);
+        final SimpleCursorAdapter groupAdapter = new SimpleCursorAdapter(this.getContext(),
+            R.layout.group_spinner_item, query, columns, to, 0);
         groupAdapter.setDropDownViewResource(R.layout.group_spinner_dropdown_item);
         return groupAdapter;
     }
 
+    /* (non-Javadoc)
+     * @see android.app.ListFragment#onCreateView(android.view.LayoutInflater, android.view.ViewGroup, android.os.Bundle)
+     */
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        transactionListFragment = inflater.inflate(R.layout.fragment_transaction_list, container, false);
+        transactionListFragment = inflater.inflate(R.layout.fragment_transaction, container, false);
 
         totalPaymentsText = transactionListFragment.findViewById(R.id.total_payments);
         shouldPayName = transactionListFragment.findViewById(R.id.should_pay_name);
@@ -263,6 +369,9 @@ public class TransactionFragment extends ListFragment implements LoaderManager.L
     }
 
 
+    /* (non-Javadoc)
+     * @see android.app.Fragment#onAttach(android.content.Context)
+     */
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
@@ -270,11 +379,17 @@ public class TransactionFragment extends ListFragment implements LoaderManager.L
 
     }
 
+    /* (non-Javadoc)
+     * @see android.app.Fragment#onDetach()
+     */
     @Override
     public void onDetach() {
         super.onDetach();
     }
 
+    /* (non-Javadoc)
+     * @see android.app.ListFragment#onListItemClick(android.widget.ListView, android.view.View, int, long)
+     */
     @Override
     public void onListItemClick(ListView l, View v, int position, long id) {
         super.onListItemClick(l, v, position, id);
@@ -284,6 +399,12 @@ public class TransactionFragment extends ListFragment implements LoaderManager.L
         startTransactionDetailActivity(transaction, paidByUsername);
     }
 
+    /**
+     * Start transaction detail activity.
+     *
+     * @param transaction    the transaction
+     * @param paidByUsername the paid by username
+     */
     private void startTransactionDetailActivity(Transaction transaction, String paidByUsername) {
         final Intent intent = new Intent(this.getActivity(), TransactionDetailViewActivity.class);
         final Bundle b = new Bundle();
@@ -299,6 +420,9 @@ public class TransactionFragment extends ListFragment implements LoaderManager.L
         startActivity(intent);
     }
 
+    /* (non-Javadoc)
+     * @see android.app.LoaderManager.LoaderCallbacks#onCreateLoader(int, android.os.Bundle)
+     */
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
         String search = "%%";
@@ -314,22 +438,27 @@ public class TransactionFragment extends ListFragment implements LoaderManager.L
         final String[] projection = {TransactionTable.TABLE_NAME + ".*", UserTable.TABLE_NAME + "." + UserTable.COLUMN_USERNAME};
         final String sortOrder = TransactionTable.TABLE_NAME + "." + TransactionTable.COLUMN_INFO_CREATED_AT + " DESC";
         final String selection = GroupTable.TABLE_NAME + "." + GroupTable.COLUMN_GROUP_ID + " = ? AND ("
-                + TransactionTable.TABLE_NAME + "." + TransactionTable.COLUMN_INFO_NAME + " like ? OR "
-                + TransactionTable.TABLE_NAME + "." + TransactionTable.COLUMN_INFO_CREATED_AT + " like ? )";
+            + TransactionTable.TABLE_NAME + "." + TransactionTable.COLUMN_INFO_NAME + " like ? OR "
+            + TransactionTable.TABLE_NAME + "." + TransactionTable.COLUMN_INFO_CREATED_AT + " like ? )";
         String[] selectionArgs;
         if (mainMode) {
-            selectionArgs = new String[]{getCurrentGroupId(), search, search};
+            selectionArgs = new String[] {getCurrentGroupId(), search, search};
         } else {
-            selectionArgs = new String[]{"", search, search};
+            selectionArgs = new String[] {"", search, search};
         }
-        return new CursorLoader(getActivity(), DatabaseProvider.CONTENT_GROUP_USER_TRANSACTION_JOIN_URI, projection, selection, selectionArgs, sortOrder);
+        return new CursorLoader(getActivity(),
+            DatabaseProvider.CONTENT_GROUP_USER_TRANSACTION_JOIN_URI, projection,
+            selection, selectionArgs, sortOrder);
     }
 
+    /* (non-Javadoc)
+     * @see android.app.LoaderManager.LoaderCallbacks#onLoadFinished(android.content.Loader, java.lang.Object)
+     */
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
         Log.d(TAG, "Data: " + data.getCount());
         if (transactionAdapter == null) {
-            transactionAdapter = new TransactionAdapter(getContext(), R.layout.fragment_transaction, data);
+            transactionAdapter = new TransactionAdapter(getContext(), R.layout.fragment_transaction_list_item, data);
         } else {
             transactionAdapter.swapCursor(data);
         }
@@ -337,18 +466,23 @@ public class TransactionFragment extends ListFragment implements LoaderManager.L
         setListAdapter(transactionAdapter);
     }
 
+    /* (non-Javadoc)
+     * @see android.app.LoaderManager.LoaderCallbacks#onLoaderReset(android.content.Loader)
+     */
     @Override
     public void onLoaderReset(Loader<Cursor> loader) {
         transactionAdapter.swapCursor(null);
     }
 
 
+    /* (non-Javadoc)
+     * @see com.media.interactive.cs3.hdm.interactivemedia.fragments.IFragment#getOnFabClickListener()
+     */
     @Override
     public View.OnClickListener getOnFabClickListener() {
         return new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Log.d(TAG, "Hello from " + TAG);
                 if (isMainMode()) {
                     final Intent intent = new Intent(view.getContext(), AddTransactionActivity.class);
                     intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
@@ -362,6 +496,11 @@ public class TransactionFragment extends ListFragment implements LoaderManager.L
         };
     }
 
+    /**
+     * Checks if is main mode.
+     *
+     * @return true, if is main mode
+     */
     public boolean isMainMode() {
         return mainMode;
     }

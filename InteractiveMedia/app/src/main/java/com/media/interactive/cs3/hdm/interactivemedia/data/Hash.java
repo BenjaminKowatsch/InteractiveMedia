@@ -3,12 +3,20 @@ package com.media.interactive.cs3.hdm.interactivemedia.data;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
+
+
 /**
  * Created by benny on 31.10.17.
  */
 
 public class Hash {
 
+    /**
+     * Hash string sha 256.
+     *
+     * @param toHash the to hash
+     * @return the string
+     */
     public static String hashStringSha256(String toHash) {
         String result = null;
         MessageDigest md;

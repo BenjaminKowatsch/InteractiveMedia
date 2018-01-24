@@ -7,12 +7,12 @@ import android.util.Log;
 import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.error.VolleyError;
-import com.media.interactive.cs3.hdm.interactivemedia.CallbackListener;
 import com.media.interactive.cs3.hdm.interactivemedia.R;
-import com.media.interactive.cs3.hdm.interactivemedia.RestRequestQueue;
-import com.media.interactive.cs3.hdm.interactivemedia.authorizedrequests.AuthorizedJsonObjectRequest;
-import com.media.interactive.cs3.hdm.interactivemedia.authorizedrequests.AuthorizedSimpleMultiPartRequest;
-import com.media.interactive.cs3.hdm.interactivemedia.notification.DeleteInstanceIDService;
+import com.media.interactive.cs3.hdm.interactivemedia.notification.DeleteInstanceIdService;
+import com.media.interactive.cs3.hdm.interactivemedia.util.CallbackListener;
+import com.media.interactive.cs3.hdm.interactivemedia.volley.AuthorizedJsonObjectRequest;
+import com.media.interactive.cs3.hdm.interactivemedia.volley.AuthorizedSimpleMultiPartRequest;
+import com.media.interactive.cs3.hdm.interactivemedia.volley.RestRequestQueue;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -21,23 +21,50 @@ import org.json.JSONObject;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
+
+
 /**
  * Created by benny on 20.01.18.
  */
 
 public class SynchronisationHelper {
 
+    /**
+     * The Constant TAG.
+     */
     private static final String TAG = SynchronisationHelper.class.getSimpleName();
+
+    /**
+     * The helper.
+     */
     private DatabaseProviderHelper helper;
+
+    /**
+     * The on user data set list.
+     */
     private List<CallbackListener<JSONObject, Exception>> onUserDataSetList = null;
 
+    /**
+     * Instantiates a new synchronisation helper.
+     *
+     * @param helper            the helper
+     * @param onUserDataSetList the on user data set list
+     */
     public SynchronisationHelper(DatabaseProviderHelper helper, List<CallbackListener<JSONObject, Exception>> onUserDataSetList) {
         this.onUserDataSetList = onUserDataSetList;
         this.helper = helper;
     }
 
-    public void synchronize(final Context context, final JSONObject response, final CallbackListener<JSONObject, Exception> callbackListener){
-        final String url = context.getResources().getString(R.string.web_service_url).concat("/v1/users/user");
+    /**
+     * Synchronize.
+     *
+     * @param context          the context
+     * @param response         the response
+     * @param callbackListener the callback listener
+     */
+    public void synchronize(final Context context, final JSONObject response,
+                            final CallbackListener<JSONObject, Exception> callbackListener) {
+        final String url = context.getResources().getString(R.string.web_service_url).concat(context.getString(R.string.requestPathGetUser));
         Log.d(TAG, "Get: " + url);
         final AuthorizedJsonObjectRequest jsonObjectRequest = new AuthorizedJsonObjectRequest(
             Request.Method.GET, url, null, new Response.Listener<JSONObject>() {
@@ -55,9 +82,9 @@ public class SynchronisationHelper {
                         } catch (JSONException e) {
                             Log.d(TAG, "Username is not set.");
                         }
-                        if (!payload.has("fcmToken")){
+                        if (!payload.has("fcmToken")) {
                             // Delete current local FcmToken
-                            final Intent deleteTokenIntent = new Intent(context, DeleteInstanceIDService.class);
+                            final Intent deleteTokenIntent = new Intent(context, DeleteInstanceIdService.class);
                             context.startService(deleteTokenIntent);
                         }
 
@@ -88,7 +115,7 @@ public class SynchronisationHelper {
                         }
                         uploadUnsyncedGroups(context);
                         uploadUnsyncedTransactions(context);
-                        if(response != null && callbackListener != null) {
+                        if (response != null && callbackListener != null) {
                             callbackListener.onSuccess(response);
                         }
                         Login.getInstance().getUser().setSync(true);
@@ -116,15 +143,21 @@ public class SynchronisationHelper {
         RestRequestQueue.getInstance(context).addToRequestQueue(jsonObjectRequest);
     }
 
+    /**
+     * Upload unsynced transactions.
+     *
+     * @param context the context
+     */
     private void uploadUnsyncedTransactions(final Context context) {
         final List<Transaction> transactions = helper.getUnsyncedTransactions(Login.getInstance().getUser().getUserId());
 
         Log.d(TAG, "-----------------------------" + transactions.size() + " unsynced transactions available ");
         for (final Transaction transaction : transactions) {
-            Log.d(TAG,"Transaction to be uploaded: "+ transaction.toString());
+            Log.d(TAG, "Transaction to be uploaded: " + transaction.toString());
             if (transaction.getImageUrl() != null) {
-                final String url = context.getResources().getString(R.string.web_service_url) + "/v1/object-store/upload?filename=image.png";
-                final AuthorizedSimpleMultiPartRequest simpleMultiPartRequest = new AuthorizedSimpleMultiPartRequest(Request.Method.POST, url, new Response.Listener<String>() {
+                final String url = context.getResources().getString(R.string.web_service_url) + context.getString(R.string.requestPathUpload);
+                final AuthorizedSimpleMultiPartRequest simpleMultiPartRequest = new AuthorizedSimpleMultiPartRequest(Request.Method.POST,
+                    url, new Response.Listener<String>() {
                     @Override
                     public void onResponse(String response) {
                         JSONObject object = null;
@@ -167,7 +200,7 @@ public class SynchronisationHelper {
                 uploadTransaction(transaction, context, new CallbackListener<JSONObject, Exception>() {
                     @Override
                     public void onSuccess(JSONObject payload) {
-                        Log.d(TAG,"uploadTransactionResponse: "+ payload.toString());
+                        Log.d(TAG, "uploadTransactionResponse: " + payload.toString());
                         helper.updateTransactionWithResponse(transaction, payload);
                     }
 
@@ -185,8 +218,18 @@ public class SynchronisationHelper {
         }
     }
 
-    private void uploadTransaction(final Transaction transaction, final Context context, final CallbackListener<JSONObject, Exception> callbackListener) {
-        final String url = context.getResources().getString(R.string.web_service_url).concat("/v1/groups/").concat(transaction.getGroup().getGroupId()).concat("/transactions");
+    /**
+     * Upload transaction.
+     *
+     * @param transaction      the transaction
+     * @param context          the context
+     * @param callbackListener the callback listener
+     */
+    private void uploadTransaction(final Transaction transaction, final Context context,
+                                   final CallbackListener<JSONObject, Exception> callbackListener) {
+        final String url = context.getResources().getString(R.string.web_service_url).concat(context.getString(R.string.requestPathAddTransaction1))
+            .concat(transaction.getGroup().getGroupId())
+            .concat(context.getString(R.string.requestPathAddTransaction2));
         Log.d(TAG, "url: " + url);
         try {
             Log.d(TAG, "UploadTransaction: " + transaction.toJson().toString());
@@ -194,7 +237,7 @@ public class SynchronisationHelper {
                 Request.Method.POST, url, transaction.toJson(), new Response.Listener<JSONObject>() {
                 @Override
                 public void onResponse(JSONObject response) {
-                    Log.d(TAG, "Response from backend: "+ response.toString());
+                    Log.d(TAG, "Response from backend: " + response.toString());
                     // Update Transaction with Response
                     try {
                         if (response.getBoolean("success") == true) {
@@ -211,24 +254,29 @@ public class SynchronisationHelper {
                 @Override
                 public void onErrorResponse(VolleyError error) {
                     error.printStackTrace();
-                    Log.d(TAG,"Error while uploading Transaction.");
+                    Log.d(TAG, "Error while uploading Transaction.");
                     callbackListener.onFailure(error);
                 }
             });
             RestRequestQueue.getInstance(context).addToRequestQueue(jsonObjectRequest);
         } catch (JSONException e) {
             e.printStackTrace();
-            Log.d(TAG,"Error while ");
+            Log.d(TAG, "Error while ");
             callbackListener.onFailure(e);
         }
     }
 
+    /**
+     * Upload unsynced groups.
+     *
+     * @param context the context
+     */
     private void uploadUnsyncedGroups(final Context context) {
 
         final List<Group> groups = helper.getUnsyncedGroups(Login.getInstance().getUser().getUserId());
         for (final Group group : groups) {
             if (group.getImageUrl() != null) {
-                final String url = context.getResources().getString(R.string.web_service_url) + "/v1/object-store/upload?filename=image.png";
+                final String url = context.getResources().getString(R.string.web_service_url) + context.getString(R.string.requestPathUpload);
                 final AuthorizedSimpleMultiPartRequest simpleMultiPartRequest = new AuthorizedSimpleMultiPartRequest(Request.Method.POST, url, new Response.Listener<String>() {
                     @Override
                     public void onResponse(String response) {
@@ -287,8 +335,15 @@ public class SynchronisationHelper {
         }
     }
 
+    /**
+     * Upload group.
+     *
+     * @param group            the group
+     * @param context          the context
+     * @param callbackListener the callback listener
+     */
     private void uploadGroup(Group group, final Context context, final CallbackListener<JSONObject, Exception> callbackListener) {
-        final String url = context.getResources().getString(R.string.web_service_url).concat("/v1/groups/");
+        final String url = context.getResources().getString(R.string.web_service_url).concat(context.getString(R.string.requestPathCreateGroup));
         Log.d(TAG, "url: " + url);
         AuthorizedJsonObjectRequest jsonObjectRequest = null;
         try {
@@ -321,6 +376,14 @@ public class SynchronisationHelper {
 
     }
 
+    /**
+     * Request transactions by group id.
+     *
+     * @param context        the context
+     * @param groupId        the group id
+     * @param groupCreatedAt the group created at
+     * @param callback       the callback
+     */
     public void requestTransactionsByGroupId(Context context, final String groupId, String groupCreatedAt, final CallbackListener<JSONObject, Exception> callback) {
 
         String latestPublishedDate = helper.getLatestTransactionPubDateByGroupId(groupId);
@@ -328,7 +391,7 @@ public class SynchronisationHelper {
         if (latestPublishedDate == null) {
             latestPublishedDate = groupCreatedAt;
         }
-        final String url = context.getResources().getString(R.string.web_service_url).concat("/v1/groups/").concat(groupId).concat("/transactions?after=").concat(latestPublishedDate);
+        final String url = context.getResources().getString(R.string.web_service_url).concat(context.getString(R.string.requestPathPullTransactionsAfter1)).concat(groupId).concat(context.getString(R.string.requestPathPullTransactionsAfter2)).concat(latestPublishedDate);
         Log.d(TAG, "Get: " + url);
         final AuthorizedJsonObjectRequest jsonObjectRequest = new AuthorizedJsonObjectRequest(
             Request.Method.GET, url, null, new Response.Listener<JSONObject>() {
@@ -371,12 +434,18 @@ public class SynchronisationHelper {
 
     }
 
-    private void requestNewGroups(Context context,final JSONArray groupIds) {
+    /**
+     * Request new groups.
+     *
+     * @param context  the context
+     * @param groupIds the group ids
+     */
+    private void requestNewGroups(Context context, final JSONArray groupIds) {
         final AtomicInteger atomicInteger = new AtomicInteger();
         for (int i = 0; i < groupIds.length(); i++) {
             try {
                 final String groupId = (String) groupIds.get(i);
-                final String url = context.getResources().getString(R.string.web_service_url).concat("/v1/groups/").concat(groupId);
+                final String url = context.getResources().getString(R.string.web_service_url).concat(context.getString(R.string.requestPathGetGroup)).concat(groupId);
                 Log.d(TAG, "Get: " + url);
                 final AuthorizedJsonObjectRequest jsonObjectRequest = new AuthorizedJsonObjectRequest(
                     Request.Method.GET, url, null, new Response.Listener<JSONObject>() {
@@ -402,7 +471,7 @@ public class SynchronisationHelper {
                                     user.setUserId(jsonObject.getString("userId"));
                                     try {
                                         user.setImageUrl(jsonObject.getString("imageUrl"));
-                                    } catch(JSONException e){
+                                    } catch (JSONException e) {
                                     }
                                     user.setUsername(jsonObject.getString("username"));
                                     user.setSync(true);

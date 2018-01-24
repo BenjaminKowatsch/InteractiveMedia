@@ -11,18 +11,29 @@ import com.google.firebase.iid.FirebaseInstanceId;
 
 import java.io.IOException;
 
+
+
 /**
  * Created by benny on 23.12.17.
  */
 
-public class DeleteInstanceIDService extends IntentService {
+public class DeleteInstanceIdService extends IntentService {
 
-    public static final String TAG = DeleteInstanceIDService.class.getSimpleName();
+    /**
+     * The Constant TAG.
+     */
+    public static final String TAG = DeleteInstanceIdService.class.getSimpleName();
 
-    public DeleteInstanceIDService() {
+    /**
+     * Instantiates a new delete instance ID service.
+     */
+    public DeleteInstanceIdService() {
         super(TAG);
     }
 
+    /* (non-Javadoc)
+     * @see android.app.IntentService#onHandleIntent(android.content.Intent)
+     */
     @Override
     protected void onHandleIntent(@Nullable Intent intent) {
         try {
@@ -48,6 +59,11 @@ public class DeleteInstanceIDService extends IntentService {
         }
     }
 
+    /**
+     * Save token to prefs.
+     *
+     * @param token the token
+     */
     private void saveTokenToPrefs(String token) {
         // Access Shared Preferences
         final SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
@@ -58,6 +74,11 @@ public class DeleteInstanceIDService extends IntentService {
         editor.apply();
     }
 
+    /**
+     * Gets the token from prefs.
+     *
+     * @return the token from prefs
+     */
     private String getTokenFromPrefs() {
         final SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
         return preferences.getString("registration_id", null);

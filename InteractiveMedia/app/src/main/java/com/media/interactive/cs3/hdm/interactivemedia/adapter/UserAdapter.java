@@ -15,10 +15,12 @@ import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.load.model.GlideUrl;
 import com.bumptech.glide.load.model.LazyHeaders;
 import com.media.interactive.cs3.hdm.interactivemedia.R;
-import com.media.interactive.cs3.hdm.interactivemedia.database.tables.UserTable;
 import com.media.interactive.cs3.hdm.interactivemedia.data.Group;
 import com.media.interactive.cs3.hdm.interactivemedia.data.Login;
 import com.media.interactive.cs3.hdm.interactivemedia.data.User;
+import com.media.interactive.cs3.hdm.interactivemedia.database.tables.UserTable;
+
+
 
 /**
  * Created by benny on 04.01.18.
@@ -26,23 +28,52 @@ import com.media.interactive.cs3.hdm.interactivemedia.data.User;
 
 public class UserAdapter extends CursorAdapter {
 
-    private LayoutInflater mLayoutInflater;
+    /**
+     * The layout inflater.
+     */
+    private LayoutInflater layoutInflater;
+
+    /**
+     * The layout.
+     */
     private int layout;
 
+    /**
+     * Instantiates a new user adapter.
+     *
+     * @param context the context
+     * @param layout  the layout
+     * @param c       the c
+     */
     public UserAdapter(Context context, int layout, Cursor c) {
         super(context, c, 0);
         this.layout = layout;
-        mLayoutInflater = LayoutInflater.from(context);
+        layoutInflater = LayoutInflater.from(context);
     }
 
+    /**
+     * New view.
+     *
+     * @param context   the context
+     * @param cursor    the cursor
+     * @param viewGroup the view group
+     * @return the view
+     */
     @Override
     public View newView(Context context, Cursor cursor, ViewGroup viewGroup) {
-        final View view = mLayoutInflater.inflate(layout, viewGroup, false);
+        final View view = layoutInflater.inflate(layout, viewGroup, false);
         view.setTag(new ViewHolder(view));
         // no need to bind data here. you do in later
         return view;
     }
 
+    /**
+     * Bind view.
+     *
+     * @param view    the view
+     * @param context the context
+     * @param cursor  the cursor
+     */
     @Override
     public void bindView(View view, final Context context, Cursor cursor) {
         // Extract properties from cursor
@@ -64,9 +95,10 @@ public class UserAdapter extends CursorAdapter {
         final String imageUrl = user.getImageUrl();
         LazyHeaders.Builder builder = new LazyHeaders.Builder();
         GlideUrl glideUrl = null;
-        if (imageUrl != null ){
-            if(imageUrl.startsWith(context.getResources().getString(R.string.web_service_url))) {
-                builder = builder.addHeader("Authorization", Login.getInstance().getUserType().getValue() + " " + Login.getInstance().getAccessToken());
+        if (imageUrl != null) {
+            if (imageUrl.startsWith(context.getResources().getString(R.string.web_service_url))) {
+                builder = builder.addHeader("Authorization", Login.getInstance().getUserType().getValue()
+                    + " " + Login.getInstance().getAccessToken());
                 glideUrl = new GlideUrl(imageUrl, builder.build());
             } else {
                 glideUrl = new GlideUrl(imageUrl, builder.build());
@@ -82,14 +114,44 @@ public class UserAdapter extends CursorAdapter {
 
     }
 
+    /**
+     * The Class ViewHolder.
+     *
+     * @author benny
+     */
     public class ViewHolder {
+
+        /**
+         * The user icon.
+         */
         ImageView userIcon;
+
+        /**
+         * The user title.
+         */
         TextView userTitle;
+
+        /**
+         * The user email.
+         */
         TextView userEmail;
+
+        /**
+         * The user creation date.
+         */
         TextView userCreationDate;
+
+        /**
+         * The user.
+         */
         private User user;
 
-        ViewHolder(View view) {
+        /**
+         * Instantiates a new view holder.
+         *
+         * @param view the view
+         */
+        public ViewHolder(View view) {
             userIcon = (ImageView) view.findViewById(R.id.user_icon);
             userTitle = (TextView) view.findViewById(R.id.user_name);
             userEmail = (TextView) view.findViewById(R.id.user_email);
@@ -98,6 +160,11 @@ public class UserAdapter extends CursorAdapter {
             user = new User();
         }
 
+        /**
+         * Gets the user.
+         *
+         * @return the user
+         */
         public User getUser() {
             return user;
         }

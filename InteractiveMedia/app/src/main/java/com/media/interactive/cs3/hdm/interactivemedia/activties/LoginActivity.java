@@ -1,11 +1,8 @@
 package com.media.interactive.cs3.hdm.interactivemedia.activties;
 
-import android.content.Context;
 import android.content.Intent;
-import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.support.annotation.RequiresApi;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
@@ -17,8 +14,6 @@ import android.widget.Toast;
 import com.facebook.CallbackManager;
 import com.facebook.FacebookCallback;
 import com.facebook.FacebookException;
-import com.facebook.GraphRequest;
-import com.facebook.GraphResponse;
 import com.facebook.login.LoginResult;
 import com.facebook.login.widget.LoginButton;
 import com.google.android.gms.auth.api.Auth;
@@ -28,36 +23,82 @@ import com.google.android.gms.auth.api.signin.GoogleSignInResult;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.SignInButton;
 import com.google.android.gms.common.api.GoogleApiClient;
-import com.media.interactive.cs3.hdm.interactivemedia.CallbackListener;
 import com.media.interactive.cs3.hdm.interactivemedia.R;
 import com.media.interactive.cs3.hdm.interactivemedia.data.Hash;
 import com.media.interactive.cs3.hdm.interactivemedia.data.Login;
 import com.media.interactive.cs3.hdm.interactivemedia.data.UserType;
+import com.media.interactive.cs3.hdm.interactivemedia.util.CallbackListener;
 
-import org.json.JSONException;
 import org.json.JSONObject;
 
 
+
+
+/**
+ * The type Login activity.
+ */
 public class LoginActivity extends AppCompatActivity
     implements View.OnClickListener, GoogleApiClient.OnConnectionFailedListener {
 
+    /**
+     * The Constant TAG.
+     */
     private static final String TAG = LoginActivity.class.getSimpleName();
+
+    /**
+     * The Constant REQ_CODE.
+     */
     private static final int REQ_CODE = 9001;
+
+    /**
+     * The sign in.
+     */
     // Google SignIn variables
     private SignInButton signIn;
+
+    /**
+     * The google api client.
+     */
     private GoogleApiClient googleApiClient;
+
+    /**
+     * The login button.
+     */
     // Facebook SignIn variables
     private LoginButton loginButton;
+
+    /**
+     * The callback manager.
+     */
     private CallbackManager callbackManager;
 
+    /**
+     * The default login button.
+     */
     // Default Login variables
     private Button defaultLoginButton;
+
+    /**
+     * The login username.
+     */
     private EditText loginUsername;
+
+    /**
+     * The login password.
+     */
     private EditText loginPassword;
 
+    /**
+     * The register button.
+     */
     // Register variables
     private Button registerButton;
 
+    /**
+     * On create.
+     *
+     * @param savedInstanceState the saved instance state
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -124,6 +165,9 @@ public class LoginActivity extends AppCompatActivity
             .build();
     }
 
+    /**
+     * Navigate to home.
+     */
     private void navigateToHome() {
         final Intent toHome = new Intent(LoginActivity.this, HomeActivity.class);
         toHome.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
@@ -131,12 +175,23 @@ public class LoginActivity extends AppCompatActivity
         finish();
     }
 
+    /**
+     * Login failed handler.
+     *
+     * @param error the error
+     * @return the void
+     */
     private Void loginFailedHandler(Throwable error) {
         Void nil = null;
         Toast.makeText(this, "Login failed please try again.", Toast.LENGTH_SHORT).show();
         return nil;
     }
 
+    /**
+     * On click.
+     *
+     * @param v the v
+     */
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
@@ -172,20 +227,36 @@ public class LoginActivity extends AppCompatActivity
         }
     }
 
+    /**
+     * On connection failed.
+     *
+     * @param connectionResult the connection result
+     */
     @Override
     public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
         Log.e(TAG, connectionResult.getErrorMessage());
     }
 
+    /**
+     * Sign in.
+     */
     private void signIn() {
         Log.i(TAG, "signIn called");
-        Intent intent = Auth.GoogleSignInApi.getSignInIntent(googleApiClient);
+        final Intent intent = Auth.GoogleSignInApi.getSignInIntent(googleApiClient);
         startActivityForResult(intent, REQ_CODE);
     }
 
+    /**
+     * Sign out.
+     */
     private void signOut() {
     }
 
+    /**
+     * Handle result.
+     *
+     * @param result the result
+     */
     private void handleResult(GoogleSignInResult result) {
         if (result.isSuccess()) {
             final GoogleSignInAccount account = result.getSignInAccount();
@@ -204,18 +275,18 @@ public class LoginActivity extends AppCompatActivity
                     loginFailedHandler(error);
                 }
             });
-            /*
-            if (account.getPhotoUrl() != null) {
-                final String googleImgUrl = account.getPhotoUrl().toString();
-                Glide.with(this).load(googleImgUrl).into(profPic);
-            }*/
-
         } else {
             Log.e(TAG, "Error during Google login");
         }
     }
 
-
+    /**
+     * On activity result.
+     *
+     * @param requestCode the request code
+     * @param resultCode  the result code
+     * @param data        the data
+     */
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);

@@ -24,7 +24,6 @@ import android.text.InputType;
 import android.text.TextWatcher;
 import android.util.Log;
 import android.util.SparseArray;
-import android.view.ContextThemeWrapper;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
@@ -47,12 +46,12 @@ import com.google.android.gms.vision.Frame;
 import com.google.android.gms.vision.text.Text;
 import com.google.android.gms.vision.text.TextBlock;
 import com.google.android.gms.vision.text.TextRecognizer;
-import com.media.interactive.cs3.hdm.interactivemedia.ArrayAdapterWithIcon;
-import com.media.interactive.cs3.hdm.interactivemedia.CallbackListener;
 import com.media.interactive.cs3.hdm.interactivemedia.R;
-import com.media.interactive.cs3.hdm.interactivemedia.RestRequestQueue;
+import com.media.interactive.cs3.hdm.interactivemedia.adapter.ArrayAdapterWithIcon;
 import com.media.interactive.cs3.hdm.interactivemedia.data.Login;
+import com.media.interactive.cs3.hdm.interactivemedia.util.CallbackListener;
 import com.media.interactive.cs3.hdm.interactivemedia.util.Helper;
+import com.media.interactive.cs3.hdm.interactivemedia.volley.RestRequestQueue;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -71,30 +70,91 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+
 /**
  * Created by benny on 03.01.18.
  */
 
 public class ImagePickerActivity extends AppCompatActivity {
 
+    /**
+     * The Constant TAG.
+     */
     private static final String TAG = ImagePickerActivity.class.getSimpleName();
 
+    /**
+     * The Constant REQUEST_TAKE_IMAGE.
+     */
     private static final int REQUEST_TAKE_IMAGE = 1;
+
+    /**
+     * The Constant RESULT_LOAD_IMAGE.
+     */
     private static final int RESULT_LOAD_IMAGE = 2;
+
+    /**
+     * The Constant PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE.
+     */
     private static final int PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE = 1;
+
+    /**
+     * The image view.
+     */
     protected ImageView imageView;
+
+    /**
+     * The read external storage permission granted.
+     */
     private boolean readExternalStoragePermissionGranted = false;
+
+    /**
+     * The detector.
+     */
     private TextRecognizer detector;
+
+    /**
+     * The date text field.
+     */
     private EditText dateTextField = null;
+
+    /**
+     * The date time text field.
+     */
     private EditText dateTimeTextField = null;
+
+    /**
+     * The amount text field.
+     */
     private EditText amountTextField = null;
+
+    /**
+     * The minimum date.
+     */
     private Date minimumDate;
+
+    /**
+     * The recognized date.
+     */
     private Date recognizedDate = null;
+
+    /**
+     * The recognized amount.
+     */
     private Double recognizedAmount = null;
+
+    /**
+     * The ocr enable.
+     */
     private boolean ocrEnable = false;
 
+    /**
+     * The image filename.
+     */
     private String imageFilename;
 
+    /**
+     * The current photo path.
+     */
     private String currentPhotoPath = null;
 
     /**
@@ -102,6 +162,7 @@ public class ImagePickerActivity extends AppCompatActivity {
      *
      * @param viewId        Reference to the ImageView where the picked image shall be displayed
      * @param imageFilename if null a default imageFilename 'image.png' will be used
+     * @param ocrEnabled    the ocr enabled
      */
     protected void initImagePickerActivity(final int viewId, String imageFilename, boolean ocrEnabled) {
         this.ocrEnable = ocrEnabled;
@@ -123,6 +184,9 @@ public class ImagePickerActivity extends AppCompatActivity {
         readExternalStoragePermissionGranted = isStoragePermissionGranted();
     }
 
+    /**
+     * Dispatch take picture intent.
+     */
     private void dispatchTakePictureIntent() {
         final Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
         // Ensure that there's a camera activity to handle the intent
@@ -138,15 +202,21 @@ public class ImagePickerActivity extends AppCompatActivity {
             }
             // Continue only if the File was successfully created
             if (photoFile != null) {
-                final Uri photoURI = FileProvider.getUriForFile(this,
+                final Uri photoUri = FileProvider.getUriForFile(this,
                     "com.media.interactive.cs3.hdm.interactivemedia.fileprovider",
                     photoFile);
-                takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI);
+                takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoUri);
                 startActivityForResult(takePictureIntent, REQUEST_TAKE_IMAGE);
             }
         }
     }
 
+    /**
+     * Creates the image file.
+     *
+     * @return the file
+     * @throws IOException Signals that an I/O exception has occurred.
+     */
     private File createImageFile() throws IOException {
         final File storageDir = getExternalFilesDir(Environment.DIRECTORY_PICTURES);
         final File image = new File(storageDir, imageFilename);
@@ -158,36 +228,44 @@ public class ImagePickerActivity extends AppCompatActivity {
         return image;
     }
 
+    /**
+     * Sets the pic.
+     */
     private void setPic() {
         // Get the dimensions of the View
-        int targetW = imageView.getWidth();
-        int targetH = imageView.getHeight();
+        final int targetW = imageView.getWidth();
+        final int targetH = imageView.getHeight();
         Log.d(TAG, "imageView-size:" + imageView.getWidth() + " x " + imageView.getHeight());
 
         // Get the dimensions of the bitmap
         final BitmapFactory.Options bmOptions = new BitmapFactory.Options();
         bmOptions.inJustDecodeBounds = true;
         BitmapFactory.decodeFile(currentPhotoPath, bmOptions);
-        int photoW = bmOptions.outWidth;
-        int photoH = bmOptions.outHeight;
+        final int photoW = bmOptions.outWidth;
+        final int photoH = bmOptions.outHeight;
         Log.d(TAG, "photoW:" + photoW + " x photoH " + photoH);
 
         // Determine how much to scale down the image
-        int scaleFactor = Math.min(Math.round((float) photoW / (float) targetW), Math.round((float) photoH / (float) targetH));
+        final int scaleFactor = Math.min(Math.round((float) photoW / (float) targetW), Math.round((float) photoH / (float) targetH));
 
         // Decode the image file into a Bitmap sized to fill the View
         bmOptions.inJustDecodeBounds = false;
         bmOptions.inSampleSize = scaleFactor;
         bmOptions.inPurgeable = true;
 
-        Bitmap bitmap = BitmapFactory.decodeFile(currentPhotoPath, bmOptions);
+        final Bitmap bitmap = BitmapFactory.decodeFile(currentPhotoPath, bmOptions);
         Log.d(TAG, "Bitmap-size:" + bitmap.getWidth() + " x " + bitmap.getHeight());
-        doOCR(bitmap);
+        doOcr(bitmap);
         imageView.setImageBitmap(bitmap);
     }
 
-    private void doOCR(Bitmap bitmapOrg) {
-        if(ocrEnable) {
+    /**
+     * Do OCR.
+     *
+     * @param bitmapOrg the bitmap org
+     */
+    private void doOcr(Bitmap bitmapOrg) {
+        if (ocrEnable) {
             recognizedAmount = null;
             recognizedDate = null;
             final SimpleDateFormat sdfDate = new SimpleDateFormat("dd.MM.yyyy");
@@ -195,9 +273,9 @@ public class ImagePickerActivity extends AppCompatActivity {
 
             final int rotationAngle = 90;
 
-            for(int j = 1;j <= 4; j++) {
+            for (int j = 1; j <= 4; j++) {
                 final Matrix matrix = new Matrix();
-                matrix.postRotate(rotationAngle*j);
+                matrix.postRotate(rotationAngle * j);
                 final Bitmap scaledBitmap = Bitmap.createScaledBitmap(bitmapOrg, bitmapOrg.getWidth(), bitmapOrg.getHeight(), true);
                 final Bitmap bitmap = Bitmap.createBitmap(scaledBitmap, 0, 0, scaledBitmap.getWidth(), scaledBitmap.getHeight(), matrix, true);
 
@@ -220,6 +298,7 @@ public class ImagePickerActivity extends AppCompatActivity {
                                 parsedNumbers.add(parsed);
                                 meanValue += parsed;
                             } catch (NumberFormatException e) {
+                                e.printStackTrace();
                             }
                             for (Text element : line.getComponents()) {
                                 //extract scanned text words here
@@ -227,10 +306,12 @@ public class ImagePickerActivity extends AppCompatActivity {
                                 try {
                                     date = sdfDate.parse(elem);
                                 } catch (ParseException e) {
+                                    e.printStackTrace();
                                 }
                                 try {
                                     time = sdfTime.parse(elem);
                                 } catch (ParseException e) {
+                                    e.printStackTrace();
                                 }
                             }
                         }
@@ -254,7 +335,7 @@ public class ImagePickerActivity extends AppCompatActivity {
                             variance += ((possiblePrice - meanValue) * (possiblePrice - meanValue)) / (parsedNumbers.size() - 1);
                         }
                         double varianceCoefficient = Math.sqrt(variance) / meanValue;
-                        // Remove autliers based on variance coefficient
+                        // Remove outliers based on variance coefficient
                         while (varianceCoefficient > 1.1) {
                             // Remove highest entry and recalculate
                             parsedNumbers.remove(parsedNumbers.size() - 1);
@@ -285,7 +366,7 @@ public class ImagePickerActivity extends AppCompatActivity {
                         dateTimeTextField.setText(sdfTime.format(recognizedDate));
                         break;
                     } else {
-                        makeToast("Recognized date is before group creation date.");
+                        makeToast(getString(R.string.errorMessageOcrInvalidDate));
                     }
                 }
                 if (recognizedAmount != null && amountTextField != null) {
@@ -294,24 +375,41 @@ public class ImagePickerActivity extends AppCompatActivity {
                 }
             }
             if (recognizedAmount == null && recognizedDate == null) {
-                makeToast("Could not recognize any price or date.\nPlease try again.");
+                makeToast(getString(R.string.errorMessageOcrFailed));
             }
         }
 
     }
 
-    protected void setMinimumDate(Date minimumDate){
+    /**
+     * Sets the minimum date.
+     *
+     * @param minimumDate the new minimum date
+     */
+    protected void setMinimumDate(Date minimumDate) {
         this.minimumDate = minimumDate;
     }
 
+    /**
+     * Upload image.
+     *
+     * @param callbackListener the callback listener
+     */
     protected void uploadImage(final CallbackListener<JSONObject, Exception> callbackListener) {
         uploadImage(currentPhotoPath, callbackListener);
     }
 
+    /**
+     * Upload image.
+     *
+     * @param imageFilePath    the image file path
+     * @param callbackListener the callback listener
+     */
     private void uploadImage(final String imageFilePath, final CallbackListener<JSONObject, Exception> callbackListener) {
         if (imageFilePath != null && imageFilePath.length() > 0) {
-            final String url = getResources().getString(R.string.web_service_url) + "/v1/object-store/upload?filename=image.png";
-            final SimpleMultiPartRequest simpleMultiPartRequest = new SimpleMultiPartRequest(Request.Method.POST, url, new Response.Listener<String>() {
+            final String url = getResources().getString(R.string.web_service_url) + getString(R.string.requestPathUpload);
+            final SimpleMultiPartRequest simpleMultiPartRequest = new SimpleMultiPartRequest(Request.Method.POST,
+                url, new Response.Listener<String>() {
                 @Override
                 public void onResponse(String response) {
                     try {
@@ -320,8 +418,8 @@ public class ImagePickerActivity extends AppCompatActivity {
                             callbackListener.onFailure(new Exception("Image upload failed"));
                         } else {
                             final File file = new File(imageFilePath);
-                            boolean deleted = file.delete();
-                            Log.d(TAG,"Deleted uploaded file: "+ deleted);
+                            final boolean deleted = file.delete();
+                            Log.d(TAG, "Deleted uploaded file: " + deleted);
                             callbackListener.onSuccess(object);
                         }
                         Log.d(TAG, response);
@@ -352,10 +450,22 @@ public class ImagePickerActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * Make toast.
+     *
+     * @param message the message
+     */
     protected void makeToast(String message) {
         Toast.makeText(ImagePickerActivity.this, message, Toast.LENGTH_SHORT).show();
     }
 
+    /**
+     * On activity result.
+     *
+     * @param requestCode the request code
+     * @param resultCode  the result code
+     * @param data        the data
+     */
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == REQUEST_TAKE_IMAGE && resultCode == RESULT_OK) {
@@ -368,7 +478,7 @@ public class ImagePickerActivity extends AppCompatActivity {
                 filePathColumn, null, null, null);
             cursor.moveToFirst();
 
-            int columnIndex = cursor.getColumnIndex(filePathColumn[0]);
+            final int columnIndex = cursor.getColumnIndex(filePathColumn[0]);
 
             final File original = new File(cursor.getString(columnIndex));
 
@@ -385,6 +495,13 @@ public class ImagePickerActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * On request permissions result.
+     *
+     * @param requestCode  the request code
+     * @param permissions  the permissions
+     * @param grantResults the grant results
+     */
     @Override
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
@@ -401,6 +518,11 @@ public class ImagePickerActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * Checks if is storage permission granted.
+     *
+     * @return true, if is storage permission granted
+     */
     private boolean isStoragePermissionGranted() {
         if (ContextCompat.checkSelfPermission(ImagePickerActivity.this,
             Manifest.permission.READ_EXTERNAL_STORAGE)
@@ -421,7 +543,7 @@ public class ImagePickerActivity extends AppCompatActivity {
 
                 Log.v(TAG, "Permission is revoked");
                 ActivityCompat.requestPermissions(ImagePickerActivity.this,
-                    new String[] {Manifest.permission.READ_EXTERNAL_STORAGE},
+                    new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},
                     PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE);
                 return false;
                 // MY_PERMISSIONS_REQUEST_READ_CONTACTS is an
@@ -432,6 +554,9 @@ public class ImagePickerActivity extends AppCompatActivity {
         return true;
     }
 
+    /**
+     * Dispatch pick picture intent.
+     */
     private void dispatchPickPictureIntent() {
         final Intent i = new Intent(
             Intent.ACTION_PICK,
@@ -440,9 +565,14 @@ public class ImagePickerActivity extends AppCompatActivity {
         startActivityForResult(i, RESULT_LOAD_IMAGE);
     }
 
+    /**
+     * Creates the options dialog.
+     *
+     * @return the dialog
+     */
     private Dialog createOptionsDialog() {
         final AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        final Integer[] icons = new Integer[] {R.drawable.ic_menu_camera, R.drawable.ic_menu_share, R.drawable.ic_menu_gallery};
+        final Integer[] icons = new Integer[]{R.drawable.ic_menu_camera, R.drawable.ic_menu_share, R.drawable.ic_menu_gallery};
         final ListAdapter adapter = new ArrayAdapterWithIcon(this, getResources().getStringArray(R.array.image_sources), icons);
 
         builder.setTitle(R.string.pick_image_source)
@@ -473,6 +603,9 @@ public class ImagePickerActivity extends AppCompatActivity {
         return builder.create();
     }
 
+    /**
+     * Start url dialog.
+     */
     private void startUrlDialog() {
         final AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(this);
         final LayoutInflater inflater = this.getLayoutInflater();
@@ -499,7 +632,7 @@ public class ImagePickerActivity extends AppCompatActivity {
 
                         @Override
                         public void onResourceReady(Bitmap resource, GlideAnimation<? super Bitmap> glideAnimation) {
-                            doOCR(resource);
+                            doOcr(resource);
                             imageView.setImageBitmap(resource);
                             try {
                                 final File created = createImageFile();
@@ -558,18 +691,38 @@ public class ImagePickerActivity extends AppCompatActivity {
 
     }
 
+    /**
+     * Gets the current photo path.
+     *
+     * @return the current photo path
+     */
     protected String getCurrentPhotoPath() {
         return currentPhotoPath;
     }
 
+    /**
+     * Sets the date text field.
+     *
+     * @param dateTextField the new date text field
+     */
     protected void setDateTextField(EditText dateTextField) {
         this.dateTextField = dateTextField;
     }
 
+    /**
+     * Sets the amount text field.
+     *
+     * @param amountTextField the new amount text field
+     */
     protected void setAmountTextField(EditText amountTextField) {
         this.amountTextField = amountTextField;
     }
 
+    /**
+     * Sets the date time text field.
+     *
+     * @param dateTimeTextField the new date time text field
+     */
     protected void setDateTimeTextField(EditText dateTimeTextField) {
         this.dateTimeTextField = dateTimeTextField;
     }

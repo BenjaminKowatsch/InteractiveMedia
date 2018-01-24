@@ -15,13 +15,15 @@ import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.load.model.GlideUrl;
 import com.bumptech.glide.load.model.LazyHeaders;
 import com.media.interactive.cs3.hdm.interactivemedia.R;
-import com.media.interactive.cs3.hdm.interactivemedia.database.tables.GroupTable;
 import com.media.interactive.cs3.hdm.interactivemedia.data.Group;
 import com.media.interactive.cs3.hdm.interactivemedia.data.Login;
+import com.media.interactive.cs3.hdm.interactivemedia.database.tables.GroupTable;
 import com.media.interactive.cs3.hdm.interactivemedia.util.Helper;
 
 import java.io.File;
 import java.util.Date;
+
+
 
 /**
  * Created by benny on 04.01.18.
@@ -29,15 +31,37 @@ import java.util.Date;
 
 public class GroupAdapter extends CursorAdapter {
 
+    /**
+     * The layout inflater.
+     */
     private LayoutInflater layoutInflater;
+
+    /**
+     * The layout.
+     */
     private int layout;
 
+    /**
+     * Instantiates a new group adapter.
+     *
+     * @param context the context
+     * @param layout  the layout
+     * @param c       the c
+     */
     public GroupAdapter(Context context, int layout, Cursor c) {
         super(context, c, 0);
         this.layout = layout;
         layoutInflater = LayoutInflater.from(context);
     }
 
+    /**
+     * New view.
+     *
+     * @param context   the context
+     * @param cursor    the cursor
+     * @param viewGroup the view group
+     * @return the view
+     */
     @Override
     public View newView(Context context, Cursor cursor, ViewGroup viewGroup) {
         final View view = layoutInflater.inflate(layout, viewGroup, false);
@@ -46,12 +70,19 @@ public class GroupAdapter extends CursorAdapter {
         return view;
     }
 
+    /**
+     * Bind view.
+     *
+     * @param view    the view
+     * @param context the context
+     * @param cursor  the cursor
+     */
     @Override
     public void bindView(View view, final Context context, Cursor cursor) {
 
-        if(cursor.getPosition() % 2 == 0) {
+        if (cursor.getPosition() % 2 == 0) {
             view.setBackgroundColor(context.getResources().getColor(R.color.colorPrimary));
-        }else{
+        } else {
             view.setBackgroundColor(context.getResources().getColor(R.color.colorPrimaryLight));
         }
 
@@ -83,13 +114,13 @@ public class GroupAdapter extends CursorAdapter {
             builder = builder.addHeader("Authorization", Login.getInstance().getUserType().getValue() + " " + Login.getInstance().getAccessToken());
             glideUrl = new GlideUrl(imageUrl, builder.build());
         }
-        if(group.getSync() && group.getImageUrl() != null) {
+        if (group.getSync() && group.getImageUrl() != null) {
             Glide.with(context).load(glideUrl)
                 .diskCacheStrategy(DiskCacheStrategy.SOURCE)
                 .fallback(R.drawable.anonymousgroup)
                 .placeholder(R.drawable.anonymousgroup)
                 .into(viewHolder.groupIcon);
-        } else if(group.getImageUrl() != null){
+        } else if (group.getImageUrl() != null) {
             Glide.with(context).load(new File(group.getImageUrl()))
                 .diskCacheStrategy(DiskCacheStrategy.SOURCE)
                 .fallback(R.drawable.anonymousgroup)
@@ -103,13 +134,41 @@ public class GroupAdapter extends CursorAdapter {
         }
     }
 
+    /**
+     * The Class ViewHolder.
+     */
     public class ViewHolder {
+
+        /**
+         * The group icon.
+         */
         ImageView groupIcon;
+
+        /**
+         * The group title.
+         */
         TextView groupTitle;
+
+        /**
+         * The group creation date.
+         */
         TextView groupCreationDate;
+
+        /**
+         * The synced icon.
+         */
         ImageView syncedIcon;
+
+        /**
+         * The group.
+         */
         private Group group;
 
+        /**
+         * Instantiates a new view holder.
+         *
+         * @param view the view
+         */
         ViewHolder(View view) {
             groupIcon = (ImageView) view.findViewById(R.id.group_icon);
             groupTitle = (TextView) view.findViewById(R.id.group_title);
@@ -118,6 +177,11 @@ public class GroupAdapter extends CursorAdapter {
             group = new Group();
         }
 
+        /**
+         * Gets the group.
+         *
+         * @return the group
+         */
         public Group getGroup() {
             return group;
         }

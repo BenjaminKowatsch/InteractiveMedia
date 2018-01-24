@@ -13,14 +13,46 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
+
+
+/**
+ * The Class PairBasedSettlementTest.
+ */
 public class PairBasedSettlementTest {
+
+    /**
+     * The Constant DELTA.
+     */
     public static final double DELTA = 0.0000001;
+
+    /**
+     * The settlement.
+     */
     private PairBasedSettlement settlement;
+
+    /**
+     * The test user 1.
+     */
     private User testUser1;
+
+    /**
+     * The test user 2.
+     */
     private User testUser2;
+
+    /**
+     * The test user 3.
+     */
     private User testUser3;
+
+    /**
+     * The debts.
+     */
     private ArrayList<Debt> debts;
 
+    /**
+     * Inits the.
+     */
     @Before
     public void init() {
         settlement = new PairBasedSettlement();
@@ -33,6 +65,9 @@ public class PairBasedSettlementTest {
         testUser3.setId(3);
     }
 
+    /**
+     * Settle no debts returns empty list.
+     */
     @Test
     public void settle_noDebts_returnsEmptyList() {
         final List<Payment> payments = settlement.settle(debts);
@@ -40,6 +75,9 @@ public class PairBasedSettlementTest {
         assertTrue(payments.isEmpty());
     }
 
+    /**
+     * Settle single debt returns one payment.
+     */
     @Test
     public void settle_singleDebt_returnsOnePayment() {
         final double amount = 50.12;
@@ -49,6 +87,9 @@ public class PairBasedSettlementTest {
         assertEquals(1, payments.size());
     }
 
+    /**
+     * Settle single debt returns one payment with amount from debtor to creditor.
+     */
     @Test
     public void settle_singleDebt_returnsOnePaymentWithAmountFromDebtorToCreditor() {
         final double amount = 50.12;
@@ -61,6 +102,9 @@ public class PairBasedSettlementTest {
         assertEquals(payment.getToUserId(), testDebt.getCreditorId());
     }
 
+    /**
+     * Settle multiple debts one pair returns one payment.
+     */
     @Test
     public void settle_multipleDebtsOnePair_returnsOnePayment() {
         Debt testDebt1 = new Debt(testUser2, testUser1, 10.0, 1);
@@ -73,6 +117,9 @@ public class PairBasedSettlementTest {
         assertEquals(1, payments.size());
     }
 
+    /**
+     * Settle multiple debts one pair returns one payment with correct amount.
+     */
     @Test
     public void settle_multipleDebtsOnePair_returnsOnePaymentWithCorrectAmount() {
         final double summedAmount = 50.0;
@@ -89,6 +136,9 @@ public class PairBasedSettlementTest {
         assertEquals(summedAmount, payment.getAmount(), DELTA);
     }
 
+    /**
+     * Settle one debt per pair multiple pairs returns number of pair amount of payments.
+     */
     @Test
     public void settle_oneDebtPerPairMultiplePairs_returnsNumberOfPairAmountOfPayments() {
         Debt pair1Debt = new Debt(testUser2, testUser1, 50.0, 1);
@@ -101,6 +151,9 @@ public class PairBasedSettlementTest {
         assertEquals(3, payments.size());
     }
 
+    /**
+     * Settle one debt per pair multiple pairs returns correct amount for each pair.
+     */
     @Test
     public void settle_oneDebtPerPairMultiplePairs_returnsCorrectAmountForEachPair() {
         final double amount = 50.0;

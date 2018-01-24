@@ -13,7 +13,7 @@ import java.util.List;
 public interface Settlement {
 
     /**
-     * Method to resolve the debts from multiple transactions into a set of payments
+     * Method to resolve the debts from multiple transactions into a set of payments.
      *
      * @param debts to resolve
      * @return payments where each recipient/sender combination may only appear once

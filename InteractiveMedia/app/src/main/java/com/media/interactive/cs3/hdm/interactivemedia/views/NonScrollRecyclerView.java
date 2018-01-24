@@ -7,24 +7,50 @@ import android.util.AttributeSet;
 import android.view.View;
 import android.view.ViewGroup;
 
+
+
 /**
  * Created by benny on 31.12.17.
  */
 
 public class NonScrollRecyclerView extends RecyclerView {
 
+    /**
+     * Instantiates a new non scroll recycler view.
+     *
+     * @param context the context
+     */
     public NonScrollRecyclerView(Context context) {
         super(context);
     }
 
+    /**
+     * Instantiates a new non scroll recycler view.
+     *
+     * @param context the context
+     * @param attrs   the attrs
+     */
     public NonScrollRecyclerView(Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
     }
 
+    /**
+     * Instantiates a new non scroll recycler view.
+     *
+     * @param context  the context
+     * @param attrs    the attrs
+     * @param defStyle the def style
+     */
     public NonScrollRecyclerView(Context context, @Nullable AttributeSet attrs, int defStyle) {
         super(context, attrs, defStyle);
     }
 
+    /**
+     * On measure.
+     *
+     * @param widthMeasureSpec  the width measure spec
+     * @param heightMeasureSpec the height measure spec
+     */
     @Override
     public void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
         int heightMeasureSpeCustom = View.MeasureSpec.makeMeasureSpec(

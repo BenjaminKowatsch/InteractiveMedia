@@ -29,27 +29,42 @@ import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.load.model.GlideUrl;
 import com.bumptech.glide.load.model.LazyHeaders;
-import com.media.interactive.cs3.hdm.interactivemedia.CallbackListener;
 import com.media.interactive.cs3.hdm.interactivemedia.R;
 import com.media.interactive.cs3.hdm.interactivemedia.data.Login;
 import com.media.interactive.cs3.hdm.interactivemedia.data.User;
 import com.media.interactive.cs3.hdm.interactivemedia.fragments.GroupFragment;
-import com.media.interactive.cs3.hdm.interactivemedia.fragments.IMyFragment;
+import com.media.interactive.cs3.hdm.interactivemedia.fragments.IFragment;
 import com.media.interactive.cs3.hdm.interactivemedia.fragments.MapTransactionFragment;
 import com.media.interactive.cs3.hdm.interactivemedia.fragments.ProfileFragment;
 import com.media.interactive.cs3.hdm.interactivemedia.fragments.TransactionFragment;
 import com.media.interactive.cs3.hdm.interactivemedia.receiver.NetworkStateChangeReceiver;
+import com.media.interactive.cs3.hdm.interactivemedia.util.CallbackListener;
 
 import org.json.JSONObject;
 
+
+/**
+ * The Class HomeActivity.
+ */
 public class HomeActivity extends AppCompatActivity
     implements NavigationView.OnNavigationItemSelectedListener,
     AdapterView.OnItemSelectedListener {
 
+    /**
+     * The Constant TAG.
+     */
     private static final String TAG = HomeActivity.class.getSimpleName();
 
+    /**
+     * The fab.
+     */
     private FloatingActionButton fab;
 
+    /**
+     * On create.
+     *
+     * @param savedInstanceState the saved instance state
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -62,10 +77,9 @@ public class HomeActivity extends AppCompatActivity
         fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.getDrawable().mutate().setTint(ContextCompat.getColor(this, R.color.colorPrimary));
 
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        final DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
 
-
-        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
+        final ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
             this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         drawer.addDrawerListener(toggle);
         toggle.syncState();
@@ -86,6 +100,9 @@ public class HomeActivity extends AppCompatActivity
         registerNetworkStatusChangeReceiver();
     }
 
+    /**
+     * Register network status change receiver.
+     */
     private void registerNetworkStatusChangeReceiver() {
         final IntentFilter intentFilter = new IntentFilter(NetworkStateChangeReceiver.NETWORK_AVAILABLE_ACTION);
         LocalBroadcastManager.getInstance(this).registerReceiver(new BroadcastReceiver() {
@@ -101,11 +118,19 @@ public class HomeActivity extends AppCompatActivity
         }, intentFilter);
     }
 
+    /**
+     * On destroy.
+     */
     @Override
     protected void onDestroy() {
         super.onDestroy();
     }
 
+    /**
+     * Load user data.
+     *
+     * @param navigationView the navigation view
+     */
     private void loadUserData(NavigationView navigationView) {
         final User user = Login.getInstance().getUser();
         final String imageUrl = user.getImageUrl();
@@ -118,11 +143,14 @@ public class HomeActivity extends AppCompatActivity
 
             Log.d(TAG, "Try to download URL: " + imageUrl);
 
-            LazyHeaders.Builder builder = new LazyHeaders.Builder();
-            GlideUrl glideUrl = null;
             if (imageUrl != null) {
+                LazyHeaders.Builder builder = null;
+                GlideUrl glideUrl = null;
                 if (imageUrl.startsWith(getResources().getString(R.string.web_service_url))) {
-                    builder = builder.addHeader("Authorization", Login.getInstance().getUserType().getValue() + " " + Login.getInstance().getAccessToken());
+                    builder = new LazyHeaders.Builder().addHeader("Authorization", Login.getInstance().getUserType().getValue()
+                        + " " + Login.getInstance().getAccessToken());
+                } else {
+                    builder = new LazyHeaders.Builder();
                 }
                 glideUrl = new GlideUrl(imageUrl, builder.build());
                 Glide.with(this).load(glideUrl)
@@ -139,9 +167,12 @@ public class HomeActivity extends AppCompatActivity
         }
     }
 
+    /**
+     * On back pressed.
+     */
     @Override
     public void onBackPressed() {
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        final DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
         } else {
@@ -149,22 +180,22 @@ public class HomeActivity extends AppCompatActivity
         }
     }
 
+    /**
+     * On create options menu.
+     *
+     * @param menu the menu
+     * @return true, if successful
+     */
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         return true;
     }
 
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-
-
-        return super.onOptionsItemSelected(item);
-    }
-
+    /**
+     * Display fragment.
+     *
+     * @param id the id
+     */
     private void displayFragment(int id) {
 
         Fragment fragment = null;
@@ -219,17 +250,23 @@ public class HomeActivity extends AppCompatActivity
                 break;
         }
         if (fragment != null) {
-            IMyFragment myFragment = (IMyFragment) fragment;
+            final IFragment myFragment = (IFragment) fragment;
             fab.setOnClickListener(myFragment.getOnFabClickListener());
             FragmentTransaction fragmentTransaction = getFragmentManager().beginTransaction();
             fragmentTransaction.replace(R.id.content_home, fragment);
             fragmentTransaction.commit();
         }
 
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        final DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
     }
 
+    /**
+     * On navigation item selected.
+     *
+     * @param item the item
+     * @return true, if successful
+     */
     @SuppressWarnings("StatementWithEmptyBody")
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {
@@ -241,6 +278,14 @@ public class HomeActivity extends AppCompatActivity
         return true;
     }
 
+    /**
+     * On item selected.
+     *
+     * @param parent   the parent
+     * @param view     the view
+     * @param position the position
+     * @param id       the id
+     */
     @Override
     public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
 
@@ -248,6 +293,11 @@ public class HomeActivity extends AppCompatActivity
             + " Selected Group/Transaction at position: " + position, Toast.LENGTH_SHORT).show();
     }
 
+    /**
+     * On nothing selected.
+     *
+     * @param parent the parent
+     */
     @Override
     public void onNothingSelected(AdapterView<?> parent) {
         Toast.makeText(this, "Selected nothing ", Toast.LENGTH_SHORT).show();

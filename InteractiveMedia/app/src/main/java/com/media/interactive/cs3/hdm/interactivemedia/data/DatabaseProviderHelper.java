@@ -10,22 +10,22 @@ import android.support.annotation.NonNull;
 import android.util.Log;
 
 import com.media.interactive.cs3.hdm.interactivemedia.R;
-import com.media.interactive.cs3.hdm.interactivemedia.contentprovider.DatabaseProvider;
-import com.media.interactive.cs3.hdm.interactivemedia.contentprovider.tables.DebtTable;
-import com.media.interactive.cs3.hdm.interactivemedia.contentprovider.tables.GroupTable;
-import com.media.interactive.cs3.hdm.interactivemedia.contentprovider.tables.GroupTransactionTable;
-import com.media.interactive.cs3.hdm.interactivemedia.contentprovider.tables.GroupUserTable;
-import com.media.interactive.cs3.hdm.interactivemedia.contentprovider.tables.LoginTable;
-import com.media.interactive.cs3.hdm.interactivemedia.contentprovider.tables.PaymentTable;
-import com.media.interactive.cs3.hdm.interactivemedia.contentprovider.tables.SplitTable;
-import com.media.interactive.cs3.hdm.interactivemedia.contentprovider.tables.TransactionTable;
-import com.media.interactive.cs3.hdm.interactivemedia.contentprovider.tables.UserTable;
 import com.media.interactive.cs3.hdm.interactivemedia.data.settlement.PairBasedSettlement;
 import com.media.interactive.cs3.hdm.interactivemedia.data.settlement.Payment;
 import com.media.interactive.cs3.hdm.interactivemedia.data.split.ConstantDeduction;
 import com.media.interactive.cs3.hdm.interactivemedia.data.split.EvenSplit;
 import com.media.interactive.cs3.hdm.interactivemedia.data.split.Split;
 import com.media.interactive.cs3.hdm.interactivemedia.data.split.SplitFactory;
+import com.media.interactive.cs3.hdm.interactivemedia.database.DatabaseProvider;
+import com.media.interactive.cs3.hdm.interactivemedia.database.tables.DebtTable;
+import com.media.interactive.cs3.hdm.interactivemedia.database.tables.GroupTable;
+import com.media.interactive.cs3.hdm.interactivemedia.database.tables.GroupTransactionTable;
+import com.media.interactive.cs3.hdm.interactivemedia.database.tables.GroupUserTable;
+import com.media.interactive.cs3.hdm.interactivemedia.database.tables.LoginTable;
+import com.media.interactive.cs3.hdm.interactivemedia.database.tables.PaymentTable;
+import com.media.interactive.cs3.hdm.interactivemedia.database.tables.SplitTable;
+import com.media.interactive.cs3.hdm.interactivemedia.database.tables.TransactionTable;
+import com.media.interactive.cs3.hdm.interactivemedia.database.tables.UserTable;
 import com.media.interactive.cs3.hdm.interactivemedia.util.Helper;
 import com.media.interactive.cs3.hdm.interactivemedia.util.TransactionSplittingTask;
 
@@ -33,13 +33,13 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import static com.media.interactive.cs3.hdm.interactivemedia.contentprovider.tables.DebtTable.extractDebtFromCurrentPosition;
+import static com.media.interactive.cs3.hdm.interactivemedia.database.tables.DebtTable.extractDebtFromCurrentPosition;
+
+
 
 /**
  * Created by benny on 08.01.18.
@@ -47,13 +47,30 @@ import static com.media.interactive.cs3.hdm.interactivemedia.contentprovider.tab
 
 public class DatabaseProviderHelper {
 
+    /**
+     * The Constant TAG.
+     */
     private static final String TAG = DatabaseProviderHelper.class.getSimpleName();
+
+    /**
+     * The content resolver.
+     */
     private ContentResolver contentResolver;
 
+    /**
+     * Instantiates a new database provider helper.
+     *
+     * @param contentResolver the content resolver
+     */
     public DatabaseProviderHelper(ContentResolver contentResolver) {
         this.contentResolver = contentResolver;
     }
 
+    /**
+     * Upsert user.
+     *
+     * @param user the user
+     */
     public void upsertUser(User user) {
         final String[] projection = {UserTable.COLUMN_ID};
 
@@ -71,12 +88,7 @@ public class DatabaseProviderHelper {
         if (search.moveToNext()) {
             foundId = search.getLong(0);
         }
-        final ContentValues userValues = new ContentValues();
-        userValues.put(UserTable.COLUMN_USERNAME, user.getUsername());
-        userValues.put(UserTable.COLUMN_IMAGE_URL, user.getImageUrl());
-        userValues.put(UserTable.COLUMN_USER_ID, user.getUserId());
-        userValues.put(UserTable.COLUMN_EMAIL, user.getEmail());
-        userValues.put(UserTable.COLUMN_SYNCHRONIZED, user.getSync());
+        final ContentValues userValues = user.toContentValues();
         if (foundId < 0) {
             final Uri result = contentResolver.insert(DatabaseProvider.CONTENT_USER_URI, userValues);
             user.setId(Long.parseLong(result.getLastPathSegment()));
@@ -90,13 +102,13 @@ public class DatabaseProviderHelper {
 
     }
 
+    /**
+     * Insert group at database.
+     *
+     * @param group the group
+     */
     public void insertGroupAtDatabase(Group group) {
-        final ContentValues groupValues = new ContentValues();
-        groupValues.put(GroupTable.COLUMN_NAME, group.getName());
-        groupValues.put(GroupTable.COLUMN_IMAGE_URL, group.getImageUrl());
-        groupValues.put(GroupTable.COLUMN_GROUP_ID, group.getGroupId());
-        groupValues.put(GroupTable.COLUMN_CREATED_AT, group.getCreatedAt());
-        groupValues.put(GroupTable.COLUMN_SYNCHRONIZED, group.getSync());
+        final ContentValues groupValues = group.toContentValues();
         final Uri result = contentResolver.insert(DatabaseProvider.CONTENT_GROUP_URI, groupValues);
 
         group.setId(Long.parseLong(result.getLastPathSegment()));
@@ -112,6 +124,13 @@ public class DatabaseProviderHelper {
         contentResolver.notifyChange(DatabaseProvider.CONTENT_GROUP_USER_JOIN_URI, null);
     }
 
+    /**
+     * Sets the image url by response.
+     *
+     * @param context  the context
+     * @param group    the group
+     * @param response the response
+     */
     public void setImageUrlByResponse(Context context, Group group, JSONObject response) {
         JSONObject payload = null;
         String imageName = null;
@@ -123,10 +142,56 @@ public class DatabaseProviderHelper {
             e.printStackTrace();
         }
         final String newImageUrl = context.getResources().getString(R.string.web_service_url)
-            .concat("/v1/object-store/download?filename=").concat(imageName);
+            .concat(context.getString(R.string.requestPathDownload)).concat(imageName);
         group.setImageUrl(newImageUrl);
     }
 
+    /**
+     * Update group and users.
+     *
+     * @param group    the group
+     * @param response the response
+     * @throws JSONException the JSON exception
+     */
+    public void updateGroupAndUsers(Group group, JSONObject response) throws JSONException {
+        final JSONObject payload = response.getJSONObject("payload");
+        final String groupId = payload.getString("groupId");
+        // Update group values
+        final ContentValues groupUpdateValues = new ContentValues();
+        groupUpdateValues.put(GroupTable.COLUMN_GROUP_ID, groupId);
+        groupUpdateValues.put(GroupTable.COLUMN_SYNCHRONIZED, true);
+        final String groupSelection = GroupTable.COLUMN_ID.concat(" = ?");
+        final String[] groupSelectionArgs = {String.valueOf(group.getId())};
+        contentResolver.update(DatabaseProvider.CONTENT_GROUP_URI, groupUpdateValues, groupSelection, groupSelectionArgs);
+        // Update user values
+        final JSONArray users = payload.getJSONArray("users");
+        for (int i = 0; i < users.length(); i++) {
+            final JSONObject jsonObject = (JSONObject) users.get(i);
+            final ContentValues userUpdateValues = new ContentValues();
+            final String userEmail = jsonObject.getString("email");
+            if (jsonObject.has("username")) {
+                userUpdateValues.put(UserTable.COLUMN_USERNAME, jsonObject.getString("username"));
+            }
+            try {
+                userUpdateValues.put(UserTable.COLUMN_IMAGE_URL, jsonObject.getString("imageUrl"));
+            } catch (JSONException error) {
+                error.printStackTrace();
+            }
+            userUpdateValues.put(UserTable.COLUMN_USER_ID, jsonObject.getString("userId"));
+            userUpdateValues.put(UserTable.COLUMN_SYNCHRONIZED, true);
+            final String userSelection = UserTable.COLUMN_EMAIL.concat(" = ?");
+            final String[] userSelectionArgs = {userEmail};
+            contentResolver.update(DatabaseProvider.CONTENT_USER_URI, userUpdateValues, userSelection, userSelectionArgs);
+        }
+    }
+
+    /**
+     * Sets the transaction image url by response.
+     *
+     * @param context     the context
+     * @param transaction the transaction
+     * @param response    the response
+     */
     public void setTransactionImageUrlByResponse(Context context, Transaction transaction, JSONObject response) {
         JSONObject payload = null;
         String imageName = null;
@@ -138,10 +203,16 @@ public class DatabaseProviderHelper {
             e.printStackTrace();
         }
         final String newImageUrl = context.getResources().getString(R.string.web_service_url)
-            .concat("/v1/object-store/download?filename=").concat(imageName);
+            .concat(context.getString(R.string.requestPathDownload)).concat(imageName);
         transaction.setImageUrl(newImageUrl);
     }
 
+    /**
+     * Update transaction with response.
+     *
+     * @param transaction the transaction
+     * @param payload     the payload
+     */
     public void updateTransactionWithResponse(Transaction transaction, JSONObject payload) {
         try {
             transaction.setPublishedAt(Helper.parseDateString(payload.getString("publishedAt")));
@@ -163,6 +234,12 @@ public class DatabaseProviderHelper {
 
     }
 
+    /**
+     * Update group with response.
+     *
+     * @param group   the group
+     * @param payload the payload
+     */
     public void updateGroupWithResponse(Group group, JSONObject payload) {
         try {
             final String groupId = payload.getString("groupId");
@@ -195,6 +272,11 @@ public class DatabaseProviderHelper {
         }
     }
 
+    /**
+     * Find insert users at database.
+     *
+     * @param group the group
+     */
     public void findInsertUsersAtDatabase(Group group) {
         for (User user : group.getUsers()) {
             final String[] projection = {UserTable.COLUMN_ID};
@@ -212,12 +294,7 @@ public class DatabaseProviderHelper {
             if (search.moveToNext()) {
                 foundId = search.getLong(0);
             }
-            final ContentValues userValues = new ContentValues();
-            userValues.put(UserTable.COLUMN_USERNAME, user.getUsername());
-            userValues.put(UserTable.COLUMN_IMAGE_URL, user.getImageUrl());
-            userValues.put(UserTable.COLUMN_EMAIL, user.getEmail());
-            userValues.put(UserTable.COLUMN_USER_ID, user.getUserId());
-            userValues.put(UserTable.COLUMN_SYNCHRONIZED, user.getSync());
+            final ContentValues userValues = user.toContentValues();
             if (foundId < 0) {
                 final Uri result = contentResolver.insert(DatabaseProvider.CONTENT_USER_URI, userValues);
                 user.setId(Long.parseLong(result.getLastPathSegment()));
@@ -228,6 +305,13 @@ public class DatabaseProviderHelper {
         }
     }
 
+    /**
+     * Adds the transactions.
+     *
+     * @param jsonArray the json array
+     * @param groupId   the group id
+     * @throws JSONException the JSON exception
+     */
     public void addTransactions(JSONArray jsonArray, String groupId) throws JSONException {
         List<Transaction> transactions = new ArrayList<>();
         for (int i = 0; i < jsonArray.length(); i++) {
@@ -245,18 +329,17 @@ public class DatabaseProviderHelper {
                 location.setLatitude(infoLocation.getDouble("latitude"));
                 location.setLongitude(infoLocation.getDouble("longitude"));
             } catch (JSONException e) {
+                e.printStackTrace();
             }
             transaction.setLocation(location);
-            final SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
-            try {
-                transaction.setDateTime(sdf.parse(transactionObject.getString("infoCreatedAt")));
-                transaction.setPublishedAt(sdf.parse(transactionObject.getString("publishedAt")));
-            } catch (ParseException e) {
-            }
+
+            transaction.setDateTime(Helper.parseDateString(transactionObject.getString("infoCreatedAt")));
+            transaction.setPublishedAt(Helper.parseDateString(transactionObject.getString("publishedAt")));
+
             transaction.setImageUrl(transactionObject.getString("infoImageUrl"));
             transaction.setPaidBy(transactionObject.getString("paidBy"));
             final JSONArray split = transactionObject.getJSONArray("split");
-            transaction.setSplit(SplitFactory.fromJSON(split));
+            transaction.setSplit(SplitFactory.fromJson(split));
             Log.d(TAG, "Saving Transaction: " + transaction.toString());
             //using impl and then add them to task in batches to optimize resolving speed
             saveTransactionImpl(transaction);
@@ -265,11 +348,21 @@ public class DatabaseProviderHelper {
         calculateSplit(transactions.toArray(new Transaction[] {}));
     }
 
+    /**
+     * Save transaction.
+     *
+     * @param transaction the transaction
+     */
     public void saveTransaction(Transaction transaction) {
         saveTransactionImpl(transaction);
         calculateSplit(transaction);
     }
 
+    /**
+     * Save transaction impl.
+     *
+     * @param transaction the transaction
+     */
     private void saveTransactionImpl(Transaction transaction) {
         final Uri splitId = insertSplit(transaction.getSplit());
         final ContentValues transactionContent = transaction.toContentValues();
@@ -286,6 +379,12 @@ public class DatabaseProviderHelper {
         contentResolver.notifyChange(DatabaseProvider.CONTENT_GROUP_USER_TRANSACTION_JOIN_URI, null);
     }
 
+    /**
+     * Insert split.
+     *
+     * @param split the split
+     * @return the uri
+     */
     private Uri insertSplit(Split split) {
         final ContentValues splitContent = split.toContentValues();
         if (split.hasNext()) {
@@ -295,21 +394,33 @@ public class DatabaseProviderHelper {
         return contentResolver.insert(DatabaseProvider.CONTENT_SPLIT_URI, splitContent);
     }
 
+    /**
+     * Calculate split.
+     *
+     * @param saved the saved
+     */
     private void calculateSplit(Transaction... saved) {
-        TransactionSplittingTask task = new TransactionSplittingTask(this, new PairBasedSettlement());
+        final TransactionSplittingTask task = new TransactionSplittingTask(this, new PairBasedSettlement());
         task.execute(saved);
     }
 
+    /**
+     * Save debt.
+     *
+     * @param debt the debt
+     */
     public void saveDebt(Debt debt) {
-        final ContentValues debtContent = new ContentValues();
-        debtContent.put(DebtTable.COLUMN_TRANSACTION_ID, debt.getTransactionId());
-        debtContent.put(DebtTable.COLUMN_AMOUNT, debt.getAmount());
-        debtContent.put(DebtTable.COLUMN_FROM_USER, debt.getDebtorId());
-        debtContent.put(DebtTable.COLUMN_TO_USER, debt.getCreditorId());
+        final ContentValues debtContent = debt.toContentValues();
         final Uri insert = contentResolver.insert(DatabaseProvider.CONTENT_DEBT_URI, debtContent);
         Log.d(TAG, "Inserted debt " + debt + " at " + insert);
     }
 
+    /**
+     * Gets the unsynced transactions.
+     *
+     * @param userId the user id
+     * @return the unsynced transactions
+     */
     public List<Transaction> getUnsyncedTransactions(String userId) {
         final List<Transaction> result = new ArrayList<>();
 
@@ -318,7 +429,8 @@ public class DatabaseProviderHelper {
             + " " + GroupTable.TABLE_NAME + "." + GroupTable.COLUMN_SYNCHRONIZED + " = 1 AND"
             + " " + TransactionTable.TABLE_NAME + "." + TransactionTable.COLUMN_SYNCHRONIZED + " = 0 ";
         final String[] selectionArgs = {userId};
-        final Cursor cursor = contentResolver.query(DatabaseProvider.CONTENT_GROUP_USER_TRANSACTION_JOIN_URI, projection, selection, selectionArgs, null);
+        final Cursor cursor = contentResolver.query(DatabaseProvider.CONTENT_GROUP_USER_TRANSACTION_JOIN_URI,
+            projection, selection, selectionArgs, null);
         Log.d(TAG, "Unsynched Transactions Cursor: Count: " + cursor.getCount());
 
         while (cursor.moveToNext()) {
@@ -337,6 +449,12 @@ public class DatabaseProviderHelper {
         return result;
     }
 
+    /**
+     * Resolve to split.
+     *
+     * @param id the id
+     * @return the split
+     */
     // this is not efficient, but it works
     public Split resolveToSplit(long id) {
         final String[] projection = {SplitTable.TABLE_NAME + ".*"};
@@ -348,6 +466,12 @@ public class DatabaseProviderHelper {
     }
 
 
+    /**
+     * Extract split from current position.
+     *
+     * @param cursor the cursor
+     * @return the split
+     */
     private Split extractSplitFromCurrentPosition(Cursor cursor) {
         Split out = null;
         final String type = cursor.getString(cursor.getColumnIndex(SplitTable.COLUMN_TYPE));
@@ -369,12 +493,23 @@ public class DatabaseProviderHelper {
         }
     }
 
+    /**
+     * Calculate split.
+     *
+     * @param saved the saved
+     */
     private void calculateSplit(Transaction saved) {
-        TransactionSplittingTask task = new TransactionSplittingTask(this, new PairBasedSettlement());
+        final TransactionSplittingTask task = new TransactionSplittingTask(this, new PairBasedSettlement());
         task.execute(saved);
     }
 
 
+    /**
+     * Gets the unsynced groups.
+     *
+     * @param userId the user id
+     * @return the unsynced groups
+     */
     public List<Group> getUnsyncedGroups(String userId) {
         final List<Group> result = new ArrayList<>();
 
@@ -410,6 +545,12 @@ public class DatabaseProviderHelper {
         return result;
     }
 
+    /**
+     * Check for cached credentials.
+     *
+     * @param login the login
+     * @return true, if successful
+     */
     public boolean checkForCachedCredentials(Login login) {
         if (contentResolver != null) {
             boolean result = false;
@@ -430,6 +571,12 @@ public class DatabaseProviderHelper {
         return false;
     }
 
+    /**
+     * Gets the latest transaction pub date by group id.
+     *
+     * @param groupId the group id
+     * @return the latest transaction pub date by group id
+     */
     public String getLatestTransactionPubDateByGroupId(String groupId) {
         String result = null;
         final String[] projection = {TransactionTable.TABLE_NAME + "." + TransactionTable.COLUMN_PUBLISHED_AT};
@@ -445,8 +592,14 @@ public class DatabaseProviderHelper {
         return result;
     }
 
+    /**
+     * Removes the existing group ids.
+     *
+     * @param groupIds the group ids
+     * @return the list
+     */
     public List<Group> removeExistingGroupIds(JSONArray groupIds) {
-        List<Group> existingGroups = new ArrayList<>();
+        final List<Group> existingGroups = new ArrayList<>();
         for (int i = groupIds.length() - 1; i >= 0; i--) {
             final Group group = new Group();
             final String[] projection = {GroupTable.TABLE_NAME + ".*"};
@@ -478,17 +631,26 @@ public class DatabaseProviderHelper {
         return existingGroups;
     }
 
-    public void savePayment(Payment payment, Date creationTimestmap, long groupId) {
-        final ContentValues paymentContent = new ContentValues();
-        paymentContent.put(PaymentTable.COLUMN_AMOUNT, payment.getAmount());
-        paymentContent.put(PaymentTable.COLUMN_FROM_USER, payment.getFromUserId());
-        paymentContent.put(PaymentTable.COLUMN_TO_USER, payment.getToUserId());
-        paymentContent.put(PaymentTable.COLUMN_CREATED_AT, Helper.formatDate(creationTimestmap));
+    /**
+     * Save payment.
+     *
+     * @param payment           the payment
+     * @param creationTimestamp the creation timestamp
+     * @param groupId           the group id
+     */
+    public void savePayment(Payment payment, Date creationTimestamp, long groupId) {
+        final ContentValues paymentContent = payment.toContentValues();
+        paymentContent.put(PaymentTable.COLUMN_CREATED_AT, Helper.formatDate(creationTimestamp));
         paymentContent.put(PaymentTable.COLUMN_GROUP_ID, groupId);
         final Uri insert = contentResolver.insert(DatabaseProvider.CONTENT_PAYMENT_URI, paymentContent);
         Log.d(TAG, "Inserted payment " + insert);
     }
 
+    /**
+     * Complete transaction.
+     *
+     * @param transaction the transaction
+     */
     public void completeTransaction(Transaction transaction) {
         if (transaction.getGroup() == null) {
             transaction.setGroup(loadGroupForTransaction(transaction));
@@ -501,6 +663,12 @@ public class DatabaseProviderHelper {
         }
     }
 
+    /**
+     * Load users for group.
+     *
+     * @param group the group
+     * @return the list
+     */
     @NonNull
     private List<User> loadUsersForGroup(Group group) {
         final String[] projection = {UserTable.TABLE_NAME + ".*"};
@@ -519,6 +687,12 @@ public class DatabaseProviderHelper {
         }
     }
 
+    /**
+     * Load group for transaction.
+     *
+     * @param transaction the transaction
+     * @return the group
+     */
     private Group loadGroupForTransaction(Transaction transaction) {
         final String[] projection = {GroupTable.TABLE_NAME + ".*"};
         final String selection = TransactionTable.TABLE_NAME + "." + TransactionTable.COLUMN_ID + " = ?";
@@ -537,6 +711,54 @@ public class DatabaseProviderHelper {
         }
     }
 
+    /**
+     * Delete login.
+     *
+     * @param login the login
+     * @return true, if successful
+     */
+    public boolean deleteLogin(Login login) {
+        if (contentResolver != null) {
+            final int result = contentResolver.delete(DatabaseProvider.CONTENT_LOGIN_URI,
+                LoginTable.COLUMN_ID + "=?", new String[] {String.valueOf(login.getId())});
+            Log.d(TAG, "delete Login: " + login + " to "
+                + DatabaseProvider.CONTENT_LOGIN_URI + "  " + result);
+            return result > 0;
+        }
+        Log.e(TAG, "Could not cache credentials, contentResolver is null.");
+        return false;
+    }
+
+    /**
+     * Cache credentials.
+     *
+     * @param login the login
+     * @return true, if successful
+     */
+    public boolean cacheCredentials(Login login) {
+        if (contentResolver != null) {
+            final ContentValues contentValues = login.toContentValues();
+            final Uri result = contentResolver.insert(DatabaseProvider.CONTENT_LOGIN_URI, contentValues);
+            Log.d(TAG, "cacheCredentials: Adding " + login.toString() + " to " + DatabaseProvider.CONTENT_LOGIN_URI);
+            long id = Long.parseLong(result.getLastPathSegment());
+            if (id > 0) {
+                login.setId(id);
+                return true;
+            } else {
+                Log.e(TAG, "Could not cache credentials, error at database.");
+                return false;
+            }
+        }
+        Log.e(TAG, "Could not cache credentials, contentResolver is null.");
+        return false;
+    }
+
+    /**
+     * Gets the all debts for group.
+     *
+     * @param id the id
+     * @return the all debts for group
+     */
     public List<Debt> getAllDebtsForGroup(String id) {
         final String[] projection = {DebtTable.COLUMN_ID, DebtTable.COLUMN_AMOUNT,
             DebtTable.COLUMN_FROM_USER, DebtTable.COLUMN_TO_USER,

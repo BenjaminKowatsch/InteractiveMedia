@@ -2,12 +2,17 @@ package com.media.interactive.cs3.hdm.interactivemedia.database.tables;
 
 import android.database.sqlite.SQLiteDatabase;
 
+
+
 /**
  * Created by benny on 20.11.17.
  */
 
 public class LoginTable {
 
+    /**
+     * The Constant TABLE_NAME.
+     */
     public static final String TABLE_NAME = "login";
     /**
      * First attribute, type integer.
@@ -30,6 +35,9 @@ public class LoginTable {
      */
     public static final String COLUMN_CREATED_AT = "created_at";
 
+    /**
+     * The Constant DATABASE_CREATE.
+     */
     public static final String DATABASE_CREATE =
         "create table if not exists " + TABLE_NAME + "("
             + COLUMN_ID + " integer unique primary key AUTOINCREMENT,"
@@ -37,8 +45,17 @@ public class LoginTable {
             + COLUMN_HASHED_PASSWORD + " TEXT,"
             + COLUMN_LOGIN_TYPE + " INTEGER NOT NULL,"
             + COLUMN_CREATED_AT + " TIMESTAMP DEFAULT CURRENT_TIMESTAMP)";
+
+    /**
+     * The Constant DATABASE_DROP.
+     */
     public static final String DATABASE_DROP = "drop table if exists " + TABLE_NAME;
 
+    /**
+     * On create.
+     *
+     * @param database the database
+     */
     public static void onCreate(SQLiteDatabase database) {
         database.execSQL(DATABASE_CREATE);
     }

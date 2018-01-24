@@ -16,19 +16,43 @@ import java.util.List;
 import java.util.Set;
 
 
+
+
+/**
+ * The Class TransactionSplittingTask.
+ */
 public class TransactionSplittingTask extends AsyncTask<Transaction, Void, Boolean> {
+
+    /**
+     * The Constant TAG.
+     */
     private static final String TAG = TransactionSplittingTask.class.getSimpleName();
 
+    /**
+     * The helper.
+     */
     private final DatabaseProviderHelper helper;
 
+    /**
+     * The settlement method.
+     */
     private final Settlement settlementMethod;
 
+    /**
+     * Instantiates a new transaction splitting task.
+     *
+     * @param helper           the helper
+     * @param settlementMethod the settlement method
+     */
     public TransactionSplittingTask(DatabaseProviderHelper helper, Settlement settlementMethod) {
         super();
         this.helper = helper;
         this.settlementMethod = settlementMethod;
     }
 
+    /* (non-Javadoc)
+     * @see android.os.AsyncTask#doInBackground(java.lang.Object[])
+     */
     @Override
     protected Boolean doInBackground(Transaction... transactions) {
         Set<Group> groupsInTransactions = new HashSet<>();
@@ -38,7 +62,7 @@ public class TransactionSplittingTask extends AsyncTask<Transaction, Void, Boole
             } catch (Exception e) {
                 Log.e(TAG, "An error occured in completing transaction " + transaction, e);
             }
-            if(transaction.getGroup().getUsers().size() > 1) {
+            if (transaction.getGroup().getUsers().size() > 1) {
                 List<Debt> debts;
                 try {
                     debts = transaction.split();
@@ -61,7 +85,7 @@ public class TransactionSplittingTask extends AsyncTask<Transaction, Void, Boole
             }
         }
         Log.d(TAG, "Groups in transaction: " + groupsInTransactions);
-        for(Group group: groupsInTransactions) {
+        for (Group group : groupsInTransactions) {
             List<Debt> allDebts;
             try {
                 allDebts = helper.getAllDebtsForGroup(group.getGroupId());
@@ -91,6 +115,9 @@ public class TransactionSplittingTask extends AsyncTask<Transaction, Void, Boole
         return true;
     }
 
+    /* (non-Javadoc)
+     * @see android.os.AsyncTask#onPostExecute(java.lang.Object)
+     */
     @Override
     protected void onPostExecute(Boolean result) {
         if (result) {

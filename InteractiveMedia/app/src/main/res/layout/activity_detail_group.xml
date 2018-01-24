@@ -151,7 +151,7 @@
             android:text="Group users:"
             android:textSize="18dp" />
 
-        <com.media.interactive.cs3.hdm.interactivemedia.NonScrollListView
+        <com.media.interactive.cs3.hdm.interactivemedia.views.NonScrollListView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginRight="30dp"

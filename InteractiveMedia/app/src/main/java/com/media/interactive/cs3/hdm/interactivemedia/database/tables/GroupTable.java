@@ -6,12 +6,17 @@ import android.support.annotation.NonNull;
 
 import com.media.interactive.cs3.hdm.interactivemedia.data.Group;
 
+
+
 /**
  * Created by benny on 20.11.17.
  */
 
 public class GroupTable {
 
+    /**
+     * The Constant TABLE_NAME.
+     */
     public static final String TABLE_NAME = "groups";
     /**
      * First attribute, type integer.
@@ -29,32 +34,51 @@ public class GroupTable {
      * Fourth attribute, type TIMESTAMP DEFAULT CURRENT_TIMESTAMP.
      */
     public static final String COLUMN_CREATED_AT = "created_at";
+
     /**
-     * Fifth attribute, type STRING references the server group id
+     * Fifth attribute, type STRING references the server group id.
      */
     public static final String COLUMN_GROUP_ID = "group_id";
+
     /**
-     * Sixth attribute, type INTEGER representing an boolean 0/1 not synced/synched
+     * Sixth attribute, type INTEGER representing an boolean 0/1 not synced/synched.
      */
     public static final String COLUMN_SYNCHRONIZED = "synchronized";
 
+    /**
+     * The Constant DATABASE_CREATE.
+     */
     public static final String DATABASE_CREATE =
 
-            "create table if not exists " + TABLE_NAME + "(" +
-                    COLUMN_ID + " integer unique primary key AUTOINCREMENT," +
-                    COLUMN_NAME + " TEXT NOT NULL," +
-                    COLUMN_IMAGE_URL + " TEXT," +
-                    COLUMN_CREATED_AT + " TIMESTAMP DEFAULT CURRENT_TIMESTAMP," +
-                    COLUMN_GROUP_ID + " TEXT," +
-                    COLUMN_SYNCHRONIZED + " INTEGER NOT NULL)";
+        "create table if not exists " + TABLE_NAME + "("
+            + COLUMN_ID + " integer unique primary key AUTOINCREMENT,"
+            + COLUMN_NAME + " TEXT NOT NULL,"
+            + COLUMN_IMAGE_URL + " TEXT,"
+            + COLUMN_CREATED_AT + " TIMESTAMP DEFAULT CURRENT_TIMESTAMP,"
+            + COLUMN_GROUP_ID + " TEXT,"
+            + COLUMN_SYNCHRONIZED + " INTEGER NOT NULL)";
 
 
+    /**
+     * The Constant DATABASE_DROP.
+     */
     public static final String DATABASE_DROP = "drop table if exists " + TABLE_NAME;
 
+    /**
+     * On create.
+     *
+     * @param database the database
+     */
     public static void onCreate(SQLiteDatabase database) {
         database.execSQL(DATABASE_CREATE);
     }
 
+    /**
+     * Extract group from current position.
+     *
+     * @param cur the cur
+     * @return the group
+     */
     @NonNull
     /**
      * Extract Group out of this cursor. May throw exceptions if any column is missing in cursor.
