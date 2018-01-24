@@ -5,40 +5,38 @@
 <div>
   <v-container fluid grid-list-md text-xs-center>
     <v-layout row wrap>
-    <v-flex xs12 sm12 md12 lg6 xl6>
-      <v-btn large @click="showUserTable = toggleState(showUserTable)">Overview/Update Users</v-btn>
-      <user-table-vuetify v-if="usersLoaded && showUserTable" :users="users" :authToken="authToken"></user-table-vuetify>
-    </v-flex>
-    <p></p>
-    <v-flex xs12 sm12 md12 lg6 xl6>
-      <v-btn  large @click="showGroupTable = toggleState(showGroupTable)">Overview Groups</v-btn>
-      <group-table-vuetify v-if="groupsLoaded && showGroupTable" :groups="groups" :authToken="authToken"></group-table-vuetify>
-    </v-flex>
-    <p></p>
-    <v-flex xs12 sm12 md12 lg6 xl6>
-      <v-btn slot="activator" large @click="showResetPW = toggleState(showResetPW)">Reset PW</v-btn>
-      <reset-user-pw v-if="usersLoaded && showResetPW" :users="users" :authToken="authToken"></reset-user-pw>
-    </v-flex>
-    <p></p>
-    <v-flex xs12 sm12 md12 lg6 xl6>
-      <v-btn slot="activator" large @click="showSearchGroups = toggleState(showSearchGroups)">Reset PW</v-btn>
-      <search-for-groups v-if="groupsLoaded && showSearchGroups" :groups="groups" :authToken="authToken"></search-for-groups>
-    </v-flex>
-    <p></p>
-    <v-flex xs12 sm12 md12 lg6 xl6>
-      <v-btn  large @click="showLoginTypeChart = toggleState(showLoginTypeChart)">Logintypes</v-btn>
-      <login-type-chart v-if="usersLoaded && showLoginTypeChart" :passwordUsers="passwordUsers" :facebookUsers="facebookUsers" :googleUsers="googleUsers"></login-type-chart>
-    </v-flex>
-    <p></p>
-    <v-flex xs12 sm12 md12 lg6 xl6>
-       <v-tooltip left>
-        <v-btn slot="activator" large @click="showTransactionAmountChart = toggleState(showTransactionAmountChart)">TOP 3 Groups</v-btn>
-          <span>Needs at least three groups with transactions</span>
-        </v-tooltip>
-        <transaction-amout-chart v-if="amountsCalculated && showTransactionAmountChart && transactionGroups.length > 2" :transactionGroups="transactionGroups"></transaction-amout-chart>
-    </v-flex>
-    <p></p>
-
+      <v-flex xs12 sm12 md12 lg6 xl6>
+        <v-btn large @click="showUserTable = toggleState(showUserTable)">Overview/Update Users</v-btn>
+        <user-table-vuetify v-if="usersLoaded && showUserTable" :users="users" :authToken="authToken"></user-table-vuetify>
+      </v-flex>
+      <p></p>
+      <v-flex xs12 sm12 md12 lg6 xl6>
+        <v-btn  large @click="showGroupTable = toggleState(showGroupTable)">Overview Groups</v-btn>
+        <group-table-vuetify v-if="groupsLoaded && showGroupTable" :groups="groups" :authToken="authToken"></group-table-vuetify>
+      </v-flex>
+      <p></p>
+      <v-flex xs12 sm12 md12 lg6 xl6>
+        <v-btn  large @click="showLoginTypeChart = toggleState(showLoginTypeChart)">Logintypes</v-btn>
+        <login-type-chart v-if="usersLoaded && showLoginTypeChart" :passwordUsers="passwordUsers" :facebookUsers="facebookUsers" :googleUsers="googleUsers"></login-type-chart>
+      </v-flex>
+      <p></p>
+      <v-flex xs12 sm12 md12 lg6 xl6>
+        <v-tooltip left>
+          <v-btn slot="activator" large @click="showTransactionAmountChart = toggleState(showTransactionAmountChart)">TOP 3 Groups</v-btn>
+            <span>Needs at least three groups with transactions</span>
+          </v-tooltip>
+          <transaction-amout-chart v-if="amountsCalculated && showTransactionAmountChart && transactionGroups.length > 2" :transactionGroups="transactionGroups"></transaction-amout-chart>
+      </v-flex>
+      <p></p>
+      <v-flex xs12 sm12 md12 lg6 xl6>
+        <v-btn slot="activator" large @click="showResetPW = toggleState(showResetPW)">Reset PW</v-btn>
+        <reset-user-pw v-if="usersLoaded && showResetPW" :users="users" :authToken="authToken"></reset-user-pw>
+      </v-flex>
+      <p></p>
+      <v-flex xs12 sm12 md12 lg6 xl6>
+        <v-btn slot="activator" large @click="showSearchGroups = toggleState(showSearchGroups)">Search Group</v-btn>
+        <search-for-groups v-if="groupsLoaded && showSearchGroups" :groups="groups" :authToken="authToken"></search-for-groups>
+      </v-flex>
     </v-layout>    
   </v-container>
  </div>
