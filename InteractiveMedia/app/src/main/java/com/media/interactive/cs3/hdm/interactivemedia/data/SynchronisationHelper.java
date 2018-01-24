@@ -56,7 +56,8 @@ public class SynchronisationHelper {
     }
 
     /**
-     * Synchronize.
+     * Synchronizes all the user data including new groups and transactions for existing groups.
+     * Uploads offline created groups and transactions.
      *
      * @param context          the context
      * @param response         the response
@@ -287,7 +288,7 @@ public class SynchronisationHelper {
                             if (object.getBoolean("success") == false) {
                                 Log.d(TAG, "Image upload failed");
                             } else {
-                                helper.setImageUrlByResponse(context, group, object);
+                                helper.setGroupImageUrlByResponse(context, group, object);
                                 uploadGroup(group, context, new CallbackListener<JSONObject, Exception>() {
                                     @Override
                                     public void onSuccess(JSONObject payload) {

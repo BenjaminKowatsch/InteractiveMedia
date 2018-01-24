@@ -219,7 +219,7 @@ public class AddTransactionActivity extends ImagePickerActivity implements Recyc
     private boolean validAmount;
 
     /**
-     * On activity result.
+     * On activity result. Is called when a user picked a location.
      *
      * @param requestCode the request code
      * @param resultCode  the result code
@@ -246,7 +246,7 @@ public class AddTransactionActivity extends ImagePickerActivity implements Recyc
     }
 
     /**
-     * Start location selection.
+     * Start location selection via intent.
      */
     private void startLocationSelection() {
         final PlacePicker.IntentBuilder builder = new PlacePicker.IntentBuilder();
@@ -384,7 +384,7 @@ public class AddTransactionActivity extends ImagePickerActivity implements Recyc
     }
 
     /**
-     * Gets the all group users.
+     * Gets the all group users from the database.
      *
      * @return the all group users
      */
@@ -398,7 +398,7 @@ public class AddTransactionActivity extends ImagePickerActivity implements Recyc
     }
 
     /**
-     * Show add deduction dialog.
+     * Create and show the add deduction dialog.
      */
     private void showAddDeductionDialog() {
         final AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(new ContextThemeWrapper(this, R.style.AlertDialogCustom));
@@ -469,7 +469,9 @@ public class AddTransactionActivity extends ImagePickerActivity implements Recyc
     }
 
     /**
-     * Creates the and save transaction.
+     * Creates a transaction data object using the UI data.
+     * Tries to upload the optional transaction image. Then uploads the transaction data.
+     * If no image is selected the transaction is immediately uploaded.
      *
      * @param view the view
      */
@@ -510,7 +512,9 @@ public class AddTransactionActivity extends ImagePickerActivity implements Recyc
     }
 
     /**
-     * Send to backend.
+     * Saves the transaction into the SQL database marked as 'unsynchronized'.
+     * Tries to upload the transaction to the backend.
+     * If it succeeds the transaction is marked as 'synchronized'.
      *
      * @param toSave the to save
      * @throws JSONException the JSON exception
@@ -701,7 +705,7 @@ public class AddTransactionActivity extends ImagePickerActivity implements Recyc
     }
 
     /**
-     * Initialize user adapter.
+     * Initialize the user adapter using the 'groupId' to request data from the database.
      *
      * @return the simple cursor adapter
      */

@@ -53,7 +53,6 @@ public class LoginActivity extends AppCompatActivity
     /**
      * The sign in.
      */
-    // Google SignIn variables
     private SignInButton signIn;
 
     /**
@@ -64,7 +63,6 @@ public class LoginActivity extends AppCompatActivity
     /**
      * The login button.
      */
-    // Facebook SignIn variables
     private LoginButton loginButton;
 
     /**
@@ -75,7 +73,6 @@ public class LoginActivity extends AppCompatActivity
     /**
      * The default login button.
      */
-    // Default Login variables
     private Button defaultLoginButton;
 
     /**
@@ -91,7 +88,6 @@ public class LoginActivity extends AppCompatActivity
     /**
      * The register button.
      */
-    // Register variables
     private Button registerButton;
 
     /**
@@ -166,7 +162,7 @@ public class LoginActivity extends AppCompatActivity
     }
 
     /**
-     * Navigate to home.
+     * Navigate to home activity.
      */
     private void navigateToHome() {
         final Intent toHome = new Intent(LoginActivity.this, HomeActivity.class);
@@ -181,10 +177,9 @@ public class LoginActivity extends AppCompatActivity
      * @param error the error
      * @return the void
      */
-    private Void loginFailedHandler(Throwable error) {
-        Void nil = null;
+    private void loginFailedHandler(Throwable error) {
+        error.printStackTrace();
         Toast.makeText(this, "Login failed please try again.", Toast.LENGTH_SHORT).show();
-        return nil;
     }
 
     /**

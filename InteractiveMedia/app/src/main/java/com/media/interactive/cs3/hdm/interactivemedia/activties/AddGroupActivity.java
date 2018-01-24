@@ -103,7 +103,7 @@ public class AddGroupActivity extends ImagePickerActivity implements View.OnClic
     private Group toAdd;
 
     /**
-     * On swiped.
+     * On swiped. Handles the action if a user swipes to the left to remove an email.
      *
      * @param viewHolder the view holder
      * @param direction  the direction

@@ -119,7 +119,7 @@ public class GroupDetailViewActivity extends AppCompatActivity implements Loader
     }
 
     /**
-     * On create loader.
+     * On create loader. Creates the call to the database to create the cursor containing the user data.
      *
      * @param i      the i
      * @param bundle the bundle
@@ -135,7 +135,7 @@ public class GroupDetailViewActivity extends AppCompatActivity implements Loader
     }
 
     /**
-     * On load finished.
+     * On load finished. The user adapter is initialized when the cursor is ready.
      *
      * @param loader the loader
      * @param cursor the cursor

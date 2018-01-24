@@ -66,9 +66,9 @@ public class DatabaseProviderHelper {
     }
 
     /**
-     * Upsert user.
+     * Updates or inserts the user object at the database.
      *
-     * @param user the user
+     * @param user the user object to be upserted
      */
     public void upsertUser(User user) {
         final String[] projection = {UserTable.COLUMN_ID};
@@ -124,13 +124,13 @@ public class DatabaseProviderHelper {
     }
 
     /**
-     * Sets the image url by response.
+     * Sets the image url of the group using the JSON response object.
      *
      * @param context  the context
      * @param group    the group
      * @param response the response
      */
-    public void setImageUrlByResponse(Context context, Group group, JSONObject response) {
+    public void setGroupImageUrlByResponse(Context context, Group group, JSONObject response) {
         JSONObject payload = null;
         String imageName = null;
         try {
@@ -186,7 +186,7 @@ public class DatabaseProviderHelper {
 
 
     /**
-     * Sets the transaction image url by response.
+     * Sets the transaction image url using the JSON response.
      *
      * @param context     the context
      * @param transaction the transaction
@@ -208,7 +208,7 @@ public class DatabaseProviderHelper {
     }
 
     /**
-     * Update transaction with response.
+     * Update transaction entry at the database using the JSON response.
      *
      * @param transaction the transaction
      * @param payload     the payload
@@ -235,7 +235,7 @@ public class DatabaseProviderHelper {
     }
 
     /**
-     * Update group with response.
+     * Update the group at the database with the JSON response.
      *
      * @param group   the group
      * @param payload the payload
@@ -273,9 +273,9 @@ public class DatabaseProviderHelper {
     }
 
     /**
-     * Find insert users at database.
+     * Find or insert users from a group at the database.
      *
-     * @param group the group
+     * @param group the group containing the users to be inserted or found
      */
     public void findInsertUsersAtDatabase(Group group) {
         for (User user : group.getUsers()) {
@@ -306,7 +306,7 @@ public class DatabaseProviderHelper {
     }
 
     /**
-     * Adds the transactions.
+     * Adds the transactions to the database.
      *
      * @param jsonArray the json array
      * @param groupId   the group id
@@ -349,7 +349,8 @@ public class DatabaseProviderHelper {
     }
 
     /**
-     * Save transaction.
+     * Saves a single transaction at the database.
+     * Also the split for the transaction is calculated.
      *
      * @param transaction the transaction
      */
@@ -380,7 +381,7 @@ public class DatabaseProviderHelper {
     }
 
     /**
-     * Insert split.
+     * Insert split at the database.
      *
      * @param split the split
      * @return the uri
@@ -415,7 +416,7 @@ public class DatabaseProviderHelper {
     }
 
     /**
-     * Save debt.
+     * Save debt at the database.
      *
      * @param debt the debt
      */
@@ -426,7 +427,7 @@ public class DatabaseProviderHelper {
     }
 
     /**
-     * Gets the unsynced transactions.
+     * Gets the unsynced transactions from the database for a specific user.
      *
      * @param userId the user id
      * @return the unsynced transactions
@@ -504,7 +505,7 @@ public class DatabaseProviderHelper {
     }
 
     /**
-     * Gets the unsynced groups.
+     * Gets the unsynced groups from the database for a specific user.
      *
      * @param userId the user id
      * @return the unsynced groups
@@ -545,7 +546,7 @@ public class DatabaseProviderHelper {
     }
 
     /**
-     * Check for cached credentials.
+     * Check for cached credentials at the database.
      *
      * @param login the login
      * @return true, if successful
@@ -571,7 +572,7 @@ public class DatabaseProviderHelper {
     }
 
     /**
-     * Gets the latest transaction pub date by group id.
+     * Gets the latest transaction publication date by group id.
      *
      * @param groupId the group id
      * @return the latest transaction pub date by group id
@@ -592,7 +593,7 @@ public class DatabaseProviderHelper {
     }
 
     /**
-     * Removes the existing group ids.
+     * Removes the group ids existing at the database from the JSON array.
      *
      * @param groupIds the group ids
      * @return the list
@@ -631,7 +632,7 @@ public class DatabaseProviderHelper {
     }
 
     /**
-     * Save payment.
+     * Save payment at the database.
      *
      * @param payment           the payment
      * @param creationTimestamp the creation timestamp
@@ -663,7 +664,7 @@ public class DatabaseProviderHelper {
     }
 
     /**
-     * Load users for group.
+     * Load users for group from the database.
      *
      * @param group the group
      * @return the list
@@ -687,7 +688,7 @@ public class DatabaseProviderHelper {
     }
 
     /**
-     * Load group for transaction.
+     * Load group for transaction from the database.
      *
      * @param transaction the transaction
      * @return the group
@@ -711,7 +712,7 @@ public class DatabaseProviderHelper {
     }
 
     /**
-     * Delete login.
+     * Delete login credentials at the database.
      *
      * @param login the login
      * @return true, if successful
@@ -729,7 +730,7 @@ public class DatabaseProviderHelper {
     }
 
     /**
-     * Cache credentials.
+     * Cache credentials at the database.
      *
      * @param login the login
      * @return true, if successful
@@ -753,7 +754,7 @@ public class DatabaseProviderHelper {
     }
 
     /**
-     * Gets the all debts for group.
+     * Gets the all debts for group from the database.
      *
      * @param id the id
      * @return the all debts for group

@@ -49,7 +49,7 @@ public class InteractiveMediaMessagingService extends FirebaseMessagingService {
     }
 
     /**
-     * Send notification.
+     * Send notification to the UI.
      *
      * @param data the data
      */

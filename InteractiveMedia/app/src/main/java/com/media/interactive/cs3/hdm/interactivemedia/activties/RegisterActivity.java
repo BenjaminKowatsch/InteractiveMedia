@@ -200,7 +200,7 @@ public class RegisterActivity extends ImagePickerActivity
     }
 
     /**
-     * Navigate to home.
+     * Navigate to home activity.
      */
     private void navigateToHome() {
         final Intent toHome = new Intent(RegisterActivity.this, HomeActivity.class);
