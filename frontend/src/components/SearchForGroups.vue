@@ -1,34 +1,40 @@
 <!--
  -->
 <template>
- <v-layout row>
-    <v-flex xs12 sm6 offset-sm3>
-        <v-text-field
-            label="Search for group"
-            prepend-icon="search"
-            v-model="groupId"
-            @keyup.enter="getGroup()"  
-          ></v-text-field>
-          <v-menu v-if="hasUsers">
-            <v-btn slot="activator">Users</v-btn>
-            <v-list>
-              <v-list-tile v-for="user in userList" :key="user.username" @click="">
-                <v-list-tile-title @click="selectUser(user), isUser=true">{{ user.username }}</v-list-tile-title>
-              </v-list-tile>
-            </v-list>
-          </v-menu>
-          <v-menu v-if="hasTransactions">
-            <v-btn  dark slot="activator">Transactions</v-btn>
-            <v-list>
-              <v-list-tile v-for="transaction in transactionList" :key="transaction.amount" @click="">
-                <v-list-tile-title @click="selectTransaction(transaction), isTransaction=true">{{ transaction.amount }}</v-list-tile-title>
-              </v-list-tile>
-            </v-list>
-          </v-menu>
-        <span v-if="isUser">{{selectedUser.username}}</span>
-        <span v-if="isTransaction">{{selectedTransaction.amount}}</span>
-    </v-flex>
- </v-layout>      
+<v-container fluid fill-height>
+ <v-layout justify-center align-center> 
+    <v-flex xs12 sm12 md6 lg6 xl6>
+      <v-text-field
+        label="Search for group"
+        prepend-icon="search"
+        v-model="groupId"
+        @keyup.enter="getGroup()"
+      ></v-text-field>
+      <v-card v-if="hasUsers || hasTransactions" height="150px">
+      <v-card-title >
+        <v-menu  v-if="hasUsers" top min-width="150px">
+          <v-btn slot="activator">Users</v-btn>
+          <v-list>
+            <v-list-tile v-for="user in userList" :key="user.username" @click="">
+              <v-list-tile-title @click="selectUser(user), isUser=true">{{ user.username }}</v-list-tile-title>
+            </v-list-tile>
+          </v-list>
+        </v-menu>
+        <v-menu v-if="hasTransactions" top min-width="150px">
+          <v-btn slot="activator">Transactions</v-btn>
+          <v-list>
+            <v-list-tile v-for="transaction in transactionList" :key="transaction.amount" @click="">
+              <v-list-tile-title @click="selectTransaction(transaction), isTransaction=true">{{ transaction.amount }}</v-list-tile-title>
+            </v-list-tile>
+          </v-list>
+        </v-menu>
+        <v-btn v-if="hasTransactions || hasUsers" @click="reset()">Reset</v-btn>
+      </v-card-title>
+      <v-card-text v-if="isUser">{{selectedUser.username}}</v-card-text>
+      <v-card-text v-if="isTransaction">{{selectedTransaction.amount}}</v-card-text>
+    </v-flex>       
+ </v-layout>
+</v-container>      
 </template>
 
 <script>
@@ -50,8 +56,7 @@ import Config from "../js/Config.js";
           hasUsers: false,
           hasTransactions: false,
           isUser: false,
-          isTransaction: false,
-          text: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.'
+          isTransaction: false
       }
     },
 
@@ -64,6 +69,11 @@ import Config from "../js/Config.js";
     methods: {
 
            getGroup: function(){
+            
+            this.hasUsers = false
+            this.hasTransactions = false
+            this.isUser = false
+            this.isTransaction = false
 
             axios.get(Config.webServiceURL + "/v1/admin/groups/" + this.groupId, {
                 headers: { Authorization: "0 " + this.authToken }
@@ -116,6 +126,13 @@ import Config from "../js/Config.js";
             console.log("Selected Transaction:")
             console.log(this.selectedTransaction)
 
+          },
+
+          reset: function(){
+              this.selectedUser = [],
+              this.selectedTransaction = [],
+              this.isUser = false,
+              this.isTransaction = false
           }
 
           
