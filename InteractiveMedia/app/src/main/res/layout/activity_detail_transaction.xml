@@ -96,7 +96,8 @@
             android:layout_marginBottom="10dp"
             android:layout_marginRight="40dp"
             android:layout_marginLeft="40dp"
-            android:text="Placholdername"/>
+            android:text="Placholdername"
+            tools:ignore="RtlCompat" />
 
         <TextView
             android:layout_width="wrap_content"
@@ -117,7 +118,8 @@
             android:layout_marginBottom="10dp"
             android:layout_marginRight="40dp"
             android:layout_marginLeft="40dp"
-            android:text="Placholdername"/>
+            android:text="Placholdername"
+            tools:ignore="RtlCompat" />
 
         <TextView
             android:layout_width="wrap_content"
@@ -139,7 +141,8 @@
             android:layout_marginBottom="10dp"
             android:layout_marginRight="40dp"
             android:layout_marginLeft="40dp"
-            android:text="Placholdername"/>
+            android:text="Placholdername"
+            tools:ignore="RtlCompat" />
 
         <TextView
             android:layout_width="wrap_content"
@@ -160,7 +163,8 @@
             android:layout_marginBottom="10dp"
             android:layout_marginRight="40dp"
             android:layout_marginLeft="40dp"
-            android:text="Amount"/>
+            android:text="Amount"
+            tools:ignore="RtlCompat" />
 
         <TextView
             android:layout_width="wrap_content"

@@ -277,7 +277,8 @@ public class SynchronisationHelper {
         for (final Group group : groups) {
             if (group.getImageUrl() != null) {
                 final String url = context.getResources().getString(R.string.web_service_url) + context.getString(R.string.requestPathUpload);
-                final AuthorizedSimpleMultiPartRequest simpleMultiPartRequest = new AuthorizedSimpleMultiPartRequest(Request.Method.POST, url, new Response.Listener<String>() {
+                final AuthorizedSimpleMultiPartRequest simpleMultiPartRequest =
+                        new AuthorizedSimpleMultiPartRequest(Request.Method.POST, url, new Response.Listener<String>() {
                     @Override
                     public void onResponse(String response) {
                         JSONObject object = null;
@@ -384,14 +385,19 @@ public class SynchronisationHelper {
      * @param groupCreatedAt the group created at
      * @param callback       the callback
      */
-    public void requestTransactionsByGroupId(Context context, final String groupId, String groupCreatedAt, final CallbackListener<JSONObject, Exception> callback) {
+    public void requestTransactionsByGroupId(Context context, final String groupId,
+                                             String groupCreatedAt,
+                                             final CallbackListener<JSONObject, Exception> callback) {
 
         String latestPublishedDate = helper.getLatestTransactionPubDateByGroupId(groupId);
         Log.d(TAG, "latest published date: " + latestPublishedDate);
         if (latestPublishedDate == null) {
             latestPublishedDate = groupCreatedAt;
         }
-        final String url = context.getResources().getString(R.string.web_service_url).concat(context.getString(R.string.requestPathPullTransactionsAfter1)).concat(groupId).concat(context.getString(R.string.requestPathPullTransactionsAfter2)).concat(latestPublishedDate);
+        final String url = context.getResources().getString(R.string.web_service_url)
+                .concat(context.getString(R.string.requestPathPullTransactionsAfter1))
+                .concat(groupId)
+                .concat(context.getString(R.string.requestPathPullTransactionsAfter2)).concat(latestPublishedDate);
         Log.d(TAG, "Get: " + url);
         final AuthorizedJsonObjectRequest jsonObjectRequest = new AuthorizedJsonObjectRequest(
             Request.Method.GET, url, null, new Response.Listener<JSONObject>() {
@@ -445,7 +451,9 @@ public class SynchronisationHelper {
         for (int i = 0; i < groupIds.length(); i++) {
             try {
                 final String groupId = (String) groupIds.get(i);
-                final String url = context.getResources().getString(R.string.web_service_url).concat(context.getString(R.string.requestPathGetGroup)).concat(groupId);
+                final String url = context.getResources().getString(R.string.web_service_url)
+                        .concat(context.getString(R.string.requestPathGetGroup))
+                        .concat(groupId);
                 Log.d(TAG, "Get: " + url);
                 final AuthorizedJsonObjectRequest jsonObjectRequest = new AuthorizedJsonObjectRequest(
                     Request.Method.GET, url, null, new Response.Listener<JSONObject>() {
@@ -472,6 +480,7 @@ public class SynchronisationHelper {
                                     try {
                                         user.setImageUrl(jsonObject.getString("imageUrl"));
                                     } catch (JSONException e) {
+                                        e.printStackTrace();
                                     }
                                     user.setUsername(jsonObject.getString("username"));
                                     user.setSync(true);

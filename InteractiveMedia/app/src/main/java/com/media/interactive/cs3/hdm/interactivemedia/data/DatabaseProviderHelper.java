@@ -40,7 +40,6 @@ import java.util.List;
 import static com.media.interactive.cs3.hdm.interactivemedia.database.tables.DebtTable.extractDebtFromCurrentPosition;
 
 
-
 /**
  * Created by benny on 08.01.18.
  */
@@ -78,10 +77,10 @@ public class DatabaseProviderHelper {
         String[] selectionArgs;
         if (user.getUserId() == null) {
             selection = UserTable.COLUMN_EMAIL + " = ?";
-            selectionArgs = new String[] {user.getEmail()};
+            selectionArgs = new String[]{user.getEmail()};
         } else {
             selection = UserTable.COLUMN_USER_ID + " = ?";
-            selectionArgs = new String[] {user.getUserId()};
+            selectionArgs = new String[]{user.getUserId()};
         }
         final Cursor search = contentResolver.query(DatabaseProvider.CONTENT_USER_URI, projection, selection, selectionArgs, null);
         long foundId = -1;
@@ -142,7 +141,7 @@ public class DatabaseProviderHelper {
             e.printStackTrace();
         }
         final String newImageUrl = context.getResources().getString(R.string.web_service_url)
-            .concat(context.getString(R.string.requestPathDownload)).concat(imageName);
+                .concat(context.getString(R.string.requestPathDownload)).concat(imageName);
         group.setImageUrl(newImageUrl);
     }
 
@@ -185,6 +184,7 @@ public class DatabaseProviderHelper {
         }
     }
 
+
     /**
      * Sets the transaction image url by response.
      *
@@ -203,7 +203,7 @@ public class DatabaseProviderHelper {
             e.printStackTrace();
         }
         final String newImageUrl = context.getResources().getString(R.string.web_service_url)
-            .concat(context.getString(R.string.requestPathDownload)).concat(imageName);
+                .concat(context.getString(R.string.requestPathDownload)).concat(imageName);
         transaction.setImageUrl(newImageUrl);
     }
 
@@ -284,10 +284,10 @@ public class DatabaseProviderHelper {
             String[] selectionArgs;
             if (user.getUserId() == null) {
                 selection = UserTable.COLUMN_EMAIL + " = ?";
-                selectionArgs = new String[] {user.getEmail()};
+                selectionArgs = new String[]{user.getEmail()};
             } else {
                 selection = UserTable.COLUMN_USER_ID + " = ?";
-                selectionArgs = new String[] {user.getUserId()};
+                selectionArgs = new String[]{user.getUserId()};
             }
             final Cursor search = contentResolver.query(DatabaseProvider.CONTENT_USER_URI, projection, selection, selectionArgs, null);
             long foundId = -1;
@@ -345,7 +345,7 @@ public class DatabaseProviderHelper {
             saveTransactionImpl(transaction);
             transactions.add(transaction);
         }
-        calculateSplit(transactions.toArray(new Transaction[] {}));
+        calculateSplit(transactions.toArray(new Transaction[]{}));
     }
 
     /**
@@ -405,6 +405,16 @@ public class DatabaseProviderHelper {
     }
 
     /**
+     * Calculate split.
+     *
+     * @param saved the saved
+     */
+    private void calculateSplit(Transaction saved) {
+        final TransactionSplittingTask task = new TransactionSplittingTask(this, new PairBasedSettlement());
+        task.execute(saved);
+    }
+
+    /**
      * Save debt.
      *
      * @param debt the debt
@@ -426,11 +436,11 @@ public class DatabaseProviderHelper {
 
         final String[] projection = {TransactionTable.TABLE_NAME + ".*", GroupTable.TABLE_NAME + "." + GroupTable.COLUMN_GROUP_ID};
         final String selection = UserTable.TABLE_NAME + "." + UserTable.COLUMN_USER_ID + " = ? AND"
-            + " " + GroupTable.TABLE_NAME + "." + GroupTable.COLUMN_SYNCHRONIZED + " = 1 AND"
-            + " " + TransactionTable.TABLE_NAME + "." + TransactionTable.COLUMN_SYNCHRONIZED + " = 0 ";
+                + " " + GroupTable.TABLE_NAME + "." + GroupTable.COLUMN_SYNCHRONIZED + " = 1 AND"
+                + " " + TransactionTable.TABLE_NAME + "." + TransactionTable.COLUMN_SYNCHRONIZED + " = 0 ";
         final String[] selectionArgs = {userId};
         final Cursor cursor = contentResolver.query(DatabaseProvider.CONTENT_GROUP_USER_TRANSACTION_JOIN_URI,
-            projection, selection, selectionArgs, null);
+                projection, selection, selectionArgs, null);
         Log.d(TAG, "Unsynched Transactions Cursor: Count: " + cursor.getCount());
 
         while (cursor.moveToNext()) {
@@ -494,17 +504,6 @@ public class DatabaseProviderHelper {
     }
 
     /**
-     * Calculate split.
-     *
-     * @param saved the saved
-     */
-    private void calculateSplit(Transaction saved) {
-        final TransactionSplittingTask task = new TransactionSplittingTask(this, new PairBasedSettlement());
-        task.execute(saved);
-    }
-
-
-    /**
      * Gets the unsynced groups.
      *
      * @param userId the user id
@@ -515,8 +514,8 @@ public class DatabaseProviderHelper {
 
         final String[] projection = {GroupTable.TABLE_NAME + ".*", UserTable.TABLE_NAME + "." + UserTable.COLUMN_EMAIL};
         final String selection = "(" + UserTable.TABLE_NAME + "." + UserTable.COLUMN_USER_ID + " = ?  OR"
-            + " " + UserTable.TABLE_NAME + "." + UserTable.COLUMN_USER_ID + " IS NULL ) AND"
-            + " " + GroupTable.TABLE_NAME + "." + GroupTable.COLUMN_SYNCHRONIZED + " = 0 ";
+                + " " + UserTable.TABLE_NAME + "." + UserTable.COLUMN_USER_ID + " IS NULL ) AND"
+                + " " + GroupTable.TABLE_NAME + "." + GroupTable.COLUMN_SYNCHRONIZED + " = 0 ";
         final String[] selectionArgs = {userId};
         final Cursor cursor = contentResolver.query(DatabaseProvider.CONTENT_GROUP_USER_JOIN_URI, projection, selection, selectionArgs, null);
         Log.d(TAG, "Unsynched Group Cursor: Count: " + cursor.getCount());
@@ -555,8 +554,8 @@ public class DatabaseProviderHelper {
         if (contentResolver != null) {
             boolean result = false;
             final Cursor cursor = contentResolver.query(DatabaseProvider.CONTENT_LOGIN_URI,
-                null, null, null,
-                LoginTable.COLUMN_CREATED_AT + " DESC LIMIT 1");
+                    null, null, null,
+                    LoginTable.COLUMN_CREATED_AT + " DESC LIMIT 1");
             result = cursor.getCount() > 0;
             while (cursor.moveToNext()) {
                 login.setId(cursor.getLong(0));
@@ -583,8 +582,8 @@ public class DatabaseProviderHelper {
         final String selection = GroupTable.TABLE_NAME + "." + GroupTable.COLUMN_GROUP_ID + " = ?";
         final String[] selectionArgs = {groupId};
         final Cursor cursor = contentResolver.query(DatabaseProvider.CONTENT_GROUP_TRANSACTION_JOIN_URI,
-            projection, selection, selectionArgs,
-            TransactionTable.COLUMN_PUBLISHED_AT + " DESC LIMIT 1");
+                projection, selection, selectionArgs,
+                TransactionTable.COLUMN_PUBLISHED_AT + " DESC LIMIT 1");
         Log.d(TAG, "LatestTransaction Count: " + cursor.getCount());
         if (cursor.moveToFirst()) {
             result = cursor.getString(0);
@@ -675,7 +674,7 @@ public class DatabaseProviderHelper {
         final String selection = GroupTable.TABLE_NAME + "." + GroupTable.COLUMN_ID + " = ?";
         final String[] selectionArgs = {"" + group.getId()};
         final Cursor cursor = contentResolver.query(DatabaseProvider.CONTENT_GROUP_USER_JOIN_URI,
-            projection, selection, selectionArgs, null);
+                projection, selection, selectionArgs, null);
         if (cursor != null) {
             List<User> out = new ArrayList<>();
             while (cursor.moveToNext()) {
@@ -698,7 +697,7 @@ public class DatabaseProviderHelper {
         final String selection = TransactionTable.TABLE_NAME + "." + TransactionTable.COLUMN_ID + " = ?";
         final String[] selectionArgs = {"" + transaction.getId()};
         final Cursor cursor = contentResolver.query(DatabaseProvider.CONTENT_GROUP_TRANSACTION_JOIN_URI,
-            projection, selection, selectionArgs, null);
+                projection, selection, selectionArgs, null);
         if (cursor != null) {
             final boolean hadFirst = cursor.moveToFirst();
             if (hadFirst) {
@@ -720,9 +719,9 @@ public class DatabaseProviderHelper {
     public boolean deleteLogin(Login login) {
         if (contentResolver != null) {
             final int result = contentResolver.delete(DatabaseProvider.CONTENT_LOGIN_URI,
-                LoginTable.COLUMN_ID + "=?", new String[] {String.valueOf(login.getId())});
+                    LoginTable.COLUMN_ID + "=?", new String[]{String.valueOf(login.getId())});
             Log.d(TAG, "delete Login: " + login + " to "
-                + DatabaseProvider.CONTENT_LOGIN_URI + "  " + result);
+                    + DatabaseProvider.CONTENT_LOGIN_URI + "  " + result);
             return result > 0;
         }
         Log.e(TAG, "Could not cache credentials, contentResolver is null.");
@@ -761,13 +760,13 @@ public class DatabaseProviderHelper {
      */
     public List<Debt> getAllDebtsForGroup(String id) {
         final String[] projection = {DebtTable.COLUMN_ID, DebtTable.COLUMN_AMOUNT,
-            DebtTable.COLUMN_FROM_USER, DebtTable.COLUMN_TO_USER,
-            DebtTable.TABLE_NAME + "." + DebtTable.COLUMN_TRANSACTION_ID,
-            GroupTransactionTable.TABLE_NAME + "." + GroupTransactionTable.COLUMN_GROUP_ID};
+                DebtTable.COLUMN_FROM_USER, DebtTable.COLUMN_TO_USER,
+                DebtTable.TABLE_NAME + "." + DebtTable.COLUMN_TRANSACTION_ID,
+                GroupTransactionTable.TABLE_NAME + "." + GroupTransactionTable.COLUMN_GROUP_ID};
         final String selection = GroupTransactionTable.COLUMN_GROUP_ID + " = ?";
-        final String[] selectionArgs = new String[] {id};
+        final String[] selectionArgs = new String[]{id};
         final Cursor query = contentResolver.query(DatabaseProvider.CONTENT_GROUP_ID_DEBT_JOIN_URI, projection,
-            selection, selectionArgs, null);
+                selection, selectionArgs, null);
         List<Debt> out = new ArrayList<>();
         if (query != null) {
             while (query.moveToNext()) {
