@@ -71,7 +71,7 @@ public class GroupAdapter extends CursorAdapter {
     }
 
     /**
-     * Bind the view with the group data from the cursor using the ViewHolder pattern
+     * Bind the view with the group data from the cursor using the ViewHolder pattern.
      *
      * @param view    the view
      * @param context the context
