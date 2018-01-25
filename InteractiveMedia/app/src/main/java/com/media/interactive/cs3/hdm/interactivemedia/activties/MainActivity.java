@@ -53,8 +53,9 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        final DatabaseHelper databaseHelper = new DatabaseHelper(this);
-        databaseHelper.resetDatabase();
+        // Clear local database, dev only
+        //final DatabaseHelper databaseHelper = new DatabaseHelper(this);
+        //databaseHelper.resetDatabase();
 
         Login.getInstance().clear();
 
