@@ -38,6 +38,7 @@ RUN rm -v /etc/nginx/conf.d/*.conf
 # copy configuration files from the current directory
 COPY nginx/nginx.conf /etc/nginx/
 COPY nginx/default.conf /etc/nginx/conf.d/
+COPY nginx/compression.conf /etc/nginx/conf.d/
 
 # add static sources from build container
 COPY --from=build /app/dist /var/www/html
