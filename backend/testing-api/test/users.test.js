@@ -17,7 +17,7 @@ chai.use(require('chai-http'));
 const userData = require('../data/user.data');
 
 describe('User-Controller', () => {
-
+  /*
   describe('Auth-Type: Facebook', function() {
     before('Clean DB', databaseService.cbResetDB);
     let facebookToken;
@@ -142,6 +142,7 @@ describe('User-Controller', () => {
       });
     });
   });
+  */
 
   describe('Auth-Type: Password', function() {
     describe('Register', function() {
