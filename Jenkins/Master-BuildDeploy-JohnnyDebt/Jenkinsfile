@@ -135,7 +135,9 @@ pipeline {
         }
         stage ('Generate lighthouse report') {
             steps {
-                sh 'mkdir lighthouse-reports'
+                sh 'if [ ! -d "lighthouse-reports" ]; then
+                        mkdir lighthouse-reports
+                    fi'
                 sh 'chmod ugo+wr -R ./lighthouse-reports'
                 sh 'rm -rf ./lighthouse-reports/*'
                 sh 'wget https://raw.githubusercontent.com/jfrazelle/dotfiles/master/etc/docker/seccomp/chrome.json -O /var/lib/jenkins/chrome.json'
