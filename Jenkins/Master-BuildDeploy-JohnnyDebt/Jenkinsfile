@@ -133,6 +133,22 @@ pipeline {
                 sh 'docker-compose -f docker-compose.prod.yml up -d'
             }
         }
+        stage ('Generate lighthouse report') {
+            steps {
+                sh 'mkdir lighthouse-reports'
+                sh 'chmod ugo+wr -R ./lighthouse-reports'
+                sh 'rm -rf ./lighthouse-reports/*'
+                sh 'wget https://raw.githubusercontent.com/jfrazelle/dotfiles/master/etc/docker/seccomp/chrome.json -O ~/chrome.json'
+                sh 'docker run --rm --name lighthouse -it -v ./lighthouse-reports:/home/chrome/reports --security-opt seccomp=~/chrome.json femtopixel/google-lighthouse https://www.google.com'
+                publishHTML( [allowMissing: false,
+                    alwaysLinkToLastBuild: false,
+                    keepAll: false,
+                    reportDir: 'lighthouse-reports',
+                    reportFiles: '*.html',
+                    reportName: 'Lighthouse report',
+                    reportTitles: ''])
+            }
+        }
     }
 
     post {
