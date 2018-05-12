@@ -138,8 +138,8 @@ pipeline {
                 sh 'mkdir lighthouse-reports'
                 sh 'chmod ugo+wr -R ./lighthouse-reports'
                 sh 'rm -rf ./lighthouse-reports/*'
-                sh 'wget https://raw.githubusercontent.com/jfrazelle/dotfiles/master/etc/docker/seccomp/chrome.json -O ~/chrome.json'
-                sh 'docker run --rm --name lighthouse -it -v ./lighthouse-reports:/home/chrome/reports --security-opt seccomp=~/chrome.json femtopixel/google-lighthouse https://www.google.com'
+                sh 'wget https://raw.githubusercontent.com/jfrazelle/dotfiles/master/etc/docker/seccomp/chrome.json -O /var/lib/jenkins/chrome.json'
+                sh 'docker run --rm --name lighthouse -it -v ./lighthouse-reports:/home/chrome/reports --security-opt seccomp=/var/lib/jenkins/chrome.json femtopixel/google-lighthouse https://www.google.com'
                 publishHTML( [allowMissing: false,
                     alwaysLinkToLastBuild: false,
                     keepAll: false,
