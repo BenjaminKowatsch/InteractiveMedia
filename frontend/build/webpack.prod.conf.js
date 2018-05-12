@@ -47,12 +47,13 @@ var webpackConfig = merge(baseWebpackConfig, {
             favicon: path.join(__dirname, '../src/assets/favicon.png'),
             inject: true,
             minify: {
+                // true: minify on, false: minfiy off
                 //  toggled from true to false
-                removeComments: false,
+                removeComments: true,
                 //  toggled from true to false
-                collapseWhitespace: false,
+                collapseWhitespace: true,
                 // toggled from true to false
-                removeAttributeQuotes: false
+                removeAttributeQuotes: true
 
             },
             // necessary to consistently work with multiple chunks via CommonsChunkPlugin
