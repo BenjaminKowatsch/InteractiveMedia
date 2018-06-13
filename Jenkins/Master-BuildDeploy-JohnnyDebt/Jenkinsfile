@@ -70,7 +70,7 @@ pipeline {
                 }
             }
         }
-
+/*
         stage ('API tests') {
             steps {
 				sh 'docker-compose -f docker-compose.backend-testing-api.yml rm -fsv'
@@ -92,7 +92,7 @@ pipeline {
 				sh 'docker-compose -f docker-compose.backend-testing-api.yml rm -fsv'
             }
         }
-
+*/
         stage ('Generate docu') {
             steps {
                 dir('InteractiveMedia') {
@@ -135,16 +135,10 @@ pipeline {
         }
         stage ('Generate lighthouse report') {
             steps {
-                sh 'if [ ! -d "lighthouse-reports" ]; then mkdir lighthouse-reports; fi'
-                sh 'chmod ugo+wr -R ./lighthouse-reports'
-                sh 'rm -rf ./lighthouse-reports/*'
-                sh 'export path=$(pwd)'
-                sh 'wget https://raw.githubusercontent.com/jfrazelle/dotfiles/master/etc/docker/seccomp/chrome.json -O /var/lib/jenkins/chrome.json'
-                sh 'docker run --rm --name lighthouse -v $path/lighthouse-reports:/home/chrome/reports --security-opt seccomp=/var/lib/jenkins/chrome.json femtopixel/google-lighthouse https://www.google.com --no-sandbox'
                 publishHTML( [allowMissing: false,
                     alwaysLinkToLastBuild: false,
                     keepAll: false,
-                    reportDir: 'lighthouse-reports',
+                    reportDir: '/lighthouse_reports',
                     reportFiles: '*.html',
                     reportName: 'Lighthouse report',
                     reportTitles: ''])
