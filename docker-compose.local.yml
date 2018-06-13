@@ -74,3 +74,17 @@ services:
       interval: 1s
       timeout: 1s
       retries: 12
+
+  lighthouse:
+      build:
+        context: ./lighthouse
+      environment: 
+        - URL=http://web:80/#/
+        - AUDIT_NAME=report.html
+      volumes:
+        - /lighthouse_reports:/results
+      image: localhost:5000/lighthouse
+      depends_on:
+        web:
+          condition: service_healthy
+     
