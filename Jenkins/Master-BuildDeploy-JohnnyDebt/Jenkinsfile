@@ -139,7 +139,7 @@ pipeline {
                     alwaysLinkToLastBuild: false,
                     keepAll: false,
                     reportDir: '/lighthouse_reports',
-                    reportFiles: '*.html',
+                    reportFiles: 'report.html',
                     reportName: 'Lighthouse report',
                     reportTitles: ''])
             }
