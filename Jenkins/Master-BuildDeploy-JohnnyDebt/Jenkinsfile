@@ -1,3 +1,5 @@
+import groovy.json.JsonSlurperClassic
+
 pipeline {
     tools {
         gradle "Gradle 4.3"
@@ -139,9 +141,12 @@ pipeline {
                     alwaysLinkToLastBuild: false,
                     keepAll: false,
                     reportDir: '/lighthouse_reports',
-                    reportFiles: 'report.html',
+                    reportFiles: 'report.report.html',
                     reportName: 'Lighthouse report',
                     reportTitles: ''])
+                def json = readFile(file:'/lighthouse_reports/report.report.json')
+                def data = new JsonSlurperClassic().parseText(json)
+                echo "data: ${data}"
             }
         }
     }
