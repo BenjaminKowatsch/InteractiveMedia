@@ -78,7 +78,6 @@ services:
         context: ./lighthouse
       environment: 
         - URL=http://web:80/#/
-        - AUDIT_NAME=report.json
       volumes:
         - ./lighthouse_reports:/results
       image: localhost:5000/lighthouse

@@ -146,9 +146,11 @@ pipeline {
                     reportFiles: 'report.report.html',
                     reportName: 'Lighthouse report',
                     reportTitles: ''])
-                def json = readFile(file:'./lighthouse_reports/report.report.json')
-                def data = new JsonSlurperClassic().parseText(json)
-                echo "data: ${data}"
+                script {
+                    def json = readFile(file:'./lighthouse_reports/report.report.json')
+                    def data = new JsonSlurperClassic().parseText(json)
+                    echo "data: ${data}"
+                }
             }
         }
     }
