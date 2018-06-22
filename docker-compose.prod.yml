@@ -64,6 +64,7 @@ services:
     image: localhost:5000/frontend
     ports:
       - 8088:443
+      - 80:80
     depends_on:
       backend:
         condition: service_healthy
