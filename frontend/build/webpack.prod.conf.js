@@ -6,7 +6,9 @@ var merge = require('webpack-merge')
 var baseWebpackConfig = require('./webpack.base.conf')
 var HtmlWebpackPlugin = require('html-webpack-plugin')
 var ExtractTextPlugin = require('extract-text-webpack-plugin')
-var OptimizeCSSPlugin = require('optimize-css-assets-webpack-plugin')
+var OptimizeCssAssetsPlugin = require('optimize-css-assets-webpack-plugin')
+var UglifyJsPlugin = require('uglifyjs-webpack-plugin')
+
 
 var env = config.build.env
 
@@ -14,7 +16,9 @@ var webpackConfig = merge(baseWebpackConfig, {
     module: {
         rules: utils.styleLoaders({
             sourceMap: config.build.productionSourceMap,
-            extract: true
+            extract: true,
+            minimize: true
+
         })
     },
     output: {
@@ -23,7 +27,9 @@ var webpackConfig = merge(baseWebpackConfig, {
         chunkFilename: utils.assetsPath('js/[id].[chunkhash].js')
     },
     plugins: [
-
+        new webpack.optimize.UglifyJsPlugin({
+            include: /\.js$/
+        }),
         new webpack.DefinePlugin({
             'process.env': {
                 'NODE_ENV': '"production"',
@@ -37,7 +43,12 @@ var webpackConfig = merge(baseWebpackConfig, {
         }),
         // Compress extracted CSS. We are using this plugin so that possible
         // duplicated CSS from different components can be deduped.
-        new OptimizeCSSPlugin(),
+        new OptimizeCssAssetsPlugin({
+            assetNameRegExp: /\.css$/g,
+            cssProcessor: require('cssnano'),
+            cssProcessorOptions: { discardComments: { removeAll: true } },
+            canPrint: true
+        }),
         // generate dist index.html with correct asset hash for caching.
         // you can customize output by editing /index.html
         // see https://github.com/ampedandwired/html-webpack-plugin
@@ -48,13 +59,12 @@ var webpackConfig = merge(baseWebpackConfig, {
             inject: true,
             minify: {
                 // true: minify on, false: minfiy off
-                //  toggled from true to false
-                removeComments: true,
-                //  toggled from true to false
+                //  toggled from true to false                        
                 collapseWhitespace: true,
-                // toggled from true to false
-                removeAttributeQuotes: true
-
+                removeComments: true,
+                removeRedundantAttributes: true,
+                removeScriptTypeAttributes: true,
+                removeStyleLinkTypeAttributes: true
             },
             // necessary to consistently work with multiple chunks via CommonsChunkPlugin
             chunksSortMode: 'dependency'
@@ -79,6 +89,7 @@ var webpackConfig = merge(baseWebpackConfig, {
             name: 'manifest',
             chunks: ['vendor']
         })
+
     ]
 })
 

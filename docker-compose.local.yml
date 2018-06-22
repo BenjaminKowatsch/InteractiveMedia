@@ -65,7 +65,10 @@ services:
         - WEB_SERVICE_URL=http://localhost:8081
     image: localhost:5000/frontend
     ports:
-      - 8088:80
+      - 8088:443
+    volumes:
+      - /etc/ssl/certs:/etc/ssl/certs
+      - /etc/ssl/private:/etc/ssl/private
     depends_on:
       backend:
         condition: service_healthy
@@ -79,7 +82,7 @@ services:
       build:
         context: ./lighthouse
       environment: 
-        - URL=http://web:80/#/
+        - URL=https://web:443/#/
       volumes:
         - ./lighthouse_reports:/results
       image: localhost:5000/lighthouse

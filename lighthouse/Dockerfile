@@ -1,7 +1,6 @@
 FROM alpeware/chrome-headless-trunk
 
 ENV URL https://example.com
-ENV AUDIT_NAME report.html
 
 RUN apt-get update
 RUN apt-get install -y curl
@@ -12,6 +11,7 @@ RUN npm install -g lighthouse
 ENTRYPOINT ["/usr/bin/dumb-init", "--"]
 
 ADD ./start.sh /usr/bin/run.sh 
+ADD ./config.js /usr/bin/config.js 
 
 RUN chmod go+x /usr/bin/run.sh 
 

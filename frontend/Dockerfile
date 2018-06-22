@@ -25,8 +25,18 @@ RUN npm run build
 
 
 #
+# ---- Certificate ----
+FROM alpine:3.4 AS certificate
+RUN apk update && \
+     apk add --no-cache openssl && \
+     rm -rf /var/cache/apk/*
+COPY cert_defaults.txt /src/cert_defaults.txt
+RUN openssl req -x509 -nodes -out /src/cert.pem -keyout /src/cert.key -config /src/cert_defaults.txt
+#
 # ---- Release ----
 FROM nginx:stable-alpine AS release
+
+COPY --from=certificate /src/cert.* /etc/nginx/
 
 # install tini
 RUN apk add --no-cache tini

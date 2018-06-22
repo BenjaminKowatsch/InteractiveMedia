@@ -6,7 +6,6 @@ import VueRouter from 'vue-router'
 
 // Import Vuetify (material component framework)
 import Vuetify from 'vuetify'
-import ('../node_modules/vuetify/dist/vuetify.min.css')
 
 // Import VueCharts (charts)
 import VueCharts from 'vue-chartjs'
