@@ -82,7 +82,7 @@ services:
       build:
         context: ./lighthouse
       environment: 
-        - URL=https://web:443/#/
+        - URL=http://web:80/#/
       volumes:
         - ./lighthouse_reports:/results
       image: localhost:5000/lighthouse

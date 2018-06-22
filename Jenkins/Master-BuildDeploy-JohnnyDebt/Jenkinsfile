@@ -161,7 +161,7 @@ pipeline {    tools {
         }
         stage('Taurus Performance Test') {
             steps {
-                bzt "./Jenkins/Taurus/settings.yml -report"
+                bzt './Jenkins/Taurus/settings.yml -report -o modules.blazemeter.report-name="Jenkins Build ${BUILD_NUMBER}"'
             }
         }
     }

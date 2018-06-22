@@ -10,5 +10,5 @@ while ! nc -z localhost 9222; do
 done
 
 echo "Chrome started. Perform audit..."
-lighthouse --port 9222 $URL --output json --output html --output-path ./report.json #--config-path=/usr/bin/config.js
-chmod og+wr ./report.report.json ./report.report.html
+lighthouse --port 9222 $URL --output json --output html --output-path ./report.json --config-path=/usr/bin/config.js
+chmod uog+wxr report.report.json report.report.html

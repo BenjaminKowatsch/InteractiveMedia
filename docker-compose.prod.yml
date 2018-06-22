@@ -63,7 +63,7 @@ services:
         - WEB_SERVICE_URL=http://cloudproject.mi.hdm-stuttgart.de:8081
     image: localhost:5000/frontend
     ports:
-      - 8088:80
+      - 8088:443
     depends_on:
       backend:
         condition: service_healthy
