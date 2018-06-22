@@ -1,11 +1,17 @@
 execution:
 - concurrency: 5
-  ramp-up: 20s
+  throughput: 25
+  ramp-up: 2m
+  steps: 5
   hold-for: 2m
   scenario: scenario1
 
+  locations:
+    eu-west-1: 2
+    us-east-1: 1
+
 scenarios:
   scenario1:
-    default-address: http://localhost:8088/
-    requests: 
-      - /
+    retrieve-resources: false
+    requests:
+      - http://localhost:8088/

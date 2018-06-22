@@ -159,7 +159,7 @@ pipeline {    tools {
                 }
             }
         }
-        stage('get config file and run test') {
+        stage('Taurus Performance Test') {
             steps {
                 bzt "./Jenkins/Taurus/settings.yml -report"
             }
