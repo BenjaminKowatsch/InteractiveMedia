@@ -1,7 +1,6 @@
 import groovy.json.JsonSlurperClassic
-
-pipeline {
-    tools {
+def maxFMP = 5000
+pipeline {    tools {
         gradle "Gradle 4.3"
     }
     agent any
@@ -149,8 +148,20 @@ pipeline {
                 script {
                     def json = readFile(file:'./lighthouse_reports/report.report.json')
                     def data = new JsonSlurperClassic().parseText(json)
-                    echo "data: ${data}"
+                    def fMP = data.audits['first-meaningful-paint'].extendedInfo.value.timings.fMP
+                    if( maxFMP < fMP){
+                        echo "First meaningful paint time ${fMP} exceeded the maximum of ${maxFMP}"
+                        currentBuild.result = 'UNSTABLE'
+                    } else {
+                        echo "First meaningful paint time: ${fMP}"
+                        currentBuild.result = 'SUCCESS'
+                    }
                 }
+            }
+        }
+        stage('get config file and run test') {
+            steps {
+                bzt "./Jenkins/Taurus/settings.yml -report"
             }
         }
     }

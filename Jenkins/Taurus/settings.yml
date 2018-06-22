@@ -1,0 +1,11 @@
+execution:
+- concurrency: 5
+  ramp-up: 20s
+  hold-for: 2m
+  scenario: scenario1
+
+scenarios:
+  scenario1:
+    default-address: http://localhost:8088/
+    requests: 
+      - /
