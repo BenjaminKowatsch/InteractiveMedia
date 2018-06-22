@@ -11,4 +11,5 @@ done
 
 echo "Chrome started. Perform audit..."
 lighthouse --port 9222 $URL --output json --output html --output-path ./report.json --config-path=/usr/bin/config.js
+chmod uog+wxr ./ -R
 chmod uog+wxr report.report.json report.report.html
