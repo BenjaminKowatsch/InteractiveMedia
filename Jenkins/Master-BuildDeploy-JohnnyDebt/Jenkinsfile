@@ -129,6 +129,10 @@ pipeline {    tools {
 
         stage ('Deploy artefacts') {
             steps {
+                // clean artefacts
+                sh 'mkdir -p ./lighthouse_reports'
+                sh 'rm ./lighthouse_reports/*'
+                // Run container
                 sh 'docker-compose -f docker-compose.prod.yml stop'
                 sh 'docker-compose -f docker-compose.prod.yml rm -sf'
                 sh 'docker-compose -f docker-compose.prod.yml pull'
@@ -137,7 +141,7 @@ pipeline {    tools {
         }
         stage ('Generate lighthouse report') {
             steps {
-                sh 'mkdir -p ./lighthouse_reports'
+                sh './Jenkins/wait_for_file.sh ./lighthouse_reports/report.report.html 10'
                 publishHTML( [allowMissing: false,
                     alwaysLinkToLastBuild: false,
                     keepAll: false,
