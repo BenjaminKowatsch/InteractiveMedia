@@ -3,17 +3,24 @@
 
 <head>
     <meta charset="utf-8">
-
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no">
-
-    <!-- include vue-chartsjs and chartjs -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.1/Chart.min.js" async ></script>
-    <script src="https://unpkg.com/vue-chartjs/dist/vue-chartjs.min.js" async ></script>
+    <style>*,:after,:before{box-sizing:inherit}:after,:before{text-decoration:inherit;vertical-align:inherit}*{background-repeat:no-repeat;padding:0;margin:0}html{overflow-x:hidden}::-webkit-file-upload-button{-webkit-appearance:button;font:inherit}html{box-sizing:border-box;overflow-y:scroll;-webkit-text-size-adjust:100%;font-size:14px;text-rendering:optimizeLegibility;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale}::-ms-clear,::-ms-reveal{display:none}</style>
+    <link rel="shortcut icon" href="favicon.png">
     <title>Debts² Admin Panel</title>
 </head>
 
 <body>
     <div id="app"></div>
+    <!-- Begin manual inject -->
+    <% for (let css in htmlWebpackPlugin.files.css) { %>
+        <script >var cb=function(){var e=document.createElement("link");e.rel="stylesheet",e.href="<%= htmlWebpackPlugin.files.css[css] %>";var t=document.getElementsByTagName("head")[0];t.parentNode.insertBefore(e,t)},raf=requestAnimationFrame||mozRequestAnimationFrame||webkitRequestAnimationFrame||msRequestAnimationFrame;raf?raf(cb):window.addEventListener("load",cb);</script>
+    <% } %>
+    <% for (let js in htmlWebpackPlugin.files.js) { %>
+      <script defer src="<%= htmlWebpackPlugin.files.js[js] %>"></script>
+    <% } %>
+    <script async src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.1/Chart.min.js" ></script>
+    <script async src="https://unpkg.com/vue-chartjs/dist/vue-chartjs.min.js" ></script>
+    <!-- End manual inject -->
 </body>
 
 </html>

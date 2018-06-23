@@ -56,7 +56,7 @@ var webpackConfig = merge(baseWebpackConfig, {
             filename: config.build.index,
             template: 'index.html',
             favicon: path.join(__dirname, '../src/assets/favicon.png'),
-            inject: true,
+            inject: false,
             minify: {
                 // true: minify on, false: minfiy off
                 //  toggled from true to false                        
