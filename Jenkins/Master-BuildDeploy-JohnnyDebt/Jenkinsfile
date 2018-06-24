@@ -141,7 +141,7 @@ pipeline {    tools {
         }
         stage ('Generate lighthouse report') {
             steps {
-                sh './Jenkins/wait_for_file.sh ./lighthouse_reports/report.report.html 10'
+                sh './Jenkins/wait_for_file.sh ./lighthouse_reports/report.report.html 30'
                 publishHTML( [allowMissing: false,
                     alwaysLinkToLastBuild: false,
                     keepAll: false,
