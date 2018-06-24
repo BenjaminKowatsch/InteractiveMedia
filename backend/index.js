@@ -57,8 +57,15 @@ app.use(bodyParser.json());
 
 // Add headers
 app.use(function(req, res, next) {
+  var allowedOrigins = config.origins;
+  var origin = req.headers.origin;
+
+  winston.error('Allowed Origins', allowedOrigins);
+
   // Website you wish to allow to connect
-  res.setHeader('Access-Control-Allow-Origin', config.origin);
+  if (allowedOrigins.indexOf(origin) > -1) {
+    res.setHeader('Access-Control-Allow-Origin', origin);
+  }
 
   // Request methods you wish to allow
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, PATCH, DELETE');

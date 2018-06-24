@@ -424,7 +424,7 @@ describe('User-Controller', () => {
       .then(res => {done();})
       .catch((error) => {winston.error('Facbook Login Error', error);});
     });
-
+    /*
     it('should get the user-data of facebook_user', function() {
       return chai.request(settings.host)
       .get(settings.url.users.base  + '/user')
@@ -447,7 +447,7 @@ describe('User-Controller', () => {
         '/picture?type=normal');
       });
     });
-
+    */
     it('should get the user-data of user_0', function() {
       return chai.request(settings.host)
       .get(settings.url.users.base  + '/user')

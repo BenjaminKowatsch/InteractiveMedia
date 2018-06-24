@@ -24,11 +24,11 @@ services:
 
   backend:
     build: ./backend 
-    environment: 
-      - ORIGIN=http://cloudproject.mi.hdm-stuttgart.de:8088
+    environment:
+      - ORIGINS=https://cloudproject.mi.hdm-stuttgart.de:8088::::http://cloudproject.mi.hdm-stuttgart.de 
       - LOGLEVEL=info
       - ADMIN_USERNAME=admin
-      - ADMIN_PASSWORD=4e9930338e59fb560b1f192615aea7b622c9a3949c549b32964e47028ca52a18
+      - ADMIN_PASSWORD=8C6976E5B5410415BDE908BD4DEE15DFB167A9C873FC4BB8A81F6F2AB448A918
       - ADMIN_EMAIL=admin@example.com
       - FCM_SERVER_KEY=AAAA03Mtpdk:APA91bGy9qAosK5suZI3ctH2mhYbtyS1f7pXajkaPePTuZ58IiZcYy_2PUlpwfXnuqck9KZIXDZvDzvJyfgg7uJS5YJsy5uIYjOXTTxhapMhbtjBfimnbDYA3nJAN76-XVU--g0KVoLM
       - PORT=8081

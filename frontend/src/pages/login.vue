@@ -149,7 +149,7 @@ export default {
     checkLogin: function() {
         if (this.$refs.form.validate()){
         var sha256 = require('js-sha256')
-        var hashedPassword = sha256(this.password)
+        var hashedPassword = sha256(this.password).toUpperCase();
         console.log(hashedPassword)
         var credentials = {
           username: this.username,

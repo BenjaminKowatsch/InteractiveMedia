@@ -71,7 +71,7 @@ pipeline {    tools {
                 }
             }
         }
-/*
+
         stage ('API tests') {
             steps {
 				sh 'docker-compose -f docker-compose.backend-testing-api.yml rm -fsv'
@@ -93,7 +93,7 @@ pipeline {    tools {
 				sh 'docker-compose -f docker-compose.backend-testing-api.yml rm -fsv'
             }
         }
-*/
+
         stage ('Generate docu') {
             steps {
                 dir('InteractiveMedia') {
