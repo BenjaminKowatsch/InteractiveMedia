@@ -60,8 +60,6 @@ app.use(function(req, res, next) {
   var allowedOrigins = config.origins;
   var origin = req.headers.origin;
 
-  winston.error('Allowed Origins', allowedOrigins);
-
   // Website you wish to allow to connect
   if (allowedOrigins.indexOf(origin) > -1) {
     res.setHeader('Access-Control-Allow-Origin', origin);
