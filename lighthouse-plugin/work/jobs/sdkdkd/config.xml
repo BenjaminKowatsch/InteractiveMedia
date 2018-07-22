@@ -1,0 +1,32 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<project>
+  <actions/>
+  <description></description>
+  <keepDependencies>false</keepDependencies>
+  <properties/>
+  <scm class="hudson.scm.NullSCM"/>
+  <canRoam>true</canRoam>
+  <disabled>false</disabled>
+  <blockBuildWhenDownstreamBuilding>false</blockBuildWhenDownstreamBuilding>
+  <blockBuildWhenUpstreamBuilding>false</blockBuildWhenUpstreamBuilding>
+  <triggers/>
+  <concurrentBuild>false</concurrentBuild>
+  <builders>
+    <io.jenkins.plugins.sample.LighthousePlugin plugin="lighthouse-plugin@0.1">
+      <filepath>report.json</filepath>
+      <value>8</value>
+      <action>Greater_than</action>
+      <actionEnum>GREATER_THAN</actionEnum>
+      <path>reportCategories/Array/0/Object/score/Double</path>
+    </io.jenkins.plugins.sample.LighthousePlugin>
+    <io.jenkins.plugins.sample.LighthousePlugin plugin="lighthouse-plugin@0.1">
+      <filepath>report.json</filepath>
+      <value>20</value>
+      <action>Lower_than</action>
+      <actionEnum>LOWER_THAN</actionEnum>
+      <path>reportCategories/Array/1/Object/score/Double</path>
+    </io.jenkins.plugins.sample.LighthousePlugin>
+  </builders>
+  <publishers/>
+  <buildWrappers/>
+</project>

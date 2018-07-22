@@ -1,0 +1,31 @@
+<?jelly escape-by-default='true'?>
+<j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define" xmlns:l="/lib/layout" xmlns:t="/lib/hudson" xmlns:f="/lib/form">
+    <f:entry title="${%Filepath}" field="filepath" description="A path to the JSON file to be parsed" >
+        <f:textbox value="${filepath}" default="" />
+    </f:entry>
+
+            <f:entry title="${%Path}" description="A custom path to the property to be validated"
+                                    field="path">
+                <f:textbox value="${path}" default="" />
+            </f:entry>
+            <f:entry name="action" title="${%Action}" field="action" description="The comparison action" >
+                <select name="action">
+                    <option value="eq" selected="${instance.action.equals('==')? 'true':null}" >==</option>
+                    <option value="gt" selected="${instance.action.equals('gt')? 'true':null}" >&gt;</option>
+                    <option value="lt" selected="${instance.action.equals('gt')? 'true':null}" >&lt;</option>
+                </select>
+            </f:entry>
+            <f:entry title="${%Value}" description="A value to be compared to the path property"
+                                    field="value">
+                <f:textbox value="${value}" default="" />
+            </f:entry>
+            <f:entry name="failStatus" title="${%FailStatus}" field="failStatus" description="The status to be set, if check fails" >
+                <select name="failStatus">
+                    <option value="UNSTABLE" selected="${instance.action.equals('UNSTABLE')? 'true':null}" >UNSTABLE</option>
+                    <option value="ABORTED" selected="${instance.action.equals('ABORTED')? 'true':null}" >ABORTED</option>
+                    <option value="FAILURE" selected="${instance.action.equals('FAILURE')? 'true':null}" >FAILURE</option>
+                </select>
+            </f:entry>
+</j:jelly>
+
+

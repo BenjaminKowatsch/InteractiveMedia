@@ -1,0 +1,56 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<flow-build plugin="workflow-job@2.11.2">
+  <actions>
+    <hudson.model.CauseAction>
+      <causeBag class="linked-hash-map">
+        <entry>
+          <hudson.model.Cause_-UserIdCause/>
+          <int>1</int>
+        </entry>
+      </causeBag>
+    </hudson.model.CauseAction>
+  </actions>
+  <queueId>1</queueId>
+  <timestamp>1532266590158</timestamp>
+  <startTime>1532266590161</startTime>
+  <result>SUCCESS</result>
+  <duration>980</duration>
+  <keepLog>false</keepLog>
+  <execution class="org.jenkinsci.plugins.workflow.cps.CpsFlowExecution">
+    <result>SUCCESS</result>
+    <script>node {
+   step([$class: &apos;LighthousePlugin&apos;,
+   filepath: &apos;report.json&apos;,
+   path: &apos;reportCategories/Array/0/Object/score/Double&apos;,
+   action: &apos;&gt;&apos;,
+   value: &apos;22&apos;])
+}</script>
+    <loadedScripts class="map"/>
+    <timings class="map">
+      <entry>
+        <string>flowNode</string>
+        <long>42378486</long>
+      </entry>
+      <entry>
+        <string>classLoad</string>
+        <long>126486652</long>
+      </entry>
+      <entry>
+        <string>run</string>
+        <long>653338172</long>
+      </entry>
+      <entry>
+        <string>parse</string>
+        <long>178136264</long>
+      </entry>
+      <entry>
+        <string>saveProgram</string>
+        <long>249096331</long>
+      </entry>
+    </timings>
+    <sandbox>true</sandbox>
+    <iota>8</iota>
+    <head>1:8</head>
+  </execution>
+  <checkouts class="hudson.util.PersistedList"/>
+</flow-build>

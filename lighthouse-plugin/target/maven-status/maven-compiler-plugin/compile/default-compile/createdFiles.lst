@@ -1,0 +1,10 @@
+io/jenkins/plugins/sample/LighthousePlugin/DescriptorImpl/doCheckName.stapler
+io/jenkins/plugins/sample/LighthousePlugin$Action.class
+META-INF/annotations/org.kohsuke.accmod.Restricted
+io/jenkins/plugins/sample/Messages.class
+META-INF/annotations/org.jenkinsci.Symbol
+io/jenkins/plugins/sample/LighthousePlugin.stapler
+io/jenkins/plugins/sample/LighthousePlugin$DescriptorImpl.class
+io/jenkins/plugins/sample/LighthousePlugin.class
+io/jenkins/plugins/sample/LighthousePlugin$1.class
+META-INF/annotations/hudson.Extension

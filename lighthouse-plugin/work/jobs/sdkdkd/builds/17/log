@@ -1,0 +1,26 @@
+Gestartet durch Benutzer [8mha:AAAAlh+LCAAAAAAAAP9b85aBtbiIQTGjNKU4P08vOT+vOD8nVc83PyU1x6OyILUoJzMv2y+/JJUBAhiZGBgqihhk0NSjKDWzXb3RdlLBUSYGJk8GtpzUvPSSDB8G5tKinBIGIZ+sxLJE/ZzEvHT94JKizLx0a6BxUmjGOUNodHsLgAzOEgYu/dLi1CL9vNKcHACFIKlWvwAAAA==[0manonymous
+Baue in Arbeitsbereich /home/benny/Dokumente/lighthouse-plugin/work/jobs/sdkdkd/workspace
+Loading JSON file from: /home/benny/Dokumente/lighthouse-plugin/work/jobs/sdkdkd/workspace/report.json
+The variable of type Double with the value 61.94117647058823 is GREATER_THAN 8
+Build step 'Lighthouse Plugin' changed build result to SUCCESS
+Loading JSON file from: /home/benny/Dokumente/lighthouse-plugin/work/jobs/sdkdkd/workspace/report.json
+ERROR: Build step failed with exception
+[8mha:AAAAWB+LCAAAAAAAAP9b85aBtbiIQSmjNKU4P08vOT+vOD8nVc8DzHWtSE4tKMnMz/PLL0ldFVf2c+b/lb5MDAwVRQxSaBqcITRIIQMEMIIUFgAAckCEiWAAAAA=[0mjava.lang.ClassCastException: Cannot cast java.lang.Integer to java.lang.Double
+	at java.lang.Class.cast(Class.java:3369)
+	at io.jenkins.plugins.sample.LighthousePlugin.find(LighthousePlugin.java:156)
+	at io.jenkins.plugins.sample.LighthousePlugin.find(LighthousePlugin.java:174)
+	at io.jenkins.plugins.sample.LighthousePlugin.find(LighthousePlugin.java:150)
+	at io.jenkins.plugins.sample.LighthousePlugin.analyseLighthouseReport(LighthousePlugin.java:91)
+	at io.jenkins.plugins.sample.LighthousePlugin.perform(LighthousePlugin.java:73)
+	at hudson.tasks.BuildStepCompatibilityLayer.perform(BuildStepCompatibilityLayer.java:78)
+	at hudson.tasks.BuildStepMonitor$1.perform(BuildStepMonitor.java:20)
+	at hudson.model.AbstractBuild$AbstractBuildExecution.perform(AbstractBuild.java:779)
+	at hudson.model.Build$BuildExecution.build(Build.java:205)
+	at hudson.model.Build$BuildExecution.doRun(Build.java:162)
+	at hudson.model.AbstractBuild$AbstractBuildExecution.run(AbstractBuild.java:534)
+	at hudson.model.Run.execute(Run.java:1741)
+	at hudson.model.FreeStyleBuild.run(FreeStyleBuild.java:43)
+	at hudson.model.ResourceController.execute(ResourceController.java:98)
+	at hudson.model.Executor.run(Executor.java:410)
+Build step 'Lighthouse Plugin' marked build as failure
+Finished: FAILURE

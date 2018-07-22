@@ -1,0 +1,29 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<flow-definition plugin="workflow-job@2.11.2">
+  <actions/>
+  <description></description>
+  <keepDependencies>false</keepDependencies>
+  <properties>
+    <org.jenkinsci.plugins.workflow.job.properties.PipelineTriggersJobProperty>
+      <triggers/>
+    </org.jenkinsci.plugins.workflow.job.properties.PipelineTriggersJobProperty>
+  </properties>
+  <definition class="org.jenkinsci.plugins.workflow.cps.CpsFlowDefinition" plugin="workflow-cps@2.39">
+    <script>node {
+   step([$class: &apos;LighthousePlugin&apos;,
+   filepath: &apos;report.json&apos;,
+   path: &apos;reportCategories/Array/0/Object/score/Double&apos;,
+   action: &apos;gt&apos;,
+   value: &apos;22&apos;,
+   failStatus: &apos;ABORTED&apos;])
+   step([$class: &apos;LighthousePlugin&apos;,
+   filepath: &apos;report.json&apos;,
+   path: &apos;reportCategories/Array/1/Object/score/Double&apos;,
+   action: &apos;lt&apos;,
+   value: &apos;22&apos;])
+}</script>
+    <sandbox>true</sandbox>
+  </definition>
+  <triggers/>
+  <disabled>false</disabled>
+</flow-definition>

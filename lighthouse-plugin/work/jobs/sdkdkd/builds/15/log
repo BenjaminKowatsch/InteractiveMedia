@@ -1,0 +1,9 @@
+Gestartet durch Benutzer [8mha:AAAAlh+LCAAAAAAAAP9b85aBtbiIQTGjNKU4P08vOT+vOD8nVc83PyU1x6OyILUoJzMv2y+/JJUBAhiZGBgqihhk0NSjKDWzXb3RdlLBUSYGJk8GtpzUvPSSDB8G5tKinBIGIZ+sxLJE/ZzEvHT94JKizLx0a6BxUmjGOUNodHsLgAzOEgYu/dLi1CL9vNKcHACFIKlWvwAAAA==[0manonymous
+Baue in Arbeitsbereich /home/benny/Dokumente/lighthouse-plugin/work/jobs/sdkdkd/workspace
+Loading JSON file from: /home/benny/Dokumente/lighthouse-plugin/work/jobs/sdkdkd/workspace/report.json
+The variable of type Double with the value 61.94117647058823 is GREATER_THAN 8.0
+Build step 'Lighthouse Plugin' changed build result to SUCCESS
+Loading JSON file from: /home/benny/Dokumente/lighthouse-plugin/work/jobs/sdkdkd/workspace/report.json
+The variable of type Integer with the value 30 is not LOWER_THAN 20
+Build step 'Lighthouse Plugin' changed build result to UNSTABLE
+Finished: UNSTABLE

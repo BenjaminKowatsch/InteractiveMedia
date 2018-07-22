@@ -1,0 +1,3 @@
+Loading JSON file from: /home/benny/Dokumente/lighthouse-plugin/work/jobs/test/workspace/report.json
+The variable of type Double with the value 30 is not LOWER_THAN 22
+Constraint not valid, setting the status UNSTABLE.

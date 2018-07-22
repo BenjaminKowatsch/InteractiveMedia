@@ -1,0 +1,14 @@
+Manifest-Version: 1.0
+Group-Id: io.jenkins.plugins
+Short-Name: lighthouse-plugin
+Long-Name: Lighthouse Plugin
+Plugin-Version: 0.1
+Hudson-Version: 2.7.3
+Jenkins-Version: 2.7.3
+Plugin-Dependencies: structs:1.7
+Plugin-Developers: 
+Libraries: /home/benny/Dokumente/lighthouse-plugin/src/main/resources,
+ /home/benny/Dokumente/lighthouse-plugin/target/classes,/home/benny/.m
+ 2/repository/org/json/json/20180130/json-20180130.jar
+Resource-Path: /home/benny/Dokumente/lighthouse-plugin/src/main/webapp
+
