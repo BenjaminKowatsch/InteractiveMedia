@@ -13,7 +13,7 @@ scenarios:
   scenario1:
     retrieve-resources: false
     requests:
-      - http://localhost:80/
+      - http://cloudproject.mi.hdm-stuttgart.de/
 
 reporting:
 - module: passfail
@@ -24,9 +24,6 @@ provisioning: cloud
 
 modules:
   cloud:
-    token: '012c454bc4f50b97ef83e71d:442ebdde6092d67dbfd44fd5bcacb97024692cd764adee032e277f2158132a504f528c1b'  # API id and API secret divided by :
     timeout: 10s  # BlazeMeter API client timeout
     browser-open: none  # auto-open browser on test start/end/both/none
     check-interval: 5s  # interval which Taurus uses to query test status from BlazeMeter
-    public-report: false  # make test report public, disabled by default
-    send-report-email: false  # send report email once test is finished, disabled by default
