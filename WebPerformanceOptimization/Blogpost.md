@@ -54,7 +54,16 @@ Based on this insight I was able to create a local solution first. Subsequently,
 Initially, I thought that the generation of the lighthouse report would be integrated into the pipeline via a separate build stage at the [Jenkinsfile](https://github.com/BenjaminKowatsch/InteractiveMedia/blob/master/lighthouse/Dockerfile). By using this Dockerfile in combination with Docker Compose [health checks](https://docs.docker.com/compose/compose-file/compose-file-v2/#healthcheck), I was able to line up the build and run of my custom Docker lighthouse container into the execution order of the build and run of the actual distributed application. The resulting output contains only a few lines of code at the [Docker Compose file](https://github.com/BenjaminKowatsch/InteractiveMedia/blob/master/docker-compose.local.yml). Additionally, no separate build stage is required.  
 Next, to put the lighthouse report at disposal at Jenkins I used the Jenkins [HTML Publisher Plugin](https://wiki.jenkins.io/display/JENKINS/HTML+Publisher+Plugin) to publish the HTML version of the lighthouse report.
 Therefore I created a new stage at the Jenkinsfile.  
-To ensure the performance of the website under load another stage was appended. By the means of [Taurus](https://gettaurus.org/), the Automation-friendly framework for Continous Testing, load tests can be specified in a declarative manner by using a YAML-file. In conjunction with Taurus I harnessed the Testing platform [BlazeMeter](https://www.blazemeter.com/) for load test execution. In order to connect the Jenkins server to BlazeMeter the [Taurus command line tool *bzt*](https://gettaurus.org/docs/CommandLine/) has to be [installed](https://gettaurus.org/install/Installation/) on the Jenkins host machine. Afterwards
+To ensure the performance of the website under load, an additional stage was appended. By the means of [Taurus](https://gettaurus.org/), the Automation-friendly framework for Continous Testing, load tests can be specified in a declarative manner by using a YAML-file. Simply put, 
+Simply put, the file consists of the following three sections. 
+- execution
+- scenarios
+- reporting
+- provisioning
+- modules  
+
+A more comprehensive breakdown can be found [here](https://gettaurus.org/docs/YAMLTutorial/)
+In conjunction with Taurus I harnessed the Testing platform [BlazeMeter](https://www.blazemeter.com/) for load test execution. In order to connect the Jenkins server to BlazeMeter the [Taurus command line tool *bzt*](https://gettaurus.org/docs/CommandLine/) has to be [installed](https://gettaurus.org/install/Installation/) on the Jenkins host machine. More detailed Information about the installation is avaiable [here](https://dzone.com/articles/how-to-run-a-taurus-test-through-jenkins-pipelines). Afterwards it's ready for use in the Jenkinsfile. Invoking a report to be accessed at BlazeMeter the option 'report' has to be applied. To better distinguish the load tests, the Jenkins build number can also be integrated into the test name. During each build process, a link to the newly created load test report on BlazeMeter is now displayed in the console.
 
 - Load testing with [Taurus](https://gettaurus.org/) Automation-friendly framework for Continuous Testing
   - Testing platform 

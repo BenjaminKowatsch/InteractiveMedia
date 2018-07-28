@@ -20,3 +20,9 @@ reporting:
 - module: passfail
   criteria:
   - avg-rt>5000ms for 5s, stop as failed
+
+provisioning: cloud
+
+modules:
+  cloud:
+    test: https://a.blazemeter.com/app/#/accounts/234064/workspaces/228106/projects/291563/tests/6159497
