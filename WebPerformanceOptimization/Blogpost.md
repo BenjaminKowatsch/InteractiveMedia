@@ -88,15 +88,22 @@ step([$class: 'LighthousePlugin',
 ```
 For my initial concept I wanted to pass an array of input data, so multiple rules could be checked in sequence. However, due to little documentation I wasn't able integrate an extendable list into the [UI Jelly](https://wiki.jenkins.io/display/JENKINS/Basic+guide+to+Jelly+usage+in+Jenkins). Therefore, I simplified the concept to only validate one rule every plugin call. The possible values for the data fields are comprehensible and can be read as well as the whole plugin source code more precisely [here](https://github.com/BenjaminKowatsch/InteractiveMedia/tree/master/lighthouse-plugin). 
 
-Now that my first goal was achieved, I could focus on optimizing the admin frontend. Based on the lighthouse report a number of things were in need of improvement.
+Now that my first goal was achieved, I could focus on optimizing the admin frontend. Based on the [results of the initial lighthouse report](TODO://) a number of things were in need of improvement. Now I have listed a subset of the most important optimizations for me in the following. 
+  1. Image and video compression
+  2. Gzip compression
+  3. Uglify/Minify source files
+  4. [Unused CSS](https://www.jitbit.com/unusedcss/)
+  5. [Critical CSS path](https://www.sitelocity.com/critical-path-css-generator)
+  6. Cache Control
+  7. SSL certificates  
 
-- Admin frontend optimizations
-  - Gzip compression
-  - Uglify/Minify
-  - Cache Control
-  - [Critical CSS path](https://www.sitelocity.com/critical-path-css-generator)
-  - [Unused CSS](https://www.jitbit.com/unusedcss/)
-  - SSL certificates
+Due to the simple use case of the admin frontend image and video content is not available. Therefore techniques for image and video compression could not be applied.  
+On the other hand the gzip compression at the nginx could be activated. For this purpose, a [new file](https://github.com/BenjaminKowatsch/InteractiveMedia/blob/master/frontend/nginx/compression.conf) was simply created in the configuration of nginx, which sets the compression for the different MIME types.  
+Next, minifying or uglifying the source code files was done via [webpack](https://webpack.js.org/). Unfortunatley, an older version and a lot of plugins were used. Therefore, this task, which previously seemed so simple, became more difficult than expected. In order to minify HTML-files the minify property of the [HtmlWebpackPlugin](https://webpack.js.org/plugins/html-webpack-plugin/) had to be set. Minifying CSS-files was configured by the use of a [style-loader](https://webpack.js.org/loaders/style-loader/). JS-file uglification also required the use of an additional plugin called [UglifyjsWebpackPlugin](https://webpack.js.org/plugins/uglifyjs-webpack-plugin/).  
+Removing unused CSS can be very performance-enhancing, but also very dangerous, as initially invisible code can be removed, especially in single page applications.
+
+
+
 
 ## Lessons Learned
 <a name="lessonslearned"></a>
