@@ -1,6 +1,5 @@
-import groovy.json.JsonSlurperClassic
-def maxFMP = 5000
-pipeline {    tools {
+pipeline {    
+    tools {
         gradle "Gradle 4.3"
     }
     agent any
@@ -131,7 +130,7 @@ pipeline {    tools {
             steps {
                 // clean artefacts
                 sh 'mkdir -p ./lighthouse_reports'
-                sh 'rm ./lighthouse_reports/*'
+                sh 'rm ./lighthouse_reports/* -rf'
                 // Run container
                 sh 'docker-compose -f docker-compose.prod.yml stop'
                 sh 'docker-compose -f docker-compose.prod.yml rm -sf'
@@ -141,7 +140,7 @@ pipeline {    tools {
         }
         stage ('Generate lighthouse report') {
             steps {
-                sh './Jenkins/wait_for_file.sh ./lighthouse_reports/report.report.html 30'
+                sh './Jenkins/wait_for_file.sh ./lighthouse_reports/report.report.html 120'
                 publishHTML( [allowMissing: false,
                     alwaysLinkToLastBuild: false,
                     keepAll: false,
@@ -149,18 +148,29 @@ pipeline {    tools {
                     reportFiles: 'report.report.html',
                     reportName: 'Lighthouse report',
                     reportTitles: ''])
-                script {
-                    def json = readFile(file:'./lighthouse_reports/report.report.json')
-                    def data = new JsonSlurperClassic().parseText(json)
-                    def fMP = data.audits['first-meaningful-paint'].extendedInfo.value.timings.fMP
-                    if( maxFMP < fMP){
-                        echo "First meaningful paint time ${fMP} exceeded the maximum of ${maxFMP}"
-                        currentBuild.result = 'UNSTABLE'
-                    } else {
-                        echo "First meaningful paint time: ${fMP}"
-                        currentBuild.result = 'SUCCESS'
-                    }
-                }
+                   step([$class: 'LighthousePlugin',
+                   filepath: './lighthouse_reports/report.report.json',
+                   // Performance score
+                   path: 'reportCategories/Array/0/Object/score/Double',
+                   action: 'lt',
+                   value: '60',
+                   failStatus: 'UNSTABLE'])
+                
+                   step([$class: 'LighthousePlugin',
+                   filepath: './lighthouse_reports/report.report.json',
+                   // PWA score
+                   path: 'reportCategories/Array/1/Object/score/Double',
+                   action: 'lt',
+                   value: '30',
+                   failStatus: 'UNSTABLE'])
+                
+                   step([$class: 'LighthousePlugin',
+                   filepath: './lighthouse_reports/report.report.json',
+                   // first meaningful paint
+                   path: 'audits/object/first-meaningful-paint/Object/rawValue/Double',
+                   action: 'lt',
+                   value: '5000',
+                   failStatus: 'UNSTABLE'])
             }
         }
         stage('Taurus Performance Test') {
