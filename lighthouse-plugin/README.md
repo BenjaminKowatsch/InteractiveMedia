@@ -1,15 +1,24 @@
 ## Created using the hello-world-plugin archetype
+```bash
 mvn archetype:generate -Dfilter=io.jenkins.archetypes:hello-world-plugin
+```
 ## Requires JAVA_HOME environment variable to be set
+```bash
 export JAVA_HOME=/usr/lib/jvm/java-8-openjdk/
+```
 ## Build Plugin
+```bash
 mvn clean package -X
+```
 ## Start local jenkins with lighthouse-plugin
+```bash
 export MAVEN_OPTS="-Xdebug -Xrunjdwp:transport=dt_socket,server=y,address=8000,suspend=n"
 mvn hpi:run -Djetty.port=8090 -Dhpi.prefix=/jenkins
+```
 ## Go to your browser
-127.0.0.1:8090/jenkins
+http://127.0.0.1:8090/jenkins
 ## Pipeline Usage
+```groovy
 step([$class: 'LighthousePlugin',
    filepath: 'report.json',
    // Performance score
@@ -17,7 +26,7 @@ step([$class: 'LighthousePlugin',
    action: 'lt',
    value: '60',
    failStatus: 'UNSTABLE'])
-
+```
 ### Path syntax
  <JSONObjectKey> '/' <JSONObjectType> or 
  <JSONArrayKey> '/' <JSONObjectType>
@@ -34,7 +43,7 @@ step([$class: 'LighthousePlugin',
 - 'FAILURE' FAILURE
 
 ## Extended example
-
+```groovy
    step([$class: 'LighthousePlugin',
         filepath: './lighthouse_reports/report.report.json',
         // Performance score
@@ -58,3 +67,4 @@ step([$class: 'LighthousePlugin',
         action: 'lt',
         value: '5000',
         failStatus: 'UNSTABLE'])
+```

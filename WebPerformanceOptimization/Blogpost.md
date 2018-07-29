@@ -1,7 +1,7 @@
 # Web Performance Optimization for Continuous Deployment 
 The performance of websites today is a decisive factor in how many users visit them and thus how much money can be earned from them. The impact of this fact is further enhanced by the widespread use of mobile devices and the speed of the mobile Internet.  
 To counteract the development of heavyweight websites, web performance optimizations should be integrated into the development process as early as possible.  
-As part of this blog post I want to address this topic in the context of Continous Deployment using the following sections.
+As part of this blog post I want to address this topic in the context of Continuous Deployment using the following sections.
 
 - [Motivation](#motivation)
 - [Implementation](#implementation)
@@ -13,7 +13,7 @@ As part of this blog post I want to address this topic in the context of Contino
 To avoid starting a continuous deployment environment from scratch, I used a previous project as a basis. 
 The Debts² project is a distributed application used to jointly manage expenses in groups. The application consists of the following three components.
 - A backend server
-- A native Android App
+- A native Android app
 - A simple admin frontend  
 
 The [backend](http://cloudproject.mi.hdm-stuttgart.de:8081/v1/status) was hosted on a server of the HdM. Using this server, both the [admin frontend](http://cloudproject.mi.hdm-stuttgart.de/#/) and the [Jenkins](https://jenkins.io/) could be hosted as a continuous deployment environment. Within this environment the native Android app was also built. Additional resources related to debts² can be found [here](https://drive.google.com/open?id=1-nLpRGqmhLp7_h3A1u77xGPB9ETMatoa) for further information.  
@@ -23,7 +23,7 @@ To enable a before-and-after comparison, a snapshot of the admin frontend and th
 | :--: |
 | *Initial pipeline snapshot* |
 
-| ![Initial lighthouse report](images/old-snapshot.png) |
+| ![Initial lighthouse report](images/initial-lighthouse-report.png) |
 | :--: |
 | *Initial lighthouse report* |
 Based on this initial status survey, I have formulated the following goals.
@@ -49,36 +49,47 @@ Due to the minimal effort of option one, I decided to try the second one and dec
 First, I wanted to make use of a prexisting Docker image. After trying several images without success, I was able to run the image [lighthouse-ci](https://hub.docker.com/r/kmturley/lighthouse-ci/) on my local system. Next, it should run on the Jenkins server. Unfortunately, the image could not be executed on the  server due to missing UI. The container couldn't also be executed using its settings for the headless mode of google chrome.  
 As a further try, I installed lighthouse and chrome on the server directly without Docker to reduce complexity. However, this attempt failed because Lighthouse waited for Chrome on a specific port, although it had already started in headless mode. In hindsight, I have to say that at this point the information about starting chrome with remote debugging would have saved a lot of effort.  
 For the last attempt I organized a remote server with UI in order to have all prerequisites to make it work.
-Unfortunately, when starting google chrome I received a missleading error regarding no display connection being established. To overcome this difficulty, I took a closer look at the google chrome headless mode and how it interacts with lighthouse. I learned that chrome must be started in headless mode using remote debugging on a specific port in order to work with lighthouse.  
+Unfortunately, when starting google chrome I received a misleading error regarding no display connection being established. To overcome this difficulty, I took a closer look at the google chrome headless mode and how it interacts with lighthouse. I learned that chrome must be started in headless mode using remote debugging on a specific port in order to work with lighthouse.  
 Based on this insight I was able to create a local solution first. Subsequently, I managed to build an own Docker Image based on the [chrome-headless-trunk](https://hub.docker.com/r/alpeware/chrome-headless-trunk/) by installing [Node.js](https://nodejs.org/en/download/package-manager/#debian-and-ubuntu-based-linux-distributions) and the [lighthouse npm package](https://www.npmjs.com/package/lighthouse) manually. The resulting Dockerfile is accessible [here](https://github.com/BenjaminKowatsch/InteractiveMedia/blob/master/lighthouse/Dockerfile).  
 Initially, I thought that the generation of the lighthouse report would be integrated into the pipeline via a separate build stage at the [Jenkinsfile](https://github.com/BenjaminKowatsch/InteractiveMedia/blob/master/lighthouse/Dockerfile). By using this Dockerfile in combination with Docker Compose [health checks](https://docs.docker.com/compose/compose-file/compose-file-v2/#healthcheck), I was able to line up the build and run of my custom Docker lighthouse container into the execution order of the build and run of the actual distributed application. The resulting output contains only a few lines of code at the [Docker Compose file](https://github.com/BenjaminKowatsch/InteractiveMedia/blob/master/docker-compose.local.yml). Additionally, no separate build stage is required.  
 Next, to put the lighthouse report at disposal at Jenkins I used the Jenkins [HTML Publisher Plugin](https://wiki.jenkins.io/display/JENKINS/HTML+Publisher+Plugin) to publish the HTML version of the lighthouse report.
 Therefore I created a new stage at the Jenkinsfile.  
-To ensure the performance of the website under load, an additional stage was appended. By the means of [Taurus](https://gettaurus.org/), the Automation-friendly framework for Continous Testing, load tests can be specified in a declarative manner by using a YAML-file. Simply put, the file consists of the following five sections. 
-- scenarios
-- execution
-- reporting
-- provisioning
-- modules  
+To ensure the performance of the website under load, an additional stage was appended. By the means of [Taurus](https://gettaurus.org/), the Automation-friendly framework for Continuous Testing, load tests can be specified in a declarative manner by using a YAML-file. Simply put, the file consists of the following five sections. 
+- Scenarios
+- Execution
+- Reporting
+- Provisioning
+- Modules  
 
 The section scenarios depicts actual http requests to be executed.  
 The section execution describes load test metrics such as a concurrency, locations, scenario, ramp-up and hold-for time. The subsection scenario links one scenario to be realized.  
 In the section [reporting](https://gettaurus.org/docs/Reporting/) consists of modules aggregating the results of the executors and feeding them into a report. By making use of the module [passfail](https://gettaurus.org/docs/PassFail/) rules for certain metrics like the average response or latency time can be defined to either let the test succeed or fail.  
 To perform the load tests in the [cloud](https://gettaurus.org/docs/Cloud/), the provisioning section must be set correctly. By default Taurus uses local provisioning.
 BlazeMeter's free plan allows one location only for cloud testing. So, be sure to set only one location, when enabling cloud provisioning.  
-In the module section, you can provide the credentials and further settings to connect to BlazeMeter or other Cloud Testing platforms. In addition, data worth protecting can be defined at the module section of the .bzt-rc file of the current user. A more comprehensive breakdown regarging the YAML-file can be found [here](https://gettaurus.org/docs/YAMLTutorial/)  
+In the module section, you can provide the credentials and further settings to connect to BlazeMeter or other Cloud Testing platforms. In addition, data worth protecting can be defined at the module section of the .bzt-rc file of the current user. A more comprehensive breakdown regarding the YAML-file can be found [here](https://gettaurus.org/docs/YAMLTutorial/)  
 
-In conjunction with Taurus I harnessed the Testing platform [BlazeMeter](https://www.blazemeter.com/) for load test execution. In order to connect the Jenkins server to BlazeMeter the [Taurus command line tool *bzt*](https://gettaurus.org/docs/CommandLine/) has to be [installed](https://gettaurus.org/install/Installation/) on the Jenkins host machine. A well structured tutorial containing detailed Information about the installation is avaiable [here](https://dzone.com/articles/how-to-run-a-taurus-test-through-jenkins-pipelines). Next, the Taurus command line tool *bzt* has to connect to BlazeMeter. Therefore an API key and API secret has to be generated at BlazeMeter's account settings. To avoid exposing the credentials, it's recommended to write these into the .bzt-rc file at the home directory of the Jenkins user. to Afterwards it's ready for use in the Jenkinsfile. Invoking a report to be accessed at BlazeMeter the option 'report' has to be applied. To better distinguish the load tests, the Jenkins build number can also be integrated into the test name. During each build process, a link to the newly created load test report on BlazeMeter is now displayed in the console. In the following picture an overview of a sample report of a cloud test is depicted.
-
+In conjunction with Taurus I harnessed the Testing platform [BlazeMeter](https://www.blazemeter.com/) for load test execution. In order to connect the Jenkins server to BlazeMeter the [Taurus command line tool *bzt*](https://gettaurus.org/docs/CommandLine/) has to be [installed](https://gettaurus.org/install/Installation/) on the Jenkins host machine. A well structured tutorial containing detailed Information about the installation is available [here](https://dzone.com/articles/how-to-run-a-taurus-test-through-jenkins-pipelines). Next, the Taurus command line tool *bzt* has to connect to BlazeMeter. Therefore an API key and API secret has to be generated at BlazeMeter's account settings. To avoid exposing the credentials, it's recommended to write these into the .bzt-rc file at the home directory of the Jenkins user. to Afterwards it's ready for use in the Jenkinsfile. Invoking a report to be accessed at BlazeMeter the option 'report' has to be applied. To better distinguish the load tests, the Jenkins build number can also be integrated into the test name. During each build process, a link to the newly created load test report on BlazeMeter is now displayed in the console. In the following picture an overview of a sample report of a cloud test is depicted.
 | ![Overview Cloud Test on BlazeMeter](images/BlazeMeter_Cloud_Test.png) |
 | :--: |
 | *Overview Cloud Test on BlazeMeter* |
 
- 
-- Influence the pipeline status according to the results of the lighthouse report using the JSON version of the lighthouse report.
-  - Using a script section in Jenkinsfile
-  - Using a custom Jenkins Plugin
-    - Little documentation 
+For the purpose of influencing the pipeline status according to the results of the lighthouse report, I initially created a script section in the Jenkinsfile. Using the JSON version of the lighthouse report certain values could be extracted. Analog to the Taurus module passfail certain rules could be formulated by the means of these values. Depending on whether these rules apply or not, the pipeline status has been set. Although this solution worked well, the Jenkinsfile quickly became confusing because declarative code was mixed with functional code.  
+
+To counteract this problem, I decided to develop my own Jenkins plugin for it. The starting point for me was [this article](https://wiki.jenkins.io/display/JENKINS/Plugin+tutorial#Plugintutorial-CreatingaNewPlugin) in the Jenkins Wiki. Additionally, this [link](https://jenkins.io/doc/developer/plugin-development/pipeline-integration/) was especially helpful for the implementation of the pipeline support. Instead of using the empty-plugin archetype, I used the hello-world-plugin archetype to better understand the structure of it.
+The goal of the Jenkins Plugin is very straightforward. As an input it receives a JSON lighthouse report, a path to a nested property inside the JSON file, a limiting value, a type of comparison and a pipeline status. In this way, the nested value can be found in the JSON file and compared with the limiting value. When the expected comparison is met, the pipeline status is set to success, otherwise the predefined pipeline status is set. To ensure correct execution, I have defined some unit tests. The most challenging part was the realization of the recursive descent to the nested property using its path. A working example is depicted in the following code snippet.
+```groovy
+step([$class: 'LighthousePlugin',
+      filepath: 'report.json',
+      // Performance score
+      path: 'reportCategories/Array/0/Object/score/Double',
+      action: 'lt',
+      value: '60',
+      failStatus: 'UNSTABLE'])
+```
+For my initial concept I wanted to pass an array of input data, so multiple rules could be checked in sequence. However, due to little documentation I wasn't able integrate an extendable list into the [UI Jelly](https://wiki.jenkins.io/display/JENKINS/Basic+guide+to+Jelly+usage+in+Jenkins). Therefore, I simplified the concept to only validate one rule every plugin call. The possible values for the data fields are comprehensible and can be read as well as the whole plugin source code more precisely [here](https://github.com/BenjaminKowatsch/InteractiveMedia/tree/master/lighthouse-plugin). 
+
+Now that my first goal was achieved, I could focus on optimizing the admin frontend. Based on the lighthouse report a number of things were in need of improvement.
+
 - Admin frontend optimizations
   - Gzip compression
   - Uglify/Minify
