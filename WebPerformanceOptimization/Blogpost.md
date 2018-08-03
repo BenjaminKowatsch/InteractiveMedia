@@ -5,7 +5,7 @@ As part of this blog post I want to address this topic in the context of Continu
 
 - [Motivation](#motivation)
 - [Implementation](#implementation)
-- [Lessons Learned](#lessonslearned)
+- [Results](#results)
 - [Conclusion](#conclusion)
 
 ## Motivation
@@ -22,6 +22,7 @@ To enable a before-and-after comparison, a snapshot of the admin frontend and th
 | ![Initial pipeline snapshot](images/old-snapshot.png) |
 | :--: |
 | *Initial pipeline snapshot* |
+<a name="initialpipeline"></a>
 
 | ![Initial lighthouse report](images/initial-lighthouse-report.png) |
 | :--: |
@@ -30,6 +31,7 @@ Based on this initial status survey, I have formulated the following goals.
 - Extend the Jenkins pipeline to automatically measure the performance of the admin frontend and modify its pipeline status accordingly
 - Make use of the measurements to optimize the performance of the admin frontend
 
+In the context of this blog entry, the former is the main goal. 
 ## Implementation
 <a name="implementation"></a>
 All source code is available at [GitHub](https://github.com/BenjaminKowatsch/InteractiveMedia). Code concerning this blog post can be found in the following subdirectories of the mono repository.
@@ -38,6 +40,10 @@ All source code is available at [GitHub](https://github.com/BenjaminKowatsch/Int
 - [lighthouse](https://github.com/BenjaminKowatsch/InteractiveMedia/tree/master/lighthouse)
 - [lighthouse-plugin](https://github.com/BenjaminKowatsch/InteractiveMedia/tree/master/lighthouse-plugin)
 - [frontend](https://github.com/BenjaminKowatsch/InteractiveMedia/tree/master/frontend)
+
+The following course of action is based on  my previously depicted self-defined goals. The second serves to illustrate what the benefits of the first goal could look like, where many websites still have optimization potential, and what actions are necessary for this.
+
+### Goal 1: Extend the Jenkins pipeline
 
 In order to achieve the first goal, I decided to integrate a lighthouse report generation into the pipeline using [Docker](https://www.docker.com/) and [Docker Compose](https://docs.docker.com/compose/). 
 After some research I found multiple possible options to proceed. 
@@ -68,14 +74,14 @@ To perform the load tests in the [cloud](https://gettaurus.org/docs/Cloud/), the
 BlazeMeter's free plan allows one location only for cloud testing. So, be sure to set only one location, when enabling cloud provisioning.  
 In the module section, you can provide the credentials and further settings to connect to BlazeMeter or other Cloud Testing platforms. In addition, data worth protecting can be defined at the module section of the .bzt-rc file of the current user. A more comprehensive breakdown regarding the YAML-file can be found [here](https://gettaurus.org/docs/YAMLTutorial/)  
 
-In conjunction with Taurus I harnessed the Testing platform [BlazeMeter](https://www.blazemeter.com/) for load test execution. In order to connect the Jenkins server to BlazeMeter the [Taurus command line tool *bzt*](https://gettaurus.org/docs/CommandLine/) has to be [installed](https://gettaurus.org/install/Installation/) on the Jenkins host machine. A well structured tutorial containing detailed Information about the installation is available [here](https://dzone.com/articles/how-to-run-a-taurus-test-through-jenkins-pipelines). Next, the Taurus command line tool *bzt* has to connect to BlazeMeter. Therefore an API key and API secret has to be generated at BlazeMeter's account settings. To avoid exposing the credentials, it's recommended to write these into the .bzt-rc file at the home directory of the Jenkins user. to Afterwards it's ready for use in the Jenkinsfile. Invoking a report to be accessed at BlazeMeter the option 'report' has to be applied. To better distinguish the load tests, the Jenkins build number can also be integrated into the test name. During each build process, a link to the newly created load test report on BlazeMeter is now displayed in the console. In the following picture an overview of a sample report of a cloud test is depicted.
+In conjunction with Taurus I harnessed the Testing platform [BlazeMeter](https://www.blazemeter.com/) for load test execution. In order to connect the Jenkins server to BlazeMeter the [Taurus command line tool *bzt*](https://gettaurus.org/docs/CommandLine/) has to be [installed](https://gettaurus.org/install/Installation/) on the Jenkins host machine. Make sure to install the version [1.12.1](https://github.com/Blazemeter/taurus/blob/master/site/dat/docs/Changelog.md#112111-jul-2018) to avoid the AssertionError: monitoring bug for cloud tests. A well structured tutorial containing detailed Information about the installation is available [here](https://dzone.com/articles/how-to-run-a-taurus-test-through-jenkins-pipelines). Next, the Taurus command line tool *bzt* has to connect to BlazeMeter. Therefore an API key and API secret has to be generated at BlazeMeter's account settings. To avoid exposing the credentials, it's recommended to write these into the .bzt-rc file at the home directory of the Jenkins user. to Afterwards it's ready for use in the Jenkinsfile. Invoking a report to be accessed at BlazeMeter the option 'report' has to be applied. To better distinguish the load tests, the Jenkins build number can also be integrated into the test name. During each build process, a link to the newly created load test report on BlazeMeter is now displayed in the console. In the following picture an overview of a sample report of a cloud test is depicted.
 | ![Overview Cloud Test on BlazeMeter](images/BlazeMeter_Cloud_Test.png) |
 | :--: |
 | *Overview Cloud Test on BlazeMeter* |
 
 For the purpose of influencing the pipeline status according to the results of the lighthouse report, I initially created a script section in the Jenkinsfile. Using the JSON version of the lighthouse report certain values could be extracted. Analog to the Taurus module passfail certain rules could be formulated by the means of these values. Depending on whether these rules apply or not, the pipeline status has been set. Although this solution worked well, the Jenkinsfile quickly became confusing because declarative code was mixed with functional code.  
 
-To counteract this problem, I decided to develop my own Jenkins plugin for it. The starting point for me was [this article](https://wiki.jenkins.io/display/JENKINS/Plugin+tutorial#Plugintutorial-CreatingaNewPlugin) in the Jenkins Wiki. Additionally, this [link](https://jenkins.io/doc/developer/plugin-development/pipeline-integration/) was especially helpful for the implementation of the pipeline support. Instead of using the empty-plugin archetype, I used the hello-world-plugin archetype to better understand the structure of it.
+To counteract this problem, I decided to develop my own Jenkins plugin for it. The starting point for me was [this article](https://wiki.jenkins.io/display/JENKINS/Plugin+tutorial#Plugintutorial-CreatingaNewPlugin) in the Jenkins Wiki. Additionally, this [link](https://jenkins.io/doc/developer/plugin-development/pipeline-integration/) was especially helpful for the implementation of the pipeline support. Instead of using the empty-plugin archetype, I used the [hello-world-plugin archetype](https://mvnrepository.com/artifact/io.jenkins.archetypes/hello-world-plugin/1.4) to better understand the structure of it.
 The goal of the Jenkins Plugin is very straightforward. As an input it receives a JSON lighthouse report, a path to a nested property inside the JSON file, a limiting value, a type of comparison and a pipeline status. In this way, the nested value can be found in the JSON file and compared with the limiting value. When the expected comparison is met, the pipeline status is set to success, otherwise the predefined pipeline status is set. To ensure correct execution, I have defined some unit tests. The most challenging part was the realization of the recursive descent to the nested property using its path. A working example is depicted in the following code snippet.
 ```groovy
 step([$class: 'LighthousePlugin',
@@ -86,44 +92,85 @@ step([$class: 'LighthousePlugin',
       value: '60',
       failStatus: 'UNSTABLE'])
 ```
-For my initial concept I wanted to pass an array of input data, so multiple rules could be checked in sequence. However, due to little documentation I wasn't able integrate an extendable list into the [UI Jelly](https://wiki.jenkins.io/display/JENKINS/Basic+guide+to+Jelly+usage+in+Jenkins). Therefore, I simplified the concept to only validate one rule every plugin call. The possible values for the data fields are comprehensible and can be read as well as the whole plugin source code more precisely [here](https://github.com/BenjaminKowatsch/InteractiveMedia/tree/master/lighthouse-plugin). 
+For my initial concept I wanted to pass an array of input data, so multiple rules could be checked in sequence. However, due to little documentation I wasn't able integrate an extendable list into the [UI Jelly](https://wiki.jenkins.io/display/JENKINS/Basic+guide+to+Jelly+usage+in+Jenkins). Therefore, I simplified the concept to only validate one rule every plugin call. The plugin can also be integrated into Free Style projects. It is configured as a build step and may be executed. The following figure illustrates the previous configuration with the pipeline as a build step using UI.
+| ![Ligthouse plugin UI configuration](images/Jenkins_Plugin_UI.png) |
+| :--: |
+| *Ligthouse plugin UI configuration* |
+The possible values for the data fields are comprehensible and can be read as well as the whole plugin source code more precisely [here](https://github.com/BenjaminKowatsch/InteractiveMedia/tree/master/lighthouse-plugin). 
 
-Now that my first goal was achieved, I could focus on optimizing the admin frontend. Based on the [results of the initial lighthouse report](TODO://) a number of things were in need of improvement. Now I have listed a subset of the most important optimizations for me in the following. 
+### Goal 2: Optimize the performance
+
+Now that my first goal was achieved, I could focus on optimizing the admin frontend. Based on the [results of the initial lighthouse report](http://htmlpreview.github.io/?https://raw.githubusercontent.com/BenjaminKowatsch/InteractiveMedia/master/lighthouse_reports/old_lighthouse_reports/report.report.html) a number of things were in need of improvement. Now I have listed a subset of the most important optimizations for me in the following. 
   1. Image and video compression
   2. Gzip compression
   3. Uglify/Minify source files
-  4. [Unused CSS](https://www.jitbit.com/unusedcss/)
-  5. [Critical CSS path](https://www.sitelocity.com/critical-path-css-generator)
+  4. Unused CSS
+  5. Critical CSS path
   6. Cache Control
   7. SSL certificates  
 
 Due to the simple use case of the admin frontend image and video content is not available. Therefore techniques for image and video compression could not be applied.  
 On the other hand the gzip compression at the nginx could be activated. For this purpose, a [new file](https://github.com/BenjaminKowatsch/InteractiveMedia/blob/master/frontend/nginx/compression.conf) was simply created in the configuration of nginx, which sets the compression for the different MIME types.  
 Next, minifying or uglifying the source code files was done via [webpack](https://webpack.js.org/). Unfortunatley, an older version and a lot of plugins were used. Therefore, this task, which previously seemed so simple, became more difficult than expected. In order to minify HTML-files the minify property of the [HtmlWebpackPlugin](https://webpack.js.org/plugins/html-webpack-plugin/) had to be set. Minifying CSS-files was configured by the use of a [style-loader](https://webpack.js.org/loaders/style-loader/). JS-file uglification also required the use of an additional plugin called [UglifyjsWebpackPlugin](https://webpack.js.org/plugins/uglifyjs-webpack-plugin/).  
-Removing unused CSS can be very performance-enhancing, but also very dangerous, as initially invisible code can be removed, especially in single page applications.
+Removing unused CSS can be very performance-enhancing, but also very dangerous, as initially invisible code can be removed, especially in single page applications. To remove unnecessary CSS automatically, there are several free websites like [jitbit](https://www.jitbit.com/unusedcss/). 
+It requires only an URL as input and starts to analyse the given website. The result is a list of unused CSS selectors. However, after removing these selectors you should check manually if the styles of the subpages of your single page application are still functional. Of course, this is not a viable solution for larger scaled websites, as the risk of accidentally removing code that is needed later is too high. In such cases, it is best to eliminate unnecessary code during the development, e.g. through code reviews, or possibly fall back on more high-quality and possibly proprietary tools.  
+In order to obtain a rapid first meaningful paint a critical css path is crucial. Online tools like the ones from [sitelocity.com](https://www.sitelocity.com/critical-path-css-generator) or [jonassebastianohlsson.com](https://jonassebastianohlsson.com/criticalpathcssgenerator/) are also available for this purpose. I tried both and noticed that the generated internal stylesheets are the identical. In addition, sitelocity.com advises you to load the remaining CSS files asynchronously using JavaScript. This prevents a CSS file in the head tag to be loaded in a blocking manner.  
+Caching data can be very performance-enhancing, but can also limit the functionality of the website if used incorrectly. Caching should therefore be used carefully. Adding a cache control header is fairly easy with the [ngx_http_headers_module module](http://nginx.org/en/docs/http/ngx_http_headers_module.html). An expiration date can be assigned to each MIME type or a location by the means of a simple key-value mapping.  
+Finally, I intended to convert the individual system components to HTTPS in order to comply with today's minimum security requirements. I used self-signed certificates. Using an intermediate docker container, a new certificate could be generated in the multi-stage build and integrated in nginx, for example. In the backend, the inclusion of a certificate has become tougher due to the fact that the certificate had to be in a certain format as a result of the older Node.js version 6. Unfortunately, after a functioning state was reached, I had to realize that the lighthouse report could no longer be created. The reason for this is the self-signed certificate, whose error messages can usually be ignored via the flag ```--ignore-certifcate-errors```. Unfortunately, this flag has no effect in conjunction with the chrome headless mode, as stated [here](https://github.com/GoogleChrome/lighthouse/issues/559). This is the reason why the final version of the source code does not include SSL support. Alternatively, this problem could have been overcome with a correctly signed certificate. Due to time constraints, this solution could no longer be pursued.  
 
+## Results
+<a name="results"></a>
+Since the performance and condition of the pipeline were measured initially, it is now possible to measure again and compare the results.  
+First, we look at the lighthouse reports. The following figure depicts the final result of the lighthouse report, which is fully available [here](http://htmlpreview.github.io/?https://raw.githubusercontent.com/BenjaminKowatsch/InteractiveMedia/master/lighthouse_reports/report.report.html).
+| ![Optimized lighthouse report](images/new_lighthouse_report.png) |
+| :--: |
+| *Optimized lighthouse report* |
+Compared to the [initial report](http://htmlpreview.github.io/?https://raw.githubusercontent.com/BenjaminKowatsch/InteractiveMedia/master/lighthouse_reports/old_lighthouse_reports/report.report.html), the optimizations described in the previous section achieved performance improvements of 58 points, 10 points in PWA, and 3 points in Best Practices.  
+These reports were created on a local computer for better comparability, since if we take a look at the [lighthouse report generated by Jenkins](http://cloudproject.mi.hdm-stuttgart.de:8080/job/Master-BuildDeploy-JohnnyDebt/Lighthouse_report/), we notice that the performance rating is significantly inferior.  
+The explanation for this is the performance gap of the computers, especially since the Jenkins server is under greater load due to the execution of the backend, frontend and the database of the application. 
+To avoid this problem, the generation of the lighthouse report could be swapped out onto a dedicated server so that it produces consistent results.  
+Nevertheless, I find the increase in performance that I have achieved with the optimizations more than sufficient. Without integrating the performance measurements into the distributed application and thus also into the Continuous Deployment pipeline, I would not have obtained regular feedback to constantly improve it.  
+Second, a closer look at the Jenkins pipeline. The subsequent image illustrates the final status of the Jenkins pipeline.
+| ![Final Jenkins snapshot](images/new_snapshot.png) |
+| :--: |
+| *Final Jenkins snapshot* |
+In contrast to the [initial snapshot](#initialpipeline), the new build steps stand out instantly. These ensure that both the lighthouse report is generated and the load test is performed, but they also tremendously extend the execution time. The primary cause for this increase of execution time is the load test. Load tests are considered as integration tests and therefore should not be executed every build. To abbreviate the time of execution, the load test could be conducted less frequently depending on a conditional manually set.
+For each build that executes a load test, a new record is created in a [performance trend](http://cloudproject.mi.hdm-stuttgart.de:8080/job/Master-BuildDeploy-JohnnyDebt/performance/) via the BlazeMeter Jenkins plugin, allowing you to view the performance curve of the load tests during the development process. The following figure displays the performance trend of my Jenkins server as an instance.
+| ![Jenkins BlazeMeter Performance Trend](images/BlazeMeter_Jenkins_Plugin.png) |
+| :--: |
+| *Jenkins BlazeMeter Performance Trend* |
+On the other hand, the lighthouse report generation is lightweight and has a rapid execution time. By means of configuration, the scope of the audits can be limited, so that the generation proceeds even faster.  
+The lighthouse plugin I created is extremely compact and small. Since it is based for the most part on the hello-world-plugin archetype, it probably still contains a few unnecessary files. So it could be possible to refactor them. Additional optimization opportunities would be to support arrays of rules. This way, the JSON report file would have to be parsed only once. More detailed information on the Jenkins pipeline you will find [here](http://cloudproject.mi.hdm-stuttgart.de:8080/job/Master-BuildDeploy-JohnnyDebt/).
 
-
-
-## Lessons Learned
-<a name="lessonslearned"></a>
-  - WPO Concepts
-  - Improved skills (nginx, lighthouse)
 ## Conclusion
 <a name="conclusion"></a>
- - Results
- - 
+So far, we have focused on the incentives, realization and outcome of Web Performance Optimization for Continuous Deployment environments using a concrete scenario. I would like to conclude this post by identifying the challenges that will most likely be encountered if you are also aiming for similar goals and highlighting opportunities to address them.  
+
+The integration of the Lighthouse Report into a Docker container or on my host machine of the Jenkins server proved to be complicated due to missing GPU and UI. Especially as there was less information to obtain about the virtualization software of the virtual machine and thus possible conflicts for Lighthouse's requirements could be excluded. Therefore, my fundamental recommendation is to familiarize yourself with the target environment and the needs of Lighthouse or comparable software. If possible, keep the target environment as lean as possible so that if errors occur, they are easy to reproduce and fewer conflicts may arise with other software. Through this learning I have dealt more closely with the individual components of lighthouse and have gradually worked out an individual solution. Although this took longer, I got a more comprehensive understanding of how Lighthouse works compared to just using a Docker Container.
+
+During the development of the Jenkins plugin, the biggest challenge was to get an overview of the individual units and their interaction. Especially the special use case that the plugin is supposed to be compatible with the pipeline plugin made it harder to search for samples and documentation. Also the documentation for the Jelly UI components regarding the data binding was not intuitive, which is why I could not realize the support for arrays as rules by now.
+As a tip I can only refer to the links I mentioned before. There you will find a detailed description of the development of a Jenkins plugin with pipeline support.  
+
+Während der Optimierungen des Admin Frontends war die Arbeit mit webpack sehr fordernd. Gerade weil die 
+...
+
+Finally, I would like to emphasize that the measurement of web performance as part of a continuous deployment system itself only points to grievances. The value of such a solution depends heavily on the resulting business value, commitment and acceptance of the development team.
+
+- Herausforderungen:
+  - Pipeline/ Jenkins Plugin
+    Pipeline:
+
+    Jenkins Plugin:
+    - 
+  - Website Optimierungen
+
+  - Lessons Learned
+  - WPO Concepts
+  - Improved skills (nginx, lighthouse)
 
 [Presentation](https://docs.google.com/presentation/d/1zSLEMyPWvWehIqo3YlQUSIo7wDnUUFUUTjbfS97cn3g/edit?usp=sharing)
 
 TODO:
-
-- Implementation (5 1/2 Pages)
-  - Course of action
-    - Jenkins Docker
-  - Challenges
-  - Appendix 
-    - Jenkins Plugin
 - Lessons Learned (3 Pages)
   - WPO Concepts
   - Improved skills (nginx, lighthouse)
