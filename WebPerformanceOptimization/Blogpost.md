@@ -24,7 +24,7 @@ To enable a before-and-after comparison, a snapshot of the admin frontend and th
 <a name="initialpipeline"></a>
 | ![Initial pipeline snapshot](images/old-snapshot.png) |
 | :--: |
-| *Figure 1: Initial pipeline snapshot*  |  
+| *Figure 1: Initial pipeline snapshot* |  
 
 | ![Initial lighthouse report](images/initial-lighthouse-report.png) |
 | :--: |
@@ -83,7 +83,7 @@ In the module section, you can provide the credentials and further settings to c
 In conjunction with Taurus I harnessed the Testing platform [BlazeMeter](https://www.blazemeter.com/) for load test execution. In order to connect the Jenkins server to BlazeMeter the [Taurus command line tool *bzt*](https://gettaurus.org/docs/CommandLine/) has to be [installed](https://gettaurus.org/install/Installation/) on the Jenkins host machine. Make sure to install the version [1.12.1](https://github.com/Blazemeter/taurus/blob/master/site/dat/docs/Changelog.md#112111-jul-2018) to avoid the AssertionError: monitoring bug for cloud tests. A well structured tutorial containing detailed Information about the installation is available [here](https://dzone.com/articles/how-to-run-a-taurus-test-through-jenkins-pipelines). Next, the Taurus command line tool *bzt* has to connect to BlazeMeter. Therefore an API key and API secret has to be generated at BlazeMeter's account settings. To avoid exposing the credentials, it's recommended to write these into the .bzt-rc file at the home directory of the Jenkins user. to Afterwards it's ready for use in the Jenkinsfile. Invoking a report to be accessed at BlazeMeter the option 'report' has to be applied. To better distinguish the load tests, the Jenkins build number can also be integrated into the test name. During each build process, a link to the newly created load test report on BlazeMeter is now displayed in the console. In the following picture an overview of a sample report of a cloud test is depicted.
 | ![Overview Cloud Test on BlazeMeter](images/BlazeMeter_Cloud_Test.png) |
 | :--: |
-| *Figure 3: Overview Cloud Test on BlazeMeter* |
+| *Figure 3: Overview Cloud Test on BlazeMeter* |  
 
 For the purpose of influencing the pipeline status according to the results of the lighthouse report, I initially created a script section in the Jenkinsfile. Using the JSON version of the lighthouse report certain values could be extracted. Analog to the Taurus module passfail certain rules could be formulated by the means of these values. Depending on whether these rules apply or not, the pipeline status has been set. Although this solution worked well, the Jenkinsfile quickly became confusing because declarative code was mixed with functional code.
 
