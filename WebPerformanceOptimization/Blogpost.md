@@ -24,11 +24,11 @@ To enable a before-and-after comparison, a snapshot of the admin frontend and th
 <a name="initialpipeline"></a>
 | ![Initial pipeline snapshot](images/old-snapshot.png) |
 | :--: |
-| <center> *Figure 1: Initial pipeline snapshot*</center> |  
+| *Figure 1: Initial pipeline snapshot*  |  
 
 | ![Initial lighthouse report](images/initial-lighthouse-report.png) |
 | :--: |
-| <center> *Figure 2: Initial lighthouse report* </center> |  
+| *Figure 2: Initial lighthouse report* |  
 
 Based on this initial status survey, I have formulated the following goals.  
 
@@ -83,7 +83,7 @@ In the module section, you can provide the credentials and further settings to c
 In conjunction with Taurus I harnessed the Testing platform [BlazeMeter](https://www.blazemeter.com/) for load test execution. In order to connect the Jenkins server to BlazeMeter the [Taurus command line tool *bzt*](https://gettaurus.org/docs/CommandLine/) has to be [installed](https://gettaurus.org/install/Installation/) on the Jenkins host machine. Make sure to install the version [1.12.1](https://github.com/Blazemeter/taurus/blob/master/site/dat/docs/Changelog.md#112111-jul-2018) to avoid the AssertionError: monitoring bug for cloud tests. A well structured tutorial containing detailed Information about the installation is available [here](https://dzone.com/articles/how-to-run-a-taurus-test-through-jenkins-pipelines). Next, the Taurus command line tool *bzt* has to connect to BlazeMeter. Therefore an API key and API secret has to be generated at BlazeMeter's account settings. To avoid exposing the credentials, it's recommended to write these into the .bzt-rc file at the home directory of the Jenkins user. to Afterwards it's ready for use in the Jenkinsfile. Invoking a report to be accessed at BlazeMeter the option 'report' has to be applied. To better distinguish the load tests, the Jenkins build number can also be integrated into the test name. During each build process, a link to the newly created load test report on BlazeMeter is now displayed in the console. In the following picture an overview of a sample report of a cloud test is depicted.
 | ![Overview Cloud Test on BlazeMeter](images/BlazeMeter_Cloud_Test.png) |
 | :--: |
-| <center> *Figure 3: Overview Cloud Test on BlazeMeter* </center> |
+| *Figure 3: Overview Cloud Test on BlazeMeter* |
 
 For the purpose of influencing the pipeline status according to the results of the lighthouse report, I initially created a script section in the Jenkinsfile. Using the JSON version of the lighthouse report certain values could be extracted. Analog to the Taurus module passfail certain rules could be formulated by the means of these values. Depending on whether these rules apply or not, the pipeline status has been set. Although this solution worked well, the Jenkinsfile quickly became confusing because declarative code was mixed with functional code.
 
@@ -101,7 +101,7 @@ failStatus: 'UNSTABLE'])
 For my initial concept I wanted to pass an array of input data, so multiple rules could be checked in sequence. However, due to little documentation I wasn't able integrate an extendable list into the [UI Jelly](https://wiki.jenkins.io/display/JENKINS/Basic+guide+to+Jelly+usage+in+Jenkins). Therefore, I simplified the concept to only validate one rule every plugin call. The plugin can also be integrated into Free Style projects. It is configured as a build step and may be executed. The following figure illustrates the previous configuration with the pipeline as a build step using UI.
 | ![Ligthouse plugin UI configuration](images/Jenkins_Plugin_UI.png) |
 | :--: |
-| <center> *Figure 4: Ligthouse plugin UI configuration* </center> |  
+| *Figure 4: Ligthouse plugin UI configuration* |  
 
 The possible values for the data fields are comprehensible and can be read as well as the whole plugin source code more precisely [here](https://github.com/BenjaminKowatsch/InteractiveMedia/tree/master/lighthouse-plugin).
 
@@ -132,7 +132,7 @@ Since the performance and condition of the pipeline were measured initially, it 
 First, we look at the lighthouse reports. The following figure depicts the final result of the lighthouse report, which is fully available [here](http://htmlpreview.github.io/?https://raw.githubusercontent.com/BenjaminKowatsch/InteractiveMedia/master/lighthouse_reports/report.report.html).
 | ![Optimized lighthouse report](images/new_lighthouse_report.png) |
 | :--: |
-| <center> *Figure 5: Optimized lighthouse report* </center> |  
+| *Figure 5: Optimized lighthouse report* |  
 
 Compared to the [initial report](http://htmlpreview.github.io/?https://raw.githubusercontent.com/BenjaminKowatsch/InteractiveMedia/master/lighthouse_reports/old_lighthouse_reports/report.report.html), the optimizations described in the previous section achieved performance improvements of 58 points, 10 points in PWA, and 3 points in Best Practices.
 These reports were created on a local computer for better comparability, since if we take a look at the [lighthouse report generated by Jenkins](http://cloudproject.mi.hdm-stuttgart.de:8080/job/Master-BuildDeploy-JohnnyDebt/Lighthouse_report/), we notice that the performance rating is significantly inferior.
@@ -142,13 +142,13 @@ Nevertheless, I find the increase in performance that I have achieved with the o
 Second, a closer look at the Jenkins pipeline. The subsequent image illustrates the final status of the Jenkins pipeline.
 | ![Final Jenkins snapshot](images/new_snapshot.png) |
 | :--: |
-| <center> *Figure 6: Final Jenkins snapshot* </center> |  
+| *Figure 6: Final Jenkins snapshot* |  
 
 In contrast to the [initial snapshot](#initialpipeline), the new build steps stand out instantly. These ensure that both the lighthouse report is generated and the load test is performed, but they also tremendously extend the execution time. The primary cause for this increase of execution time is the load test. Load tests are considered as integration tests and therefore should not be executed every build. To abbreviate the time of execution, the load test could be conducted less frequently depending on a conditional manually set.
 For each build that executes a load test, a new record is created in a [performance trend](http://cloudproject.mi.hdm-stuttgart.de:8080/job/Master-BuildDeploy-JohnnyDebt/performance/) via the BlazeMeter Jenkins plugin, allowing you to view the performance curve of the load tests during the development process. The following figure displays the performance trend of my Jenkins server as an instance.
 | ![Jenkins BlazeMeter Performance Trend](images/BlazeMeter_Jenkins_Plugin.png) |
 | :--: |
-| <center> *Figure 7: Jenkins BlazeMeter Performance Trend* </center> |  
+| *Figure 7: Jenkins BlazeMeter Performance Trend* |  
 
 On the other hand, the lighthouse report generation is lightweight and has a rapid execution time. By means of configuration, the scope of the audits can be limited, so that the generation proceeds even faster.
 The lighthouse plugin I created is extremely compact and small. Since it is based for the most part on the hello-world-plugin archetype, it probably still contains a few unnecessary files. So it could be possible to refactor them. Additional optimization opportunities would be to support arrays of rules. This way, the JSON report file would have to be parsed only once. More detailed information on the Jenkins pipeline you will find [here](http://cloudproject.mi.hdm-stuttgart.de:8080/job/Master-BuildDeploy-JohnnyDebt/).
