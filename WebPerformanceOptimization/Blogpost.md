@@ -22,6 +22,7 @@ So, the Jenkins and the admin frontend created the starting point for the integr
 To enable a before-and-after comparison, a snapshot of the admin frontend and the Jenkins [pipeline](https://jenkins.io/doc/book/pipeline/) was taken first. In order to measure the performance of the admin frontend a [lighthouse](https://developers.google.com/web/tools/lighthouse/) report was generated. The following figures represent the initial state of the Jenkins pipeline and the performance of the admin frontend.
 
 <a name="initialpipeline"></a>
+
 | ![Initial pipeline snapshot](images/old-snapshot.png) |
 | :--: |
 | *Figure 1: Initial pipeline snapshot* |  
@@ -81,6 +82,7 @@ BlazeMeter's free plan allows one location only for cloud testing. So, be sure t
 In the module section, you can provide the credentials and further settings to connect to BlazeMeter or other Cloud Testing platforms. In addition, data worth protecting can be defined at the module section of the .bzt-rc file of the current user. A more comprehensive breakdown regarding the YAML-file can be found [here](https://gettaurus.org/docs/YAMLTutorial/)
 
 In conjunction with Taurus I harnessed the Testing platform [BlazeMeter](https://www.blazemeter.com/) for load test execution. In order to connect the Jenkins server to BlazeMeter the [Taurus command line tool *bzt*](https://gettaurus.org/docs/CommandLine/) has to be [installed](https://gettaurus.org/install/Installation/) on the Jenkins host machine. Make sure to install the version [1.12.1](https://github.com/Blazemeter/taurus/blob/master/site/dat/docs/Changelog.md#112111-jul-2018) to avoid the AssertionError: monitoring bug for cloud tests. A well structured tutorial containing detailed Information about the installation is available [here](https://dzone.com/articles/how-to-run-a-taurus-test-through-jenkins-pipelines). Next, the Taurus command line tool *bzt* has to connect to BlazeMeter. Therefore an API key and API secret has to be generated at BlazeMeter's account settings. To avoid exposing the credentials, it's recommended to write these into the .bzt-rc file at the home directory of the Jenkins user. to Afterwards it's ready for use in the Jenkinsfile. Invoking a report to be accessed at BlazeMeter the option 'report' has to be applied. To better distinguish the load tests, the Jenkins build number can also be integrated into the test name. During each build process, a link to the newly created load test report on BlazeMeter is now displayed in the console. In the following picture an overview of a sample report of a cloud test is depicted.
+
 | ![Overview Cloud Test on BlazeMeter](images/BlazeMeter_Cloud_Test.png) |
 | :--: |
 | *Figure 3: Overview Cloud Test on BlazeMeter* |  
@@ -99,6 +101,7 @@ value: '60',
 failStatus: 'UNSTABLE'])
 ```
 For my initial concept I wanted to pass an array of input data, so multiple rules could be checked in sequence. However, due to little documentation I wasn't able integrate an extendable list into the [UI Jelly](https://wiki.jenkins.io/display/JENKINS/Basic+guide+to+Jelly+usage+in+Jenkins). Therefore, I simplified the concept to only validate one rule every plugin call. The plugin can also be integrated into Free Style projects. It is configured as a build step and may be executed. The following figure illustrates the previous configuration with the pipeline as a build step using UI.
+
 | ![Ligthouse plugin UI configuration](images/Jenkins_Plugin_UI.png) |
 | :--: |
 | *Figure 4: Ligthouse plugin UI configuration* |  
@@ -130,6 +133,7 @@ Finally, I intended to convert the individual system components to HTTPS in orde
 <a name="results"></a>
 Since the performance and condition of the pipeline were measured initially, it is now possible to measure again and compare the results.
 First, we look at the lighthouse reports. The following figure depicts the final result of the lighthouse report, which is fully available [here](http://htmlpreview.github.io/?https://raw.githubusercontent.com/BenjaminKowatsch/InteractiveMedia/master/lighthouse_reports/report.report.html).
+
 | ![Optimized lighthouse report](images/new_lighthouse_report.png) |
 | :--: |
 | *Figure 5: Optimized lighthouse report* |  
@@ -140,12 +144,14 @@ The explanation for this is the performance gap of the computers, especially sin
 To avoid this problem, the generation of the lighthouse report could be swapped out onto a dedicated server so that it produces consistent results.
 Nevertheless, I find the increase in performance that I have achieved with the optimizations more than sufficient. Without integrating the performance measurements into the distributed application and thus also into the Continuous Deployment pipeline, I would not have obtained regular feedback to constantly improve it.
 Second, a closer look at the Jenkins pipeline. The subsequent image illustrates the final status of the Jenkins pipeline.
+
 | ![Final Jenkins snapshot](images/new_snapshot.png) |
 | :--: |
 | *Figure 6: Final Jenkins snapshot* |  
 
 In contrast to the [initial snapshot](#initialpipeline), the new build steps stand out instantly. These ensure that both the lighthouse report is generated and the load test is performed, but they also tremendously extend the execution time. The primary cause for this increase of execution time is the load test. Load tests are considered as integration tests and therefore should not be executed every build. To abbreviate the time of execution, the load test could be conducted less frequently depending on a conditional manually set.
 For each build that executes a load test, a new record is created in a [performance trend](http://cloudproject.mi.hdm-stuttgart.de:8080/job/Master-BuildDeploy-JohnnyDebt/performance/) via the BlazeMeter Jenkins plugin, allowing you to view the performance curve of the load tests during the development process. The following figure displays the performance trend of my Jenkins server as an instance.
+
 | ![Jenkins BlazeMeter Performance Trend](images/BlazeMeter_Jenkins_Plugin.png) |
 | :--: |
 | *Figure 7: Jenkins BlazeMeter Performance Trend* |  
